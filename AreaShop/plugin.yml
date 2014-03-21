@@ -1,0 +1,80 @@
+name: AreaShop
+main: nl.evolutioncoding.AreaShop.AreaShop
+version: 1.0
+depend: [Vault, WorldGuard]
+commands:
+  AreaShop:
+    description: For all commands use /as help 
+    usage: /AreaShop or /AS
+    permission: areashop.help
+    permission-message: You don't have <permission>
+    aliases: [as]
+permissions:
+  areashop.*:
+    description: Give access to all commands of RegionRent
+    children:
+      areashop.help: true
+      areashop.createrent: true
+      areashop.createbuy: true
+      areashop.destroyrent: true
+      areashop.destroybuy: true
+      areashop.rent: true
+      areashop.buy: true
+      areashop.unrent: true
+      areashop.info: true
+      areashop.updaterentsigns: true
+      areashop.updatebuysigns: true
+      areashop.updaterentregions: true
+      areashop.updatebuyregions: true
+      areashop.reload: true
+  areashop.help:
+    description: Allows you to see the help pages
+    default: true
+  areashop.rent:
+    description: Allows you to rent a region
+    default: true
+  areashop.buy:
+    description: Allows you to buy a region
+    default: true
+  areashop.unrent:
+    description: Allows you to unrent a specific region
+    default: op
+  areashop.unrentown:
+    description: Allows you to unrent your own region
+    default: true
+  areashop.sell:
+    description: Allows you to sell a specific region
+    default: op
+  areashop.sellown:
+    description: Allows you to sell your own region
+    default: true
+  areashop.createrent:
+    description: Allows you to set up signs for renting regions
+    default: op
+  areashop.createbuy:
+    description: Allows you to set up signs for buying regions
+    default: op
+  areashop.destroyrent:
+    description: Allows you to break signs used for renting regions
+    default: op
+  areashop.destroybuy:
+    description: Allows you to break signs used for renting regions
+    default: op
+  areashop.info:
+    description: Allows you check the status of regions and players
+    default: true
+  areashop.updaterentsigns:
+    description: Allows you to update all rent signs
+    default: op
+  areashop.updatebuysigns:
+    description: Allows you to update all buy signs
+    default: op
+  areashop.updaterentregions:
+    description: Allows you to update all rent regions
+    default: op
+  areashop.updatebuyregions:
+    description: Allows you to update all buy regions
+    default: op
+  areashop.reload:
+    description: Allows you to reload the config
+    default: op

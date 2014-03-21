@@ -1,0 +1,64 @@
+##############################################
+# config.yml of the AreaShop plugin          #
+# This plugin has been created by NLThijs48  #
+# Check the server minecraft.go-craft.com    #
+# and then the Prison server for a demo      #
+##############################################
+
+########## GENERAL ##########
+## Chatprefix used for all messages in the chat
+chatPrefix: '&2[AreaShop]&r '
+## The character used for the prices of regions, for the euro character use '%euro%'
+moneyCharacter: '$'
+## Enables / disables debug messages in the console, no need to change
+debug: false
+## The .yml language file that should be used, provided by this plugin: EN, NL
+language: EN
+## Maximum total amount of rents and buys together
+maximumTotal: 1
+
+########## RENTING ##########
+## The tag you have to write on the sign for renting a region
+rentSign: '[rent]'
+## The line that should be placed on the sign when the region is not rented
+signRentable: '&2&l[For Rent]'
+## The line that should be placed on the sign when the region is rented
+signRented: '&4&l[Rented]'
+## How much regions a player can rent at the same time, -1 for not limited
+maximumRents: 1
+## The percentage of the renting price you get back if you unrent the region (price of time left will be multiplied by this/100)
+rentMoneyBack: 100
+## How much seconds between checking if renting has expired (don't put this to low)
+checkDelay: 60
+## Flags for the 'For Rent' regions, flags and options to apply when the region is not rented
+## All region flags can be used + members, owners, priority and parent.
+flagsForRent:
+  members: -%player%
+  greeting: '%region% can be rented for %price% per %duration%'
+## Flags for the 'Rented' regions, flags and options to apply when the region is rented
+## All region flags can be used + members, owners, priority and parent.
+flagsRented:
+  members: +%player%
+  greeting: '%region% is rented by %player% until %until%'
+
+########## BUYING ##########
+## The tag you have to write on the sign for renting a region
+buySign: '[buy]'
+## The line that should be placed on the sign when the region is not sold
+signBuyable: '&2&l[For Sale]'
+## The line that should be placed on the sign when the region is sold
+signBuyed: '&4&l[Sold]'
+## How much regions a player can buy at the same time, -1 for not limited
+maximumBuys: 1
+## The percentage of the buying price you get back if you sell the region
+buyMoneyBack: 100
+## Flags for the 'For Sale' regions, flags and options to apply when the region is for sale
+## All region flags can be used + members, owners, priority and parent.
+flagsForSale:
+  members: -%player%
+  greeting: '%region% can be bought for %price%'
+## Flags for the 'Sold' regions, flags and options to apply when the region is rented
+## All region flags can be used + members, owners, priority and parent.
+flagsSold:
+  members: +%player%
+  greeting: '%region% is bought by %player%'

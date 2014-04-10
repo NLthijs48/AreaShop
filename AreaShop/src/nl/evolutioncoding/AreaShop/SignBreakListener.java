@@ -2,6 +2,8 @@ package nl.evolutioncoding.AreaShop;
 
 import java.util.HashMap;
 
+import nl.evolutioncoding.AreaShop.AreaShop.RegionEventType;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -46,7 +48,9 @@ public final class SignBreakListener implements Listener {
 					&& rent.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
 				/* Remove the rent if the player has permission */
 				if(event.getPlayer().hasPermission("areashop.destroyrent")) {
+					plugin.getShopManager().handleSchematicEvent(sign.getLine(1), true, RegionEventType.DELETED);
 					boolean result = plugin.getShopManager().removeRent(sign.getLine(1));
+					
 					if(result) {
 						event.getPlayer().sendMessage(plugin.fixColors(plugin.config().getString("chatPrefix")) + "Renting of the region succesfully removed");
 					}
@@ -60,6 +64,7 @@ public final class SignBreakListener implements Listener {
 					&& buy.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
 				/* Remove the buy if the player has permission */
 				if(event.getPlayer().hasPermission("areashop.destroybuy")) {
+					plugin.getShopManager().handleSchematicEvent(sign.getLine(1), false, RegionEventType.DELETED);
 					boolean result = plugin.getShopManager().removeBuy(sign.getLine(1));
 					if(result) {
 						event.getPlayer().sendMessage(plugin.fixColors(plugin.config().getString("chatPrefix")) + "Buying of the region succesfully removed");

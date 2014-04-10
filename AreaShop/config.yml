@@ -16,6 +16,10 @@ debug: false
 language: EN
 ## Maximum total amount of rents and buys together
 maximumTotal: 1
+## Enable Schematic saving and restoring in general
+enableSchematics: true
+## Maximum number of blocks to save to or restore from a .schemetic
+maximumBlocks: 1000000
 
 ########## RENTING ##########
 ## The tag you have to write on the sign for renting a region
@@ -41,6 +45,27 @@ flagsRented:
   members: +%player%
   greeting: '%region% is rented by %player% until %until%'
 
+## Enable or disable saving and restoring for rents that don't have their individual option set
+useRentRestore: false
+## For the following events you can specify if you want to restore or save the region to a schematic
+## After 'save:' or 'restore:' you enter the name of the file, %region% will be replaced by the region name (.schematic will be added automatically)
+## If your regions are all the same size you could use just 1 file as the restore file, just enter a name without %region%
+## Be carefull with these options, it could crash your server or destroy (parts of) your world if used wrong!
+rentSchematicProfiles:
+  default:
+    created:
+      save: 'rent-%region%'
+      restore: ''
+    deleted:
+      save: ''
+      restore: 'rent-%region%'
+    rented:
+      save: ''
+      restore: ''
+    unrented:
+      save: ''
+      restore: 'rent-%region%'
+
 ########## BUYING ##########
 ## The tag you have to write on the sign for renting a region
 buySign: '[buy]'
@@ -62,3 +87,25 @@ flagsForSale:
 flagsSold:
   members: +%player%
   greeting: '%region% is bought by %player%'
+
+## Enable or disable saving and restoring for buys that don't have their individual option set
+useBuyRestore: false
+## For the following events you can specify if you want to restore or save the region to a schematic
+## After 'save:' or 'restore:' you enter the name of the file, %region% will be replaced by the region name (.schematic will be added automatically)
+## If your regions are all the same size you could use just 1 file as the restore file, just enter a name without %region%
+## Be carefull with these options, it could crash your server or destroy (parts of) your world if used wrong!
+## ('bought' and 'sold' are from the players perspective)
+buySchematicProfiles:
+  default:
+    created:
+      save: 'buy-%region%'
+      restore: ''
+    deleted:
+      save: ''
+      restore: 'buy-%region%'
+    bought:
+      save: ''
+      restore: ''
+    sold:
+      save: ''
+      restore: 'buy-%region%'

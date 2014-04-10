@@ -1,7 +1,7 @@
 name: AreaShop
 main: nl.evolutioncoding.AreaShop.AreaShop
-version: 1.0
-depend: [Vault, WorldGuard]
+version: 1.1
+depend: [Vault, WorldGuard, WorldEdit]
 commands:
   AreaShop:
     description: For all commands use /as help 
@@ -22,11 +22,11 @@ permissions:
       areashop.buy: true
       areashop.unrent: true
       areashop.info: true
-      areashop.updaterentsigns: true
-      areashop.updatebuysigns: true
-      areashop.updaterentregions: true
-      areashop.updatebuyregions: true
+      areashop.updaterents: true
+      areashop.updatebuys: true
       areashop.reload: true
+      areashop.rentrestore: true
+      areashop.buyrestore: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -63,18 +63,18 @@ permissions:
   areashop.info:
     description: Allows you check the status of regions and players
     default: true
-  areashop.updaterentsigns:
-    description: Allows you to update all rent signs
+  areashop.updaterents:
+    description: Allows you to update all rent signs and regions
     default: op
-  areashop.updatebuysigns:
-    description: Allows you to update all buy signs
-    default: op
-  areashop.updaterentregions:
-    description: Allows you to update all rent regions
-    default: op
-  areashop.updatebuyregions:
-    description: Allows you to update all buy regions
+  areashop.updatebuys:
+    description: Allows you to update all buy signs and regions
     default: op
   areashop.reload:
     description: Allows you to reload the config
+    default: op
+  areashop.rentrestore:
+    description: Allows you to change the restore settings of a rent
+    default: op
+  areashop.buyrestore:
+    description: Allows you to change the restore settings of a buy
     default: op

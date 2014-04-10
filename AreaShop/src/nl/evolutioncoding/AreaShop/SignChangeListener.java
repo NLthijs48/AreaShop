@@ -2,6 +2,8 @@ package nl.evolutioncoding.AreaShop;
 
 import java.util.HashMap;
 
+import nl.evolutioncoding.AreaShop.AreaShop.RegionEventType;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
@@ -95,7 +97,7 @@ public final class SignChangeListener implements Listener {
 				event.setLine(1, regionManager.getRegion(secondLine).getId());
 				event.setLine(3, plugin.getCurrencyCharacter() + fourthLine);
 				
-				/* Add rent to the ShopManager */
+				/* Add rent to the FileManager */
 				HashMap<String,String> rent = new HashMap<String,String>();
 				rent.put(plugin.keyWorld, event.getBlock().getWorld().getName());
 				rent.put(plugin.keyX, String.valueOf(event.getBlock().getX()));
@@ -104,7 +106,11 @@ public final class SignChangeListener implements Listener {
 				rent.put(plugin.keyDuration, thirdLine);
 				rent.put(plugin.keyPrice, fourthLine);
 				rent.put(plugin.keyName, regionManager.getRegion(secondLine).getId());
+				rent.put(plugin.keyRestore, "general");
+				rent.put(plugin.keySchemProfile, "default");
+				
 				plugin.getShopManager().addRent(secondLine, rent);
+				plugin.getShopManager().handleSchematicEvent(secondLine, true, RegionEventType.CREATED);
 				
 				/* Set the flags for the region */
 				plugin.getShopManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForRent"), true);
@@ -152,7 +158,7 @@ public final class SignChangeListener implements Listener {
 				event.setLine(1, regionManager.getRegion(secondLine).getId());
 				event.setLine(2, plugin.getCurrencyCharacter() + thirdLine);
 				
-				/* Add buy to the ShopManager */
+				/* Add buy to the FileManager */
 				HashMap<String,String> buy = new HashMap<String,String>();
 				buy.put(plugin.keyWorld, event.getBlock().getWorld().getName());
 				buy.put(plugin.keyX, String.valueOf(event.getBlock().getX()));
@@ -160,7 +166,11 @@ public final class SignChangeListener implements Listener {
 				buy.put(plugin.keyZ, String.valueOf(event.getBlock().getZ()));
 				buy.put(plugin.keyPrice, thirdLine);
 				buy.put(plugin.keyName, regionManager.getRegion(secondLine).getId());
+				buy.put(plugin.keyRestore, "general");
+				buy.put(plugin.keySchemProfile, "default");
+				
 				plugin.getShopManager().addBuy(secondLine, buy);
+				plugin.getShopManager().handleSchematicEvent(secondLine, false, RegionEventType.CREATED);
 				
 				/* Set the flags for the region */
 				plugin.getShopManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForSale"), false);

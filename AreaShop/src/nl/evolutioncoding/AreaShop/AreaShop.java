@@ -14,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 /**
@@ -23,15 +24,18 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 public final class AreaShop extends JavaPlugin {
 	/* General variables */
 	private WorldGuardPlugin worldGuard = null;
+	private WorldEditPlugin worldEdit = null;
 	private Economy economy = null;
-	private ShopManager shopManager = null;
+	private FileManager fileManager = null;
 	private LanguageManager languageManager = null;
 	private boolean configOk = false;
 	private boolean debug = false;
 	private String chatprefix = null;
 	
-	/* Folder where the language files will be stored */
+	/* Folders where the files will be stored */
 	public final String languageFolder = "lang";
+	public final String schematicFolder = "schem";
+	public final String schematicExtension = ".schematic";	
 	
 	/* Euro tag for in the config */
 	public final String currencyEuro = "%euro%";
@@ -46,6 +50,8 @@ public final class AreaShop extends JavaPlugin {
 	public final String keyPlayer = "player";
 	public final String keyRentedUntil = "rented";
 	public final String keyName = "name";
+	public final String keyRestore = "restore";
+	public final String keySchemProfile = "profile";
 	
 	/* Keys for replacing parts of flags */
 	public final String tagPlayerName = "%player%";
@@ -53,6 +59,22 @@ public final class AreaShop extends JavaPlugin {
 	public final String tagPrice = "%price%";
 	public final String tagDuration = "%duration%";
 	public final String tagRentedUntil = "%until%";
+	
+	/* Enum for type of event */
+	public enum RegionEventType {		
+		CREATED("Created"),
+		DELETED("Deleted"),
+		BOUGHT("Bought"),
+		SOLD("Sold");
+		
+		private final String value;
+		private RegionEventType(String value) {
+			this.value = value;
+		}
+		public String getValue() {
+			return value;
+		}
+	} 
 	
 	
 	
@@ -76,6 +98,15 @@ public final class AreaShop extends JavaPlugin {
 	    } else {
 		    worldGuard = (WorldGuardPlugin)plugin;
 	    }
+	    
+		/* Check if WorldEdit is present */
+		plugin = getServer().getPluginManager().getPlugin("WorldEdit");
+	    if (plugin == null || !(plugin instanceof WorldEditPlugin)) {
+	    	this.getLogger().info("Error: WorldEdit plugin is not present or has not loaded correctly");
+	    	error = true;
+	    } else {
+		    worldEdit = (WorldEditPlugin)plugin;
+	    }
 
 	    /* Check if Vault is present */
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
@@ -93,10 +124,10 @@ public final class AreaShop extends JavaPlugin {
 	    chatprefix = this.config().getString("chatPrefix");
 
 		/* Load all data from files */
-	    shopManager = new ShopManager(this);
-	    error = error & !shopManager.loadRents();
-	    shopManager.checkRents();
-	    error = error & !shopManager.loadBuys();
+	    fileManager = new FileManager(this);
+	    error = error & !fileManager.loadRents();
+	    fileManager.checkRents();
+	    error = error & !fileManager.loadBuys();
 	    
 		if(error) {
 			this.getLogger().info("The plugin has not started, fix the errors listed above");
@@ -111,7 +142,7 @@ public final class AreaShop extends JavaPlugin {
 	        new RentCheck(this).runTaskTimer(this, checkDelay, checkDelay);
 		    
 		    /* Bind commands for this plugin */
-			getCommand("AreaShop").setExecutor(new ShopCommands(this));			
+			getCommand("AreaShop").setExecutor(new CommandManager(this));			
 		}
 	}
 	
@@ -123,7 +154,7 @@ public final class AreaShop extends JavaPlugin {
 		/* set variables to null to prevent memory leaks */
 		worldGuard = null;
 		economy = null;
-		shopManager = null;
+		fileManager = null;
 		languageManager = null;
 		configOk = false;
 		debug = false;
@@ -135,6 +166,14 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public WorldGuardPlugin getWorldGuard() {
 	    return worldGuard;
+	}
+	
+	/**
+	 * Function to get the WorldEdit plugin
+	 * @return WorldEditPlugin
+	 */
+	public WorldEditPlugin getWorldEdit() {
+	    return worldEdit;
 	}
 	
 	/**
@@ -154,11 +193,11 @@ public final class AreaShop extends JavaPlugin {
 	}		
 	
 	/**
-	 * Method to get the ShopManager
-	 * @return The shopManager
+	 * Method to get the FileManager
+	 * @return The fileManager
 	 */
-	public ShopManager getShopManager() {
-		return shopManager;
+	public FileManager getShopManager() {
+		return fileManager;
 	}
 	
 	/**
@@ -267,17 +306,17 @@ public final class AreaShop extends JavaPlugin {
 		} else if(target.hasPermission("areashop.sellown")) {
 			messages.add(languageManager.getLang("help-sellOwn"));
 		}
-		if(target.hasPermission("areashop.updaterentsigns")) {
-			messages.add(languageManager.getLang("help-updaterentsigns"));
+		if(target.hasPermission("areashop.updaterents")) {
+			messages.add(languageManager.getLang("help-updaterents"));
 		}
-		if(target.hasPermission("areashop.updatebuysigns")) {
-			messages.add(languageManager.getLang("help-updatebuysigns"));
+		if(target.hasPermission("areashop.updatebuys")) {
+			messages.add(languageManager.getLang("help-updatebuys"));
 		}
-		if(target.hasPermission("areashop.updaterentregions")) {
-			messages.add(languageManager.getLang("help-updaterentregions"));
+		if(target.hasPermission("areashop.setrentrestore")) {
+			messages.add(languageManager.getLang("help-rentrestore"));
 		}
-		if(target.hasPermission("areashop.updatebuyregions")) {
-			messages.add(languageManager.getLang("help-updatebuyregions"));
+		if(target.hasPermission("areashop.setbuyrestore")) {
+			messages.add(languageManager.getLang("help-buyrestore"));
 		}
 		if(target.hasPermission("areashop.reload")) {
 			messages.add(languageManager.getLang("help-reload"));
@@ -438,7 +477,7 @@ public final class AreaShop extends JavaPlugin {
 		configOk = this.checkConfig();
 		chatprefix = this.config().getString("chatPrefix");
 		languageManager = new LanguageManager(this);
-		shopManager.checkRents();
+		fileManager.checkRents();
 	}
 	
 }

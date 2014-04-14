@@ -1,9 +1,11 @@
 package nl.evolutioncoding.AreaShop;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
+import nl.evolutioncoding.AreaShop.Metrics.Graph;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -77,7 +79,6 @@ public final class AreaShop extends JavaPlugin {
 	} 
 	
 	
-	
 	/**
 	 * Called on start or reload of the server
 	 */
@@ -142,7 +143,12 @@ public final class AreaShop extends JavaPlugin {
 	        new RentCheck(this).runTaskTimer(this, checkDelay, checkDelay);
 		    
 		    /* Bind commands for this plugin */
-			getCommand("AreaShop").setExecutor(new CommandManager(this));			
+			getCommand("AreaShop").setExecutor(new CommandManager(this));	
+			
+			if(this.config().getBoolean("sendStats")) {
+				this.startMetrics();
+			}
+			
 		}
 	}
 	
@@ -196,7 +202,7 @@ public final class AreaShop extends JavaPlugin {
 	 * Method to get the FileManager
 	 * @return The fileManager
 	 */
-	public FileManager getShopManager() {
+	public FileManager getFileManager() {
 		return fileManager;
 	}
 	
@@ -245,13 +251,19 @@ public final class AreaShop extends JavaPlugin {
 	}
 	
 	/**
-	 * Get the currency character, fixes problems with euro character acting weird
-	 * @return Currency character
+	 * Format the currency amount with the characters before and after
+	 * @return Currency character format string
+	 * @param amount Amount of money to format
 	 */
-	public String getCurrencyCharacter() {
-		String result = this.config().getString("moneyCharacter");
-		result = result.replace(currencyEuro, "\u20ac");
-		return result;
+	public String formatCurrency(String amount) {
+		String before = this.config().getString("moneyCharacter");
+		before = before.replace(currencyEuro, "\u20ac");
+		String after = this.config().getString("moneyCharacterAfter");
+		after = after.replace(currencyEuro, "\u20ac");
+		return before + amount + after;
+	}
+	public String formatCurrency(double amount) {
+		return this.formatCurrency("" + amount);
 	}
 	
 	
@@ -312,11 +324,20 @@ public final class AreaShop extends JavaPlugin {
 		if(target.hasPermission("areashop.updatebuys")) {
 			messages.add(languageManager.getLang("help-updatebuys"));
 		}
-		if(target.hasPermission("areashop.setrentrestore")) {
+		if(target.hasPermission("areashop.rentrestore")) {
 			messages.add(languageManager.getLang("help-rentrestore"));
 		}
-		if(target.hasPermission("areashop.setbuyrestore")) {
+		if(target.hasPermission("areashop.buyrestore")) {
 			messages.add(languageManager.getLang("help-buyrestore"));
+		}
+		if(target.hasPermission("areashop.rentprice")) {
+			messages.add(languageManager.getLang("help-rentprice"));
+		}
+		if(target.hasPermission("areashop.buyprice")) {
+			messages.add(languageManager.getLang("help-buyprice"));
+		}
+		if(target.hasPermission("areashop.rentduration")) {
+			messages.add(languageManager.getLang("help-rentduration"));
 		}
 		if(target.hasPermission("areashop.reload")) {
 			messages.add(languageManager.getLang("help-reload"));
@@ -325,6 +346,68 @@ public final class AreaShop extends JavaPlugin {
 		/* Send them all */
 		for(int i=0; i<messages.size(); i++) {
 			target.sendMessage(this.fixColors(messages.get(i)));
+		}
+	}
+	
+	private void startMetrics() {
+		try {
+		    Metrics metrics = new Metrics(this);
+		    // Number of rents rented/not rented
+		    Graph rentGraph = metrics.createGraph("Rent regions");
+		    rentGraph.addPlotter(new Metrics.Plotter("For rent") {
+	            @Override
+	            public int getValue() {
+	    		    int result = 0;
+	    		    for(String rent : fileManager.getRents().keySet()) {
+	    		    	if(fileManager.getRent(rent).get(keyPlayer) == null) {
+	    		    		result++;
+	    		    	}
+	    		    }
+                    return result;
+	            }
+		    });
+		    rentGraph.addPlotter(new Metrics.Plotter("Rented") {
+	            @Override
+	            public int getValue() {
+	    		    int result = 0;
+	    		    for(String rent : fileManager.getRents().keySet()) {
+	    		    	if(fileManager.getRent(rent).get(keyPlayer) != null) {
+	    		    		result++;
+	    		    	}
+	    		    }
+                    return result;
+	            }
+		    });
+		    // Number of buys bought/not bought
+		    Graph buyGraph = metrics.createGraph("Buy regions");
+		    buyGraph.addPlotter(new Metrics.Plotter("For sale") {
+	            @Override
+	            public int getValue() {
+	    		    int result = 0;
+	    		    for(String buy : fileManager.getBuys().keySet()) {
+	    		    	if(fileManager.getBuy(buy).get(keyPlayer) == null) {
+	    		    		result++;
+	    		    	}
+	    		    }
+                    return result;
+	            }
+		    });
+		    buyGraph.addPlotter(new Metrics.Plotter("Sold") {
+	            @Override
+	            public int getValue() {
+	    		    int result = 0;
+	    		    for(String buy : fileManager.getBuys().keySet()) {
+	    		    	if(fileManager.getBuy(buy).get(keyPlayer) != null) {
+	    		    		result++;
+	    		    	}
+	    		    }
+                    return result;
+	            }
+		    });
+		    
+		    metrics.start();
+		} catch (IOException e) {
+		    this.debug("Could not start Metrics");
 		}
 	}
 	
@@ -341,11 +424,6 @@ public final class AreaShop extends JavaPlugin {
 		String chatPrefix = this.getConfig().getString("chatPrefix");
 		if (chatPrefix.length() == 0) {
 			this.getLogger().info("Config-Error: chatPrefix has length zero");
-			error++;
-		}
-		String moneyCharacter = this.getCurrencyCharacter();
-		if (moneyCharacter.length() > 14) {
-			this.getLogger().info("Config-Error: moneyCharacter is longer than 14 characters");
 			error++;
 		}
 		String maximumTotal = this.getConfig().getString("maximumTotal");
@@ -456,6 +534,34 @@ public final class AreaShop extends JavaPlugin {
 		
 		/* return true if no errors, false if there are errors */
 		return (error == 0);
+	}
+	
+	/**
+	 * Checks if the string is a correct time period
+	 * @param time String that has to be checked
+	 * @return true if format is correct, false if not
+	 */
+	public boolean checkTimeFormat(String time) {
+		/* Check if the string is not empty and check the length */
+		if(time == null || time.length() <= 1 || time.indexOf(' ') == -1 || time.indexOf(' ') >= (time.length()-1)) {
+			return false;
+		}
+		
+		/* Check if the suffix is one of these values */
+		String suffix = time.substring(time.indexOf(' ')+1, time.length());
+		ArrayList<String> identifiers = new ArrayList<String>();
+		identifiers.addAll(this.config().getStringList("minutes"));
+		identifiers.addAll(this.config().getStringList("hours"));
+		identifiers.addAll(this.config().getStringList("days"));
+		identifiers.addAll(this.config().getStringList("months"));
+		identifiers.addAll(this.config().getStringList("years"));
+		if(!identifiers.contains(suffix)) {
+			return false;
+		}
+		
+		/* check if the part before the space is a number */
+		String prefix = time.substring(0, (time.indexOf(' ')));
+		return prefix.matches("\\d+");
 	}
 	
 	/**

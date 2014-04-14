@@ -23,7 +23,7 @@ public class CommandManager implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
 		if(command.getName().equalsIgnoreCase("AreaShop")) {
-			FileManager fileManager = plugin.getShopManager();
+			FileManager fileManager = plugin.getFileManager();
 			
 			/* Commands with 1 argument or more */
 			if(args.length > 0 && args[0] != null) {
@@ -229,7 +229,7 @@ public class CommandManager implements CommandExecutor {
 								} else {
 									plugin.message(sender, "info-regionRenting", rent.get(plugin.keyName));
 									plugin.message(sender, "info-regionSign", rent.get(plugin.keyWorld), rent.get(plugin.keyX), rent.get(plugin.keyY), rent.get(plugin.keyZ));
-									plugin.message(sender, "info-regionPriceDuration", plugin.getCurrencyCharacter() + rent.get(plugin.keyPrice), rent.get(plugin.keyDuration));
+									plugin.message(sender, "info-regionPriceDuration", plugin.formatCurrency(rent.get(plugin.keyPrice)), rent.get(plugin.keyDuration));
 									if(rent.get(plugin.keyPlayer) == null) {
 										plugin.message(sender, "info-regionNotRented");
 									} else {
@@ -248,7 +248,7 @@ public class CommandManager implements CommandExecutor {
 								} else {
 									plugin.message(sender, "info-regionBuying", buy.get(plugin.keyName));
 									plugin.message(sender, "info-regionSign", buy.get(plugin.keyWorld), buy.get(plugin.keyX), buy.get(plugin.keyY), buy.get(plugin.keyZ));
-									plugin.message(sender, "info-regionPrice", plugin.getCurrencyCharacter() + buy.get(plugin.keyPrice));
+									plugin.message(sender, "info-regionPrice", plugin.formatCurrency(buy.get(plugin.keyPrice)));
 									if(buy.get(plugin.keyPlayer) == null) {
 										plugin.message(sender, "info-regionNotBought");
 									} else {
@@ -282,12 +282,12 @@ public class CommandManager implements CommandExecutor {
 							} else {
 								if(sender.hasPermission("areashop.unrent")) {
 									plugin.message(sender, "unrent-other", rent.get(plugin.keyPlayer));
-									fileManager.unRent(args[1]);
+									fileManager.unRent(args[1], true);
 								} else {
 									if(sender.hasPermission("areashop.unrentown")) {
 										if(rent.get(plugin.keyPlayer).equals(sender.getName())) {
 											plugin.message(sender, "unrent-unrented");
-											fileManager.unRent(args[1]);
+											fileManager.unRent(args[1], true);
 										} else {
 											plugin.message(sender, "unrent-noPermissionOther");
 										}
@@ -314,12 +314,12 @@ public class CommandManager implements CommandExecutor {
 							} else {
 								if(sender.hasPermission("areashop.sell")) {
 									plugin.message(sender, "sell-sold", buy.get(plugin.keyPlayer));
-									fileManager.unBuy(args[1]);
+									fileManager.unBuy(args[1], true);
 								} else {
 									if(sender.hasPermission("areashop.sellown")) {
 										if(buy.get(plugin.keyPlayer).equals(sender.getName())) {
 											plugin.message(sender, "sell-soldYours");
-											fileManager.unBuy(args[1]);
+											fileManager.unBuy(args[1], true);
 										} else {
 											plugin.message(sender, "sell-noPermissionOther");
 										}
@@ -338,8 +338,8 @@ public class CommandManager implements CommandExecutor {
 				else if(args[0].equalsIgnoreCase("updaterents")) {
 					
 					if(sender.hasPermission("areashop.updaterents")) {
-						boolean result = plugin.getShopManager().updateRentSigns();
-						plugin.getShopManager().updateRentRegions();
+						boolean result = plugin.getFileManager().updateRentSigns();
+						plugin.getFileManager().updateRentRegions();
 						if(result) {
 							plugin.message(sender, "rents-updated");
 						} else {
@@ -355,7 +355,7 @@ public class CommandManager implements CommandExecutor {
 				else if(args[0].equalsIgnoreCase("updatebuys")) {
 					
 					if(sender.hasPermission("areashop.updatebuys")) {
-						boolean result = plugin.getShopManager().updateBuySigns();
+						boolean result = plugin.getFileManager().updateBuySigns();
 						if(result) {
 							plugin.message(sender, "buys-updated");
 						} else {
@@ -442,6 +442,107 @@ public class CommandManager implements CommandExecutor {
 					} else {
 						plugin.message(sender, "buyrestore-noPermission");
 					}
+				}
+				
+				/* rentprice command*/
+				else if(args[0].equalsIgnoreCase("rentprice")) {
+					if(!sender.hasPermission("areashop.rentprice")) {
+						plugin.message(sender, "rentprice-noPermission");
+						return true;
+					}
+					
+					if(args.length < 3 || args[1] == null || args[2] == null) {
+						plugin.message(sender, "rentprice-help");
+						return true;
+					}
+					
+					HashMap<String,String> rent = fileManager.getRent(args[1]);
+					if(rent == null) {
+						plugin.message(sender, "rentprice-notRegistered", args[1]);
+						return true;
+					} 
+					
+					try {
+						Double.parseDouble(args[2]);
+					} catch(NumberFormatException e) {
+						plugin.message(sender, "rentprice-wrongPrice", args[2]);
+						return true;
+					}
+					
+					rent.put(plugin.keyPrice, args[2]);
+					plugin.getFileManager().saveRents();
+					plugin.getFileManager().updateRentSign(args[1]);
+					plugin.getFileManager().updateRentRegion(args[1]);
+					plugin.message(sender, "rentprice-success", rent.get(plugin.keyName), args[2], rent.get(plugin.keyDuration));
+				}
+				
+				/* buyprice command*/
+				else if(args[0].equalsIgnoreCase("buyprice")) {
+					if(!sender.hasPermission("areashop.buyprice")) {
+						plugin.message(sender, "buyprice-noPermission");
+						return true;
+					}
+					
+					if(args.length < 3 || args[1] == null || args[2] == null) {
+						plugin.message(sender, "buyprice-help");
+						return true;
+					}
+					
+					HashMap<String,String> buy = fileManager.getBuy(args[1]);
+					if(buy == null) {
+						plugin.message(sender, "buyprice-notRegistered", args[1]);
+						return true;
+					} 
+
+					try {
+						Double.parseDouble(args[2]);
+					} catch(NumberFormatException e) {
+						plugin.message(sender, "buyprice-wrongPrice", args[2]);
+						return true;
+					}
+					
+					buy.put(plugin.keyPrice, args[2]);
+					plugin.getFileManager().saveBuys();
+					plugin.getFileManager().updateBuySign(args[1]);
+					plugin.getFileManager().updateBuyRegion(args[1]);
+					plugin.message(sender, "buyprice-success", buy.get(plugin.keyName), args[2]);
+				}
+				
+				/* rentduration command*/
+				else if(args[0].equalsIgnoreCase("rentduration")) {
+					if(!sender.hasPermission("areashop.rentduration")) {
+						plugin.message(sender, "rentduration-noPermission");
+						return true;
+					}
+					
+					if(args.length < 4 || args[1] == null || args[2] == null || args[3] == null) {
+						plugin.message(sender, "rentduration-help");
+						return true;
+					}
+					
+					HashMap<String,String> rent = fileManager.getRent(args[1]);
+					if(rent == null) {
+						plugin.message(sender, "rentduration-notRegistered", args[1]);
+						return true;
+					} 
+
+					try {
+						Integer.parseInt(args[2]);
+					} catch(NumberFormatException e) {
+						plugin.message(sender, "rentduration-wrongAmount", args[2]);
+						return true;
+					}
+					
+					if(!plugin.checkTimeFormat(args[2] + " " + args[3])) {
+						plugin.message(sender, "rentduration-wrongFormat", args[2]+" "+args[3]);
+						return true;
+					}					
+					
+					rent.put(plugin.keyDuration, args[2]+" "+args[3]);
+					plugin.getFileManager().saveRents();
+					plugin.getFileManager().updateRentSign(args[1]);
+					plugin.getFileManager().updateRentRegion(args[1]);
+					plugin.message(sender, "rentduration-success", rent.get(plugin.keyName), args[2]+" "+args[3]);
 				}
 				
 				/* reload command */

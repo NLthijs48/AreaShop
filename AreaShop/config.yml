@@ -8,8 +8,10 @@
 ########## GENERAL ##########
 ## Chatprefix used for all messages in the chat
 chatPrefix: '&2[AreaShop]&r '
-## The character used for the prices of regions, for the euro character use '%euro%'
+## The characters used for the prices of regions, will appear before the number, for the euro character use '%euro%'
 moneyCharacter: '$'
+## The characters used after a currency number, '%euro%' will become the euro character
+moneyCharacterAfter: ''
 ## Enables / disables debug messages in the console, no need to change
 debug: false
 ## The .yml language file that should be used, provided by this plugin: EN, NL
@@ -20,6 +22,8 @@ maximumTotal: 1
 enableSchematics: true
 ## Maximum number of blocks to save to or restore from a .schemetic
 maximumBlocks: 1000000
+## Enable sending stats to http://mcstats.org/ (Metrics plugin)
+sendStats: true
 
 ########## RENTING ##########
 ## The tag you have to write on the sign for renting a region
@@ -34,6 +38,19 @@ maximumRents: 1
 rentMoneyBack: 100
 ## How much seconds between checking if renting has expired (don't put this to low)
 checkDelay: 60
+## Timeformat to use on the signs, default is like '30-06 14:52', US format: 'MM-dd KK:mm a'
+## Search for 'java SimpleDateFormat' for more options and documentation
+timeFormatSign: 'dd-MM HH:mm'
+## Timeformat used in the chat, default is like '30 june 2014 14:52', US format: 'MMMMMMMMMMMMMMMMM dd yyyy KK:mm a'
+## Search for 'java SimpleDateFormat' for more options and documentation
+timeFormatChat: 'dd MMMMMMMMMMMMMMMMM yyyy HH:mm'
+## Time indicators, used for specifing rent duration on the signs
+## Be careful with deleting words, will break signs using those, adding is no problem
+minutes: [m, min, mins, minute, minutes, minuten, minuut]
+hours: [h, hour, hours, uur, uren]
+days: [d, day, days, dag, dagen]
+months: [M,  month,  months, maanden, maand]
+years: [y, year, years, jaar, jaren]
 ## Flags for the 'For Rent' regions, flags and options to apply when the region is not rented
 ## All region flags can be used + members, owners, priority and parent.
 flagsForRent:

@@ -33,15 +33,15 @@ public class RightClickListener implements Listener {
 		if(event.getAction() == Action.RIGHT_CLICK_BLOCK && (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN)) {
 			/* Check if the rent sign is really the same as a saved rent */
 			String regionName = ((Sign)(event.getClickedBlock().getState())).getLine(1);
-			HashMap<String,String> rent = plugin.getShopManager().getRent(regionName);
-			HashMap<String,String> buy = plugin.getShopManager().getBuy(regionName);
+			HashMap<String,String> rent = plugin.getFileManager().getRent(regionName);
+			HashMap<String,String> buy = plugin.getFileManager().getBuy(regionName);
 			
 			if(rent != null && block.getWorld().getName().equals(rent.get(plugin.keyWorld))	
 					&& rent.get(plugin.keyX).equals(String.valueOf(block.getX()))
 					&& rent.get(plugin.keyY).equals(String.valueOf(block.getY()))
 					&& rent.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
 				
-				plugin.getShopManager().rent(event.getPlayer(), regionName);
+				plugin.getFileManager().rent(event.getPlayer(), regionName);
 				/* Cancel placing a block */
 				event.setCancelled(true);	
 				
@@ -50,7 +50,7 @@ public class RightClickListener implements Listener {
 					&& buy.get(plugin.keyY).equals(String.valueOf(block.getY()))
 					&& buy.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
 				
-				plugin.getShopManager().buy(event.getPlayer(), regionName);
+				plugin.getFileManager().buy(event.getPlayer(), regionName);
 				/* Cancel placing a block */
 				event.setCancelled(true);	
 				

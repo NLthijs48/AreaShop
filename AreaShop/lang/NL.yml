@@ -23,6 +23,7 @@ rent-extend: "Je kunt je huur verlengen door opnieuw op het bordje te klikken of
 rent-lowMoneyExtend: "Je hebt niet genoeg geld om de huur te verlengen (je hebt %0% van de %1%)"
 rent-lowMoneyRent: "Je hebt niet genoeg geld om het gebied te huren (je hebt %0% van de %1%)"
 rent-someoneElse: "Iemand anders heeft dit gebied al gehuurd"
+rent-notRentable: "Dat gebied is niet beschikbaar om te huren"
 
 buy-help: "/as buy <gebiednaam>"
 buy-noPermission: "Je hebt geen toestemming om een gebied te kopen"
@@ -110,6 +111,9 @@ help-updatebuys: "&6/as updatebuys &7-&r Update alle koop borden en gebieden"
 help-reload: "&6/as reload &7-&r Herlaad de config en de taalbestanden"
 help-rentrestore: "&6/as rentrestore &7-&r Laat dit huur gebied herstellen of niet"
 help-buyrestore: "&6/as buyrestore &7-&r Laat dit koop gebied herstellen of niet"
+help-rentprice: "&6/as rentprice &7-&r Verander de prijs van een huur gebied"
+help-buyprice: "&6/as buyprice &7-&r Verander de prijs van een koop gebied"
+help-rentduration: "&6/as rentduration &7-&r Verander de looptijd van een huur gebied"
 
 rentrestore-help: "/as rentrestore <gebied> <true|false|general>"
 rentrestore-noPermission: "Je hebt geen toestemming om herstel instellingen te veranderen bij een huur gebied"
@@ -121,6 +125,29 @@ rentrestore-successProfile: "Succesvol de herstel optie gezet van %0% naar '%1%'
 buyrestore-help: "/as buyrestore <gebied> <true|false|general>"
 buyrestore-noPermission: "Je hebt geen toestemming om herstel instellingen te veranderen bij geen koop gebied"
 buyrestore-notRegistered: "%0% is niet geregistreerd als een koop gebied"
-buyrestore-invalidSetting: "'%0%' is geen goede optie, gebruik true, false of general
+buyrestore-invalidSetting: "'%0%' is geen goede optie, gebruik true, false of general"
 buyrestore-success: "Succesvol de herstel optie gezet van %0% naar '%1%'"
 buyrestore-successProfile: "Succesvol de herstel optie gezet van %0% naar '%1%' en het profiel naar '%2%'"
+
+rentprice-noPermission: "Je hebt geen toestemming om de prijs van een huur gebied te veranderen"
+rentprice-help: "/as rentprice <gebied> <prijs>"
+rentprice-notRegistered: "%0% is niet geregistreerd als een huur gebied"
+rentprice-wrongPrice: "'%0%' is geen goede prijs"
+rentprice-success: "Prijs van gebied %0% is veranderd naar %1% per %2%"
+
+buyprice-noPermission: "Je hebt geen toestemming om de prijs van een koop gebied te veranderen"
+buyprice-help: "/as buyprice <gebied> <prijs>"
+buyprice-notRegistered: "%0% is niet geregistreerd als koop gebied"
+buyprice-wrongPrice: "'%0%' is geen goede prijs"
+buyprice-success: "Prijs van gebied %0% is veranderd naar %1%"
+
+rentduration-noPermission: "Je hebt geen toestemming om de looptijd van een huur gebied te veranderen"
+rentduration-help: "/as rentduration <gebied> <aantal> <soort>"
+rentduration-notRegistered: "%0% is niet geregistreerd als een huur gebied"
+rentduration-wrongPrice: "'%0%' is geen goede prijs, gebruik een geheel getal"
+rentduration-wrongFormat: "'%0%' is geen goed tijdformaat, bekijk de documentatie op Bukkit"
+rentduration-success: "Looptijd van gebeid %0% veranderd naar '%1%'"
+
+
+
+

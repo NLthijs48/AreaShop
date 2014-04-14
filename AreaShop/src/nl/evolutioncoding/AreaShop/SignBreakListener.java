@@ -40,16 +40,16 @@ public final class SignBreakListener implements Listener {
 		if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
 			Sign sign = (Sign)(block.getState());
 			/* Check if the rent sign is really the same as a saved rent */
-			HashMap<String,String> rent = plugin.getShopManager().getRent(sign.getLine(1));
-			HashMap<String,String> buy = plugin.getShopManager().getBuy(sign.getLine(1));
+			HashMap<String,String> rent = plugin.getFileManager().getRent(sign.getLine(1));
+			HashMap<String,String> buy = plugin.getFileManager().getBuy(sign.getLine(1));
 			if(rent != null && rent.get(plugin.keyWorld).equals(block.getWorld().getName())	
 					&& rent.get(plugin.keyX).equals(String.valueOf(block.getX()))
 					&& rent.get(plugin.keyY).equals(String.valueOf(block.getY()))
 					&& rent.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
 				/* Remove the rent if the player has permission */
 				if(event.getPlayer().hasPermission("areashop.destroyrent")) {
-					plugin.getShopManager().handleSchematicEvent(sign.getLine(1), true, RegionEventType.DELETED);
-					boolean result = plugin.getShopManager().removeRent(sign.getLine(1));
+					plugin.getFileManager().handleSchematicEvent(sign.getLine(1), true, RegionEventType.DELETED);
+					boolean result = plugin.getFileManager().removeRent(sign.getLine(1), true);
 					
 					if(result) {
 						event.getPlayer().sendMessage(plugin.fixColors(plugin.config().getString("chatPrefix")) + "Renting of the region succesfully removed");
@@ -64,8 +64,8 @@ public final class SignBreakListener implements Listener {
 					&& buy.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
 				/* Remove the buy if the player has permission */
 				if(event.getPlayer().hasPermission("areashop.destroybuy")) {
-					plugin.getShopManager().handleSchematicEvent(sign.getLine(1), false, RegionEventType.DELETED);
-					boolean result = plugin.getShopManager().removeBuy(sign.getLine(1));
+					plugin.getFileManager().handleSchematicEvent(sign.getLine(1), false, RegionEventType.DELETED);
+					boolean result = plugin.getFileManager().removeBuy(sign.getLine(1), true);
 					if(result) {
 						event.getPlayer().sendMessage(plugin.fixColors(plugin.config().getString("chatPrefix")) + "Buying of the region succesfully removed");
 					}
@@ -89,14 +89,14 @@ public final class SignBreakListener implements Listener {
             Block attachedTo = block.getRelative(((org.bukkit.material.Sign)sign.getData()).getAttachedFace());
             if(attachedTo.getType() == Material.AIR){
 				/* Check if the rent sign is really the same as a saved rent */
-				HashMap<String,String> rent = plugin.getShopManager().getRent(sign.getLine(1));
-				HashMap<String,String> buy = plugin.getShopManager().getBuy(sign.getLine(1));
+				HashMap<String,String> rent = plugin.getFileManager().getRent(sign.getLine(1));
+				HashMap<String,String> buy = plugin.getFileManager().getBuy(sign.getLine(1));
 				if(rent != null && rent.get(plugin.keyWorld).equals(block.getWorld().getName())	
 						&& rent.get(plugin.keyX).equals(String.valueOf(block.getX()))
 						&& rent.get(plugin.keyY).equals(String.valueOf(block.getY()))
 						&& rent.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
 					/* Remove the rent */
-					boolean result = plugin.getShopManager().removeRent(sign.getLine(1));
+					boolean result = plugin.getFileManager().removeRent(sign.getLine(1), true);
 					if(result) {
 						plugin.getLogger().info("Renting of region '" + sign.getLine(1) + "' has been removed by indirectly breaking the sign");
 					}
@@ -105,7 +105,7 @@ public final class SignBreakListener implements Listener {
 						&& buy.get(plugin.keyY).equals(String.valueOf(block.getY()))
 						&& buy.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
 					/* Remove the buy */
-					boolean result = plugin.getShopManager().removeBuy(sign.getLine(1));
+					boolean result = plugin.getFileManager().removeBuy(sign.getLine(1), true);
 					if(result) {
 						plugin.getLogger().info("Buying of region '" + sign.getLine(1) + "' has been removed by indirectly breaking the sign");
 					}

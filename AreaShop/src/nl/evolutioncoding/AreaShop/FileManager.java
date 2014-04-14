@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -375,7 +376,7 @@ public class FileManager {
 	 * Unrent a region, reset to unrented
 	 * @param regionName Region that should be unrented
 	 */
-	public void unRent(String regionName) {
+	public void unRent(String regionName, boolean giveMoneyBack) {
 		regionName = regionName.toLowerCase();
 		HashMap<String,String> rent = rents.get(regionName);
 	
@@ -409,7 +410,7 @@ public class FileManager {
 		Double timePeriod = (double) (calendar.getTimeInMillis());
 		double periods = timeLeft / timePeriod;
 		double moneyBack =  periods * price * percentage;
-		if(moneyBack > 0) {
+		if(moneyBack > 0 && giveMoneyBack) {
 			/* Give back the money */
 			EconomyResponse r = plugin.getEconomy().depositPlayer(rent.get(plugin.keyPlayer), moneyBack);
 			if(!r.transactionSuccess()) {
@@ -420,10 +421,10 @@ public class FileManager {
 		this.handleSchematicEvent(regionName, true, RegionEventType.SOLD);
 		
 		/* Set the flags and options for the region */
-		plugin.getShopManager().setRegionFlags(regionName, plugin.config().getConfigurationSection("flagsForRent"), true);
+		plugin.getFileManager().setRegionFlags(regionName, plugin.config().getConfigurationSection("flagsForRent"), true);
 		
 		/* Debug message */
-		plugin.debug(rent.get(plugin.keyPlayer) + " has unrented " + rent.get(plugin.keyName) + ", got " + plugin.getCurrencyCharacter() + moneyBack + " money back");
+		plugin.debug(rent.get(plugin.keyPlayer) + " has unrented " + rent.get(plugin.keyName) + ", got " + plugin.formatCurrency(moneyBack) + " money back");
 		
 		/* Remove the player and renteduntil values */
 		rent.remove(plugin.keyPlayer);
@@ -440,7 +441,7 @@ public class FileManager {
 	 * Sell a buyed region, get part of the money back
 	 * @param regionName
 	 */
-	public void unBuy(String regionName) {
+	public void unBuy(String regionName, boolean giveMoneyBack) {
 		regionName = regionName.toLowerCase();
 		HashMap<String,String> buy = buys.get(regionName);
 		
@@ -448,7 +449,7 @@ public class FileManager {
 		double price = Double.parseDouble(buy.get(plugin.keyPrice));
 		double percentage = Integer.parseInt(plugin.config().getString("buyMoneyBack")) / 100;
 		double moneyBack =  price * percentage;
-		if(moneyBack > 0) {
+		if(moneyBack > 0 && giveMoneyBack) {
 			/* Give back the money */
 			EconomyResponse r = plugin.getEconomy().depositPlayer(buy.get(plugin.keyPlayer), moneyBack);
 			if(!r.transactionSuccess()) {
@@ -459,10 +460,10 @@ public class FileManager {
 		this.handleSchematicEvent(regionName, false, RegionEventType.SOLD);
 		
 		/* Set the flags and options for the region */
-		plugin.getShopManager().setRegionFlags(regionName, plugin.config().getConfigurationSection("flagsForSale"), false);
+		plugin.getFileManager().setRegionFlags(regionName, plugin.config().getConfigurationSection("flagsForSale"), false);
 		
 		/* Debug message */
-		plugin.debug(buy.get(plugin.keyPlayer) + " has sold " + buy.get(plugin.keyName) + ", got " + plugin.getCurrencyCharacter() + moneyBack + " money back");
+		plugin.debug(buy.get(plugin.keyPlayer) + " has sold " + buy.get(plugin.keyName) + ", got " + plugin.formatCurrency(moneyBack) + " money back");
 		
 		/* Remove the player and buyeduntil values */
 		buy.remove(plugin.keyPlayer);
@@ -493,7 +494,7 @@ public class FileManager {
 					if(player != null) {
 						plugin.message(player, "unrent-expired", rent.get(plugin.keyName));
 					}
-					this.unRent(rent.get(plugin.keyName));
+					this.unRent(rent.get(plugin.keyName), true);
 				}
 			}
 		}	
@@ -507,7 +508,7 @@ public class FileManager {
 	 */
 	public boolean rent(Player player, String regionName) {
 		regionName = regionName.toLowerCase();
-		HashMap<String,String> rent = plugin.getShopManager().getRent(regionName);
+		HashMap<String,String> rent = plugin.getFileManager().getRent(regionName);
 		if(rent == null) {
 			plugin.message(player, "rent-regionNotRentable");
 			return false;
@@ -565,36 +566,43 @@ public class FileManager {
 						calendar.setTimeInMillis(Long.parseLong(rent.get(plugin.keyRentedUntil)));
 					}
 			
+					ArrayList<String> minutes = new ArrayList<String>(plugin.config().getStringList("minutes"));
+					ArrayList<String> hours = new ArrayList<String>(plugin.config().getStringList("hours"));
+					ArrayList<String> days = new ArrayList<String>(plugin.config().getStringList("days"));
+					ArrayList<String> months = new ArrayList<String>(plugin.config().getStringList("months"));
+					ArrayList<String> years = new ArrayList<String>(plugin.config().getStringList("years"));
+					
 					String duration = rent.get(plugin.keyDuration);
-					duration = duration.replace("month", "M");
-					duration = duration.replace("months", "M");
-					char durationChar = duration.charAt(duration.indexOf(' ')+1);
-					int durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));				
-					if(durationChar == 'm') {
+					String durationString = duration.substring(duration.indexOf(' ')+1, duration.length());
+					int durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));
+					
+					if(minutes.contains(durationString)) {
 						calendar.add(Calendar.MINUTE, durationInt);
-					} else if(durationChar == 'h') {
+					} else if(hours.contains(durationString)) {
 						calendar.add(Calendar.HOUR, durationInt);
-					} else if(durationChar == 'd') {
+					} else if(days.contains(durationString)) {
 						calendar.add(Calendar.DAY_OF_MONTH, durationInt);
-					} else if(durationChar == 'M') {
+					} else if(months.contains(durationString)) {
 						calendar.add(Calendar.MONTH, durationInt);
-					} else if(durationChar == 'y') {
+					} else if(years.contains(durationString)) {
 						calendar.add(Calendar.YEAR, durationInt);
 					}
-					SimpleDateFormat dateFull = new SimpleDateFormat("dd MMMMMMMMMMMMMMMMM yyyy HH:mm");
+					SimpleDateFormat dateFull = new SimpleDateFormat(plugin.config().getString("timeFormatChat"));
 					
 					/* Add values to the rent and send it to FileManager */
 					rent.put(plugin.keyRentedUntil, String.valueOf(calendar.getTimeInMillis()));
 					rent.put(plugin.keyPlayer, player.getName());
-					plugin.getShopManager().addRent(sign.getLine(1), rent);
-	
-					this.handleSchematicEvent(regionName, true, RegionEventType.BOUGHT);
+					plugin.getFileManager().addRent(sign.getLine(1), rent);
+					
+					if(!extend) {
+						this.handleSchematicEvent(regionName, true, RegionEventType.BOUGHT);
+					}
 					
 					/* Change the sign */
 					this.updateRentSign(regionName);
 					
 					/* Set the flags and options for the region */
-					plugin.getShopManager().setRegionFlags(regionName, plugin.config().getConfigurationSection("flagsRented"), true);
+					plugin.getFileManager().setRegionFlags(regionName, plugin.config().getConfigurationSection("flagsRented"), true);
 					
 					/* Send message to the player */
 					if(extend) {
@@ -603,16 +611,16 @@ public class FileManager {
 						plugin.message(player, "rent-rented", sign.getLine(1), dateFull.format(calendar.getTime()));
 						plugin.message(player, "rent-extend");
 					}
-					plugin.debug(player.getName() + " has rented region " + rent.get(plugin.keyName) + " for " + plugin.getCurrencyCharacter() + price + " until " + dateFull.format(calendar.getTime()));
+					plugin.debug(player.getName() + " has rented region " + rent.get(plugin.keyName) + " for " + plugin.formatCurrency(price) + " until " + dateFull.format(calendar.getTime()));
 					
 					this.saveRents();
 					return true;
 				} else {
 					/* Player has not enough money */
 					if(extend) {
-						plugin.message(player, "rent-lowMoneyExtend", plugin.getCurrencyCharacter() + plugin.getEconomy().getBalance(player.getName(), block.getWorld().getName()), plugin.getCurrencyCharacter() + price);
+						plugin.message(player, "rent-lowMoneyExtend", plugin.formatCurrency(plugin.getEconomy().getBalance(player.getName(), block.getWorld().getName())), plugin.formatCurrency(price));
 					} else {
-						plugin.message(player, "rent-lowMoneyRent", plugin.getCurrencyCharacter() + plugin.getEconomy().getBalance(player.getName(), block.getWorld().getName()), plugin.getCurrencyCharacter() + price);
+						plugin.message(player, "rent-lowMoneyRent", plugin.formatCurrency(plugin.getEconomy().getBalance(player.getName(), block.getWorld().getName())), plugin.formatCurrency(price));
 					}
 				}
 			} else {
@@ -633,9 +641,9 @@ public class FileManager {
 	 */
 	public boolean buy(Player player, String regionName) {
 		regionName = regionName.toLowerCase();
-		HashMap<String,String> buy = plugin.getShopManager().getBuy(regionName);
+		HashMap<String,String> buy = plugin.getFileManager().getBuy(regionName);
 		if(buy == null) {
-			plugin.message(player, "rent-notBuyable");
+			plugin.message(player, "rent-notRentable");
 			return true;
 		}
 		Block block = Bukkit.getWorld(buy.get(plugin.keyWorld)).getBlockAt(Integer.parseInt(buy.get(plugin.keyX)), Integer.parseInt(buy.get(plugin.keyY)), Integer.parseInt(buy.get(plugin.keyZ)));
@@ -684,7 +692,7 @@ public class FileManager {
 					
 					/* Add values to the buy and send it to FileManager */
 					buy.put(plugin.keyPlayer, player.getName());
-					plugin.getShopManager().addBuy(sign.getLine(1), buy);
+					plugin.getFileManager().addBuy(sign.getLine(1), buy);
 	
 					this.handleSchematicEvent(regionName, false, RegionEventType.BOUGHT);
 					
@@ -692,17 +700,17 @@ public class FileManager {
 					this.updateBuySign(regionName);
 					
 					/* Set the flags and options for the region */
-					plugin.getShopManager().setRegionFlags(regionName, plugin.config().getConfigurationSection("flagsSold"), false);
+					plugin.getFileManager().setRegionFlags(regionName, plugin.config().getConfigurationSection("flagsSold"), false);
 					
 					/* Send message to the player */
 					plugin.message(player, "buy-succes", sign.getLine(1));
-					plugin.debug(player.getName() + " has bought region " + buy.get(plugin.keyName) + " for " + plugin.getCurrencyCharacter() + price);
+					plugin.debug(player.getName() + " has bought region " + buy.get(plugin.keyName) + " for " + plugin.formatCurrency(price));
 					
 					this.saveBuys();
 					return true;
 				} else {
 					/* Player has not enough money */
-					plugin.message(player, "buy-lowMoney", plugin.getCurrencyCharacter() + plugin.getEconomy().getBalance(player.getName(), block.getWorld().getName()), plugin.getCurrencyCharacter() + price);
+					plugin.message(player, "buy-lowMoney", plugin.formatCurrency(plugin.getEconomy().getBalance(player.getName(), block.getWorld().getName())), plugin.formatCurrency(price));
 				}
 			} else {
 				if(player.getName().equals(buy.get(plugin.keyPlayer))) {
@@ -721,13 +729,13 @@ public class FileManager {
 	 * Remove a rent from the list
 	 * @param regionName
 	 */
-	public boolean removeRent(String regionName) {
+	public boolean removeRent(String regionName, boolean giveMoneyBack) {
 		regionName = regionName.toLowerCase();
 		boolean result = false;
 		HashMap<String,String> rent = rents.get(regionName);
 		if(rent != null) {
 			if(rent.get(plugin.keyPlayer) != null) {
-				this.unRent(regionName);
+				this.unRent(regionName, giveMoneyBack);
 			}
 			/* Delete the sign and the variable */
 			Bukkit.getWorld(rent.get(plugin.keyWorld)).getBlockAt(Integer.parseInt(rent.get(plugin.keyX)), Integer.parseInt(rent.get(plugin.keyY)), Integer.parseInt(rent.get(plugin.keyZ))).setType(Material.AIR);
@@ -742,13 +750,13 @@ public class FileManager {
 	 * Remove a buy from the list
 	 * @param regionName
 	 */
-	public boolean removeBuy(String regionName) {
+	public boolean removeBuy(String regionName, boolean giveMoneyBack) {
 		regionName = regionName.toLowerCase();
 		boolean result = false;
 		HashMap<String,String> buy = buys.get(regionName);
 		if(buy != null) {
 			if(buy.get(plugin.keyPlayer) != null) {
-				this.unBuy(regionName);
+				this.unBuy(regionName, giveMoneyBack);
 			}
 			/* Delete the sign and the variable */
 			Bukkit.getWorld(buy.get(plugin.keyWorld)).getBlockAt(Integer.parseInt(buy.get(plugin.keyX)), Integer.parseInt(buy.get(plugin.keyY)), Integer.parseInt(buy.get(plugin.keyZ))).setType(Material.AIR);
@@ -789,21 +797,21 @@ public class FileManager {
 					
 					/* If region is gone delete the rent and the sign */
 					if(plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(rent.get(plugin.keyWorld))).getRegion(name) == null) {
-						this.removeRent(name);
+						this.removeRent(name, false);
 						plugin.getLogger().info(name + " does not exist anymore, rent has been deleted");
 					} else {
 						/* If the sign is gone remove the rent */
 						Block block = Bukkit.getWorld(rent.get(plugin.keyWorld)).getBlockAt(Integer.parseInt(rent.get(plugin.keyX)), Integer.parseInt(rent.get(plugin.keyY)), Integer.parseInt(rent.get(plugin.keyZ)));
 						if(!(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST)) {
 							/* remove the rent */
-							if(this.removeRent(name)) {
+							if(this.removeRent(name, false)) {
 								plugin.getLogger().info("Rent for " + name + " has been deleted, sign is not present");
 							}
 						} else {
 							/* If the name of the region is not in the map, add it and save the file again with lowercase regionName */
 							if(rent.get(plugin.keyName) == null) {
 								rent.put(plugin.keyName, name);
-								this.removeRent(name);
+								this.removeRent(name, false);
 								this.addRent(name.toLowerCase(), rent);
 							}
 							if(rent.get(plugin.keyRestore) == null) {
@@ -859,21 +867,21 @@ public class FileManager {
 					
 					/* If region is gone delete the buy and the sign */
 					if(plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(buy.get(plugin.keyWorld))).getRegion(name) == null) {
-						this.removeBuy(name);
+						this.removeBuy(name, false);
 						plugin.getLogger().info("Region '" + name + "' does not exist anymore, buy has been deleted");
 					} else {
 						/* If the sign is gone remove the buy */
 						Block block = Bukkit.getWorld(buy.get(plugin.keyWorld)).getBlockAt(Integer.parseInt(buy.get(plugin.keyX)), Integer.parseInt(buy.get(plugin.keyY)), Integer.parseInt(buy.get(plugin.keyZ)));
 						if(!(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST)) {
 							/* remove the buy */
-							if(this.removeBuy(name)) {
+							if(this.removeBuy(name, false)) {
 								plugin.getLogger().info("Buy for region '" + name + "' has been deleted, sign is not present");
 							}
 						} else {
 							/* If the name of the region is not in the map, add it and save the file again with lowercase regionName */
 							if(buy.get(plugin.keyName) == null) {
 								buy.put(plugin.keyName, name);
-								this.removeBuy(name);
+								this.removeBuy(name, false);
 								this.addBuy(name.toLowerCase(), buy);
 							}
 							if(buy.get(plugin.keyRestore) == null) {
@@ -929,11 +937,11 @@ public class FileManager {
 					sign.setLine(0, plugin.fixColors(plugin.config().getString("signRentable")));
 					sign.setLine(1, name);
 					sign.setLine(2, duration);
-					sign.setLine(3, plugin.getCurrencyCharacter() + price);
+					sign.setLine(3, plugin.formatCurrency(price));
 
 				} else {
 					/* Rented */
-					SimpleDateFormat date = new SimpleDateFormat("dd-MM HH:mm");
+					SimpleDateFormat date = new SimpleDateFormat(plugin.config().getString("timeFormatSign"));
 					String dateString = date.format(new Date(Long.parseLong(until)));					
 
 					sign.setLine(0, plugin.fixColors(plugin.config().getString("signRented")));
@@ -974,7 +982,7 @@ public class FileManager {
 					/* Not buyed */
 					sign.setLine(0, plugin.fixColors(plugin.config().getString("signBuyable")));
 					sign.setLine(1, name);
-					sign.setLine(2, plugin.getCurrencyCharacter() + price);
+					sign.setLine(2, plugin.formatCurrency(price));
 
 				} else {
 					/* Buyed */	
@@ -1105,7 +1113,7 @@ public class FileManager {
 		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(info.get(plugin.keyWorld))).getRegion(regionName);
 
 		String playerName = info.get(plugin.keyPlayer);
-		String price = plugin.getCurrencyCharacter() + info.get(plugin.keyPrice);
+		String price = plugin.formatCurrency(info.get(plugin.keyPrice));
 		String duration = info.get(plugin.keyDuration);
 		String until = null;
 		if(isRent && playerName != null) {

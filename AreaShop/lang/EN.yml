@@ -23,6 +23,7 @@ rent-extend: "You can extend your rent by rightclicking the sign again or using 
 rent-lowMoneyExtend: "You don't have enough money to extend the rent (you have %0% and you need %1%)"
 rent-lowMoneyRent: "You don't have enough money to rent this region (you have %0% and you need %1%)"
 rent-someoneElse: "Someone else already rented this region"
+rent-notRentable: "That region is not available for renting"
 
 buy-help: "/as buy <regionname>"
 buy-noPermission: "You don't have permission to buy a region"
@@ -110,6 +111,9 @@ help-updatebuys: "&6/as updatebuys &7-&r Update all buy signs and regions"
 help-reload: "&6/as reload &7-&r Reload the config and languages"
 help-rentrestore: "&6/as rentrestore &7-&r Set the profile for restoring and on/off "
 help-buyrestore: "&6/as buyrestore &7-&r Set the profile for restoring and on/off"
+help-rentprice: "&6/as rentprice &7-&r Change the price of a rent region"
+help-buyprice: "&6/as buyprice &7-&r Change the price of a buy region"
+help-rentduration: "&6/as rentduration &7-&r Change the duration of a rent region"
 
 rentrestore-help: "/as rentrestore <region> <true|false|general> [profile]"
 rentrestore-noPermission: "You don't have permission to change the restore settings of a rent"
@@ -125,8 +129,24 @@ buyrestore-invalidSetting: "'%0%' is not a valid state, should be true, false or
 buyrestore-success: "Succesfully set the restore setting of %0% to '%1%'"
 buyrestore-successProfile: "Succesfully set the restore setting of %0% to '%1%' and the profile to '%2%'"
 
+rentprice-noPermission: "You don't have permission to change the price of a rent"
+rentprice-help: "/as rentprice <region> <price>"
+rentprice-notRegistered: "%0% is not registered as a rent"
+rentprice-wrongPrice: "'%0%' is not a valid price"
+rentprice-success: "Price of region %0% changed to %1% per %2%"
 
+buyprice-noPermission: "You don't have permission to change the price of a buy"
+buyprice-help: "/as buyprice <region> <price>"
+buyprice-notRegistered: "%0% is not registered as a buy"
+buyprice-wrongPrice: "'%0%' is not a valid price"
+buyprice-success: "Price of region %0% changed to %1%"
 
+rentduration-noPermission: "You don't have permission to change the duration of a rent"
+rentduration-help: "/as rentduration <region> <amount> <identifier>"
+rentduration-notRegistered: "%0% is not registered as a rent"
+rentduration-wrongAmount: "'%0%' is not a valid amount, use a whole number"
+rentduration-wrongFormat: "'%0%' is not a proper timeformat, check the documentation on Bukkit"
+rentduration-success: "Duration of region %0% changed to '%1%'"
 
 
 

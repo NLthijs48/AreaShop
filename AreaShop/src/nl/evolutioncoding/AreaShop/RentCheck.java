@@ -15,7 +15,7 @@ public class RentCheck extends BukkitRunnable {
 	
 	@Override
 	public void run() {
-		plugin.getShopManager().checkRents();		
+		plugin.getFileManager().checkRents();		
 	}
 
 }

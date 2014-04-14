@@ -56,9 +56,6 @@ public final class SignChangeListener implements Listener {
 			/* Get the other lines */
 			String secondLine = event.getLine(1);
 			String thirdLine = event.getLine(2);
-			if(!thirdLine.equals("M")) {
-				thirdLine = thirdLine.toLowerCase();
-			}
 			String fourthLine = event.getLine(3);
 			
 			/* Get the regionManager for accessing regions */
@@ -71,13 +68,13 @@ public final class SignChangeListener implements Listener {
 			} else if(regionManager.getRegion(secondLine) == null) {
 				player.sendMessage(chatPrefix + "The region you specified does not exist!");
 				return;
-			} else if(plugin.getShopManager().getRent(secondLine) != null) {
+			} else if(plugin.getFileManager().getRent(secondLine) != null) {
 				player.sendMessage(chatPrefix + "The region you specified already has a sign for renting");
 				return;
 			} else if(thirdLine == null || thirdLine.length() == 0) {
 				player.sendMessage(chatPrefix + "You did not specify how long the region can be rented, do this on the third line");
 				return;
-			} else if(!this.checkTimeFormat(thirdLine)) {
+			} else if(!plugin.checkTimeFormat(thirdLine)) {
 				player.sendMessage(chatPrefix + "The time specified is not in the correct format");
 				return;
 			} else if(fourthLine == null || fourthLine.length() == 0) {
@@ -95,7 +92,7 @@ public final class SignChangeListener implements Listener {
 				/* Set the first line to signRentable */
 				event.setLine(0, signRentable);
 				event.setLine(1, regionManager.getRegion(secondLine).getId());
-				event.setLine(3, plugin.getCurrencyCharacter() + fourthLine);
+				event.setLine(3, plugin.formatCurrency(fourthLine));
 				
 				/* Add rent to the FileManager */
 				HashMap<String,String> rent = new HashMap<String,String>();
@@ -109,11 +106,11 @@ public final class SignChangeListener implements Listener {
 				rent.put(plugin.keyRestore, "general");
 				rent.put(plugin.keySchemProfile, "default");
 				
-				plugin.getShopManager().addRent(secondLine, rent);
-				plugin.getShopManager().handleSchematicEvent(secondLine, true, RegionEventType.CREATED);
+				plugin.getFileManager().addRent(secondLine, rent);
+				plugin.getFileManager().handleSchematicEvent(secondLine, true, RegionEventType.CREATED);
 				
 				/* Set the flags for the region */
-				plugin.getShopManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForRent"), true);
+				plugin.getFileManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForRent"), true);
 
 				player.sendMessage(chatPrefix + "Renting of the region is setup correctly");
 			}
@@ -138,7 +135,7 @@ public final class SignChangeListener implements Listener {
 			} else if(regionManager.getRegion(secondLine) == null) {
 				player.sendMessage(chatPrefix + "The region you specified does not exist!");
 				return;
-			} else if(plugin.getShopManager().getBuy(secondLine) != null) {
+			} else if(plugin.getFileManager().getBuy(secondLine) != null) {
 				player.sendMessage(chatPrefix + "The region you specified already has a sign for buying");
 				return;
 			} else if(thirdLine == null || thirdLine.length() == 0) {
@@ -156,7 +153,7 @@ public final class SignChangeListener implements Listener {
 				/* Set the first line to signbuyable */
 				event.setLine(0, signBuyable);
 				event.setLine(1, regionManager.getRegion(secondLine).getId());
-				event.setLine(2, plugin.getCurrencyCharacter() + thirdLine);
+				event.setLine(2, plugin.formatCurrency(thirdLine));
 				
 				/* Add buy to the FileManager */
 				HashMap<String,String> buy = new HashMap<String,String>();
@@ -169,46 +166,15 @@ public final class SignChangeListener implements Listener {
 				buy.put(plugin.keyRestore, "general");
 				buy.put(plugin.keySchemProfile, "default");
 				
-				plugin.getShopManager().addBuy(secondLine, buy);
-				plugin.getShopManager().handleSchematicEvent(secondLine, false, RegionEventType.CREATED);
+				plugin.getFileManager().addBuy(secondLine, buy);
+				plugin.getFileManager().handleSchematicEvent(secondLine, false, RegionEventType.CREATED);
 				
 				/* Set the flags for the region */
-				plugin.getShopManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForSale"), false);
+				plugin.getFileManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForSale"), false);
 				
 				player.sendMessage(chatPrefix + "Buying of the region is setup correctly");
 			}
 		}
-	}
-	
-	/**
-	 * Checks if the string is a correct time period
-	 * @param time String that has to be checked
-	 * @return true if format is correct, false if not
-	 */
-	public boolean checkTimeFormat(String time) {
-		/* Check if the string is not empty and check the length */
-		if(time == null || time.length() <= 1 || time.indexOf(' ') == -1 || time.indexOf(' ') >= (time.length()-1)) {
-			return false;
-		}
-		
-		/* Check if the suffix is one of these values */
-		String[] timeValues = 	{"m","min","mins","minute","minutes","minuten","minuut",
-								"h","hour","hours","uur","uren",
-								"M", "month", "months","maanden","maand",
-								"d","day","days","dag","dagen",
-								"y","year","years","jaar","jaren"};
-		String suffix = time.substring(time.indexOf(' ')+1, time.length());
-		boolean result = false;
-		for(int i=0; i<timeValues.length && !result; i++) {
-			result = timeValues[i].equals(suffix);
-		}
-		if(!result) {
-			return false;
-		}	
-		
-		/* check if the part before the space is a number */
-		String prefix = time.substring(0, (time.indexOf(' ')));
-		return prefix.matches("\\d+");
 	}
 }
 

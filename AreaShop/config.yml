@@ -2,7 +2,7 @@
 # config.yml of the AreaShop plugin          #
 # This plugin has been created by NLThijs48  #
 # Check the server minecraft.go-craft.com    #
-# and then the Prison server for a demo      #
+# and then the SurvivalNL server for a demo  #
 ##############################################
 
 ########## GENERAL ##########
@@ -24,6 +24,8 @@ enableSchematics: true
 maximumBlocks: 1000000
 ## Enable sending stats to http://mcstats.org/ (Metrics plugin)
 sendStats: true
+## Version of the config, do not change!
+version: 1.3.0
 
 ########## RENTING ##########
 ## The tag you have to write on the sign for renting a region

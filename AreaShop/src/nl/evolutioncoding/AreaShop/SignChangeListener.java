@@ -10,7 +10,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.SignChangeEvent;
 
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**
  * Checks for placement of signs for this plugin
@@ -18,11 +20,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
  */
 public final class SignChangeListener implements Listener {
 	AreaShop plugin;
-	String chatPrefix;
-	String rentSign;
-	String buySign;
-	String signRentable;
-	String signBuyable;
 	
 	/**
 	 * Constructor
@@ -30,11 +27,6 @@ public final class SignChangeListener implements Listener {
 	 */
 	public SignChangeListener(AreaShop plugin) {
 		this.plugin = plugin;
-		chatPrefix = plugin.fixColors(plugin.config().getString("chatPrefix"));
-		rentSign = plugin.config().getString("rentSign");
-		buySign = plugin.config().getString("buySign");
-		signRentable = plugin.fixColors(plugin.config().getString("signRentable"));
-		signBuyable = plugin.fixColors(plugin.config().getString("signBuyable"));
 	}
 	
 	/**
@@ -46,12 +38,11 @@ public final class SignChangeListener implements Listener {
 		Player player = event.getPlayer();
 		
 		/* Check if the sign is meant for this plugin */
-		if(event.getLine(0).contains(rentSign)) {
+		if(event.getLine(0).contains(plugin.config().getString("rentSign"))) {
 			if(!player.hasPermission("areashop.createrent")) {
-				player.sendMessage(chatPrefix + "You don't have permission for setting up renting of regions");				
+				plugin.message(player, "setup-noPermissionRent");				
 				return;
 			}
-			
 			
 			/* Get the other lines */
 			String secondLine = event.getLine(1);
@@ -60,64 +51,90 @@ public final class SignChangeListener implements Listener {
 			
 			/* Get the regionManager for accessing regions */
 			RegionManager regionManager = plugin.getWorldGuard().getRegionManager(event.getPlayer().getWorld());
+			
+			/* If the secondLine does not contain a name try to find the region by location */
+			if(secondLine == null || secondLine.length() == 0) {
+				ApplicableRegionSet regions = regionManager.getApplicableRegions(event.getBlock().getLocation());
+				if(regions != null) {
+					boolean first = true;
+					ProtectedRegion candidate = null;
+					for(ProtectedRegion pr : regions) {
+						if(first) {
+							candidate = pr;
+							first = false;
+						} else {
+							if(pr.getPriority() > candidate.getPriority()) {
+								candidate = pr;
+							} else if(pr.getParent() != null && pr.getParent().equals(candidate)) {
+								candidate = pr;
+							} else {
+								plugin.message(player, "setup-couldNotDetect", candidate.getId(), pr.getId());
+								return;
+							}
+						}
+					}
+					if(candidate != null) {
+						secondLine = candidate.getId();
+					}
+				}
+			}
 		
 			/* check if all the lines are correct */			
 			if(secondLine == null || secondLine.length() == 0) {
-				player.sendMessage(chatPrefix + "You did not specify a region on the second line!");
+				plugin.message(player, "setup-noRegion");
 				return;
 			} else if(regionManager.getRegion(secondLine) == null) {
-				player.sendMessage(chatPrefix + "The region you specified does not exist!");
+				plugin.message(player, "setup-wrongRegion");
 				return;
 			} else if(plugin.getFileManager().getRent(secondLine) != null) {
-				player.sendMessage(chatPrefix + "The region you specified already has a sign for renting");
+				plugin.message(player, "setup-alreadyRentSign");
 				return;
 			} else if(thirdLine == null || thirdLine.length() == 0) {
-				player.sendMessage(chatPrefix + "You did not specify how long the region can be rented, do this on the third line");
+				plugin.message(player, "setup-noDuration");
 				return;
 			} else if(!plugin.checkTimeFormat(thirdLine)) {
-				player.sendMessage(chatPrefix + "The time specified is not in the correct format");
+				plugin.message(player, "setup-wrongDuration");
 				return;
 			} else if(fourthLine == null || fourthLine.length() == 0) {
-				player.sendMessage(chatPrefix + "You did not specify how much the renting costs on the fourth line!");
+				plugin.message(player, "setup-noPrice");
 				return;
 			} else {
 				/* Check the fourth line */
 				try {
 					Double.parseDouble(fourthLine);
 				} catch (NumberFormatException e) {
-					player.sendMessage(chatPrefix + "You did not specify the renting cost correctly, use a number only");
+					plugin.message(player, "setup-wrongPrice");
 					return;
 				}
-								
-				/* Set the first line to signRentable */
-				event.setLine(0, signRentable);
-				event.setLine(1, regionManager.getRegion(secondLine).getId());
-				event.setLine(3, plugin.formatCurrency(fourthLine));
 				
 				/* Add rent to the FileManager */
 				HashMap<String,String> rent = new HashMap<String,String>();
-				rent.put(plugin.keyWorld, event.getBlock().getWorld().getName());
-				rent.put(plugin.keyX, String.valueOf(event.getBlock().getX()));
-				rent.put(plugin.keyY, String.valueOf(event.getBlock().getY()));
-				rent.put(plugin.keyZ, String.valueOf(event.getBlock().getZ()));
-				rent.put(plugin.keyDuration, thirdLine);
-				rent.put(plugin.keyPrice, fourthLine);
-				rent.put(plugin.keyName, regionManager.getRegion(secondLine).getId());
-				rent.put(plugin.keyRestore, "general");
-				rent.put(plugin.keySchemProfile, "default");
+				rent.put(AreaShop.keyWorld, event.getBlock().getWorld().getName());
+				rent.put(AreaShop.keyX, String.valueOf(event.getBlock().getX()));
+				rent.put(AreaShop.keyY, String.valueOf(event.getBlock().getY()));
+				rent.put(AreaShop.keyZ, String.valueOf(event.getBlock().getZ()));
+				rent.put(AreaShop.keyDuration, thirdLine);
+				rent.put(AreaShop.keyPrice, fourthLine);
+				rent.put(AreaShop.keyName, regionManager.getRegion(secondLine).getId());
+				rent.put(AreaShop.keyRestore, "general");
+				rent.put(AreaShop.keySchemProfile, "default");
 				
 				plugin.getFileManager().addRent(secondLine, rent);
 				plugin.getFileManager().handleSchematicEvent(secondLine, true, RegionEventType.CREATED);
+				event.setLine(0, plugin.fixColors(plugin.config().getString("signRentable")));
+				event.setLine(1, regionManager.getRegion(secondLine).getId());
+				event.setLine(2, thirdLine);
+				event.setLine(3, plugin.formatCurrency(fourthLine));
 				
 				/* Set the flags for the region */
 				plugin.getFileManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForRent"), true);
 
-				player.sendMessage(chatPrefix + "Renting of the region is setup correctly");
+				plugin.message(player, "setup-rentSuccess", regionManager.getRegion(secondLine).getId());
 			}
-		} else if (event.getLine(0).contains(buySign)) {
+		} else if (event.getLine(0).contains(plugin.config().getString("buySign"))) {
 			/* Check for permission */
 			if(!player.hasPermission("areashop.createbuy")) {
-				player.sendMessage(chatPrefix + "You don't have permission for setting up buying of regions");				
+				plugin.message(player, "setup-noPermissionBuy");				
 				return;
 			}
 			
@@ -128,51 +145,76 @@ public final class SignChangeListener implements Listener {
 			/* Get the regionManager for accessing regions */
 			RegionManager regionManager = plugin.getWorldGuard().getRegionManager(event.getPlayer().getWorld());
 		
+			/* If the secondLine does not contain a name try to find the region by location */
+			if(secondLine == null || secondLine.length() == 0) {
+				ApplicableRegionSet regions = regionManager.getApplicableRegions(event.getBlock().getLocation());
+				if(regions != null) {
+					boolean first = true;
+					ProtectedRegion candidate = null;
+					for(ProtectedRegion pr : regions) {
+						if(first) {
+							candidate = pr;
+							first = false;
+						} else {
+							if(pr.getPriority() > candidate.getPriority()) {
+								candidate = pr;
+							} else if(pr.getParent() != null && pr.getParent().equals(candidate)) {
+								candidate = pr;
+							} else if(pr.getPriority() == candidate.getPriority()) {
+								plugin.message(player, "setup-couldNotDetect", candidate.getId(), pr.getId());
+								return;
+							}
+						}
+					}
+					if(candidate != null) {
+						secondLine = candidate.getId();
+					}
+				}
+			}
+			
 			/* Check if all the lines are correct */			
 			if(secondLine == null || secondLine.length() == 0) {
-				player.sendMessage(chatPrefix + "You did not specify a region on the second line!");
+				plugin.message(player, "setup-noRegion");
 				return;
 			} else if(regionManager.getRegion(secondLine) == null) {
-				player.sendMessage(chatPrefix + "The region you specified does not exist!");
+				plugin.message(player, "setup-wrongRegion");
 				return;
 			} else if(plugin.getFileManager().getBuy(secondLine) != null) {
-				player.sendMessage(chatPrefix + "The region you specified already has a sign for buying");
+				plugin.message(player, "setup-alreadyBuySign");
 				return;
 			} else if(thirdLine == null || thirdLine.length() == 0) {
-				player.sendMessage(chatPrefix + "You did not specify how much the buying costs on the fourth line!");
+				plugin.message(player, "setup-noPrice");
 				return;
 			} else {
 				/* Check the fourth line */
 				try {
 					Double.parseDouble(thirdLine);
 				} catch (NumberFormatException e) {
-					player.sendMessage(chatPrefix + "You did not specify the buying cost correctly, use a number only");
+					plugin.message(player, "setup-wrongPrice");
 					return;
 				}
-								
-				/* Set the first line to signbuyable */
-				event.setLine(0, signBuyable);
-				event.setLine(1, regionManager.getRegion(secondLine).getId());
-				event.setLine(2, plugin.formatCurrency(thirdLine));
 				
 				/* Add buy to the FileManager */
 				HashMap<String,String> buy = new HashMap<String,String>();
-				buy.put(plugin.keyWorld, event.getBlock().getWorld().getName());
-				buy.put(plugin.keyX, String.valueOf(event.getBlock().getX()));
-				buy.put(plugin.keyY, String.valueOf(event.getBlock().getY()));
-				buy.put(plugin.keyZ, String.valueOf(event.getBlock().getZ()));
-				buy.put(plugin.keyPrice, thirdLine);
-				buy.put(plugin.keyName, regionManager.getRegion(secondLine).getId());
-				buy.put(plugin.keyRestore, "general");
-				buy.put(plugin.keySchemProfile, "default");
+				buy.put(AreaShop.keyWorld, event.getBlock().getWorld().getName());
+				buy.put(AreaShop.keyX, String.valueOf(event.getBlock().getX()));
+				buy.put(AreaShop.keyY, String.valueOf(event.getBlock().getY()));
+				buy.put(AreaShop.keyZ, String.valueOf(event.getBlock().getZ()));
+				buy.put(AreaShop.keyPrice, thirdLine);
+				buy.put(AreaShop.keyName, regionManager.getRegion(secondLine).getId());
+				buy.put(AreaShop.keyRestore, "general");
+				buy.put(AreaShop.keySchemProfile, "default");
 				
 				plugin.getFileManager().addBuy(secondLine, buy);
 				plugin.getFileManager().handleSchematicEvent(secondLine, false, RegionEventType.CREATED);
+				event.setLine(0, plugin.fixColors(plugin.config().getString("signBuyable")));
+				event.setLine(1, regionManager.getRegion(secondLine).getId());
+				event.setLine(2, plugin.formatCurrency(thirdLine));
 				
 				/* Set the flags for the region */
 				plugin.getFileManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForSale"), false);
 				
-				player.sendMessage(chatPrefix + "Buying of the region is setup correctly");
+				plugin.message(player, "setup-buySuccess", regionManager.getRegion(secondLine).getId());
 			}
 		}
 	}

@@ -95,6 +95,8 @@ info-regionPriceDuration: "Price: %0% for each %1%"
 info-regionPrice: "Price: %0%"
 info-regionRestore: "Restoring enabled: %0%"
 info-regionRestoreProfile: "Restoring profile: %0%"
+info-regionTPLocation: "Teleport position: World=%0%, X=%1%, Y=%2%, Z=%3%, Pitch=%4%, Yaw=%5%"
+info-regionNoTP: "No teleport location set"
 
 help-header: "Help page, commands that you can execute"
 help-alias: "Command aliases: /areashop, /as"
@@ -114,6 +116,11 @@ help-buyrestore: "&6/as buyrestore &7-&r Set the profile for restoring and on/of
 help-rentprice: "&6/as rentprice &7-&r Change the price of a rent region"
 help-buyprice: "&6/as buyprice &7-&r Change the price of a buy region"
 help-rentduration: "&6/as rentduration &7-&r Change the duration of a rent region"
+help-teleport: "&6/as tp &7-&r Teleport to your bought/rented regions"
+help-teleportAll: "&6/as tp &7-&r Teleport to a rent/buy region"
+help-setteleport: "&6/as settp &7-&r Set teleport position for bought/rented regions"
+help-setteleportAll: "&6/as settp &7-&r Set teleport position for a region"
+
 
 rentrestore-help: "/as rentrestore <region> <true|false|general> [profile]"
 rentrestore-noPermission: "You don't have permission to change the restore settings of a rent"
@@ -147,6 +154,44 @@ rentduration-notRegistered: "%0% is not registered as a rent"
 rentduration-wrongAmount: "'%0%' is not a valid amount, use a whole number"
 rentduration-wrongFormat: "'%0%' is not a proper timeformat, check the documentation on Bukkit"
 rentduration-success: "Duration of region %0% changed to '%1%'"
+
+setup-noRegion: "You did not specify a region on the second line"
+setup-wrongRegion: "The region you specified does not exist"
+setup-alreadyRentSign: "The region you specified already has a sign for renting"
+setup-alreadyBuySign: "The region you specified already has a sign for buying"
+setup-noDuration: "You did not specify how long the region can be rented, do this on the third line"
+setup-wrongDuration: "The time specified is not in the correct format, example: 1 day"
+setup-noPrice: "You did not specify the price on the fourth line"
+setup-wrongPrice: "You did not specify the price correctly, use a number only"
+setup-rentSuccess: "Renting of region %0% is setup correctly"
+setup-buySuccess: "Buying of region %0% is setup correctly"
+setup-noPermissionRent: "You don't have permission for setting up renting of regions"
+setup-noPermissionBuy: "You don't have permission for setting up buying of regions"
+setup-couldNotDetect: "Found multiple regions with the same priority and/or parent/child relation, specify one on the second line (2 of the regions that were found: %0% and %1%)"
+
+teleport-help: "/as tp <region>"
+teleport-noRentOrBuy: "Region '%0%' is not registered as rent or buy"
+teleport-noPermission: "You don't have permission to teleport to a region"
+teleport-noPermissionOther: "You don't have permission to teleport to region you do not own"
+teleport-success: "You teleported to %0%"
+teleport-noSafe: "No safe position found in region %0%, change the region or set position yourself"
+
+setteleport-help: "/as settp <region>"
+setteleport-noPermission: "You don't have permission to set the teleport location"
+setteleport-noPermissionAll: "You don't have permission to set the teleport location for a region you do not own"
+setteleport-noRentOrBuy: "Region '%0%' is not registered as rent or buy"
+setteleport-success: "Teleport location of %0% set"
+setteleport-notInside: "The location has to be inside the region"
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -36,19 +36,19 @@ public class RightClickListener implements Listener {
 			HashMap<String,String> rent = plugin.getFileManager().getRent(regionName);
 			HashMap<String,String> buy = plugin.getFileManager().getBuy(regionName);
 			
-			if(rent != null && block.getWorld().getName().equals(rent.get(plugin.keyWorld))	
-					&& rent.get(plugin.keyX).equals(String.valueOf(block.getX()))
-					&& rent.get(plugin.keyY).equals(String.valueOf(block.getY()))
-					&& rent.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
+			if(rent != null && block.getWorld().getName().equals(rent.get(AreaShop.keyWorld))	
+					&& rent.get(AreaShop.keyX).equals(String.valueOf(block.getX()))
+					&& rent.get(AreaShop.keyY).equals(String.valueOf(block.getY()))
+					&& rent.get(AreaShop.keyZ).equals(String.valueOf(block.getZ())) ) {
 				
 				plugin.getFileManager().rent(event.getPlayer(), regionName);
 				/* Cancel placing a block */
 				event.setCancelled(true);	
 				
-			} else if(buy != null && block.getWorld().getName().equals(buy.get(plugin.keyWorld))
-					&& buy.get(plugin.keyX).equals(String.valueOf(block.getX()))
-					&& buy.get(plugin.keyY).equals(String.valueOf(block.getY()))
-					&& buy.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
+			} else if(buy != null && block.getWorld().getName().equals(buy.get(AreaShop.keyWorld))
+					&& buy.get(AreaShop.keyX).equals(String.valueOf(block.getX()))
+					&& buy.get(AreaShop.keyY).equals(String.valueOf(block.getY()))
+					&& buy.get(AreaShop.keyZ).equals(String.valueOf(block.getZ())) ) {
 				
 				plugin.getFileManager().buy(event.getPlayer(), regionName);
 				/* Cancel placing a block */

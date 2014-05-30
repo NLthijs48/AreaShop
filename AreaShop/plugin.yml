@@ -1,7 +1,8 @@
 name: AreaShop
 main: nl.evolutioncoding.AreaShop.AreaShop
-version: 1.2
+version: 1.3.0
 depend: [Vault, WorldGuard, WorldEdit]
+softdepend: [Multiverse-Core]
 commands:
   AreaShop:
     description: For all commands use /as help 
@@ -30,6 +31,8 @@ permissions:
       areashop.rentprice: true
       areashop.buyprice: true
       areashop.rentduration: true
+      areashop.teleportall: true
+      areashop.setteleportall: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -89,4 +92,16 @@ permissions:
     default: op
   areashop.rentduration:
     description: Allows you to change the duration of a rent
+    default: op
+  areashop.teleport:
+    description: Teleport to your region
+    default: true
+  areashop.teleportall:
+    description: Teleport to all regions
+    default: op
+  areashop.setteleport:
+    description: Set the teleport spot for your region
+    default: true
+  areashop.setteleportall:
+    description: Set the teleport for other regions
     default: op

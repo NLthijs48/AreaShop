@@ -2,16 +2,19 @@ package nl.evolutioncoding.AreaShop;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
-import nl.evolutioncoding.AreaShop.Metrics.Graph;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,39 +33,55 @@ public final class AreaShop extends JavaPlugin {
 	private Economy economy = null;
 	private FileManager fileManager = null;
 	private LanguageManager languageManager = null;
+	private CommandManager commandManager = null;
 	private boolean configOk = false;
 	private boolean debug = false;
 	private String chatprefix = null;
 	
-	/* Folders where the files will be stored */
-	public final String languageFolder = "lang";
-	public final String schematicFolder = "schem";
-	public final String schematicExtension = ".schematic";	
+	/* Folders and file names */
+	public static final String languageFolder = "lang";
+	public static final String schematicFolder = "schem";
+	public static final String schematicExtension = ".schematic";	
+	public static final String rentsFile = "rents";
+	public static final String buysFile = "buys";
+	public static final String versionFile = "versions";
+	
+	/* Constants for handling file versions */
+	public static final String versionRentKey = "rents";
+	public static final int versionRentCurrent = 1;
+	public static final String versionBuyKey = "buys";
+	public static final int versionBuyCurrent = 1;
 	
 	/* Euro tag for in the config */
-	public final String currencyEuro = "%euro%";
+	public static final String currencyEuro = "%euro%";
 	
 	/* Keys for adding things to the hashmap */
-	public final String keyWorld = "world";
-	public final String keyX = "x";
-	public final String keyY = "y";
-	public final String keyZ = "z";
-	public final String keyDuration = "duration";
-	public final String keyPrice = "price";
-	public final String keyPlayer = "player";
-	public final String keyRentedUntil = "rented";
-	public final String keyName = "name";
-	public final String keyRestore = "restore";
-	public final String keySchemProfile = "profile";
+	public static final String keyWorld = "world";
+	public static final String keyX = "x";
+	public static final String keyY = "y";
+	public static final String keyZ = "z";
+	public static final String keyTPX = "tpx";
+	public static final String keyTPY = "tpy";
+	public static final String keyTPZ = "tpz";
+	public static final String keyTPPitch = "tppitch";
+	public static final String keyTPYaw = "tpyaw";
+	public static final String keyDuration = "duration";
+	public static final String keyPrice = "price";
+	public static final String oldKeyPlayer = "player";
+	public static final String keyPlayerUUID = "playeruuid";
+	public static final String keyRentedUntil = "rented";
+	public static final String keyName = "name";
+	public static final String keyRestore = "restore";
+	public static final String keySchemProfile = "profile";
 	
 	/* Keys for replacing parts of flags */
-	public final String tagPlayerName = "%player%";
-	public final String tagRegionName = "%region%";
-	public final String tagPrice = "%price%";
-	public final String tagDuration = "%duration%";
-	public final String tagRentedUntil = "%until%";
+	public static final String tagPlayerName = "%player%";
+	public static final String tagRegionName = "%region%";
+	public static final String tagPrice = "%price%";
+	public static final String tagDuration = "%duration%";
+	public static final String tagRentedUntil = "%until%";
 	
-	/* Enum for type of event */
+	/* Enum for schematic event types */
 	public enum RegionEventType {		
 		CREATED("Created"),
 		DELETED("Deleted"),
@@ -78,6 +97,19 @@ public final class AreaShop extends JavaPlugin {
 		}
 	} 
 	
+	/* Enum for region types */
+	public enum RegionType {
+		SELL("sell"),
+		RENT("rent");
+		
+		private final String value;
+		private RegionType(String value) {
+			this.value = value;
+		}
+		public String getValue() {
+			return value;
+		}
+	}	
 	
 	/**
 	 * Called on start or reload of the server
@@ -124,11 +156,12 @@ public final class AreaShop extends JavaPlugin {
 	    /* Save the chatPrefix */
 	    chatprefix = this.config().getString("chatPrefix");
 
-		/* Load all data from files */
+		/* Load all data from files and check versions */
 	    fileManager = new FileManager(this);
 	    error = error & !fileManager.loadRents();
 	    fileManager.checkRents();
 	    error = error & !fileManager.loadBuys();
+	    fileManager.convertFiles();
 	    
 		if(error) {
 			this.getLogger().info("The plugin has not started, fix the errors listed above");
@@ -136,20 +169,30 @@ public final class AreaShop extends JavaPlugin {
 			/* Register the event listeners */
 			this.getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 			this.getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
-			this.getServer().getPluginManager().registerEvents(new RightClickListener(this), this);
+			this.getServer().getPluginManager().registerEvents(new RightClickListener(this), this);			
 			
 	        /* Start thread for checking renting */
 	        int checkDelay = Integer.parseInt(this.config().getString("checkDelay"))*20;
 	        new RentCheck(this).runTaskTimer(this, checkDelay, checkDelay);
 		    
 		    /* Bind commands for this plugin */
-			getCommand("AreaShop").setExecutor(new CommandManager(this));	
+	        commandManager = new CommandManager(this);
 			
 			if(this.config().getBoolean("sendStats")) {
 				this.startMetrics();
 			}
 			
 		}
+	}
+	
+	// Debug
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		this.debug("getUniqueId() = " + player.getUniqueId());
+		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
+		this.debug("offlinePlayer.getName() = " + offlinePlayer.getName());
+		this.debug("offlinePlayer.getUniqueId() = " + offlinePlayer.getUniqueId());
 	}
 	
 	/**
@@ -183,11 +226,19 @@ public final class AreaShop extends JavaPlugin {
 	}
 	
 	/**
-	 * Function to get the WorldGuard plugin
-	 * @return WorldGuardPlugin
+	 * Function to get the LanguageManager
+	 * @return the LanguageManager
 	 */
 	public LanguageManager getLanguageManager() {
 	    return languageManager;
+	}
+	
+	/**
+	 * Function to get the CommandManager
+	 * @return the CommandManager
+	 */
+	public CommandManager getCommandManager() {
+		return commandManager;
 	}
 	
 	/**
@@ -287,73 +338,11 @@ public final class AreaShop extends JavaPlugin {
 		}		
 	}
 	
-	/**
-	 * Shows the help page for the player
-	 * @param player The player to show the help to
-	 */
-	public void showHelp(CommandSender target) {
-		/* Set up the list of messages to be sent */
-		ArrayList<String> messages = new ArrayList<String>();
-		messages.add(this.config().getString("chatPrefix") + languageManager.getLang("help-header"));
-		messages.add(this.config().getString("chatPrefix") + languageManager.getLang("help-alias"));
-		if(target.hasPermission("areashop.help")) {
-			messages.add(languageManager.getLang("help-help"));
-		}
-		if(target.hasPermission("areashop.info")) {
-			messages.add(languageManager.getLang("help-info"));
-		}
-		if(target.hasPermission("areashop.rent")) {
-			messages.add(languageManager.getLang("help-rent"));
-		}
-		if(target.hasPermission("areashop.buy")) {
-			messages.add(languageManager.getLang("help-buy"));
-		}
-		if(target.hasPermission("areashop.unrent")) {
-			messages.add(languageManager.getLang("help-unrent"));
-		} else if(target.hasPermission("areashop.unrentown")) {
-			messages.add(languageManager.getLang("help-unrentOwn"));
-		}
-		if(target.hasPermission("areashop.sell")) {
-			messages.add(languageManager.getLang("help-sell"));
-		} else if(target.hasPermission("areashop.sellown")) {
-			messages.add(languageManager.getLang("help-sellOwn"));
-		}
-		if(target.hasPermission("areashop.updaterents")) {
-			messages.add(languageManager.getLang("help-updaterents"));
-		}
-		if(target.hasPermission("areashop.updatebuys")) {
-			messages.add(languageManager.getLang("help-updatebuys"));
-		}
-		if(target.hasPermission("areashop.rentrestore")) {
-			messages.add(languageManager.getLang("help-rentrestore"));
-		}
-		if(target.hasPermission("areashop.buyrestore")) {
-			messages.add(languageManager.getLang("help-buyrestore"));
-		}
-		if(target.hasPermission("areashop.rentprice")) {
-			messages.add(languageManager.getLang("help-rentprice"));
-		}
-		if(target.hasPermission("areashop.buyprice")) {
-			messages.add(languageManager.getLang("help-buyprice"));
-		}
-		if(target.hasPermission("areashop.rentduration")) {
-			messages.add(languageManager.getLang("help-rentduration"));
-		}
-		if(target.hasPermission("areashop.reload")) {
-			messages.add(languageManager.getLang("help-reload"));
-		}
-		
-		/* Send them all */
-		for(int i=0; i<messages.size(); i++) {
-			target.sendMessage(this.fixColors(messages.get(i)));
-		}
-	}
-	
 	private void startMetrics() {
 		try {
 		    Metrics metrics = new Metrics(this);
 		    // Number of rents rented/not rented
-		    Graph rentGraph = metrics.createGraph("Rent regions");
+		    /*Graph rentGraph = metrics.createGraph("Rent regions");
 		    rentGraph.addPlotter(new Metrics.Plotter("For rent") {
 	            @Override
 	            public int getValue() {
@@ -404,7 +393,7 @@ public final class AreaShop extends JavaPlugin {
                     return result;
 	            }
 		    });
-		    
+		    */
 		    metrics.start();
 		} catch (IOException e) {
 		    this.debug("Could not start Metrics");
@@ -584,6 +573,46 @@ public final class AreaShop extends JavaPlugin {
 		chatprefix = this.config().getString("chatPrefix");
 		languageManager = new LanguageManager(this);
 		fileManager.checkRents();
+	}
+	
+	/**
+	 * Conversion to name by uuid
+	 * @param uuid The uuid in string format
+	 * @return the name of the player
+	 */
+	public String toName(String uuid) {
+		if(uuid == null) {
+			return null;
+		} else {
+			return this.toName(UUID.fromString(uuid));			
+		}
+	}
+	/**
+	 * Conversion to name by uuid object
+	 * @param uuid The uuid in string format
+	 * @return the name of the player
+	 */
+	public String toName(UUID uuid) {
+		if(uuid == null) {
+			return null;
+		} else {
+			return Bukkit.getOfflinePlayer(uuid).getName();			
+		}
+	}
+	
+	/**
+	 * Conversion from name to uuid
+	 * @param name The name of the player
+	 * @return The uuid of the player
+	 */
+	@SuppressWarnings("deprecation") // Fake deprecation by Bukkit to inform developers, method will stay
+	public String toUUID(String name) {
+		if(name == null) {
+			return null;
+		} else {
+			return Bukkit.getOfflinePlayer(name).getUniqueId().toString();
+		}
+		
 	}
 	
 }

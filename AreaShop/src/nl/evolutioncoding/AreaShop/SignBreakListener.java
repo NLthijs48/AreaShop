@@ -42,10 +42,10 @@ public final class SignBreakListener implements Listener {
 			/* Check if the rent sign is really the same as a saved rent */
 			HashMap<String,String> rent = plugin.getFileManager().getRent(sign.getLine(1));
 			HashMap<String,String> buy = plugin.getFileManager().getBuy(sign.getLine(1));
-			if(rent != null && rent.get(plugin.keyWorld).equals(block.getWorld().getName())	
-					&& rent.get(plugin.keyX).equals(String.valueOf(block.getX()))
-					&& rent.get(plugin.keyY).equals(String.valueOf(block.getY()))
-					&& rent.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
+			if(rent != null && rent.get(AreaShop.keyWorld).equals(block.getWorld().getName())	
+					&& rent.get(AreaShop.keyX).equals(String.valueOf(block.getX()))
+					&& rent.get(AreaShop.keyY).equals(String.valueOf(block.getY()))
+					&& rent.get(AreaShop.keyZ).equals(String.valueOf(block.getZ())) ) {
 				/* Remove the rent if the player has permission */
 				if(event.getPlayer().hasPermission("areashop.destroyrent")) {
 					plugin.getFileManager().handleSchematicEvent(sign.getLine(1), true, RegionEventType.DELETED);
@@ -58,10 +58,10 @@ public final class SignBreakListener implements Listener {
 					event.setCancelled(true);
 					event.getPlayer().sendMessage(plugin.fixColors(plugin.config().getString("chatPrefix")) + "You don't have permission for destroying a sign for renting a region");
 				}
-			} else if(buy != null && buy.get(plugin.keyWorld).equals(block.getWorld().getName())	
-					&& buy.get(plugin.keyX).equals(String.valueOf(block.getX()))
-					&& buy.get(plugin.keyY).equals(String.valueOf(block.getY()))
-					&& buy.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
+			} else if(buy != null && buy.get(AreaShop.keyWorld).equals(block.getWorld().getName())	
+					&& buy.get(AreaShop.keyX).equals(String.valueOf(block.getX()))
+					&& buy.get(AreaShop.keyY).equals(String.valueOf(block.getY()))
+					&& buy.get(AreaShop.keyZ).equals(String.valueOf(block.getZ())) ) {
 				/* Remove the buy if the player has permission */
 				if(event.getPlayer().hasPermission("areashop.destroybuy")) {
 					plugin.getFileManager().handleSchematicEvent(sign.getLine(1), false, RegionEventType.DELETED);
@@ -91,19 +91,19 @@ public final class SignBreakListener implements Listener {
 				/* Check if the rent sign is really the same as a saved rent */
 				HashMap<String,String> rent = plugin.getFileManager().getRent(sign.getLine(1));
 				HashMap<String,String> buy = plugin.getFileManager().getBuy(sign.getLine(1));
-				if(rent != null && rent.get(plugin.keyWorld).equals(block.getWorld().getName())	
-						&& rent.get(plugin.keyX).equals(String.valueOf(block.getX()))
-						&& rent.get(plugin.keyY).equals(String.valueOf(block.getY()))
-						&& rent.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
+				if(rent != null && rent.get(AreaShop.keyWorld).equals(block.getWorld().getName())	
+						&& rent.get(AreaShop.keyX).equals(String.valueOf(block.getX()))
+						&& rent.get(AreaShop.keyY).equals(String.valueOf(block.getY()))
+						&& rent.get(AreaShop.keyZ).equals(String.valueOf(block.getZ())) ) {
 					/* Remove the rent */
 					boolean result = plugin.getFileManager().removeRent(sign.getLine(1), true);
 					if(result) {
 						plugin.getLogger().info("Renting of region '" + sign.getLine(1) + "' has been removed by indirectly breaking the sign");
 					}
-				} else if(buy != null && buy.get(plugin.keyWorld).equals(block.getWorld().getName())	
-						&& buy.get(plugin.keyX).equals(String.valueOf(block.getX()))
-						&& buy.get(plugin.keyY).equals(String.valueOf(block.getY()))
-						&& buy.get(plugin.keyZ).equals(String.valueOf(block.getZ())) ) {
+				} else if(buy != null && buy.get(AreaShop.keyWorld).equals(block.getWorld().getName())	
+						&& buy.get(AreaShop.keyX).equals(String.valueOf(block.getX()))
+						&& buy.get(AreaShop.keyY).equals(String.valueOf(block.getY()))
+						&& buy.get(AreaShop.keyZ).equals(String.valueOf(block.getZ())) ) {
 					/* Remove the buy */
 					boolean result = plugin.getFileManager().removeBuy(sign.getLine(1), true);
 					if(result) {

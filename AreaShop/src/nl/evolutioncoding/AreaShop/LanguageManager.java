@@ -36,7 +36,7 @@ public class LanguageManager {
 	public void saveDefaults() {
 		/* Create the language folder if it not exists */
 		File langFolder;
-		langFolder = new File(plugin.getDataFolder() + File.separator + plugin.languageFolder);
+		langFolder = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder);
 		if(!langFolder.exists()) {
 			langFolder.mkdirs();
 		}
@@ -47,11 +47,11 @@ public class LanguageManager {
 		/* file name as the default */
 		File langFile;
 		for(int i=0; i<languages.length; i++) {
-			langFile = new File(plugin.getDataFolder() + File.separator + plugin.languageFolder + File.separator + languages[i] + ".yml");
+			langFile = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + File.separator + languages[i] + ".yml");
 			InputStream input = null;
 			OutputStream output = null;
 			try {
-				input = plugin.getResource(plugin.languageFolder + "/" + languages[i] + ".yml");
+				input = plugin.getResource(AreaShop.languageFolder + "/" + languages[i] + ".yml");
 				output = new FileOutputStream(langFile);
 		 
 				int read = 0;
@@ -83,7 +83,7 @@ public class LanguageManager {
 		
 		/* Save the current language file to the HashMap */
 		currentLanguage = new HashMap<String, String>();		
-		File file = new File(plugin.getDataFolder() + File.separator + plugin.languageFolder + File.separator + plugin.config().getString("language") + ".yml");
+		File file = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + File.separator + plugin.config().getString("language") + ".yml");
 		ymlFile = YamlConfiguration.loadConfiguration(file);
 		map = ymlFile.getValues(true);
 		set = map.keySet();
@@ -95,11 +95,8 @@ public class LanguageManager {
 		
 		/* Save the default strings to the HashMap */
 		defaultLanguage = new HashMap<String, String>();
-        InputStream defConfigStream = plugin.getResource(plugin.languageFolder + "/" + plugin.config().getString("language") + ".yml");
-        if (defConfigStream == null) {
-        	defConfigStream = plugin.getResource(plugin.languageFolder + "/" + languages[0]+ ".yml");
-        }
-        ymlFile = YamlConfiguration.loadConfiguration(defConfigStream);       
+		File standard = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + "/" + languages[0]+ ".yml");
+        ymlFile = YamlConfiguration.loadConfiguration(standard);   
         map = ymlFile.getValues(true);
 		set = map.keySet();
 		try {
@@ -128,9 +125,11 @@ public class LanguageManager {
 		if(result == null) {
 			plugin.getLogger().info("Wrong key for getting translation: " + key);
 		} else {
-			/* Replace all tags,  e.g. %1% */
+			/* Replace all tags,  e.g. %0% */
 		    for (int i=0; i<params.length; i++) {
-		        result = result.replace("%" + i + "%", params[i].toString());
+		    	if(params[i] != null) {
+		    		result = result.replace("%" + i + "%", params[i].toString());
+		    	}
 		    }
 		}
 	    

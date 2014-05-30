@@ -4,6 +4,7 @@
 # Copy this file and change the strings to your   #
 # favor. Then change the 'language' setting in    #
 # the config to the filename (excluding .yml)     #
+# NOT TOTALLY UPDATED FOR 1.3.0                   #
 ###################################################
 
 ########## Command strings
@@ -114,15 +115,17 @@ help-buyrestore: "&6/as buyrestore &7-&r Laat dit koop gebied herstellen of niet
 help-rentprice: "&6/as rentprice &7-&r Verander de prijs van een huur gebied"
 help-buyprice: "&6/as buyprice &7-&r Verander de prijs van een koop gebied"
 help-rentduration: "&6/as rentduration &7-&r Verander de looptijd van een huur gebied"
+help-teleport: "&6/as tp &7-&r Teleporteer naar je gekochte/gehuurde gebieden"
+help-teleportAll: "&6/as tp &7-&r Teleporteer naar koop/huur gebieden"
 
-rentrestore-help: "/as rentrestore <gebied> <true|false|general>"
+rentrestore-help: "/as rentrestore <gebied> <true|false|general> [profiel]"
 rentrestore-noPermission: "Je hebt geen toestemming om herstel instellingen te veranderen bij een huur gebied"
 rentrestore-notRegistered: "%0% is niet geregistreerd als een huur gebied"
 rentrestore-invalidSetting: "'%0%' is geen goede optie, gebruik true, false of general"
 rentrestore-success: "Succesvol de herstel optie gezet van %0% naar '%1%'"
 rentrestore-successProfile: "Succesvol de herstel optie gezet van %0% naar '%1%' en het profiel naar '%2%'"
 
-buyrestore-help: "/as buyrestore <gebied> <true|false|general>"
+buyrestore-help: "/as buyrestore <gebied> <true|false|general> [profiel]"
 buyrestore-noPermission: "Je hebt geen toestemming om herstel instellingen te veranderen bij geen koop gebied"
 buyrestore-notRegistered: "%0% is niet geregistreerd als een koop gebied"
 buyrestore-invalidSetting: "'%0%' is geen goede optie, gebruik true, false of general"
@@ -148,6 +151,23 @@ rentduration-wrongPrice: "'%0%' is geen goede prijs, gebruik een geheel getal"
 rentduration-wrongFormat: "'%0%' is geen goed tijdformaat, bekijk de documentatie op Bukkit"
 rentduration-success: "Looptijd van gebeid %0% veranderd naar '%1%'"
 
+setup-noRegion: "Je hebt geen gebied aangegeven op de tweede regel"
+setup-wrongRegion: "Het aangegeven gebied bestaat niet"
+setup-alreadyRentSign: "Het aangegeven gebied heeft al een bord voor huren"
+setup-alreadyBuySign: "Het aangegeven gebied heeft al een bord voor kopen"
+setup-noDuration: "Je hebt geen tijdsduur voor het huren aangegeven, zet dit op de derde regel"
+setup-wrongDuration: "De aangegeven tijdsduur is niet in het correcte formaat, voorbeeld: 1 dag"
+setup-noPrice: "Je hebt geen prijs aangegeven op de vierde regel"
+setup-wrongPrice: "Je hebt de prijs niet goed aangegeven, gebruik een nummer"
+setup-rentSuccess: "Huren van gebied %0% is goed opgezet"
+setup-buySuccess: "Kopen van gebied %0% is goed opgezet"
+setup-noPermissionRent: "Je hebt geen toestemming om huur gebieden op te zetten"
+setup-noPermissionBuy: "Je hebt geen toestemming om koop gebieden op te zetten"
+setup-couldNotDetect: "Meerdere gebieden gevonden met dezelfde prioriteit en/of parent/child relatie, geeft een specifieke aan op de tweede regel (2 van de gebieden die gevonden zijn: %0% en %1%)"
 
-
-
+teleport-help: "/as tp <gebied> <aantal> <soort>"
+teleport-noRentOrBuy: "Gebied '%0%' is niet geregistreerd als koop of huur gebied"
+teleport-noPermission: "Je hebt geen toestemming om te teleporteren naar een gebied"
+teleport-noPermissionOther: "Je hebt geen toestemming om te teleporteren naar een gebied dat niet van jou is"
+teleport-success: "Je bent naar %0% geteleporteerd"
+teleport-noSafe: "Geen veilige plek gevonden in gebied %0%, verander het gebied of stel de teleporteer positie in"

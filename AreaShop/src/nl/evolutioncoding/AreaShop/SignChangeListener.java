@@ -1,13 +1,14 @@
 package nl.evolutioncoding.AreaShop;
 
-import java.util.HashMap;
-
-import nl.evolutioncoding.AreaShop.AreaShop.RegionEventType;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion.BuyEvent;
+import nl.evolutioncoding.AreaShop.regions.RentRegion;
+import nl.evolutioncoding.AreaShop.regions.RentRegion.RentEvent;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -108,28 +109,17 @@ public final class SignChangeListener implements Listener {
 				}
 				
 				/* Add rent to the FileManager */
-				HashMap<String,String> rent = new HashMap<String,String>();
-				rent.put(AreaShop.keyWorld, event.getBlock().getWorld().getName());
-				rent.put(AreaShop.keyX, String.valueOf(event.getBlock().getX()));
-				rent.put(AreaShop.keyY, String.valueOf(event.getBlock().getY()));
-				rent.put(AreaShop.keyZ, String.valueOf(event.getBlock().getZ()));
-				rent.put(AreaShop.keyDuration, thirdLine);
-				rent.put(AreaShop.keyPrice, fourthLine);
-				rent.put(AreaShop.keyName, regionManager.getRegion(secondLine).getId());
-				rent.put(AreaShop.keyRestore, "general");
-				rent.put(AreaShop.keySchemProfile, "default");
-				
+				RentRegion rent = new RentRegion(plugin, secondLine, event.getBlock().getLocation(), Double.parseDouble(fourthLine), thirdLine);
 				plugin.getFileManager().addRent(secondLine, rent);
-				plugin.getFileManager().handleSchematicEvent(secondLine, true, RegionEventType.CREATED);
-				event.setLine(0, plugin.fixColors(plugin.config().getString("signRentable")));
-				event.setLine(1, regionManager.getRegion(secondLine).getId());
-				event.setLine(2, thirdLine);
-				event.setLine(3, plugin.formatCurrency(fourthLine));
+				rent.handleSchematicEvent(RentEvent.CREATED);
+				String[] signLines = rent.getSignLines();
+				for(int i=0; i<signLines.length; i++) {
+					event.setLine(i, signLines[i]);
+				}
 				
 				/* Set the flags for the region */
-				plugin.getFileManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForRent"), true);
-
-				plugin.message(player, "setup-rentSuccess", regionManager.getRegion(secondLine).getId());
+				rent.updateRegionFlags();
+				plugin.message(player, "setup-rentSuccess", rent.getName());
 			}
 		} else if (event.getLine(0).contains(plugin.config().getString("buySign"))) {
 			/* Check for permission */
@@ -195,24 +185,17 @@ public final class SignChangeListener implements Listener {
 				}
 				
 				/* Add buy to the FileManager */
-				HashMap<String,String> buy = new HashMap<String,String>();
-				buy.put(AreaShop.keyWorld, event.getBlock().getWorld().getName());
-				buy.put(AreaShop.keyX, String.valueOf(event.getBlock().getX()));
-				buy.put(AreaShop.keyY, String.valueOf(event.getBlock().getY()));
-				buy.put(AreaShop.keyZ, String.valueOf(event.getBlock().getZ()));
-				buy.put(AreaShop.keyPrice, thirdLine);
-				buy.put(AreaShop.keyName, regionManager.getRegion(secondLine).getId());
-				buy.put(AreaShop.keyRestore, "general");
-				buy.put(AreaShop.keySchemProfile, "default");
+				BuyRegion buy = new BuyRegion(plugin, secondLine, event.getBlock().getLocation(), Double.parseDouble(thirdLine));
 				
 				plugin.getFileManager().addBuy(secondLine, buy);
-				plugin.getFileManager().handleSchematicEvent(secondLine, false, RegionEventType.CREATED);
-				event.setLine(0, plugin.fixColors(plugin.config().getString("signBuyable")));
-				event.setLine(1, regionManager.getRegion(secondLine).getId());
-				event.setLine(2, plugin.formatCurrency(thirdLine));
+				buy.handleSchematicEvent(BuyEvent.CREATED);
+				String[] signLines = buy.getSignLines();
+				for(int i=0; i<signLines.length; i++) {
+					event.setLine(i, signLines[i]);
+				}
 				
 				/* Set the flags for the region */
-				plugin.getFileManager().setRegionFlags(secondLine, plugin.config().getConfigurationSection("flagsForSale"), false);
+				buy.updateRegionFlags();
 				
 				plugin.message(player, "setup-buySuccess", regionManager.getRegion(secondLine).getId());
 			}

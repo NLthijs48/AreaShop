@@ -1,8 +1,10 @@
 package nl.evolutioncoding.AreaShop.commands;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -36,22 +38,30 @@ public class RentpriceCommand extends CommandAreaShop {
 			plugin.message(sender, "rentprice-help");
 			return;
 		}		
-		HashMap<String,String> rent = plugin.getFileManager().getRent(args[1]);
+		RentRegion rent = plugin.getFileManager().getRent(args[1]);
 		if(rent == null) {
 			plugin.message(sender, "rentprice-notRegistered", args[1]);
 			return;
-		} 		
+		} 	
+		double price = 0.0;
 		try {
-			Double.parseDouble(args[2]);
+			price = Double.parseDouble(args[2]);
 		} catch(NumberFormatException e) {
 			plugin.message(sender, "rentprice-wrongPrice", args[2]);
 			return;
-		}		
-		rent.put(AreaShop.keyPrice, args[2]);
+		}	
+		rent.setPrice(price);
 		plugin.getFileManager().saveRents();
-		plugin.getFileManager().updateRentSign(args[1]);
-		plugin.getFileManager().updateRentRegion(args[1]);
-		plugin.message(sender, "rentprice-success", rent.get(AreaShop.keyName), args[2], rent.get(AreaShop.keyDuration));
+		plugin.message(sender, "rentprice-success", rent.getName(), args[2], rent.getDurationString());
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		List<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			result = plugin.getFileManager().getRentNames();		
+		}
+		return result;
 	}
 
 }

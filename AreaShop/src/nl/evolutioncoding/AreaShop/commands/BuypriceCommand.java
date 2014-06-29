@@ -1,8 +1,10 @@
 package nl.evolutioncoding.AreaShop.commands;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -38,24 +40,54 @@ public class BuypriceCommand extends CommandAreaShop {
 			return;
 		}
 		
-		HashMap<String,String> buy = plugin.getFileManager().getBuy(args[1]);
+		BuyRegion buy = plugin.getFileManager().getBuy(args[1]);
 		if(buy == null) {
 			plugin.message(sender, "buyprice-notRegistered", args[1]);
 			return;
 		} 
 
+		double price = 0.0;
 		try {
-			Double.parseDouble(args[2]);
+			price = Double.parseDouble(args[2]);
 		} catch(NumberFormatException e) {
 			plugin.message(sender, "buyprice-wrongPrice", args[2]);
 			return;
 		}
 		
-		buy.put(AreaShop.keyPrice, args[2]);
-		plugin.getFileManager().saveBuys();
-		plugin.getFileManager().updateBuySign(args[1]);
-		plugin.getFileManager().updateBuyRegion(args[1]);
-		plugin.message(sender, "buyprice-success", buy.get(AreaShop.keyName), args[2]);
+		buy.setPrice(price);
+		buy.save();
+		plugin.message(sender, "buyprice-success", buy.getName(), args[2]);
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		List<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			result = plugin.getFileManager().getBuyNames();		
+		}
+		return result;
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

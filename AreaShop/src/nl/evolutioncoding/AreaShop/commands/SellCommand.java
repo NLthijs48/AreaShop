@@ -1,8 +1,7 @@
 package nl.evolutioncoding.AreaShop.commands;
 
-import java.util.HashMap;
-
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -35,23 +34,23 @@ public class SellCommand extends CommandAreaShop {
 			plugin.message(sender, "sell-help");
 			return;
 		}
-		HashMap<String,String> buy = plugin.getFileManager().getBuy(args[1]);
+		BuyRegion buy = plugin.getFileManager().getBuy(args[1]);
 		if(buy == null) {
 			plugin.message(sender, "sell-notRegistered");
 			return;
 		}
-		if(buy.get(AreaShop.keyPlayerUUID) == null) {
+		if(!buy.isSold()) {
 			plugin.message(sender, "sell-notBought");
 			return;
 		}
 		if(sender.hasPermission("areashop.sell")) {
-			plugin.message(sender, "sell-sold", plugin.toName(buy.get(AreaShop.keyPlayerUUID)));
-			plugin.getFileManager().unBuy(args[1], true);
+			plugin.message(sender, "sell-sold", buy.getPlayerName());
+			buy.sell(true);
 		} else {
 			if(sender.hasPermission("areashop.sellown") && sender instanceof Player) {
-				if(buy.get(AreaShop.keyPlayerUUID).equals(((Player)sender).getUniqueId().toString())) {
+				if(buy.getOwner().equals(((Player)sender).getUniqueId())) {
 					plugin.message(sender, "sell-soldYours");
-					plugin.getFileManager().unBuy(args[1], true);
+					buy.sell(true);
 				} else {
 					plugin.message(sender, "sell-noPermissionOther");
 				}
@@ -61,3 +60,19 @@ public class SellCommand extends CommandAreaShop {
 		}		
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

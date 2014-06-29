@@ -1,8 +1,7 @@
 package nl.evolutioncoding.AreaShop.commands;
 
-import java.util.HashMap;
-
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -35,23 +34,23 @@ public class UnrentCommand extends CommandAreaShop {
 			plugin.message(sender, "unrent-help");
 			return;
 		}		
-		HashMap<String,String> rent = plugin.getFileManager().getRent(args[1]);
+		RentRegion rent = plugin.getFileManager().getRent(args[1]);
 		if(rent == null) {
 			plugin.message(sender, "unrent-notRegistered");
 			return;
 		}		
-		if(rent.get(AreaShop.keyPlayerUUID) == null) {
+		if(!rent.isRented()) {
 			plugin.message(sender, "unrent-notRented");
 			return;
 		}		
 		if(sender.hasPermission("areashop.unrent")) {
-			plugin.message(sender, "unrent-other", plugin.toName(rent.get(AreaShop.keyPlayerUUID)));
-			plugin.getFileManager().unRent(args[1], true);
+			plugin.message(sender, "unrent-other", rent.getPlayerName());
+			rent.unRent(true);
 		} else {
 			if(sender.hasPermission("areashop.unrentown") && sender instanceof Player) {
-				if(rent.get(AreaShop.keyPlayerUUID).equals(((Player)sender).getUniqueId().toString())) {
+				if(rent.getRenter().equals(((Player)sender).getUniqueId())) {
 					plugin.message(sender, "unrent-unrented");
-					plugin.getFileManager().unRent(args[1], true);
+					rent.unRent(true);
 				} else {
 					plugin.message(sender, "unrent-noPermissionOther");
 				}

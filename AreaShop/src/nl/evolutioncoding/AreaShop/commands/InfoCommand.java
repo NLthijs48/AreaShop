@@ -1,13 +1,20 @@
 package nl.evolutioncoding.AreaShop.commands;
 
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class InfoCommand extends CommandAreaShop {
 
@@ -37,9 +44,9 @@ public class InfoCommand extends CommandAreaShop {
 				/* Message for rents */
 				Iterator<String> it = plugin.getFileManager().getRents().keySet().iterator();
 				if(it.hasNext()) {
-					message = plugin.getFileManager().getRent(it.next()).get(AreaShop.keyName);
+					message = plugin.getFileManager().getRent(it.next()).getName();
 					while(it.hasNext()) {
-						message += ", " + plugin.getFileManager().getRent(it.next()).get(AreaShop.keyName);
+						message += ", " + plugin.getFileManager().getRent(it.next()).getName();
 					}
 				}
 				if(message.equals("")) {
@@ -49,11 +56,12 @@ public class InfoCommand extends CommandAreaShop {
 				}
 				
 				/* Message for buys */
+				message = "";
 				it = plugin.getFileManager().getBuys().keySet().iterator();
 				if(it.hasNext()) {
-					message = plugin.getFileManager().getBuy(it.next()).get(AreaShop.keyName);
+					message = plugin.getFileManager().getBuy(it.next()).getName();
 					while(it.hasNext()) {
-						message += ", " + plugin.getFileManager().getBuy(it.next()).get(AreaShop.keyName);
+						message += ", " + plugin.getFileManager().getBuy(it.next()).getName();
 					}
 				}
 				if(message.equals("")) {
@@ -68,8 +76,8 @@ public class InfoCommand extends CommandAreaShop {
 				Iterator<String> it = plugin.getFileManager().getRents().keySet().iterator();
 				boolean first = true;
 				while(it.hasNext()) {
-					String next = plugin.getFileManager().getRent(it.next()).get(AreaShop.keyName);
-					if(plugin.getFileManager().getRent(next).get(AreaShop.keyPlayerUUID) != null) {
+					String next = plugin.getFileManager().getRent(it.next()).getName();
+					if(plugin.getFileManager().getRent(next).isRented()) {
 						if(!first) {
 							message += ", " + next;
 						} else {
@@ -90,8 +98,8 @@ public class InfoCommand extends CommandAreaShop {
 				Iterator<String> it = plugin.getFileManager().getRents().keySet().iterator();
 				boolean first = true;
 				while(it.hasNext()) {
-					String next = plugin.getFileManager().getRent(it.next()).get(AreaShop.keyName);
-					if(plugin.getFileManager().getRent(next).get(AreaShop.keyPlayerUUID) == null) {
+					String next = plugin.getFileManager().getRent(it.next()).getName();
+					if(!plugin.getFileManager().getRent(next).isRented()) {
 						if(!first) {
 							message += ", " + next;
 						} else {
@@ -110,8 +118,8 @@ public class InfoCommand extends CommandAreaShop {
 				Iterator<String> it = plugin.getFileManager().getBuys().keySet().iterator();
 				boolean first = true;
 				while(it.hasNext()) {
-					String next = plugin.getFileManager().getBuy(it.next()).get(AreaShop.keyName);
-					if(plugin.getFileManager().getBuy(next).get(AreaShop.keyPlayerUUID) != null) {
+					String next = plugin.getFileManager().getBuy(it.next()).getName();
+					if(plugin.getFileManager().getBuy(next).isSold()) {
 						if(!first) {
 							message += ", ";
 						} else {
@@ -130,8 +138,8 @@ public class InfoCommand extends CommandAreaShop {
 				Iterator<String> it = plugin.getFileManager().getBuys().keySet().iterator();
 				boolean first = true;
 				while(it.hasNext()) {
-					String next = plugin.getFileManager().getBuy(it.next()).get(AreaShop.keyName);
-					if(plugin.getFileManager().getBuy(next).get(AreaShop.keyPlayerUUID) == null) {
+					String next = plugin.getFileManager().getBuy(it.next()).getName();
+					if(!plugin.getFileManager().getBuy(next).isSold()) {
 						if(!first) {
 							message += ", " + next;
 						} else {
@@ -151,8 +159,8 @@ public class InfoCommand extends CommandAreaShop {
 					Iterator<String> it = plugin.getFileManager().getRents().keySet().iterator();
 					boolean first = true;
 					while(it.hasNext()) {
-						String next = plugin.getFileManager().getRent(it.next()).get(AreaShop.keyName);
-						if(plugin.getFileManager().getRent(next).get(AreaShop.keyPlayerUUID) != null && plugin.toName(plugin.getFileManager().getRent(next).get(AreaShop.keyPlayerUUID)).equalsIgnoreCase(args[2])) {
+						String next = plugin.getFileManager().getRent(it.next()).getName();
+						if(plugin.getFileManager().getRent(next).isRented() && plugin.getFileManager().getRent(next).getPlayerName().equalsIgnoreCase(args[2])) {
 							if(!first) {
 								message += ", " + next;
 							} else {
@@ -171,8 +179,8 @@ public class InfoCommand extends CommandAreaShop {
 					it = plugin.getFileManager().getBuys().keySet().iterator();
 					first = true;
 					while(it.hasNext()) {
-						String next = plugin.getFileManager().getBuy(it.next()).get(AreaShop.keyName);
-						if(plugin.getFileManager().getBuy(next).get(AreaShop.keyPlayerUUID) != null && plugin.toName(plugin.getFileManager().getBuy(next).get(AreaShop.keyPlayerUUID)).equalsIgnoreCase(args[2])) {
+						String next = plugin.getFileManager().getBuy(it.next()).getName();
+						if(plugin.getFileManager().getBuy(next).isSold() && plugin.getFileManager().getBuy(next).getPlayerName().equalsIgnoreCase(args[2])) {
 							if(!first) {
 								message += ", ";
 							} else {
@@ -192,31 +200,31 @@ public class InfoCommand extends CommandAreaShop {
 			} else if(args[1].equalsIgnoreCase("region")) {
 				if(args.length > 2 && args[2] != null) {
 					
-					HashMap<String,String> rent = plugin.getFileManager().getRent(args[2]);
-					HashMap<String,String> buy = plugin.getFileManager().getBuy(args[2]);
+					RentRegion rent = plugin.getFileManager().getRent(args[2]);
+					BuyRegion buy = plugin.getFileManager().getBuy(args[2]);
 					
 					if(rent == null) {
 						plugin.message(sender, "info-regionRenting", args[2]);
 						plugin.message(sender, "info-regionNoRenting", args[2]);
 					} else {
-						plugin.message(sender, "info-regionRenting", rent.get(AreaShop.keyName));
-						plugin.message(sender, "info-regionSign", rent.get(AreaShop.keyWorld), rent.get(AreaShop.keyX), rent.get(AreaShop.keyY), rent.get(AreaShop.keyZ));
-						plugin.message(sender, "info-regionPriceDuration", plugin.formatCurrency(rent.get(AreaShop.keyPrice)), rent.get(AreaShop.keyDuration));
-						if(rent.get(AreaShop.keyPlayerUUID) == null) {
+						plugin.message(sender, "info-regionRenting", rent.getName());
+						plugin.message(sender, "info-regionSign", rent.getWorldName(), rent.getSignLocation().getBlockX(), rent.getSignLocation().getBlockY(), rent.getSignLocation().getBlockZ());
+						plugin.message(sender, "info-regionPriceDuration", rent.getFormattedPrice(), rent.getDuration());
+						if(!rent.isRented()) {
 							plugin.message(sender, "info-regionNotRented");
 						} else {
 							SimpleDateFormat dateFull = new SimpleDateFormat("dd MMMMMMMMMMMMMMMMM yyyy HH:mm");
-							plugin.message(sender, "info-regionRentedBy", plugin.toName(rent.get(AreaShop.keyPlayerUUID)), dateFull.format(Long.parseLong(rent.get(AreaShop.keyRentedUntil))));
+							plugin.message(sender, "info-regionRentedBy", rent.getPlayerName(), dateFull.format(rent.getDuration()));
 						}
 						if(sender.hasPermission("areashop.rentrestore")) {
-							plugin.message(sender, "info-regionRestore", rent.get(AreaShop.keyRestore));
-							plugin.message(sender, "info-regionRestoreProfile", rent.get(AreaShop.keySchemProfile));
+							plugin.message(sender, "info-regionRestore", rent.getRestoreSetting());
+							plugin.message(sender, "info-regionRestoreProfile", rent.getRestoreProfile());
 						}
 						if(sender.hasPermission("areashop.teleport")) {
-							if(rent.get(AreaShop.keyTPX) == null) {
+							if(rent.getTeleportLocation() == null) {
 								plugin.message(sender, "info-regionNoTP");
 							} else {
-								plugin.message(sender, "info-regionTPLocation", rent.get(AreaShop.keyWorld), rent.get(AreaShop.keyTPX), rent.get(AreaShop.keyTPY), rent.get(AreaShop.keyTPZ), rent.get(AreaShop.keyTPPitch), rent.get(AreaShop.keyTPYaw));
+								plugin.message(sender, "info-regionTPLocation", rent.getTeleportLocation().getWorld().toString(), rent.getTeleportLocation().getBlockX(), rent.getTeleportLocation().getBlockY(), rent.getTeleportLocation().getBlockZ(), rent.getTeleportLocation().getPitch(), rent.getTeleportLocation().getYaw());
 							}
 						}
 					}
@@ -225,23 +233,23 @@ public class InfoCommand extends CommandAreaShop {
 						plugin.message(sender, "info-regionBuying", args[2]);
 						plugin.message(sender, "info-regionNoBuying", args[2]);
 					} else {
-						plugin.message(sender, "info-regionBuying", buy.get(AreaShop.keyName));
-						plugin.message(sender, "info-regionSign", buy.get(AreaShop.keyWorld), buy.get(AreaShop.keyX), buy.get(AreaShop.keyY), buy.get(AreaShop.keyZ));
-						plugin.message(sender, "info-regionPrice", plugin.formatCurrency(buy.get(AreaShop.keyPrice)));
-						if(buy.get(AreaShop.keyPlayerUUID) == null) {
+						plugin.message(sender, "info-regionBuying", buy.getName());
+						plugin.message(sender, "info-regionSign", buy.getWorldName(), buy.getSignLocation().getBlockX(), buy.getSignLocation().getBlockY(), buy.getSignLocation().getBlockZ());
+						plugin.message(sender, "info-regionPrice", buy.getFormattedPrice());
+						if(!buy.isSold()) {
 							plugin.message(sender, "info-regionNotBought");
 						} else {
-							plugin.message(sender, "info-regionBoughtBy", plugin.toName(buy.get(AreaShop.keyPlayerUUID)));
+							plugin.message(sender, "info-regionBoughtBy", buy.getPlayerName());
 						}
 						if(sender.hasPermission("areashop.buyrestore")) {
-							plugin.message(sender, "info-regionRestore", buy.get(AreaShop.keyRestore));
-							plugin.message(sender, "info-regionRestoreProfile", buy.get(AreaShop.keySchemProfile));
+							plugin.message(sender, "info-regionRestore", buy.getRestoreSetting());
+							plugin.message(sender, "info-regionRestoreProfile", buy.getRestoreProfile());
 						}
 						if(sender.hasPermission("areashop.teleport")) {
-							if(buy.get(AreaShop.keyTPX) == null) {
+							if(buy.getTeleportLocation() == null) {
 								plugin.message(sender, "info-regionNoTP");
 							} else {
-								plugin.message(sender, "info-regionTPLocation", buy.get(AreaShop.keyWorld), buy.get(AreaShop.keyTPX), buy.get(AreaShop.keyTPY), buy.get(AreaShop.keyTPZ), buy.get(AreaShop.keyTPPitch), buy.get(AreaShop.keyTPYaw));
+								plugin.message(sender, "info-regionTPLocation", buy.getTeleportLocation().getWorld().toString(), buy.getTeleportLocation().getBlockX(), buy.getTeleportLocation().getBlockY(), buy.getTeleportLocation().getBlockZ(), buy.getTeleportLocation().getPitch(), buy.getTeleportLocation().getYaw());
 							}
 						}
 					}
@@ -255,4 +263,68 @@ public class InfoCommand extends CommandAreaShop {
 			plugin.message(sender, "info-help");
 		}	
 	}
+	
+	
+	/**
+	 * Create a comma-space separated list from a collection of strings
+	 * @param list The collection with strings
+	 * @return A comma-space separated list of the strings in the collection
+	 */
+	public String createCommaString(Collection<String> list) {
+		String result = "";
+		boolean first = true;
+		for(String part : list) {
+			if(first) {
+				result += part;
+				first = false;
+			} else {
+				result += ", " + part;
+			}
+		}		
+		return result;
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		List<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			result.addAll(Arrays.asList("all", "rented", "forrent", "sold", "forsale", "player", "region"));
+		} else if(toComplete == 3) {
+			if(start[2].equalsIgnoreCase("player")) {
+				for(Player player : Bukkit.getOnlinePlayers()) {
+					result.add(player.getName());
+				}
+			} else if(start[2].equalsIgnoreCase("region")) {
+				result.addAll(plugin.getFileManager().getBuyNames());
+				result.addAll(plugin.getFileManager().getRentNames());
+			}
+		}
+		return result;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

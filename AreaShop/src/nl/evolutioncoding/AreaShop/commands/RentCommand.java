@@ -1,6 +1,11 @@
 package nl.evolutioncoding.AreaShop.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,9 +38,27 @@ public class RentCommand extends CommandAreaShop {
 		}					
 		Player player = (Player)sender;
 		if(args.length > 1 && args[1] != null) {
-			plugin.getFileManager().rent(player, args[1]);
+			RentRegion rent = plugin.getFileManager().getRent(args[1]);
+			if(rent == null) {
+				plugin.message(sender, "rent-notRentable");
+			} else {
+				rent.rent(player);
+			}
 		} else {
 			plugin.message(sender, "rent-help");
 		}	
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		ArrayList<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			for(RentRegion region : plugin.getFileManager().getRents().values()) {
+				if(!region.isRented()) {
+					result.add(region.getName());
+				}
+			}
+		}
+		return result;
 	}
 }

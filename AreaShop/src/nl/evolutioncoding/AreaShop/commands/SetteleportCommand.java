@@ -39,6 +39,7 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(sender, "setteleport-help");
 			return;
 		}
+		/*
 		Player player = (Player) sender;
 		boolean owner = false;
 		owner = plugin.getFileManager().getRent(args[1]) != null && player.getUniqueId().toString().equals(plugin.getFileManager().getRent(args[1]).get(AreaShop.keyPlayerUUID));
@@ -55,12 +56,18 @@ public class SetteleportCommand extends CommandAreaShop {
 			return;
 		}
 		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(player.getWorld()).getRegion(args[1]);
+		if(args.length > 2 && args[2] != null && args[2].equalsIgnoreCase("reset")) {
+			plugin.getFileManager().setTeleport(args[1], null, plugin.getFileManager().getRent(args[1]) != null);
+			plugin.message(player, "setteleport-reset", args[1]);
+			return;
+		}
 		if(!region.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ())) {
 			plugin.message(player, "setteleport-notInside", args[1]);
 			return;
 		}
 		plugin.getFileManager().setTeleport(args[1], player.getLocation(), plugin.getFileManager().getRent(args[1]) != null);
 		plugin.message(player, "setteleport-success", args[1]);
+		*/
 	}
 
 }

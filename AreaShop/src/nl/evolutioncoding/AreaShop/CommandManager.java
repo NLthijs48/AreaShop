@@ -1,6 +1,9 @@
 package nl.evolutioncoding.AreaShop;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import nl.evolutioncoding.AreaShop.commands.BuyCommand;
 import nl.evolutioncoding.AreaShop.commands.BuypriceCommand;
@@ -23,8 +26,9 @@ import nl.evolutioncoding.AreaShop.commands.UpdaterentsCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 
-public class CommandManager implements CommandExecutor {
+public class CommandManager implements CommandExecutor, TabCompleter {
 	AreaShop plugin;
 	ArrayList<CommandAreaShop> commands;
 	
@@ -54,6 +58,7 @@ public class CommandManager implements CommandExecutor {
 		
 		/* Register commands in bukkit */
 		plugin.getCommand("AreaShop").setExecutor(this);	
+		plugin.getCommand("AreaShop").setTabCompleter(this);
 	}	
 	
 	/**
@@ -101,6 +106,47 @@ public class CommandManager implements CommandExecutor {
 			plugin.message(sender, "cmd-notValid");
 		}
 		return true;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		AreaShop.debug("Tab complete: " + command.getName());
+		List<String> result = new ArrayList<String>();
+		int toCompleteNumber = args.length;
+		String toCompletePrefix = args[args.length-1].toLowerCase();
+		AreaShop.debug("toCompleteNumber=" + toCompleteNumber + ", toCompletePrefix=" + toCompletePrefix + ", length=" + toCompletePrefix.length());
+		if(toCompleteNumber == 1) {
+			for(CommandAreaShop c : commands) {
+				String begin = c.getCommandStart();
+				result.add(begin.substring(begin.indexOf(' ') +1));
+			}
+			AreaShop.debug("top level: " + result.toString());
+		} else {
+			String[] start = new String[args.length];
+			start[0] = command.getName();
+			for(int i=1; i<args.length; i++) {
+				start[i] = args[i-1];
+			}
+			for(CommandAreaShop c : commands) {
+				if(c.canExecute(command, args)) {
+					result = c.getTabCompleteList(toCompleteNumber, start);
+				}
+			}
+			AreaShop.debug("sub level: " + result.toString());
+		}
+		// Filter and sort the results
+		if(result.size() > 0) {
+			SortedSet<String> set = new TreeSet<String>();
+			for(String suggestion : result) {
+				if(suggestion.toLowerCase().startsWith(toCompletePrefix)) {
+					set.add(suggestion);
+				}
+			}	
+			result.clear();
+			result.addAll(set);
+		}
+		AreaShop.debug("Tabcomplete #" + toCompleteNumber + ", prefix="+ toCompletePrefix + ", result=" + result.toString());
+		return result;
 	}
 }
 

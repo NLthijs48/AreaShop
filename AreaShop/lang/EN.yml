@@ -12,7 +12,6 @@ total-maximum: "You can't rent and buy more than %0% region(s) in total"
 cmd-notValid: "That command is not valid, use '/as help' for info"
 cmd-onlyByPlayer: "This command can only be run by a player"
 
-rent-regionNotRentable: "That region is not available for renting"
 rent-help: "/as rent <regionname>"
 rent-noPermission: "You don't have permission to rent a region"
 rent-maximum: "You can't rent more than %0% region(s)"
@@ -169,6 +168,11 @@ setup-noPermissionRent: "You don't have permission for setting up renting of reg
 setup-noPermissionBuy: "You don't have permission for setting up buying of regions"
 setup-couldNotDetect: "Found multiple regions with the same priority and/or parent/child relation, specify one on the second line (2 of the regions that were found: %0% and %1%)"
 
+destroy-noPermissionRent: "You don't have permission for destroying a sign for renting a region"
+destroy-noPermissionBuy: "You don't have permission for destroying a sign for buying a region"
+destroy-successRent: "Renting of %0% successfully removed"
+destroy-successBuy: "Buying of %0% successfully removed"
+
 teleport-help: "/as tp <region>"
 teleport-noRentOrBuy: "Region '%0%' is not registered as rent or buy"
 teleport-noPermission: "You don't have permission to teleport to a region"
@@ -176,12 +180,13 @@ teleport-noPermissionOther: "You don't have permission to teleport to region you
 teleport-success: "You teleported to %0%"
 teleport-noSafe: "No safe position found in region %0%, change the region or set position yourself"
 
-setteleport-help: "/as settp <region>"
+setteleport-help: "/as settp <region> [reset]"
 setteleport-noPermission: "You don't have permission to set the teleport location"
 setteleport-noPermissionAll: "You don't have permission to set the teleport location for a region you do not own"
 setteleport-noRentOrBuy: "Region '%0%' is not registered as rent or buy"
 setteleport-success: "Teleport location of %0% set"
 setteleport-notInside: "The location has to be inside the region"
+setteleport-reset: "Teleport location of %0% has been reset"
 
 
 

@@ -37,7 +37,9 @@ public class TeleportCommand extends CommandAreaShop {
 			plugin.message(sender, "teleport-help");
 			return;
 		}
+		/*
 		plugin.getFileManager().teleportToRegion((Player)sender, args[1]);
+		*/
 	}
 
 }

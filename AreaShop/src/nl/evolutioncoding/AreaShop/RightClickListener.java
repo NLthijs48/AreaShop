@@ -1,6 +1,7 @@
 package nl.evolutioncoding.AreaShop;
 
-import java.util.HashMap;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -33,27 +34,16 @@ public class RightClickListener implements Listener {
 		if(event.getAction() == Action.RIGHT_CLICK_BLOCK && (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN)) {
 			/* Check if the rent sign is really the same as a saved rent */
 			String regionName = ((Sign)(event.getClickedBlock().getState())).getLine(1);
-			HashMap<String,String> rent = plugin.getFileManager().getRent(regionName);
-			HashMap<String,String> buy = plugin.getFileManager().getBuy(regionName);
-			
-			if(rent != null && block.getWorld().getName().equals(rent.get(AreaShop.keyWorld))	
-					&& rent.get(AreaShop.keyX).equals(String.valueOf(block.getX()))
-					&& rent.get(AreaShop.keyY).equals(String.valueOf(block.getY()))
-					&& rent.get(AreaShop.keyZ).equals(String.valueOf(block.getZ())) ) {
-				
-				plugin.getFileManager().rent(event.getPlayer(), regionName);
+			RentRegion rent = plugin.getFileManager().getRent(regionName);
+			BuyRegion buy = plugin.getFileManager().getBuy(regionName);			
+			if(rent != null && block.getLocation().equals(rent.getSignLocation())) {				
+				rent.rent(event.getPlayer());
 				/* Cancel placing a block */
-				event.setCancelled(true);	
-				
-			} else if(buy != null && block.getWorld().getName().equals(buy.get(AreaShop.keyWorld))
-					&& buy.get(AreaShop.keyX).equals(String.valueOf(block.getX()))
-					&& buy.get(AreaShop.keyY).equals(String.valueOf(block.getY()))
-					&& buy.get(AreaShop.keyZ).equals(String.valueOf(block.getZ())) ) {
-				
-				plugin.getFileManager().buy(event.getPlayer(), regionName);
+				event.setCancelled(true);					
+			} else if(buy != null && block.getLocation().equals(buy.getSignLocation())) {				
+				buy.buy(event.getPlayer());
 				/* Cancel placing a block */
-				event.setCancelled(true);	
-				
+				event.setCancelled(true);					
 			}
 		}
 	}

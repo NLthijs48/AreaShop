@@ -9,12 +9,9 @@ import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,6 +25,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  */
 public final class AreaShop extends JavaPlugin {
 	/* General variables */
+	private static AreaShop instance = null;
+	
 	private WorldGuardPlugin worldGuard = null;
 	private WorldEditPlugin worldEdit = null;
 	private Economy economy = null;
@@ -82,6 +81,7 @@ public final class AreaShop extends JavaPlugin {
 	public static final String tagRentedUntil = "%until%";
 	
 	/* Enum for schematic event types */
+	// TODO delete
 	public enum RegionEventType {		
 		CREATED("Created"),
 		DELETED("Deleted"),
@@ -111,10 +111,15 @@ public final class AreaShop extends JavaPlugin {
 		}
 	}	
 	
+	public static AreaShop getInstance() {
+		return AreaShop.instance;
+	}
+	
 	/**
 	 * Called on start or reload of the server
 	 */
 	public void onEnable(){
+		AreaShop.instance = this;
 		boolean error = false;
 		
 		/* Save a copy of the default config.yml if one is not present */
@@ -149,6 +154,8 @@ public final class AreaShop extends JavaPlugin {
         } else {
             economy = economyProvider.getProvider();
         }
+
+
         
 	    /* Create a LanguageMananager */
 	    languageManager = new LanguageManager(this);
@@ -161,7 +168,6 @@ public final class AreaShop extends JavaPlugin {
 	    error = error & !fileManager.loadRents();
 	    fileManager.checkRents();
 	    error = error & !fileManager.loadBuys();
-	    fileManager.convertFiles();
 	    
 		if(error) {
 			this.getLogger().info("The plugin has not started, fix the errors listed above");
@@ -183,16 +189,6 @@ public final class AreaShop extends JavaPlugin {
 			}
 			
 		}
-	}
-	
-	// Debug
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		this.debug("getUniqueId() = " + player.getUniqueId());
-		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
-		this.debug("offlinePlayer.getName() = " + offlinePlayer.getName());
-		this.debug("offlinePlayer.getUniqueId() = " + offlinePlayer.getUniqueId());
 	}
 	
 	/**
@@ -267,6 +263,8 @@ public final class AreaShop extends JavaPlugin {
 		String langString = this.fixColors(languageManager.getLang(key, params));
 		if(langString == null) {
 			this.getLogger().info("Something is wrong with the language file, could not find key: " + key);
+		} else if(langString.equals("")) {
+			// Do nothing, message is disabled
 		} else {
 			if(target instanceof Player) {
 				((Player)target).sendMessage(this.fixColors(chatprefix) + langString);
@@ -396,7 +394,7 @@ public final class AreaShop extends JavaPlugin {
 		    */
 		    metrics.start();
 		} catch (IOException e) {
-		    this.debug("Could not start Metrics");
+		    AreaShop.debug("Could not start Metrics");
 		}
 	}
 	
@@ -557,9 +555,9 @@ public final class AreaShop extends JavaPlugin {
 	 * Sends an debug message to the console
 	 * @param message The message that should be printed to the console
 	 */
-	public void debug(String message) {
-		if(this.debug) {
-			this.getLogger().info("Debug: " + message);
+	public static void debug(String message) {
+		if(AreaShop.getInstance().debug) {
+			AreaShop.getInstance().getLogger().info("Debug: " + message);
 		}
 	}
 	

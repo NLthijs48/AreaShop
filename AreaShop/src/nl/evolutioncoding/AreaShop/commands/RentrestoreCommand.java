@@ -1,8 +1,10 @@
 package nl.evolutioncoding.AreaShop.commands;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -36,29 +38,40 @@ public class RentrestoreCommand extends CommandAreaShop {
 			plugin.message(sender, "rentrestore-help");
 			return;
 		}
-		HashMap<String,String> rent = plugin.getFileManager().getRent(args[1]);
+		RentRegion rent = plugin.getFileManager().getRent(args[1]);
 		if(rent == null) {
 			plugin.message(sender, "rentrestore-notRegistered", args[1]);
 			return;
 		}
 		String value = null;
-		if(args[2].equalsIgnoreCase("true")) {
-			value = "true";
-		} else if(args[2].equalsIgnoreCase("false")) {
-			value = "false";
-		} else if(args[2].equalsIgnoreCase("general")) {
-			value = "general";
+		if(args[2].equalsIgnoreCase("true") || args[2].equalsIgnoreCase("false") || args[2].equalsIgnoreCase("general")) {
+			value = args[2].toLowerCase();
 		} else {
 			plugin.message(sender, "rentrestore-invalidSetting", args[2]);
 			return;
 		}
-		rent.put(AreaShop.keyRestore, value);
+		rent.setRestoreSetting(value);
 		if(args.length > 3) {
-			rent.put(AreaShop.keySchemProfile, args[3]);
-			plugin.message(sender, "rentrestore-successProfile", rent.get(AreaShop.keyName), value, args[3]);
+			rent.setRestoreProfile(args[3]);
+			plugin.message(sender, "rentrestore-successProfile", rent.getName(), value, args[3]);
 		} else {
-			plugin.message(sender, "rentrestore-success", rent.get(AreaShop.keyName), value);
+			plugin.message(sender, "rentrestore-success", rent.getName(), value);
 		}
 		plugin.getFileManager().saveRents();
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		List<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			result = plugin.getFileManager().getRentNames();
+		} else if(toComplete == 3) {
+			result.add("true");
+			result.add("false");
+			result.add("general");
+		} else if(toComplete == 4) {
+			result.addAll(plugin.config().getConfigurationSection("rentSchematicProfiles").getKeys(false));
+		}
+		return result;
 	}
 }

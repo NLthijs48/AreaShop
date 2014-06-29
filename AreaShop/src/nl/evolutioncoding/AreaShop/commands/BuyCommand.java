@@ -1,6 +1,10 @@
 package nl.evolutioncoding.AreaShop.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,9 +37,27 @@ public class BuyCommand extends CommandAreaShop {
 		}
 		Player player = (Player)sender;
 		if(args.length > 1 && args[1] != null) {
-			plugin.getFileManager().buy(player, args[1]);
+			BuyRegion region = plugin.getFileManager().getBuy(args[1]);
+			if(region == null) {
+				plugin.message(player, "buy-notBuyable");
+			} else {
+				region.buy(player);
+			}
 		} else {
 			plugin.message(player, "buy-help");
 		}
+	}
+
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		ArrayList<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			for(BuyRegion region : plugin.getFileManager().getBuys().values()) {
+				if(!region.isSold()) {
+					result.add(region.getName());
+				}
+			}
+		}
+		return result;
 	}
 }

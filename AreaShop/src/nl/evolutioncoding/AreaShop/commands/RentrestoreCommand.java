@@ -57,7 +57,7 @@ public class RentrestoreCommand extends CommandAreaShop {
 		} else {
 			plugin.message(sender, "rentrestore-success", rent.getName(), value);
 		}
-		plugin.getFileManager().saveRents();
+		rent.save();
 	}
 	
 	@Override

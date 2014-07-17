@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
-import nl.evolutioncoding.AreaShop.regions.BuyRegion;
 import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.command.Command;
@@ -53,7 +52,7 @@ public class RentCommand extends CommandAreaShop {
 	public List<String> getTabCompleteList(int toComplete, String[] start) {
 		ArrayList<String> result = new ArrayList<String>();
 		if(toComplete == 2) {
-			for(RentRegion region : plugin.getFileManager().getRents().values()) {
+			for(RentRegion region : plugin.getFileManager().getRents()) {
 				if(!region.isRented()) {
 					result.add(region.getName());
 				}

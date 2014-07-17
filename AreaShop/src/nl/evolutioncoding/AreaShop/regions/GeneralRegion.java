@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
 import nl.evolutioncoding.AreaShop.FileManager;
+import nl.evolutioncoding.AreaShop.Utils;
+import nl.evolutioncoding.AreaShop.Exceptions.RegionCreateException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,6 +21,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
@@ -48,90 +51,85 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
 public abstract class GeneralRegion {
-	
-	private String name = null;
-	private Location signLocation = null;
-	private Location teleportLocation = null;
-	private String restoreSetting = null;
-	private String restoreProfile = null;
+	protected YamlConfiguration config;
 	private static ArrayList<Material> canSpawnIn  = new ArrayList<Material>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
 	private static ArrayList<Material> cannotSpawnOn = new ArrayList<Material>(Arrays.asList(Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.CACTUS, Material.IRON_FENCE, Material.FENCE_GATE, Material.THIN_GLASS, Material.NETHER_FENCE, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE, Material.STAINED_GLASS_PANE));
 	private static ArrayList<Material> cannotSpawnBeside = new ArrayList<Material>(Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CACTUS));
 	protected AreaShop plugin = null;
 
-	public GeneralRegion(AreaShop plugin, Map<String, String> settings) {
+	public GeneralRegion(AreaShop plugin, YamlConfiguration config) throws RegionCreateException {
 		this.plugin = plugin;
+		this.config = config;
 		
-		name = settings.get(AreaShop.keyName);
-		signLocation = new Location(Bukkit.getWorld(settings.get(AreaShop.keyWorld)), Integer.parseInt(settings.get(AreaShop.keyX)), Integer.parseInt(settings.get(AreaShop.keyY)), Integer.parseInt(settings.get(AreaShop.keyZ)));
-		if(settings.get(AreaShop.keyTPX) != null) {
-			teleportLocation = new Location(Bukkit.getWorld(settings.get(AreaShop.keyWorld)), Double.parseDouble(settings.get(AreaShop.keyTPX)), Double.parseDouble(settings.get(AreaShop.keyTPY)), Double.parseDouble(settings.get(AreaShop.keyTPZ)), Float.parseFloat(settings.get(AreaShop.keyTPYaw)), Float.parseFloat(settings.get(AreaShop.keyTPPitch)));
+		// If region is gone delete the rent and the sign 
+		if(getWorld() == null 
+				|| plugin.getWorldGuard().getRegionManager(getWorld()) == null 
+				|| plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName()) == null) {
+			
+			throw new RegionCreateException("Region of " + getName() + " does not exist anymore");
+		} else {
+			// If the sign is gone remove the rent 
+			if(getSignLocation() == null) {
+				throw new RegionCreateException("Sign of region " + getName() + " does not exist anymore");
+			}				
+			Block block = getWorld().getBlockAt(getSignLocation());
+			if(!(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST)) {
+				throw new RegionCreateException("Sign of region " + getName() + " does not exist anymore");
+			}
 		}
-		restoreSetting = settings.get(AreaShop.keyRestore);
-		restoreProfile = settings.get(AreaShop.keySchemProfile);
 	}
 	
-	public GeneralRegion(AreaShop plugin, String name, Location signLocation) {
+	public GeneralRegion(AreaShop plugin, String name, World world, Location signLocation) {
 		this.plugin = plugin;
 		
-		this.name = name;
-		this.signLocation = signLocation;
-		restoreSetting = "general";
-		restoreProfile = "default";
+		config = new YamlConfiguration();
+		config.set("name", name);
+		setSetting("world", world.getName());
+		setSetting("signLocation", Utils.locationToConfig(signLocation));
 	}
-	
-	public HashMap<String, String> toMap() {
-		HashMap<String, String> result = new HashMap<String, String>();
-		// Basic info
-		result.put(AreaShop.keyName, this.getName());
-		result.put(AreaShop.keyWorld, getSignLocation().getWorld().getName());
-		result.put(AreaShop.keyX, String.valueOf(getSignLocation().getBlockX()));
-		result.put(AreaShop.keyY, String.valueOf(getSignLocation().getBlockY()));
-		result.put(AreaShop.keyZ, String.valueOf(getSignLocation().getBlockZ()));
-		// Teleport location
-		if(hasTeleportLocation()) {
-			result.put(AreaShop.keyTPX, String.valueOf(getTeleportLocation().getX()));
-			result.put(AreaShop.keyTPY, String.valueOf(getTeleportLocation().getY()));
-			result.put(AreaShop.keyTPZ, String.valueOf(getTeleportLocation().getZ()));
-			result.put(AreaShop.keyTPYaw, String.valueOf(getTeleportLocation().getYaw()));
-			result.put(AreaShop.keyTPPitch, String.valueOf(getTeleportLocation().getPitch()));
-		}
-		// Schematic Saving/Restoring
-		result.put(AreaShop.keyRestore, restoreSetting);
-		result.put(AreaShop.keySchemProfile, restoreProfile);
 		
+	// GETTERS
+	public Location getSignLocation() {
+		Location result = null;
+		if(isRentRegion()) {
+			result = Utils.configToLocation(config.getConfigurationSection("rent.signLocation"));
+		} else {
+			result = Utils.configToLocation(config.getConfigurationSection("buy.signLocation"));
+		}
 		return result;
 	}
 	
-	
-	
-	// GETTERS
-	public Location getSignLocation() {
-		return signLocation;
-	}
-	
 	public Location getTeleportLocation() {
-		return teleportLocation;
+		Location result = null;
+		if(isRentRegion()) {
+			result = Utils.configToLocation(config.getConfigurationSection("rent.teleportLocation"));
+		} else {
+			result = Utils.configToLocation(config.getConfigurationSection("buy.teleportLocation"));
+		}
+		return result;
 	}
 	
 	public String getName() {
-		return name;
+		return config.getString("name");
 	}
 	
 	public String getRestoreSetting() {
-		return restoreSetting;
+		return getStringSetting("enableRestore");
 	}
 	
 	public String getRestoreProfile() {
-		return restoreProfile;
+		return getStringSetting("restoreProfile");
 	}
 	
 	public String getWorldName() {
-		return getSignLocation().getWorld().getName();
+		if(getStringSetting("world") == null) {
+			return null;
+		}
+		return getStringSetting("world");
 	}
 	
 	public World getWorld() {
-		return getSignLocation().getWorld();
+		return Bukkit.getWorld(getWorldName());
 	}
 	
 	public FileManager getFileManager() {
@@ -149,7 +147,27 @@ public abstract class GeneralRegion {
 	}
 	
 	public boolean hasTeleportLocation() {
-		return this.teleportLocation != null;
+		if(isRentRegion()) {
+			return config.isSet("rent.teleportLocation");
+		} else {
+			return config.isSet("buy.teleportLocation");
+		}
+	}
+	
+	/**
+	 * Check if this region is a RentRegion
+	 * @return true if this region is a RentRegion otherwise false
+	 */
+	public boolean isRentRegion() {
+		return this instanceof RentRegion;
+	}
+	
+	/**
+	 * Check if this region is a BuyRegion
+	 * @return true if this region is a BuyRegion otherwise false
+	 */
+	public boolean isBuyRegion() {
+		return this instanceof BuyRegion;
 	}
 	
 	
@@ -159,10 +177,10 @@ public abstract class GeneralRegion {
 	 */
 	public boolean updateSigns() {
 		boolean result = false;
-		if(signLocation.getWorld() == null) {
+		if(getSignLocation() == null || getSignLocation().getWorld() == null) {
 			return false;
 		}
-		Block block = signLocation.getBlock();			
+		Block block = getSignLocation().getBlock();			
 		if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
 			Sign sign = (Sign)block.getState();
 			String[] lines = getSignLines();
@@ -188,7 +206,7 @@ public abstract class GeneralRegion {
 	 * @param restore true, false or general
 	 */
 	public void setRestoreSetting(String restore) {
-		this.restoreSetting = restore;
+		setSetting("enableRestore", restore);
 	}
 	
 	/**
@@ -196,7 +214,7 @@ public abstract class GeneralRegion {
 	 * @param profile default or the name of the profile as set in the config
 	 */
 	public void setRestoreProfile(String profile) {
-		this.restoreProfile = profile;
+		setSetting("restoreProfile", profile);
 	}
 	
 	/**
@@ -404,7 +422,8 @@ public abstract class GeneralRegion {
 						if(value.equals("")) {
 							region.setFlag((StringFlag)flagType, null);
 						} else {
-							region.setFlag((StringFlag)flagType, (String)flagValue);
+							String coloredValue = translateBukkitToWorldGuardColors((String)flagValue);
+							region.setFlag((StringFlag)flagType, coloredValue);
 						}
 					} else if(flagType instanceof SetFlag<?>) {
 						if(value.equals("")) {
@@ -438,104 +457,73 @@ public abstract class GeneralRegion {
 		return result;
 	}
 	
+	public String translateBukkitToWorldGuardColors(String message) {
+		String result = message;
+		result = result.replace("&c", "&r");
+        result = result.replace("&4", "&R");
+        result = result.replace("&e", "&y");
+        result = result.replace("&6", "&Y");
+        result = result.replace("&a", "&g");
+        result = result.replace("&2", "&G");
+        result = result.replace("&b", "&c");
+        result = result.replace("&3", "&C");
+        result = result.replace("&9", "&b");
+        result = result.replace("&1", "&B");
+        result = result.replace("&d", "&p");
+        result = result.replace("&5", "&P");
+        result = result.replace("&0", "&0");
+        result = result.replace("&8", "&1");
+        result = result.replace("&7", "&2");
+        result = result.replace("&f", "&w");
+        result = result.replace("&r", "&x");
+		return result;
+	}
+	
 	/**
 	 * Save this region to the disk
 	 */
-	public abstract void save();
+	public boolean save() {
+		File file = new File(plugin.getFileManager().getRegionFolder() + File.separator + getName().toLowerCase() + ".yml");
+		try {
+			config.save(file);
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+	}
 	
 	
 	/**
-	 * 
+	 * Set the teleport location of this region
 	 * @param regionName
 	 * @param location
 	 */
-	
-	/*
-	public void setTeleport(String regionName, Location location, boolean isRent) {
-		HashMap<String, String> info;
-		if(isRent) {
-			info = this.getRent(regionName);
+	public void setTeleport(Location location) {
+		if(location == null) {
+			setSetting("teleportLocation", null);
 		} else {
-			info = this.getBuy(regionName);
+			setSetting("teleportLocation", Utils.locationToConfig(location, true));
 		}
-		if(info != null) {
-			if(location == null) {
-				HashMap<String, String> rent, buy;
-				rent = this.getRent(regionName);
-				buy = this.getBuy(regionName);
-				if(rent != null) {
-					rent.remove(AreaShop.keyTPX);
-					rent.remove(AreaShop.keyTPY);
-					rent.remove(AreaShop.keyTPZ);
-					rent.remove(AreaShop.keyTPPitch);
-					rent.remove(AreaShop.keyTPYaw);
-				}
-				if(buy != null) {
-					buy.remove(AreaShop.keyTPX);
-					buy.remove(AreaShop.keyTPY);
-					buy.remove(AreaShop.keyTPZ);
-					buy.remove(AreaShop.keyTPPitch);
-					buy.remove(AreaShop.keyTPYaw);
-				}
-			} else {
-				info.put(AreaShop.keyTPX, String.valueOf(location.getX()));
-				info.put(AreaShop.keyTPY, String.valueOf(location.getY()));
-				info.put(AreaShop.keyTPZ, String.valueOf(location.getZ()));
-				info.put(AreaShop.keyTPPitch, String.valueOf(location.getPitch()));
-				info.put(AreaShop.keyTPYaw, String.valueOf(location.getYaw()));
-			}
-			this.saveRents();
-		}
+		this.save();
 	}
-	*/
 	
 	/**
 	 * Teleport a player to the region
 	 * @param player Player that should be teleported
 	 * @param regionName The name of the region the player should be teleported to
 	 */
-	/*
 	public boolean teleportPlayer(Player player) {
 		int checked = 1;
 		boolean owner = false;
-		HashMap<String, String> rent = this.getRent(regionName);
-		HashMap<String, String> buy = this.getBuy(regionName);
 		Location startLocation = null;
-		String world = null;
-		ProtectedRegion region = null;
-		if(rent != null) {
-			world = rent.get(AreaShop.keyWorld);
-			region = plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(world)).getRegion(regionName);
-			if(rent.get(AreaShop.keyTPX) != null && rent.get(AreaShop.keyTPY) != null && rent.get(AreaShop.keyTPZ) != null && rent.get(AreaShop.keyTPPitch) != null && rent.get(AreaShop.keyTPYaw) != null) {
-				startLocation = new Location(
-						Bukkit.getWorld(rent.get(AreaShop.keyWorld)), 
-						Double.parseDouble(rent.get(AreaShop.keyTPX)), 
-						Double.parseDouble(rent.get(AreaShop.keyTPY)), 
-						Double.parseDouble(rent.get(AreaShop.keyTPZ)), 
-						Float.parseFloat(rent.get(AreaShop.keyTPYaw)), 
-						Float.parseFloat(rent.get(AreaShop.keyTPPitch)));
-			}
-			owner = player.getUniqueId().toString().equals(rent.get(AreaShop.keyPlayerUUID));
-			if(buy != null) {
-				owner = owner || player.getUniqueId().toString().equals(rent.get(AreaShop.keyPlayerUUID));
-			}
-		} else if(buy != null) {
-			world = buy.get(AreaShop.keyWorld);
-			region = plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(world)).getRegion(regionName);
-			if(buy.get(AreaShop.keyTPX) != null && buy.get(AreaShop.keyTPY) != null && buy.get(AreaShop.keyTPZ) != null && buy.get(AreaShop.keyTPPitch) != null && buy.get(AreaShop.keyTPYaw) != null) {
-				startLocation = new Location(
-						Bukkit.getWorld(buy.get(AreaShop.keyWorld)), 
-						Double.parseDouble(buy.get(AreaShop.keyTPX)), 
-						Double.parseDouble(buy.get(AreaShop.keyTPY)), 
-						Double.parseDouble(buy.get(AreaShop.keyTPZ)), 
-						Float.parseFloat(buy.get(AreaShop.keyTPYaw)), 
-						Float.parseFloat(buy.get(AreaShop.keyTPPitch)));
-				
-			}
-			owner = player.getUniqueId().toString().equals(buy.get(AreaShop.keyPlayerUUID));
+		ProtectedRegion region = getRegion();
+		if(this.hasTeleportLocation()) {
+			startLocation = getTeleportLocation();
+		}
+		if(isRentRegion()) {
+			owner = player.getUniqueId().equals(((RentRegion)this).getRenter());
 		} else {
-			plugin.message(player, "teleport-noRentOrBuy", regionName);
-			return false;
+			owner = player.getUniqueId().equals(((BuyRegion)this).getBuyer());
 		}
 		// Check permissions
 		if(!player.hasPermission("areashop.teleport")) {
@@ -547,9 +535,8 @@ public abstract class GeneralRegion {
 		}
 		// Set default startLocation if not set
 		if(startLocation == null) {
-			region = plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(world)).getRegion(regionName);
 			if(region != null) {
-				// Set to block in the middel, y configured in the config
+				// Set to block in the middle, y configured in the config
 				Vector middle = Vector.getMidpoint(region.getMaximumPoint(), region.getMinimumPoint());
 				String configSetting = plugin.config().getString("teleportLocationY");
 				if("bottom".equalsIgnoreCase(configSetting)) {
@@ -559,7 +546,7 @@ public abstract class GeneralRegion {
 				} else {
 					middle = middle.setY(middle.getBlockY());
 				}
-				startLocation = new Location(Bukkit.getWorld(world), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
+				startLocation = new Location(getWorld(), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
 			} else {
 				return false;
 			}
@@ -757,17 +744,16 @@ public abstract class GeneralRegion {
 			radius++;
 		}
 		if(done) {
-			plugin.message(player, "teleport-success", regionName);
+			plugin.message(player, "teleport-success", getName());
 			player.teleport(saveLocation);
 			AreaShop.debug("Found location: " + saveLocation.toString() + " Tries: " + checked);
 			return true;
 		} else {
-			plugin.message(player, "teleport-noSafe", regionName);
+			plugin.message(player, "teleport-noSafe", getName());
 			AreaShop.debug("No location found, checked " + checked + " spots");
 			return false;
 		}	
 	}
-	*/
 	
 	/**
 	 * Checks if a certain location is safe to teleport to
@@ -832,8 +818,120 @@ public abstract class GeneralRegion {
 		return true;
 	}
 	
+	
+	// CONFIG
+	public boolean getBooleanSetting(String path) {
+		if(isRentRegion()) {
+			path = "rent." + path;
+		} else {
+			path = "buy." + path;
+		}
+		if(config.isBoolean(path)) {
+			return config.getBoolean(path);
+		}
+		boolean result = false;
+		int priority = Integer.MIN_VALUE;
+		boolean found = false;
+		for(RegionGroup group : plugin.getFileManager().getGroups()) {
+			if(group.isMember(this) && group.getSettings().isBoolean(path) && group.getPriority() > priority) {
+				result = group.getSettings().getBoolean(path);
+				priority = group.getPriority();
+				found = true;
+			}
+		}
+		if(found) {
+			return result;
+		}
+		return this.getFileManager().getDefaultSettings().getBoolean(path);
+	}
+	
+	public double getDoubleSetting(String path) {
+		if(isRentRegion()) {
+			path = "rent." + path;
+		} else {
+			path = "buy." + path;
+		}
+		if(config.isDouble(path)) {
+			return config.getDouble(path);
+		}
+		double result = 0;
+		int priority = Integer.MIN_VALUE;
+		boolean found = false;
+		for(RegionGroup group : plugin.getFileManager().getGroups()) {
+			if(group.isMember(this) && group.getSettings().isBoolean(path) && group.getPriority() > priority) {
+				result = group.getSettings().getDouble(path);
+				priority = group.getPriority();
+				found = true;
+			}
+		}
+		if(found) {
+			return result;
+		}
+		return this.getFileManager().getDefaultSettings().getDouble(path);
+	}
+	
+	public long getLongSetting(String path) {
+		if(isRentRegion()) {
+			path = "rent." + path;
+		} else {
+			path = "buy." + path;
+		}
+		if(config.isLong(path)) {
+			return config.getLong(path);
+		}
+		long result = 0;
+		int priority = Integer.MIN_VALUE;
+		boolean found = false;
+		for(RegionGroup group : plugin.getFileManager().getGroups()) {
+			if(group.isMember(this) && group.getSettings().isBoolean(path) && group.getPriority() > priority) {
+				result = group.getSettings().getLong(path);
+				priority = group.getPriority();
+				found = true;
+			}
+		}
+		if(found) {
+			return result;
+		}
+		return this.getFileManager().getDefaultSettings().getLong(path);
+	}
+	
+	public String getStringSetting(String path) {
+		if(isRentRegion()) {
+			path = "rent." + path;
+		} else {
+			path = "buy." + path;
+		}
+		if(config.isString(path)) {
+			return config.getString(path);
+		}
+		String result = null;
+		int priority = Integer.MIN_VALUE;
+		boolean found = false;
+		for(RegionGroup group : plugin.getFileManager().getGroups()) {
+			if(group.isMember(this) && group.getSettings().isString(path) && group.getPriority() > priority) {
+				result = group.getSettings().getString(path);
+				priority = group.getPriority();
+				found = true;
+			}
+		}
+		if(found) {
+			return result;
+		}
+		return this.getFileManager().getDefaultSettings().getString(path);
+	}
+	
+	public void setSetting(String path, Object value) {
+		if(isRentRegion()) {
+			path = "rent." + path;
+		} else {
+			path = "buy." + path;
+		}
+		config.set(path, value);
+	}
+	
 
 }
+
 
 
 

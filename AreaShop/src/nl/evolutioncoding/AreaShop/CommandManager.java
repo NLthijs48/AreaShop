@@ -110,8 +110,10 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-		AreaShop.debug("Tab complete: " + command.getName());
 		List<String> result = new ArrayList<String>();
+		if(!sender.hasPermission("areashop.tabcomplete")) {
+			return result;
+		}
 		int toCompleteNumber = args.length;
 		String toCompletePrefix = args[args.length-1].toLowerCase();
 		AreaShop.debug("toCompleteNumber=" + toCompleteNumber + ", toCompletePrefix=" + toCompletePrefix + ", length=" + toCompletePrefix.length());
@@ -120,7 +122,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 				String begin = c.getCommandStart();
 				result.add(begin.substring(begin.indexOf(' ') +1));
 			}
-			AreaShop.debug("top level: " + result.toString());
 		} else {
 			String[] start = new String[args.length];
 			start[0] = command.getName();
@@ -132,7 +133,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 					result = c.getTabCompleteList(toCompleteNumber, start);
 				}
 			}
-			AreaShop.debug("sub level: " + result.toString());
 		}
 		// Filter and sort the results
 		if(result.size() > 0) {

@@ -1,6 +1,7 @@
 package nl.evolutioncoding.AreaShop.commands;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -37,9 +38,13 @@ public class TeleportCommand extends CommandAreaShop {
 			plugin.message(sender, "teleport-help");
 			return;
 		}
-		/*
-		plugin.getFileManager().teleportToRegion((Player)sender, args[1]);
-		*/
+		Player player = (Player)sender;
+		GeneralRegion region = plugin.getFileManager().getRegion(args[1]);
+		if(region == null) {
+			plugin.message(player, "teleport-noRentOrBuy", args[1]);
+			return;
+		}
+		region.teleportPlayer(player);
 	}
 
 }

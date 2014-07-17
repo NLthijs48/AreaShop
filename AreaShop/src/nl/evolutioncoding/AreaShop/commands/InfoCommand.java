@@ -42,11 +42,11 @@ public class InfoCommand extends CommandAreaShop {
 			if(args[1].equalsIgnoreCase("all")) {
 				String message = "";
 				/* Message for rents */
-				Iterator<String> it = plugin.getFileManager().getRents().keySet().iterator();
-				if(it.hasNext()) {
-					message = plugin.getFileManager().getRent(it.next()).getName();
-					while(it.hasNext()) {
-						message += ", " + plugin.getFileManager().getRent(it.next()).getName();
+				Iterator<RentRegion> itRent = plugin.getFileManager().getRents().iterator();
+				if(itRent.hasNext()) {
+					message = itRent.next().getName();
+					while(itRent.hasNext()) {
+						message += ", " + itRent.next().getName();
 					}
 				}
 				if(message.equals("")) {
@@ -57,11 +57,11 @@ public class InfoCommand extends CommandAreaShop {
 				
 				/* Message for buys */
 				message = "";
-				it = plugin.getFileManager().getBuys().keySet().iterator();
-				if(it.hasNext()) {
-					message = plugin.getFileManager().getBuy(it.next()).getName();
-					while(it.hasNext()) {
-						message += ", " + plugin.getFileManager().getBuy(it.next()).getName();
+				Iterator<BuyRegion> itBuy = plugin.getFileManager().getBuys().iterator();
+				if(itBuy.hasNext()) {
+					message = itBuy.next().getName();
+					while(itBuy.hasNext()) {
+						message += ", " + itBuy.next().getName();
 					}
 				}
 				if(message.equals("")) {
@@ -73,16 +73,16 @@ public class InfoCommand extends CommandAreaShop {
 			/* List of rented regions */
 			else if(args[1].equalsIgnoreCase("rented")) {
 				String message = "";
-				Iterator<String> it = plugin.getFileManager().getRents().keySet().iterator();
+				Iterator<RentRegion> it = plugin.getFileManager().getRents().iterator();
 				boolean first = true;
 				while(it.hasNext()) {
-					String next = plugin.getFileManager().getRent(it.next()).getName();
-					if(plugin.getFileManager().getRent(next).isRented()) {
+					RentRegion next = it.next();
+					if(next.isRented()) {
 						if(!first) {
-							message += ", " + next;
+							message += ", " + next.getName();
 						} else {
 							first = false;
-							message += next;
+							message += next.getName();
 						}
 					}
 				}
@@ -95,16 +95,16 @@ public class InfoCommand extends CommandAreaShop {
 			/* List of unrented regions */
 			else if(args[1].equalsIgnoreCase("forrent")) {
 				String message = "";
-				Iterator<String> it = plugin.getFileManager().getRents().keySet().iterator();
+				Iterator<RentRegion> it = plugin.getFileManager().getRents().iterator();
 				boolean first = true;
 				while(it.hasNext()) {
-					String next = plugin.getFileManager().getRent(it.next()).getName();
-					if(!plugin.getFileManager().getRent(next).isRented()) {
+					RentRegion next = it.next();
+					if(!next.isRented()) {
 						if(!first) {
-							message += ", " + next;
+							message += ", " + next.getName();
 						} else {
 							first = false;
-							message = next;
+							message = next.getName();
 						}
 					}
 				}
@@ -115,17 +115,17 @@ public class InfoCommand extends CommandAreaShop {
 				}							
 			} else if(args[1].equalsIgnoreCase("sold")) {
 				String message = "";
-				Iterator<String> it = plugin.getFileManager().getBuys().keySet().iterator();
+				Iterator<BuyRegion> it = plugin.getFileManager().getBuys().iterator();
 				boolean first = true;
 				while(it.hasNext()) {
-					String next = plugin.getFileManager().getBuy(it.next()).getName();
-					if(plugin.getFileManager().getBuy(next).isSold()) {
+					BuyRegion next = it.next();
+					if(next.isSold()) {
 						if(!first) {
 							message += ", ";
 						} else {
 							first = false;
 						}
-						message += next;
+						message += next.getName();
 					}
 				}
 				if(message.equals("")) {
@@ -135,16 +135,16 @@ public class InfoCommand extends CommandAreaShop {
 				}							
 			} else if(args[1].equalsIgnoreCase("forsale")) {
 				String message = "";
-				Iterator<String> it = plugin.getFileManager().getBuys().keySet().iterator();
+				Iterator<BuyRegion> it = plugin.getFileManager().getBuys().iterator();
 				boolean first = true;
 				while(it.hasNext()) {
-					String next = plugin.getFileManager().getBuy(it.next()).getName();
-					if(!plugin.getFileManager().getBuy(next).isSold()) {
+					BuyRegion next =it.next();
+					if(!next.isSold()) {
 						if(!first) {
-							message += ", " + next;
+							message += ", " + next.getName();
 						} else {
 							first = false;
-							message = next;
+							message = next.getName();
 						}
 					}
 				}
@@ -156,16 +156,16 @@ public class InfoCommand extends CommandAreaShop {
 			} else if(args[1].equalsIgnoreCase("player")) {
 				if(args.length > 2 && args[2] != null) {
 					String message = "";
-					Iterator<String> it = plugin.getFileManager().getRents().keySet().iterator();
+					Iterator<RentRegion> itRent = plugin.getFileManager().getRents().iterator();
 					boolean first = true;
-					while(it.hasNext()) {
-						String next = plugin.getFileManager().getRent(it.next()).getName();
-						if(plugin.getFileManager().getRent(next).isRented() && plugin.getFileManager().getRent(next).getPlayerName().equalsIgnoreCase(args[2])) {
+					while(itRent.hasNext()) {
+						RentRegion next = itRent.next();
+						if(next.isRented() && next.getPlayerName().equalsIgnoreCase(args[2])) {
 							if(!first) {
-								message += ", " + next;
+								message += ", " + next.getName();
 							} else {
 								first = false;
-								message = next;
+								message = next.getName();
 							}
 						}
 					}
@@ -176,17 +176,17 @@ public class InfoCommand extends CommandAreaShop {
 					}		
 					
 					message = "";
-					it = plugin.getFileManager().getBuys().keySet().iterator();
+					Iterator<BuyRegion> itBuy = plugin.getFileManager().getBuys().iterator();
 					first = true;
-					while(it.hasNext()) {
-						String next = plugin.getFileManager().getBuy(it.next()).getName();
-						if(plugin.getFileManager().getBuy(next).isSold() && plugin.getFileManager().getBuy(next).getPlayerName().equalsIgnoreCase(args[2])) {
+					while(itBuy.hasNext()) {
+						BuyRegion next = itBuy.next();
+						if(next.isSold() && next.getPlayerName().equalsIgnoreCase(args[2])) {
 							if(!first) {
 								message += ", ";
 							} else {
 								first = false;
 							}
-							message += next;
+							message += next.getName();
 						}
 					}
 					if(message.equals("")) {
@@ -209,7 +209,7 @@ public class InfoCommand extends CommandAreaShop {
 					} else {
 						plugin.message(sender, "info-regionRenting", rent.getName());
 						plugin.message(sender, "info-regionSign", rent.getWorldName(), rent.getSignLocation().getBlockX(), rent.getSignLocation().getBlockY(), rent.getSignLocation().getBlockZ());
-						plugin.message(sender, "info-regionPriceDuration", rent.getFormattedPrice(), rent.getDuration());
+						plugin.message(sender, "info-regionPriceDuration", rent.getFormattedPrice(), rent.getDurationString());
 						if(!rent.isRented()) {
 							plugin.message(sender, "info-regionNotRented");
 						} else {

@@ -52,7 +52,7 @@ public class BuyCommand extends CommandAreaShop {
 	public List<String> getTabCompleteList(int toComplete, String[] start) {
 		ArrayList<String> result = new ArrayList<String>();
 		if(toComplete == 2) {
-			for(BuyRegion region : plugin.getFileManager().getBuys().values()) {
+			for(BuyRegion region : plugin.getFileManager().getBuys()) {
 				if(!region.isSold()) {
 					result.add(region.getName());
 				}

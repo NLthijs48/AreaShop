@@ -109,8 +109,8 @@ public final class SignChangeListener implements Listener {
 				}
 				
 				/* Add rent to the FileManager */
-				RentRegion rent = new RentRegion(plugin, secondLine, event.getBlock().getLocation(), Double.parseDouble(fourthLine), thirdLine);
-				plugin.getFileManager().addRent(secondLine, rent);
+				RentRegion rent = new RentRegion(plugin, secondLine, event.getPlayer().getWorld(), event.getBlock().getLocation(), Double.parseDouble(fourthLine), thirdLine);
+				plugin.getFileManager().addRent(rent);
 				rent.handleSchematicEvent(RentEvent.CREATED);
 				String[] signLines = rent.getSignLines();
 				for(int i=0; i<signLines.length; i++) {
@@ -185,9 +185,9 @@ public final class SignChangeListener implements Listener {
 				}
 				
 				/* Add buy to the FileManager */
-				BuyRegion buy = new BuyRegion(plugin, secondLine, event.getBlock().getLocation(), Double.parseDouble(thirdLine));
+				BuyRegion buy = new BuyRegion(plugin, secondLine, event.getPlayer().getWorld(), event.getBlock().getLocation(), Double.parseDouble(thirdLine));
 				
-				plugin.getFileManager().addBuy(secondLine, buy);
+				plugin.getFileManager().addBuy(buy);
 				buy.handleSchematicEvent(BuyEvent.CREATED);
 				String[] signLines = buy.getSignLines();
 				for(int i=0; i<signLines.length; i++) {

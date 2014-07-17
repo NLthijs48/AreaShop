@@ -51,7 +51,7 @@ public class RentpriceCommand extends CommandAreaShop {
 			return;
 		}	
 		rent.setPrice(price);
-		plugin.getFileManager().saveRents();
+		rent.save();
 		plugin.message(sender, "rentprice-success", rent.getName(), args[2], rent.getDurationString());
 	}
 	

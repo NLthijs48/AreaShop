@@ -1,6 +1,6 @@
 name: AreaShop
 main: nl.evolutioncoding.AreaShop.AreaShop
-version: 1.3.0
+version: 1.4.0
 depend: [Vault, WorldGuard, WorldEdit]
 softdepend: [Multiverse-Core]
 commands:
@@ -12,7 +12,7 @@ commands:
     aliases: [as]
 permissions:
   areashop.*:
-    description: Give access to all commands of RegionRent
+    description: Give access to all commands of AreaShop
     children:
       areashop.help: true
       areashop.createrent: true
@@ -33,6 +33,8 @@ permissions:
       areashop.rentduration: true
       areashop.teleportall: true
       areashop.setteleportall: true
+      areashop.tabcomplete: true
+      areashop.setteleportoutsideregion: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -104,4 +106,10 @@ permissions:
     default: true
   areashop.setteleportall:
     description: Set the teleport for other regions
+    default: op
+  areashop.setteleportoutsideregion:
+    description: Set the teleport location outside the WorldGuard region
+    default: op
+  areashop.tabcomplete:
+    description: Allows you to tabcomplete all commands (also where you dont have permission)
     default: op

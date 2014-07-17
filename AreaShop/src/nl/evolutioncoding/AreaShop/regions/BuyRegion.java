@@ -2,21 +2,19 @@ package nl.evolutioncoding.AreaShop.regions;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.Exceptions.RegionCreateException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class BuyRegion extends GeneralRegion {
-
-	private UUID owner = null;
-	private double price;
-	
 	/* Enum for schematic event types */
 	public enum BuyEvent {		
 		CREATED("created"),
@@ -33,28 +31,37 @@ public class BuyRegion extends GeneralRegion {
 		}
 	} 
 	
-	public BuyRegion(AreaShop plugin, Map<String, String> settings) {
-		super(plugin, settings);
-		
-		if(settings.get(AreaShop.keyPlayerUUID) != null) {
-			owner = UUID.fromString(settings.get(AreaShop.keyPlayerUUID));
-		}
-		price = Double.parseDouble(settings.get(AreaShop.keyPrice));
-		AreaShop.debug("BuyRegion: " + getName() + ", map: " + settings.toString());
+	public BuyRegion(AreaShop plugin, YamlConfiguration config) throws RegionCreateException {
+		super(plugin, config);
 	}
 	
-	public BuyRegion(AreaShop plugin, String name, Location signLocation, double price) {
-		super(plugin, name, signLocation);
-		
-		this.price = price;
+	public BuyRegion(AreaShop plugin, String name, World world, Location signLocation, double price) {
+		super(plugin, name, world, signLocation);
+		setSetting("price", price);
 	}
 	
 	/**
 	 * Get the UUID of the owner of this region
 	 * @return The UUID of the owner of this region
 	 */
-	public UUID getOwner() {
-		return owner;
+	public UUID getBuyer() {
+		String buyer = getStringSetting("buyer");
+		if(buyer != null) {
+			try {
+				return UUID.fromString(buyer);
+			} catch(IllegalArgumentException e) {}
+		}
+		return null;
+	}
+	
+	public void setBuyer(UUID buyer) {
+		if(buyer == null) {
+			setSetting("buyer", null);
+			setSetting("buyerName", null);
+		} else {
+			setSetting("buyer", buyer.toString());
+			setSetting("buyerName", plugin.toName(buyer));
+		}
 	}
 	
 	/**
@@ -62,7 +69,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The name of the player that owns this region
 	 */
 	public String getPlayerName() {
-		return plugin.toName(owner);
+		return plugin.toName(getBuyer());
 	}
 	
 	/**
@@ -70,7 +77,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return true if the region is sold, otherwise false
 	 */
 	public boolean isSold() {
-		return owner != null;
+		return getBuyer() != null;
 	}
 	
 	/**
@@ -78,7 +85,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The price of the region
 	 */
 	public double getPrice() {
-		return price;
+		return getDoubleSetting("price");
 	}
 	
 	/**
@@ -86,7 +93,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The formatted string of the price
 	 */
 	public String getFormattedPrice() {
-		return plugin.formatCurrency(price);
+		return plugin.formatCurrency(getPrice());
 	}
 	
 	/**
@@ -94,29 +101,9 @@ public class BuyRegion extends GeneralRegion {
 	 * @param price
 	 */
 	public void setPrice(double price) {
-		this.price = price;
+		setSetting("price", price);
 		updateSigns();
 		updateRegionFlags();
-	}
-	
-	@Override
-	public HashMap<String, String> toMap() {
-		HashMap<String, String> result = super.toMap();
-		
-		if(isSold()) {
-			result.put(AreaShop.keyPlayerUUID, owner.toString());
-		}
-		result.put(AreaShop.keyPrice, String.valueOf(price));
-		
-		return result;
-	}
-	
-	/**
-	 * Save this buy to a file (currently all buys will be saved again)
-	 */
-	@Override
-	public void save() {
-		getFileManager().saveBuys();
 	}
 	
 	/**
@@ -129,20 +116,20 @@ public class BuyRegion extends GeneralRegion {
 		if(player.hasPermission("areashop.buy")) {	
 			if(!isSold()) {				
 				/* Check if the player can still buy */
-				int buyNumber = 0;
-				Iterator<String> it = getFileManager().getBuys().keySet().iterator();
-				while(it.hasNext()) {
-					String next = it.next();
-					if(player.getUniqueId().equals(getFileManager().getBuy(next).getOwner())) {
-						buyNumber++;
+				int rentNumber = 0;
+				Iterator<RentRegion> itRent = getFileManager().getRents().iterator();
+				while(itRent.hasNext()) {
+					RentRegion next = itRent.next();
+					if(player.getUniqueId().equals(next.getRenter())) {
+						rentNumber++;
 					}
 				}
-				int rentNumber = 0;
-				it = getFileManager().getRents().keySet().iterator();
-				while(it.hasNext()) {
-					String next = it.next();
-					if(player.getUniqueId().equals(getFileManager().getRent(next).getRenter())) {
-						rentNumber++;
+				int buyNumber = 0;
+				Iterator<BuyRegion> itBuy = getFileManager().getBuys().iterator();
+				while(itBuy.hasNext()) {
+					BuyRegion next = itBuy.next();
+					if(player.getUniqueId().equals(next.getBuyer())) {
+						buyNumber++;
 					}
 				}
 				int maximumBuys = Integer.parseInt(plugin.config().getString("maximumBuys"));
@@ -157,17 +144,17 @@ public class BuyRegion extends GeneralRegion {
 				}
 				
 				/* Check if the player has enough money */
-				if(plugin.getEconomy().has(player, getWorldName(), price)) {
+				if(plugin.getEconomy().has(player, getWorldName(), getPrice())) {
 					
 					/* Substract the money from the players balance */
-					EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, price);
+					EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getPrice());
 					if(!r.transactionSuccess()) {
 						plugin.message(player, "buy-payError");
 						return false;
 					}										
 					
 					/* Set the owner */
-					owner = player.getUniqueId();
+					setBuyer(player.getUniqueId());
 	
 					/* Update everything */
 					handleSchematicEvent(BuyEvent.BOUGHT);
@@ -176,16 +163,16 @@ public class BuyRegion extends GeneralRegion {
 
 					/* Send message to the player */
 					plugin.message(player, "buy-succes", getName());
-					AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + plugin.formatCurrency(price));
+					AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + getFormattedPrice());
 					
-					plugin.getFileManager().saveBuys();
+					this.save();
 					return true;
 				} else {
 					/* Player has not enough money */
-					plugin.message(player, "buy-lowMoney", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())), plugin.formatCurrency(price));
+					plugin.message(player, "buy-lowMoney", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())), getFormattedPrice());
 				}
 			} else {
-				if(player.getUniqueId().equals(owner)) {
+				if(player.getUniqueId().equals(getBuyer())) {
 					plugin.message(player, "buy-yours");
 				} else {
 					plugin.message(player, "buy-someoneElse");
@@ -204,10 +191,10 @@ public class BuyRegion extends GeneralRegion {
 	public void sell(boolean giveMoneyBack) {
 		/* Give part of the buying price back */
 		double percentage = plugin.config().getDouble("buyMoneyBack") / 100.0;
-		double moneyBack =  price * percentage;
+		double moneyBack =  getPrice() * percentage;
 		if(moneyBack > 0 && giveMoneyBack) {
 			/* Give back the money */
-			EconomyResponse r = plugin.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(owner), moneyBack);
+			EconomyResponse r = plugin.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getBuyer()), moneyBack);
 			if(!r.transactionSuccess()) {
 				plugin.getLogger().info("Something went wrong with paying back money while unrenting");
 			}	
@@ -217,13 +204,13 @@ public class BuyRegion extends GeneralRegion {
 		AreaShop.debug(getPlayerName() + " has sold " + getName() + ", got " + plugin.formatCurrency(moneyBack) + " money back");
 		
 		/* Remove the player */
-		owner = null;
+		setBuyer(null);
 		
 		/* Update everything */
 		handleSchematicEvent(BuyEvent.SOLD);
 		updateSigns();
 		updateRegionFlags();	
-		plugin.getFileManager().saveBuys();
+		this.save();
 	}
 	
 	
@@ -232,11 +219,11 @@ public class BuyRegion extends GeneralRegion {
 		if(isSold()) {
 			lines[0] = plugin.fixColors(plugin.config().getString("signBuyed"));
 			lines[1] = getName();
-			lines[2] = plugin.toName(owner);
+			lines[2] = plugin.toName(getBuyer());
 		} else {			
 			lines[0] = plugin.fixColors(plugin.config().getString("signBuyable"));
 			lines[1] = getName();
-			lines[2] = plugin.formatCurrency(price);
+			lines[2] = getFormattedPrice();
 		}		
 		return lines;
 	}
@@ -246,7 +233,7 @@ public class BuyRegion extends GeneralRegion {
 	public void updateRegionFlags() {
 		HashMap<String, String> replacements = new HashMap<String, String>();
 		replacements.put(AreaShop.tagRegionName, getName());
-		replacements.put(AreaShop.tagPrice, plugin.formatCurrency(price));
+		replacements.put(AreaShop.tagPrice, getFormattedPrice());
 		replacements.put(AreaShop.tagPlayerName, getPlayerName());
 		if(isSold()) {
 			this.setRegionFlags(plugin.config().getConfigurationSection("flagsSold"), replacements);

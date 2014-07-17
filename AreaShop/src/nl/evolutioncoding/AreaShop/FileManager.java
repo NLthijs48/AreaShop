@@ -4,21 +4,31 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import net.minecraft.util.org.apache.commons.io.FileUtils;
+import nl.evolutioncoding.AreaShop.Exceptions.RegionCreateException;
 import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
+import nl.evolutioncoding.AreaShop.regions.RegionGroup;
 import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+
+import com.google.common.io.Files;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 
 public class FileManager {
 	private static FileManager instance = null;
@@ -26,11 +36,15 @@ public class FileManager {
 	private AreaShop plugin = null;
 	private ObjectInputStream input = null;
 	private ObjectOutputStream output = null;
-	private HashMap<String, RentRegion> rents = null;
-	private HashMap<String, BuyRegion> buys = null;
+	private HashMap<String, GeneralRegion> regions = null;
+	private String regionsPath = null;
+	private HashMap<String, RegionGroup> groups = null;
+	private String groupsPath = null;
+	private YamlConfiguration groupsConfig = null;
+	private String defaultPath = null;
+	private YamlConfiguration defaultConfig = null;
+	
 	private HashMap<String,Integer> versions = null;
-	private String rentPath = null;
-	private String buyPath = null;
 	private String versionPath = null;
 	private String schemFolder = null;
 	
@@ -40,10 +54,11 @@ public class FileManager {
 	 */
 	public FileManager(AreaShop plugin) {
 		this.plugin = plugin;
-		rents = new HashMap<>();
-		buys = new HashMap<>();
-		rentPath = plugin.getDataFolder().getPath() + File.separator + AreaShop.rentsFile;
-		buyPath = plugin.getDataFolder().getPath() + File.separator + AreaShop.buysFile;
+		regions = new HashMap<String, GeneralRegion>();
+		regionsPath = plugin.getDataFolder() + File.separator + AreaShop.regionsFolder;
+		groups = new HashMap<String, RegionGroup>();
+		groupsPath = plugin.getDataFolder() + File.separator + AreaShop.groupsFile;
+		defaultPath = plugin.getDataFolder() + File.separator + AreaShop.defaultFile;
 		versionPath = plugin.getDataFolder().getPath() + File.separator + AreaShop.versionFile;
 		schemFolder = plugin.getDataFolder() + File.separator + AreaShop.schematicFolder;
 		File schemFile = new File(schemFolder);
@@ -73,25 +88,65 @@ public class FileManager {
 		return schemFolder;
 	}
 	
+	public RegionGroup getGroup(String name) {
+		return groups.get(name.toLowerCase());
+	}
+	
+	public Collection<RegionGroup> getGroups() {
+		return groups.values();
+	}
+	
+	public YamlConfiguration getDefaultSettings() {
+		return defaultConfig;
+	}
+	
+	public GeneralRegion getRegion(String name) {
+		return regions.get(name.toLowerCase());
+	}
+	
 	public RentRegion getRent(String name) {
-		return rents.get(name.toLowerCase());
+		GeneralRegion region = regions.get(name.toLowerCase());
+		if(region != null && region.isRentRegion()) {
+			return (RentRegion)region;
+		}
+		return null;
 	}
 	
 	public BuyRegion getBuy(String name) {
-		return buys.get(name.toLowerCase());
+		GeneralRegion region = regions.get(name.toLowerCase());
+		if(region != null && region.isBuyRegion()) {
+			return (BuyRegion)region;
+		}
+		return null;
 	}
 	
-	public HashMap<String, RentRegion> getRents() {
-		return rents;
+	public List<RentRegion> getRents() {
+		List<RentRegion> result = new ArrayList<RentRegion>();
+		for(GeneralRegion region : regions.values()) {
+			if(region.isRentRegion()) {
+				result.add((RentRegion)region);
+			}
+		}
+		return result;
 	}
 	
-	public HashMap<String, BuyRegion> getBuys() {
-		return buys;
+	public List<BuyRegion> getBuys() {
+		List<BuyRegion> result = new ArrayList<BuyRegion>();
+		for(GeneralRegion region : regions.values()) {
+			if(region.isBuyRegion()) {
+				result.add((BuyRegion)region);
+			}
+		}
+		return result;
+	}
+	
+	public List<GeneralRegion> getRegions() {
+		return new ArrayList<GeneralRegion>(regions.values());
 	}
 	
 	public List<String> getBuyNames() {
 		ArrayList<String> result = new ArrayList<String>();
-		for(BuyRegion region : plugin.getFileManager().getBuys().values()) {
+		for(BuyRegion region : getBuys()) {
 			result.add(region.getName());
 		}
 		return result;
@@ -99,7 +154,7 @@ public class FileManager {
 	
 	public List<String> getRentNames() {
 		ArrayList<String> result = new ArrayList<String>();
-		for(RentRegion region : plugin.getFileManager().getRents().values()) {
+		for(RentRegion region : getRents()) {
 			result.add(region.getName());
 		}
 		return result;
@@ -110,9 +165,9 @@ public class FileManager {
 	 * @param regionName Name of the region that can be rented
 	 * @param rent Map containing all the info for a rent
 	 */
-	public void addRent(String regionName, RentRegion rent) {
-		rents.put(regionName.toLowerCase(), rent);
-		plugin.getFileManager().saveRents();
+	public void addRent(RentRegion rent) {
+		regions.put(rent.getName().toLowerCase(), rent);
+		rent.save();
 	}
 	
 	/**
@@ -120,9 +175,9 @@ public class FileManager {
 	 * @param regionName Name of the region that can be buyed
 	 * @param buy Map containing all the info for a buy
 	 */
-	public void addBuy(String regionName, BuyRegion buy) {
-		buys.put(regionName.toLowerCase(), buy);
-		plugin.getFileManager().saveBuys();
+	public void addBuy(BuyRegion buy) {
+		regions.put(buy.getName().toLowerCase(), buy);
+		buy.save();
 	}
 	
 	/**
@@ -141,8 +196,24 @@ public class FileManager {
 			if(rent.getWorld() != null) {
 				rent.getWorld().getBlockAt(rent.getSignLocation()).setType(Material.AIR);
 			}
-			rents.remove(regionName);
-			this.saveRents();
+			if(rent.getRegion() != null) {
+				rent.getRegion().setFlag(DefaultFlag.GREET_MESSAGE, null);
+				rent.getRegion().setFlag(DefaultFlag.FAREWELL_MESSAGE, null);
+			}
+			regions.remove(regionName);
+			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + regionName + ".yml");
+			boolean deleted = true;
+			try {
+				deleted = file.delete();
+			} catch(Exception e) {
+				deleted = false;
+			}
+			if(!deleted) {
+				plugin.getLogger().warning("File could not be deleted: " + file.toString());
+			}
+			for(RegionGroup group : getGroups()) {
+				group.removeMember(rent);
+			}
 			result = true;
 		}		
 		return result;
@@ -160,12 +231,31 @@ public class FileManager {
 			if(buy.isSold()) {
 				buy.sell(giveMoneyBack);
 			}
-			/* Delete the sign and the variable */
+			// Delete the sign and the variable
 			if(buy.getWorld() != null) {
 				buy.getWorld().getBlockAt(buy.getSignLocation()).setType(Material.AIR);
 			}			
-			buys.remove(regionName);
-			this.saveBuys();
+			regions.remove(regionName);
+			if(buy.getRegion() != null) {
+				buy.getRegion().setFlag(DefaultFlag.GREET_MESSAGE, null);
+				buy.getRegion().setFlag(DefaultFlag.FAREWELL_MESSAGE, null);
+			}
+			// Deleting the file
+			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + regionName + ".yml");
+			boolean deleted = true;
+			try {
+				deleted = file.delete();
+			} catch(Exception e) {
+				deleted = false;
+			}
+			if(!deleted) {
+				plugin.getLogger().warning("File could not be deleted: " + file.toString());
+			}
+			
+			// Removing from groups
+			for(RegionGroup group : getGroups()) {
+				group.removeMember(buy);
+			}
 			result = true;
 		}		
 		return result;
@@ -177,8 +267,8 @@ public class FileManager {
 	 */
 	public boolean updateRentSigns() {
 		boolean result = true;			
-		for(String name : rents.keySet()) {
-			result = result & rents.get(name).updateSigns();
+		for(RentRegion rent : getRents()) {
+			result = result & rent.updateSigns();
 		}		
 		return result;		
 	}
@@ -189,8 +279,8 @@ public class FileManager {
 	 */
 	public boolean updateBuySigns() {
 		boolean result = true;			
-		for(String name : buys.keySet()) {
-			result = result & buys.get(name).updateSigns();
+		for(BuyRegion buy : getBuys()) {
+			result = result & buy.updateSigns();
 		}		
 		return result;		
 	}
@@ -198,82 +288,69 @@ public class FileManager {
 	/**
 	 * Update all regions registered for renting
 	 */
-	public void updateRentRegions() {
-		Object[] rentNames = rents.keySet().toArray();			
-		for(int i=0; i<rentNames.length; i++) {
-			rents.get((String)rentNames[i]).updateRegionFlags();
+	public void updateRentRegions() {		
+		for(RentRegion rent : getRents()) {
+			rent.updateRegionFlags();
 		}
 	}
 	
 	/**
 	 * Update all regions registered for buying
 	 */
-	public void updateBuyRegions() {
-		Object[] buyNames = buys.keySet().toArray();			
-		for(int i=0; i<buyNames.length; i++) {
-			buys.get((String)buyNames[i]).updateRegionFlags();
+	public void updateBuyRegions() {			
+		for(BuyRegion buy : getBuys()) {
+			buy.updateRegionFlags();
 		}
 	}
 	
-		
-	/**
-	 * Save all rents to disk
-	 */
-	public void saveRents() {
+	public void saveGroups() {
 		try {
-			HashMap<String, HashMap<String, String>> outputMap = new HashMap<String, HashMap<String, String>>();
-			for(String rent : rents.keySet()) {
-				outputMap.put(rent, rents.get(rent).toMap());
-			}
-			output = new ObjectOutputStream(new FileOutputStream(rentPath));
-			output.writeObject(outputMap);
-			output.close();
+			groupsConfig.save(groupsPath);
 		} catch (IOException e) {
-			plugin.getLogger().info("File could not be saved: " + rentPath);
+			plugin.getLogger().warning("Groups file could not be saved: " + groupsPath);
 		}
-		
 	}
 	
 	/**
-	 * Save all buys to disk
+	 * Save all region related files
 	 */
-	public void saveBuys() {
-		try {
-			HashMap<String, HashMap<String, String>> outputMap = new HashMap<String, HashMap<String, String>>();
-			for(String buy : buys.keySet()) {
-				outputMap.put(buy, buys.get(buy).toMap());
-			}
-			output = new ObjectOutputStream(new FileOutputStream(buyPath));
-			output.writeObject(outputMap);
-			output.close();
-		} catch (IOException e) {
-			plugin.getLogger().info("File could not be saved: " + buyPath);
+	public void saveAll() {
+		// Safe regions
+		for(GeneralRegion region : getRegions()) {
+			region.save();
 		}
 		
+		// Safe groups and default config
+		this.saveGroups();
+		try {
+			defaultConfig.save(defaultPath);
+		} catch (IOException e) {
+			plugin.getLogger().warning("Default file could not be saved: " + defaultPath);
+		}	
+		
+	}
+	
+	public String getRegionFolder() {
+		return regionsPath;
 	}
 	
 	/**
 	 * Unrent region that have no time left
 	 */
 	public void checkRents() {
-		/* Check if regions and signs are still present */
-		Object[] rentNames = rents.keySet().toArray();			
+		/* Check if regions and signs are still present */		
 		long now = Calendar.getInstance().getTimeInMillis();
-		for(int i=0; i<rentNames.length; i++) {
-			RentRegion rent = getRent((String)rentNames[i]);
-			if(rent.isRented()) {
-				if(now > rent.getRentedUntil()) {
-					/* Send message to the player if online */
-					Player player = Bukkit.getPlayer(rent.getRenter());
-					if(player != null) {
-						plugin.message(player, "unrent-expired", rent.getName());
-					}
-					rent.unRent(true);
+		for(RentRegion rent : getRents()) {
+			if(rent.isRented() && now > rent.getRentedUntil()) {
+				/* Send message to the player if online */
+				Player player = Bukkit.getPlayer(rent.getRenter());
+				if(player != null) {
+					plugin.message(player, "unrent-expired", rent.getName());
 				}
+				rent.unRent(false);				
 			}
 		}	
 	}
-	
 
 	
 	/**
@@ -295,8 +372,7 @@ public class FileManager {
 		}
 		if(versions == null || versions.size() == 0) {
 			versions = new HashMap<String, Integer>();
-			versions.put(AreaShop.versionRentKey, -1);
-			versions.put(AreaShop.versionBuyKey, -1);
+			versions.put(AreaShop.versionFiles, 0);
 			this.saveVersions();
 		}
 	}
@@ -316,236 +392,354 @@ public class FileManager {
 			plugin.getLogger().info("File could not be saved: " + versionPath);
 		}
 	}
-	
-	
-	/**
-	 * Loads the rents from disk
-	 * @return true if the file is read successfully, else false
-	 */
-	@SuppressWarnings("unchecked")
-	public boolean loadRents() {
-		// TODO do this somewhere, exeption in constructor of RentRegion?
-		/*
-					// If region is gone delete the rent and the sign 
-					if(Bukkit.getWorld(rent.get(AreaShop.keyWorld)) == null 
-							|| plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(rent.get(AreaShop.keyWorld))) == null 
-							|| plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(rent.get(AreaShop.keyWorld))).getRegion(rentName) == null) {
-						this.removeRent(rentName, false);
-						plugin.getLogger().info(rentName + " does not exist anymore, rent has been deleted");
-					} else {
-						// If the sign is gone remove the rent 
-						Block block = Bukkit.getWorld(rent.get(AreaShop.keyWorld)).getBlockAt(Integer.parseInt(rent.get(AreaShop.keyX)), Integer.parseInt(rent.get(AreaShop.keyY)), Integer.parseInt(rent.get(AreaShop.keyZ)));
-						if(!(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST)) {
-							// remove the rent 
-							if(this.removeRent(rentName, false)) {
-								plugin.getLogger().info("Rent for " + rentName + " has been deleted, sign is not present");
-							}
-						}
-					}	
-					
-		 */
+
+	public boolean loadFiles() {
+		boolean result = false;
 		
-		// Read file
-		HashMap<String,HashMap<String,String>> rents = null;
-		String rentPath = plugin.getDataFolder().getPath() + File.separator + "rents";
-		File file = new File(rentPath);
+		convertFiles();
+		
+		// Load regions
+		File file = new File(regionsPath);
 		if(!file.exists()) {
-			rents = new HashMap<String, HashMap<String, String>>();
-			this.saveRents();
-			plugin.getLogger().info("New file for rents created, should only happen when starting for the first time");
+			file.mkdirs();
+		} else if(file.isDirectory()) {
+			for(File region : file.listFiles()) {
+				if(region.isFile()) {
+					YamlConfiguration config = YamlConfiguration.loadConfiguration(region);					
+					if(config.isSet("rent")) {
+						try {
+							RentRegion rent = new RentRegion(plugin, config);
+							addRent(rent);
+						} catch (RegionCreateException exception) {
+							plugin.getLogger().warning(exception.getMessage());
+							try {
+								region.delete();
+							} catch(Exception e) {}
+						}
+						
+					} else if(config.isSet("buy")) {
+						try {
+							BuyRegion buy = new BuyRegion(plugin, config);
+							addBuy(buy);
+						} catch (RegionCreateException exception) {
+							plugin.getLogger().warning(exception.getMessage());
+							try {
+								region.delete();
+							} catch(Exception e) {}
+						}						
+					}
+				}
+			}
+		}
+		
+		// Load groups
+		File groupFile = new File(groupsPath);
+		if(groupFile.exists() && groupFile.isFile()) {
+			groupsConfig = YamlConfiguration.loadConfiguration(groupFile);
 		} else {
+			groupsConfig = new YamlConfiguration();
+		}
+		for(String groupName : groupsConfig.getKeys(false)) {
+			RegionGroup group = new RegionGroup(plugin, groupName);
+			for(String region : groupsConfig.getConfigurationSection(groupName).getStringList("regions")) {
+				group.addMember(regions.get(region.toLowerCase()));
+			}
+			groups.put(groupName, group);
+		}
+		
+		// Load default settings
+		File defaultFile = new File(defaultPath);
+		if(!defaultFile.exists()) {
+			InputStream input = null;
+			OutputStream output = null;
+			try {
+				input = plugin.getResource(AreaShop.defaultFile);
+				output = new FileOutputStream(defaultFile);
+		 
+				int read = 0;
+				byte[] bytes = new byte[1024];		 
+				while ((read = input.read(bytes)) != -1) {
+					output.write(bytes, 0, read);
+				} 
+				input.close();
+				output.close();
+				plugin.getLogger().info("File with default region settings has been saved, should only happen the first time");
+			} catch(IOException e) {
+				try {
+					input.close();
+					output.close();
+				} catch (IOException e1) {} catch (NullPointerException e2) {}
+				
+				plugin.getLogger().warning("Something went wrong saving the default region settings: " + defaultFile.getPath());
+			}
+		}		
+		defaultConfig = YamlConfiguration.loadConfiguration(defaultFile);		
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void convertFiles() {
+		String rentPath = plugin.getDataFolder() + File.separator + "rents";
+		String buyPath = plugin.getDataFolder() + File.separator + "buys";
+		File rentFile = new File(rentPath);
+		File buyFile = new File(buyPath);
+		String oldFolderPath = plugin.getDataFolder() + File.separator + "#old" + File.separator;
+		File oldFolderFile = new File(oldFolderPath);
+				
+		// If the the files are already the current version
+		if(versions.get(AreaShop.versionFiles) != null && versions.get(AreaShop.versionFiles) == AreaShop.versionFilesCurrent) {
+			return;
+		}
+		
+		// Convert old rent files
+		if(rentFile.exists()) {
+			if(!oldFolderFile.exists()) {
+				oldFolderFile.mkdirs();
+			}
+			
+			if(versions.get("rents") == null) {
+				versions.put("rents", -1);
+			}
+			
+			HashMap<String, HashMap<String, String>> rents = null;
 			try {
 				ObjectInputStream input = new ObjectInputStream(new FileInputStream(rentPath));
 		    	rents = (HashMap<String,HashMap<String,String>>)input.readObject();
 				input.close();
 			} catch (IOException | ClassNotFoundException | ClassCastException e) {
-				plugin.getLogger().info("Error: Something went wrong reading file: " + rentPath);
-				return false;
+				plugin.getLogger().warning("Error: Something went wrong reading file: " + rentPath);
 			}
-			
-			// Check if a conversion is needed
-			if(versions.get(AreaShop.versionRentKey) < AreaShop.versionRentCurrent) {
-				if(versions.get(AreaShop.versionRentKey) < 1) {
-					// Backup current file
-					try {
-						FileUtils.copyFile(new File(rentPath), new File(rentPath + ".old"));
-					} catch (IOException e) {
-						plugin.getLogger().info("Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
-					}
-					
+			// Delete the file if it is totally wrong
+			if(rents == null) {
+				try {
+					rentFile.delete();
+				} catch(Exception e) {}
+			} else {
+				// Move old file
+				try {
+					Files.move(new File(rentPath), new File(oldFolderPath + "rents"));
+				} catch (Exception e) {
+					plugin.getLogger().info("Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
+				}
+				// Check if conversion is needed
+				if(versions.get("rents") < 1) {					
 					/* Upgrade the rent to the latest version */
-					if(versions.get(AreaShop.versionRentKey) < 0) {
+					if(versions.get("rents") < 0) {
 						for(String rentName : rents.keySet()) {
 							HashMap<String,String> rent = rents.get(rentName);
 							/* Save the rentName in the hashmap and use a small caps rentName as key */
-							if(rent.get(AreaShop.keyName) == null) {
-								rent.put(AreaShop.keyName, rentName);
+							if(rent.get("name") == null) {
+								rent.put("name", rentName);
 								rents.remove(rentName);
 								rents.put(rentName.toLowerCase(), rent);
 							}
 							/* Save the default setting for region restoring */
-							if(rent.get(AreaShop.keyRestore) == null) {
-								rent.put(AreaShop.keyRestore, "general");
+							if(rent.get("restore") == null) {
+								rent.put("restore", "general");
 							}
 							/* Save the default setting for the region restore profile */
-							if(rent.get(AreaShop.keySchemProfile) == null) {
-								rent.put(AreaShop.keySchemProfile, "default");
+							if(rent.get("profile") == null) {
+								rent.put("profile", "default");
 							}
 							/* Change to version 0 */
-							versions.put(AreaShop.versionRentKey, 0);
-							this.saveVersions();
+							versions.put("rents", 0);
 						}
 						plugin.getLogger().info("Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
 					}
-					if(versions.get(AreaShop.versionRentKey) < 1) {
+					if(versions.get("rents") < 1) {
 						plugin.getLogger().info("Starting UUID conversion of '" + buyPath + "', could take a while");
 						for(String rentName : rents.keySet()) {
 							HashMap<String,String> rent = rents.get(rentName);
-							if(rent.get(AreaShop.oldKeyPlayer) != null) {
+							if(rent.get("player") != null) {
 								@SuppressWarnings("deprecation")  // Fake deprecation by Bukkit to inform developers, method will stay
-								OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(rent.get(AreaShop.oldKeyPlayer));
-								rent.put(AreaShop.keyPlayerUUID, offlinePlayer.getUniqueId().toString());		
-								rent.remove(AreaShop.oldKeyPlayer);
+								OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(rent.get("player"));
+								rent.put("playeruuid", offlinePlayer.getUniqueId().toString());		
+								rent.remove("player");
 							}					
 							/* Change version to 1 */
-							versions.put(AreaShop.versionRentKey, 1);
-							this.saveVersions();
+							versions.put("rents", 1);
 						}
 						plugin.getLogger().info("Updated version of '" + rentPath + "' from 0 to 1 (switch to UUID's for player identification)");
-					}		
+					}				
+				}		
+				// Save rents to new format
+				File regionsFile = new File(regionsPath);
+				if(!regionsFile.exists()) {
+					regionsFile.mkdirs();
+				}
+				for(HashMap<String, String> rent : rents.values()) {
+					YamlConfiguration config = new YamlConfiguration();
+					config.set("name", rent.get("name").toLowerCase());
+					config.set("rent.world", rent.get("world"));
+					config.set("rent.signLocation.world", rent.get("world"));
+					config.set("rent.signLocation.x", Double.parseDouble(rent.get("x")));
+					config.set("rent.signLocation.y", Double.parseDouble(rent.get("y")));
+					config.set("rent.signLocation.z", Double.parseDouble(rent.get("z")));
+					config.set("rent.price", Double.parseDouble(rent.get("price")));
+					config.set("rent.duration", rent.get("duration"));
+					if(rent.get("restore") != null && !rent.get("restore").equals("general")) {
+						config.set("rent.enableRestore", rent.get("restore"));
+					}
+					if(rent.get("profile") != null && !rent.get("profile").equals("default")) {
+						config.set("rent.restoreProfile", rent.get("profile"));
+					}
+					if(rent.get("tpx") != null) {
+						config.set("rent.teleportLocation.world", rent.get("world"));
+						config.set("rent.teleportLocation.x", Double.parseDouble(rent.get("tpx")));
+						config.set("rent.teleportLocation.y", Double.parseDouble(rent.get("tpy")));
+						config.set("rent.teleportLocation.z", Double.parseDouble(rent.get("tpz")));
+						config.set("rent.teleportLocation.yaw", Double.parseDouble(rent.get("tpyaw")));
+						config.set("rent.teleportLocation.pitch", Double.parseDouble(rent.get("tppitch")));
+					}
+					if(rent.get("playeruuid") != null) {
+						config.set("rent.renter", rent.get("playeruuid"));
+						config.set("rent.rentedUntil", Long.parseLong(rent.get("rented")));
+					}
+					try {
+						config.save(new File(regionsPath + File.separator + rent.get("name").toLowerCase() + ".yml"));
+					} catch (IOException e) {
+						plugin.getLogger().warning("Error: Could not save region file while converting: " + regionsPath + File.separator + rent.get("name").toLowerCase() + ".yml");
+					}
 				}
 			}
+			
+			// Change version number
+			versions.remove("rents");
+			versions.put(AreaShop.versionFiles, AreaShop.versionFilesCurrent);			
+			saveVersions();			
 		}
 		
-		// Add them all to the RegionManager
-		for(String rent : rents.keySet()) {
-			HashMap<String, String> map = rents.get(rent);
-			addRent(rent, new RentRegion(plugin, map));
+		if(buyFile.exists()) {
+			if(!oldFolderFile.exists()) {
+				oldFolderFile.mkdirs();
+			}
 			
-		}	
-				
-		/* Output info to console */
-		if(rents.keySet().size() == 1) {
-			AreaShop.debug(rents.keySet().size() + " rent loaded");
-		} else {
-			AreaShop.debug(rents.keySet().size() + " rents loaded");
-		}
-		return true;
-	}
-	
-	/**
-	 * Load the buys file from disk
-	 * @return true if the file is read successfully, else false
-	 */
-	@SuppressWarnings("unchecked")
-	public boolean loadBuys() {
-		// TODO do this somewhere, exeption in constructor of BuyRegion?
-				/*
-					// If region is gone delete the buy and the sign
-					if(Bukkit.getWorld(buy.get(AreaShop.keyWorld)) == null 
-							|| plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(buy.get(AreaShop.keyWorld))) == null 
-							|| plugin.getWorldGuard().getRegionManager(Bukkit.getWorld(buy.get(AreaShop.keyWorld))).getRegion(buyName) == null) {
-						this.removeBuy(buyName, false);
-						plugin.getLogger().info("Region '" + buyName + "' does not exist anymore, buy has been deleted");
-					} else {
-						// If the sign is gone remove the buy
-						Block block = Bukkit.getWorld(buy.get(AreaShop.keyWorld)).getBlockAt(Integer.parseInt(buy.get(AreaShop.keyX)), Integer.parseInt(buy.get(AreaShop.keyY)), Integer.parseInt(buy.get(AreaShop.keyZ)));
-						if(!(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST)) {
-							// remove the buy
-							if(this.removeBuy(buyName, false)) {
-								plugin.getLogger().info("Buy for region '" + buyName + "' has been deleted, sign is not present");
-							}
-						}
-
-							
-				 */
-				
-		// Read file
-		HashMap<String,HashMap<String,String>> buys = null;
-		String buyPath = plugin.getDataFolder().getPath() + File.separator + "buys";
-		File file = new File(buyPath);
-		if(!file.exists()) {
-			buys = new HashMap<String, HashMap<String, String>>();
-			this.saveBuys();
-			plugin.getLogger().info("New file for buys created, should only happen when starting for the first time");
-		} else {
+			if(versions.get("buys") == null) {
+				versions.put("buys", -1);
+			}
+			
+			HashMap<String, HashMap<String, String>> buys = null;
 			try {
 				ObjectInputStream input = new ObjectInputStream(new FileInputStream(buyPath));
 		    	buys = (HashMap<String,HashMap<String,String>>)input.readObject();
 				input.close();
 			} catch (IOException | ClassNotFoundException | ClassCastException e) {
-				plugin.getLogger().info("Error: Something went wrong reading file: " + buyPath);
-				return false;
+				plugin.getLogger().warning("Error: Something went wrong reading file: " + buyPath);
 			}
-			
-			// Check if a conversion is needed
-			if(versions.get(AreaShop.versionRentKey) < AreaShop.versionRentCurrent) {
-				if(versions.get(AreaShop.versionRentKey) < 1) {
-					// Backup current file
-					try {
-						FileUtils.copyFile(new File(buyPath), new File(buyPath + ".old"));
-					} catch (IOException e) {
-						plugin.getLogger().info("Could not create a backup of '" + buyPath + "', check the file permissions (conversion to next version continues)");
-					}
-					
-					/* Upgrade the rent to the latest version */
-					if(versions.get(AreaShop.versionBuyKey) < 0) {
-						for(String rentName : buys.keySet()) {
-							HashMap<String,String> rent = buys.get(rentName);
-							/* Save the rentName in the hashmap and use a small caps rentName as key */
-							if(rent.get(AreaShop.keyName) == null) {
-								rent.put(AreaShop.keyName, rentName);
-								buys.remove(rentName);
-								buys.put(rentName.toLowerCase(), rent);
+			// Delete the file if it is totally wrong
+			if(buys == null) {
+				try {
+					buyFile.delete();
+				} catch(Exception e) {}
+			} else {
+				// Backup current file
+				try {
+					Files.move(new File(buyPath), new File(oldFolderPath + "buys"));
+				} catch (Exception e) {
+					plugin.getLogger().info("Could not create a backup of '" + buyPath + "', check the file permissions (conversion to next version continues)");
+				}
+				// Check if conversion is needed
+				if(versions.get("buys") < 1) {				
+					/* Upgrade the buy to the latest version */
+					if(versions.get("buys") < 0) {
+						for(String buyName : buys.keySet()) {
+							HashMap<String,String> buy = buys.get(buyName);
+							/* Save the buyName in the hashmap and use a small caps buyName as key */
+							if(buy.get("name") == null) {
+								buy.put("name", buyName);
+								buys.remove(buyName);
+								buys.put(buyName.toLowerCase(), buy);
 							}
 							/* Save the default setting for region restoring */
-							if(rent.get(AreaShop.keyRestore) == null) {
-								rent.put(AreaShop.keyRestore, "general");
+							if(buy.get("restore") == null) {
+								buy.put("restore", "general");
 							}
 							/* Save the default setting for the region restore profile */
-							if(rent.get(AreaShop.keySchemProfile) == null) {
-								rent.put(AreaShop.keySchemProfile, "default");
+							if(buy.get("profile") == null) {
+								buy.put("profile", "default");
 							}
 							/* Change to version 0 */
-							versions.put(AreaShop.versionBuyKey, 0);
-							this.saveVersions();
+							versions.put("buys", 0);
 						}
 						plugin.getLogger().info("Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
 					}
-					if(versions.get(AreaShop.versionBuyKey) < 1) {
+					if(versions.get("buys") < 1) {
 						plugin.getLogger().info("Starting UUID conversion of '" + buyPath + "', could take a while");
-						for(String rentName : buys.keySet()) {
-							HashMap<String,String> rent = buys.get(rentName);
-							if(rent.get(AreaShop.oldKeyPlayer) != null) {
+						for(String buyName : buys.keySet()) {
+							HashMap<String,String> buy = buys.get(buyName);
+							if(buy.get("player") != null) {
 								@SuppressWarnings("deprecation")  // Fake deprecation by Bukkit to inform developers, method will stay
-								OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(rent.get(AreaShop.oldKeyPlayer));
-								rent.put(AreaShop.keyPlayerUUID, offlinePlayer.getUniqueId().toString());		
-								rent.remove(AreaShop.oldKeyPlayer);
+								OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(buy.get("player"));
+								buy.put("playeruuid", offlinePlayer.getUniqueId().toString());		
+								buy.remove("player");
 							}					
 							/* Change version to 1 */
-							versions.put(AreaShop.versionBuyKey, 1);
-							this.saveVersions();
+							versions.put("buys", 1);
 						}
 						plugin.getLogger().info("Updated version of '" + buyPath + "' from 0 to 1 (switch to UUID's for player identification)");
-					}		
+					}				
+				}		
+			
+				// Save buys to new format
+				File regionsFile = new File(regionsPath);
+				if(!regionsFile.exists()) {
+					regionsFile.mkdirs();
+				}
+				for(HashMap<String, String> buy : buys.values()) {
+					YamlConfiguration config = new YamlConfiguration();
+					config.set("name", buy.get("name").toLowerCase());
+					config.set("buy.world", buy.get("world"));
+					config.set("buy.signLocation.world", buy.get("world"));
+					config.set("buy.signLocation.x", Double.parseDouble(buy.get("x")));
+					config.set("buy.signLocation.y", Double.parseDouble(buy.get("y")));
+					config.set("buy.signLocation.z", Double.parseDouble(buy.get("z")));
+					config.set("buy.price", Double.parseDouble(buy.get("price")));
+					config.set("buy.duration", buy.get("duration"));
+					if(buy.get("restore") != null && !buy.get("restore").equals("general")) {
+						config.set("buy.enableRestore", buy.get("restore"));
+					}
+					if(buy.get("profile") != null && !buy.get("profile").equals("default")) {
+						config.set("buy.restoreProfile", buy.get("profile"));
+					}
+					if(buy.get("tpx") != null) {
+						config.set("buy.teleportLocation.world", buy.get("world"));
+						config.set("buy.teleportLocation.x", Double.parseDouble(buy.get("tpx")));
+						config.set("buy.teleportLocation.y", Double.parseDouble(buy.get("tpy")));
+						config.set("buy.teleportLocation.z", Double.parseDouble(buy.get("tpz")));
+						config.set("buy.teleportLocation.yaw", Double.parseDouble(buy.get("tpyaw")));
+						config.set("buy.teleportLocation.pitch", Double.parseDouble(buy.get("tppitch")));
+					}
+					if(buy.get("playeruuid") != null) {
+						config.set("buy.buyer", buy.get("playeruuid"));
+					}
+					try {
+						config.save(new File(regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml"));
+					} catch (IOException e) {
+						plugin.getLogger().warning("Error: Could not save region file while converting: " + regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml");
+					}
 				}
 			}
+
+			// Change version number
+			versions.remove("buys");
+			versions.put(AreaShop.versionFiles, AreaShop.versionFilesCurrent);			
+			saveVersions();			
 		}
 		
-		// Add them all to the RegionManager
-		for(String rent : buys.keySet()) {
-			HashMap<String, String> map = buys.get(rent);
-			addBuy(rent, new BuyRegion(plugin, map));
-			
-		}	
-				
-		/* Output info to console */
-		if(buys.keySet().size() == 1) {
-			AreaShop.debug(buys.keySet().size() + " buy loaded");
-		} else {
-			AreaShop.debug(buys.keySet().size() + " buys loaded");
-		}
-		return true;
+		
+		try {
+			Files.move(new File(rentPath + ".old"), new File(oldFolderPath + "rents.old"));
+			Files.move(new File(buyPath + ".old"), new File(oldFolderPath + "buys.old"));
+		} catch (Exception e) {}
+	}
+	
+	/**
+	 * Get the settings of a group
+	 * @param groupName Name of the group to get the settings from
+	 * @return The settings of the group
+	 */
+	public ConfigurationSection getGroupSettings(String groupName) {
+		return groupsConfig.getConfigurationSection(groupName.toLowerCase());
 	}
 }
 

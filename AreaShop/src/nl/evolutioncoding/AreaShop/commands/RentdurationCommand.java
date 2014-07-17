@@ -54,7 +54,7 @@ public class RentdurationCommand extends CommandAreaShop {
 			return;
 		}					
 		rent.setDuration(args[2]+" "+args[3]);
-		plugin.getFileManager().saveRents();
+		rent.save();
 		plugin.message(sender, "rentduration-success", rent.getName(), rent.getDurationString());
 	}
 	

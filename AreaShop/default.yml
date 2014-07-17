@@ -1,0 +1,17 @@
+########## GENERAL ##########  
+general:
+
+########## RENTING ##########  
+rent:
+  price: 1000
+  duration: '1 day'
+  ### Enable or disable saving and restoring for rents that don't have their individual option set
+  enableRestore: false
+  restoreProfile: 'default'
+
+########## BUYING ##########
+buy:
+  price: 1000
+  ### Enable or disable saving and restoring for buys that don't have their individual option set
+  enableRestore: false
+  restoreProfile: 'default'

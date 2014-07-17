@@ -1,6 +1,9 @@
 package nl.evolutioncoding.AreaShop.commands;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
+import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -39,11 +42,18 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(sender, "setteleport-help");
 			return;
 		}
-		/*
 		Player player = (Player) sender;
 		boolean owner = false;
-		owner = plugin.getFileManager().getRent(args[1]) != null && player.getUniqueId().toString().equals(plugin.getFileManager().getRent(args[1]).get(AreaShop.keyPlayerUUID));
-		owner = owner || plugin.getFileManager().getBuy(args[1]) != null && player.getUniqueId().toString().equals(plugin.getFileManager().getBuy(args[1]).get(AreaShop.keyPlayerUUID));
+		GeneralRegion region = plugin.getFileManager().getRegion(args[1]);
+		if(region == null) {
+			plugin.message(player, "setteleport-noRentOrBuy", args[1]);
+			return;
+		}
+		if(region.isRentRegion()) {
+			owner = player.getUniqueId().equals(((RentRegion)region).getRenter());
+		} else {
+			owner = player.getUniqueId().equals(((BuyRegion)region).getBuyer());
+		}
 		if(!player.hasPermission("areashop.setteleport")) {
 			plugin.message(player, "setteleport-noPermission");
 			return;
@@ -51,23 +61,19 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(player, "setteleport-noPermissionOther");
 			return;
 		}
-		if(plugin.getFileManager().getRent(args[1]) == null && plugin.getFileManager().getBuy(args[1]) == null) {
-			plugin.message(player, "setteleport-noRentOrBuy", args[1]);
-			return;
-		}
-		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(player.getWorld()).getRegion(args[1]);
-		if(args.length > 2 && args[2] != null && args[2].equalsIgnoreCase("reset")) {
-			plugin.getFileManager().setTeleport(args[1], null, plugin.getFileManager().getRent(args[1]) != null);
+
+		ProtectedRegion wgRegion = region.getRegion();
+		if(args.length > 2 && args[2] != null && (args[2].equalsIgnoreCase("reset") || args[2].equalsIgnoreCase("yes") || args[2].equalsIgnoreCase("true"))) {
+			region.setTeleport(null);
 			plugin.message(player, "setteleport-reset", args[1]);
 			return;
 		}
-		if(!region.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ())) {
+		if(!wgRegion.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()) && !player.hasPermission(" areashop.setteleportoutsideregion")) {
 			plugin.message(player, "setteleport-notInside", args[1]);
 			return;
 		}
-		plugin.getFileManager().setTeleport(args[1], player.getLocation(), plugin.getFileManager().getRent(args[1]) != null);
+		region.setTeleport(player.getLocation());
 		plugin.message(player, "setteleport-success", args[1]);
-		*/
 	}
 
 }

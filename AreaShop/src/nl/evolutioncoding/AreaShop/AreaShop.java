@@ -41,37 +41,17 @@ public final class AreaShop extends JavaPlugin {
 	public static final String languageFolder = "lang";
 	public static final String schematicFolder = "schem";
 	public static final String schematicExtension = ".schematic";	
-	public static final String rentsFile = "rents";
-	public static final String buysFile = "buys";
+	public static final String regionsFolder = "regions";
+	public static final String groupsFile = "groups.yml";
+	public static final String defaultFile = "default.yml";	
 	public static final String versionFile = "versions";
-	
-	/* Constants for handling file versions */
-	public static final String versionRentKey = "rents";
-	public static final int versionRentCurrent = 1;
-	public static final String versionBuyKey = "buys";
-	public static final int versionBuyCurrent = 1;
 	
 	/* Euro tag for in the config */
 	public static final String currencyEuro = "%euro%";
 	
-	/* Keys for adding things to the hashmap */
-	public static final String keyWorld = "world";
-	public static final String keyX = "x";
-	public static final String keyY = "y";
-	public static final String keyZ = "z";
-	public static final String keyTPX = "tpx";
-	public static final String keyTPY = "tpy";
-	public static final String keyTPZ = "tpz";
-	public static final String keyTPPitch = "tppitch";
-	public static final String keyTPYaw = "tpyaw";
-	public static final String keyDuration = "duration";
-	public static final String keyPrice = "price";
-	public static final String oldKeyPlayer = "player";
-	public static final String keyPlayerUUID = "playeruuid";
-	public static final String keyRentedUntil = "rented";
-	public static final String keyName = "name";
-	public static final String keyRestore = "restore";
-	public static final String keySchemProfile = "profile";
+	/* Constants for handling file versions */
+	public static final String versionFiles = "files";
+	public static final int versionFilesCurrent = 2;
 	
 	/* Keys for replacing parts of flags */
 	public static final String tagPlayerName = "%player%";
@@ -154,8 +134,6 @@ public final class AreaShop extends JavaPlugin {
         } else {
             economy = economyProvider.getProvider();
         }
-
-
         
 	    /* Create a LanguageMananager */
 	    languageManager = new LanguageManager(this);
@@ -165,9 +143,8 @@ public final class AreaShop extends JavaPlugin {
 
 		/* Load all data from files and check versions */
 	    fileManager = new FileManager(this);
-	    error = error & !fileManager.loadRents();
+	    error = error & !fileManager.loadFiles();
 	    fileManager.checkRents();
-	    error = error & !fileManager.loadBuys();
 	    
 		if(error) {
 			this.getLogger().info("The plugin has not started, fix the errors listed above");

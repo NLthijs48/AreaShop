@@ -56,7 +56,7 @@ public class BuyrestoreCommand extends CommandAreaShop {
 				} else {
 					plugin.message(sender, "buyrestore-success", buy.getName(), value);
 				}
-				plugin.getFileManager().saveBuys();
+				buy.save();
 			}
 		}
 	}

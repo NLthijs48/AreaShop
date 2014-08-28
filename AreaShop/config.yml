@@ -2,7 +2,7 @@
 # config.yml of the AreaShop plugin          #
 # This plugin has been created by NLThijs48  #
 # Check the server minecraft.go-craft.com    #
-# and then the SurvivalNL server for a demo  #
+# and then the Survival server for a demo    #
 ##############################################
 
 ########## GENERAL ##########
@@ -16,28 +16,165 @@ moneyCharacterAfter: ''
 debug: false
 ## The .yml language file that should be used, provided by this plugin: EN, NL
 language: EN
-## Maximum total amount of rents and buys together
-maximumTotal: 1
 ## Enable Schematic saving and restoring in general
 enableSchematics: true
 ## Maximum number of blocks to save to or restore from a .schemetic
 maximumBlocks: 1000000
 ## Enable sending stats to http://mcstats.org/ (Metrics plugin)
 sendStats: true
+## Use colors when sending messages to console and log files
+useColorsInConsole: false
+## Post error messages in the console when a command run from the config fails (from the 'runCommands' section for example)
+postCommandErrors: true
 ## Version of the config, do not change!
-version: 1.3.0
-
+version: 2.0.0
+## The y location within the region to start searching for safe teleport spots (x and z will be in the middle of the region)
+## Possible values: bottom, middle, top
+teleportLocationY: bottom
+## The different tags you can write on the sign to trigger the plugin
+signTags:
+  ## Tag for adding a rent region
+  rent: '[rent]'
+  ## Tag for adding a buy region
+  buy: '[buy]'
+  ## Tag for adding a sign to an existing region
+  add: '[as]'
+## Configure the max total regions, max rent regions and max buy regions with different groups (-1 is unlimited)
+## Assign a group to players by giving them the permission 'areashop.limits.<group>'
+## Every player already has the group 'default' and ops have the unlimited group
+## If a player has multiple groups the highest numbers are used
+limitGroups:
+  default:
+    total: 1
+    rents: 1
+    buys: 1
+  unlimited:
+    total: -1
+    rents: -1
+    buys: -1
+## Below are profiles for the signs, you can assign profiles to regions 
+## by setting 'general.signProfile' in default.yml, groups or individual regions
+signProfiles:
+  default:
+    ## Below is the format for each sign state, the following tags can be used for signs and commands:
+    ## %region%, %player%, %uuid%, %price%, %duration%, %world%, %type%, %until%, %untilshort%
+    ## The following sections can be added for performing certain commands when the sign is clicked:
+    ## rightClickPlayer, rightClickConsole, shiftRightClickPlayer, shiftRightClickConsole,
+    ## leftClickPlayer, leftClickConsole, shiftLeftClickPlayer, shiftLeftClickConsole
+    ## Sections with 'Player' at the end will be run by the clicking player and 'Console' ones from the console
+    forrent:
+      line1: '&2&l[For Rent]'
+      line2: '%region%'
+      line3: '%duration%'
+      line4: '%price%'
+      rightClickPlayer:
+        - 'as rent %region%'
+      leftClickPlayer:
+        - 'as info region %region%'
+    rented:
+      line1: '&4&l[Rented]'
+      line2: '%region%'
+      line3: '%player%'
+      line4: '%untilshort%'
+      rightClickPlayer:
+        - 'as rent %region%'
+      leftClickPlayer:
+        - 'as info region %region%'
+      shiftRightClickPlayer:
+        - 'as unrent %region%'
+    forsale:
+      line1: '&2&l[For Sale]'
+      line2: '%region%'
+      line3: '%price%'
+      line4:
+      rightClickPlayer:
+        - 'as buy %region%'
+      leftClickPlayer:
+        - 'as info region %region%'
+    sold:
+      line1: '&4&l[Sold]'
+      line2: '%region%'
+      line3: '%player%'
+      line4:
+      rightClickPlayer:
+        - 'as buy %region%'
+      leftClickPlayer:
+        - 'as info region %region%'
+      shiftRightClickPlayer:
+        - 'as sell %region%'
+## Option to run certain commands when one of these events happen
+## Commands at a 'before' section will execute before the region details are changed in the AreaShop system
+## and before any other actions occurred (changing signs, saving/loading schematics, etc.),
+## the 'after' commands will be run when all changes are done.
+## After 'before' or 'after' you can create a list of commands (see example at the created event)
+eventCommandProfiles:
+  default:
+    created:
+      before:
+      after:
+  ##    - "say An AreaShop region has been created: %region%"
+    deleted:
+      before:
+      after:
+    rented:
+      before:
+      after:
+    extended:
+      before:
+      after:
+    unrented:
+      before:
+      after:
+    bought:
+      before:
+      after:
+    sold:
+      before:
+      after:
+## For the following events you can specify if you want to restore or save the region to a schematic
+## After 'save:' or 'restore:' you enter the name of the file, %region% will be replaced by the region name (.schematic will be added automatically)
+## %type% represents the type of the region, could be 'rent' or 'buy'
+## If your regions are all the same size you could use just 1 file as the restore file, just enter a name without %region%
+## Be carefull with these options, it could crash your server or destroy (parts of) your world if used wrong!
+schematicProfiles:
+  default:
+    created:
+      save: '%type%-%region%'
+      restore: ''
+    deleted:
+      save: ''
+      restore: '%type%-%region%'
+    rented:
+      save: ''
+      restore: ''
+    unrented:
+      save: ''
+      restore: '%type%-%region%'
+    bought:
+      save: ''
+      restore: ''
+    sold:
+      save: ''
+      restore: '%type%-%region%'
+## Flag profiles to specify what flags should be set on the WorldGuard regions
+## All region flags can be used + members, owners, priority and parent.
+flagProfiles:
+  default:
+    forrent:
+      members: -%player%
+      greeting: '&2[AreaShop]&f %region% can be rented for %price% per %duration%'
+    rented:
+      members: +%player%
+      greeting: '&2[AreaShop]&f %region% is rented by %player% until %until%'
+    forsale:
+      members: -%player%
+      greeting: '&2[AreaShop]&f %region% can be bought for %price%'
+    sold:
+      members: +%player%
+      greeting: '&2[AreaShop]&f %region% is bought by %player%'
+      
+      
 ########## RENTING ##########
-## The tag you have to write on the sign for renting a region
-rentSign: '[rent]'
-## The line that should be placed on the sign when the region is not rented
-signRentable: '&2&l[For Rent]'
-## The line that should be placed on the sign when the region is rented
-signRented: '&4&l[Rented]'
-## How much regions a player can rent at the same time, -1 for not limited
-maximumRents: 1
-## The percentage of the renting price you get back if you unrent the region (price of time left will be multiplied by this/100)
-rentMoneyBack: 100
 ## How much seconds between checking if renting has expired (don't put this to low)
 checkDelay: 60
 ## Timeformat to use on the signs, default is like '30-06 14:52', US format: 'MM-dd KK:mm a'
@@ -53,78 +190,5 @@ hours: [h, hour, hours, uur, uren]
 days: [d, day, days, dag, dagen]
 months: [M,  month,  months, maanden, maand]
 years: [y, year, years, jaar, jaren]
-## Flags for the 'For Rent' regions, flags and options to apply when the region is not rented
-## All region flags can be used + members, owners, priority and parent.
-flagsForRent:
-  members: -%player%
-  greeting: '%region% can be rented for %price% per %duration%'
-## Flags for the 'Rented' regions, flags and options to apply when the region is rented
-## All region flags can be used + members, owners, priority and parent.
-flagsRented:
-  members: +%player%
-  greeting: '%region% is rented by %player% until %until%'
 
-## Enable or disable saving and restoring for rents that don't have their individual option set
-useRentRestore: false
-## For the following events you can specify if you want to restore or save the region to a schematic
-## After 'save:' or 'restore:' you enter the name of the file, %region% will be replaced by the region name (.schematic will be added automatically)
-## If your regions are all the same size you could use just 1 file as the restore file, just enter a name without %region%
-## Be carefull with these options, it could crash your server or destroy (parts of) your world if used wrong!
-rentSchematicProfiles:
-  default:
-    created:
-      save: 'rent-%region%'
-      restore: ''
-    deleted:
-      save: ''
-      restore: 'rent-%region%'
-    rented:
-      save: ''
-      restore: ''
-    unrented:
-      save: ''
-      restore: 'rent-%region%'
 
-########## BUYING ##########
-## The tag you have to write on the sign for renting a region
-buySign: '[buy]'
-## The line that should be placed on the sign when the region is not sold
-signBuyable: '&2&l[For Sale]'
-## The line that should be placed on the sign when the region is sold
-signBuyed: '&4&l[Sold]'
-## How much regions a player can buy at the same time, -1 for not limited
-maximumBuys: 1
-## The percentage of the buying price you get back if you sell the region
-buyMoneyBack: 100
-## Flags for the 'For Sale' regions, flags and options to apply when the region is for sale
-## All region flags can be used + members, owners, priority and parent.
-flagsForSale:
-  members: -%player%
-  greeting: '%region% can be bought for %price%'
-## Flags for the 'Sold' regions, flags and options to apply when the region is rented
-## All region flags can be used + members, owners, priority and parent.
-flagsSold:
-  members: +%player%
-  greeting: '%region% is bought by %player%'
-
-## Enable or disable saving and restoring for buys that don't have their individual option set
-useBuyRestore: false
-## For the following events you can specify if you want to restore or save the region to a schematic
-## After 'save:' or 'restore:' you enter the name of the file, %region% will be replaced by the region name (.schematic will be added automatically)
-## If your regions are all the same size you could use just 1 file as the restore file, just enter a name without %region%
-## Be carefull with these options, it could crash your server or destroy (parts of) your world if used wrong!
-## ('bought' and 'sold' are from the players perspective)
-buySchematicProfiles:
-  default:
-    created:
-      save: 'buy-%region%'
-      restore: ''
-    deleted:
-      save: ''
-      restore: 'buy-%region%'
-    bought:
-      save: ''
-      restore: ''
-    sold:
-      save: ''
-      restore: 'buy-%region%'

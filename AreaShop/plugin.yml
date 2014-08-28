@@ -1,6 +1,6 @@
 name: AreaShop
 main: nl.evolutioncoding.AreaShop.AreaShop
-version: 1.3.0
+version: 2.0.0
 depend: [Vault, WorldGuard, WorldEdit]
 softdepend: [Multiverse-Core]
 commands:
@@ -12,7 +12,7 @@ commands:
     aliases: [as]
 permissions:
   areashop.*:
-    description: Give access to all commands of RegionRent
+    description: Give access to all commands of AreaShop
     children:
       areashop.help: true
       areashop.createrent: true
@@ -26,13 +26,23 @@ permissions:
       areashop.updaterents: true
       areashop.updatebuys: true
       areashop.reload: true
-      areashop.rentrestore: true
-      areashop.buyrestore: true
-      areashop.rentprice: true
-      areashop.buyprice: true
+      areashop.setrestore: true
+      areashop.setprice: true
       areashop.rentduration: true
       areashop.teleportall: true
       areashop.setteleportall: true
+      areashop.teleportsign: true
+      areashop.tabcomplete: true
+      areashop.setteleportoutsideregion: true
+      areashop.find: true
+      areashop.groupadd: true
+      areashop.groupdel: true
+      areashop.grouplist: true
+      areashop.groupinfo: true
+      areashop.limits.unlimited: true
+      areashop.schematicevents: true
+      areashop.addsign: true
+      areashop.delsign: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -78,17 +88,11 @@ permissions:
   areashop.reload:
     description: Allows you to reload the config
     default: op
-  areashop.rentrestore:
-    description: Allows you to change the restore settings of a rent
+  areashop.setrestore:
+    description: Allows you to change the restore settings
     default: op
-  areashop.buyrestore:
-    description: Allows you to change the restore settings of a buy
-    default: op
-  areashop.rentprice:
-    description: Allows you to change the price of a rent
-    default: op
-  areashop.buyprice:
-    description: Allows you to change the price of a buy
+  areashop.setprice:
+    description: Allows you to change the price
     default: op
   areashop.rentduration:
     description: Allows you to change the duration of a rent
@@ -98,10 +102,52 @@ permissions:
     default: true
   areashop.teleportall:
     description: Teleport to all regions
-    default: op
+    default: true
+  areashop.teleportsign:
+    description: Teleport to signs of regions
+    default: true
   areashop.setteleport:
     description: Set the teleport spot for your region
     default: true
   areashop.setteleportall:
     description: Set the teleport for other regions
+    default: op
+  areashop.setteleportoutsideregion:
+    description: Set the teleport location outside the WorldGuard region
+    default: op
+  areashop.tabcomplete:
+    description: Allows you to tabcomplete all commands (also where you dont have permission)
+    default: op
+  areashop.find:
+    description: Allows you to teleport to a free region (/as find)
+    default: true
+  areashop.groupadd:
+    description: Allows you to add regions to groups
+    default: op
+  areashop.groupdel:
+    description: Allows you to delete regions from groups
+    default: op
+  areashop.grouplist:
+    description: Allows you to list all the groups currently created
+    default: op
+  areashop.groupinfo:
+    description: Allows you to display information about a group (all members)
+    default: op
+  areashop.rentextendbypass:
+    description: Bypass the extend limit on rents
+    default: op
+  areashop.limits.default:
+    description: Assign limits as set in the 'default' group in the 'limitGroups' section of the config
+    default: not op
+  areashop.limits.unlimited:
+    description: Assign limits as set in the 'unlimited' group in the 'limitGroups' section of the config
+    default: op
+  areashop.schematicevents:
+    description: Allows you to trigger schematic events for regions
+    default: op
+  areashop.addsign:
+    description: Allows you to add signs to existing regions
+    default: op
+  areashop.delsign:
+    description: Allows you to delete signs from existing regions
     default: op

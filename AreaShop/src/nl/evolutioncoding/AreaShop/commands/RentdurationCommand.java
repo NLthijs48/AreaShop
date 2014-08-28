@@ -1,8 +1,10 @@
 package nl.evolutioncoding.AreaShop.commands;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -36,7 +38,7 @@ public class RentdurationCommand extends CommandAreaShop {
 			plugin.message(sender, "rentduration-help");
 			return;
 		}
-		HashMap<String,String> rent = plugin.getFileManager().getRent(args[1]);
+		RentRegion rent = plugin.getFileManager().getRent(args[1]);
 		if(rent == null) {
 			plugin.message(sender, "rentduration-notRegistered", args[1]);
 			return;
@@ -51,11 +53,26 @@ public class RentdurationCommand extends CommandAreaShop {
 			plugin.message(sender, "rentduration-wrongFormat", args[2]+" "+args[3]);
 			return;
 		}					
-		rent.put(AreaShop.keyDuration, args[2]+" "+args[3]);
-		plugin.getFileManager().saveRents();
-		plugin.getFileManager().updateRentSign(args[1]);
-		plugin.getFileManager().updateRentRegion(args[1]);
-		plugin.message(sender, "rentduration-success", rent.get(AreaShop.keyName), args[2]+" "+args[3]);
+		rent.setDuration(args[2]+" "+args[3]);
+		rent.updateRegionFlags();
+		rent.updateSigns();
+		rent.save();
+		plugin.message(sender, "rentduration-success", rent.getName(), rent.getDurationString());
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		List<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			result = plugin.getFileManager().getRentNames();
+		} else if(toComplete == 4) {
+			result.addAll(plugin.config().getStringList("minutes"));
+			result.addAll(plugin.config().getStringList("hours"));
+			result.addAll(plugin.config().getStringList("days"));
+			result.addAll(plugin.config().getStringList("months"));
+			result.addAll(plugin.config().getStringList("years"));
+		}
+		return result;
 	}
 
 }

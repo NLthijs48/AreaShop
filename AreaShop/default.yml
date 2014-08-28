@@ -1,0 +1,56 @@
+### All settings below are default settings and can be overridden
+### by group settings or region settings (copy a section to a region or group and change them there)
+
+########## GENERAL ##########  
+general:
+  ## Set this to true to enable saving/restoring for regions as specified in the profile below, which is specified in the config
+  enableRestore: false
+  ## The schematic profile as specified in the config
+  schematicProfile: 'default'
+  ## The event commands profile as specified in the config
+  eventCommandProfile: 'default'
+  ## The profile for the format of the sign as specified in the config
+  signProfile: 'default'
+  ## The profile for the WorldGuard flags as specified in the config
+  flagProfile: 'default'
+  runCommands:
+    created:
+      before:
+      after:
+        - "say An AreaShop region has been created: %region%"
+    deleted:
+      before:
+      after:
+    rented:
+      before:
+      after:
+    extended:
+      before:
+      after:
+    unrented:
+      before:
+      after:
+    bought:
+      before:
+      after:
+    sold:
+      before:
+      after:
+
+########## RENTING ##########
+rent:
+  ## The default price of a renting region
+  price: 1000
+  ## The default duration of a renting region
+  duration: '1 day'
+  ## The percentage of the renting price you get back if you unrent the region (price of time left will be multiplied by this/100)
+  moneyBack: 100
+  ## Maximum number of extends a player can do (-1 for infinite, 0 for no extending)
+  maxExtends: -1
+
+########## BUYING ##########
+buy:
+  ## The default price of a buying region
+  price: 1000
+  ## The percentage of the buying price you get back if you sell the region
+  moneyBack: 100

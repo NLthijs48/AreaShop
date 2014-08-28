@@ -1,5 +1,8 @@
 package nl.evolutioncoding.AreaShop.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.evolutioncoding.AreaShop.AreaShop;
 
 import org.bukkit.command.Command;
@@ -31,11 +34,18 @@ public class UpdatebuysCommand extends CommandAreaShop {
 			return;
 		}
 		boolean result = plugin.getFileManager().updateBuySigns();
+		plugin.getFileManager().updateBuyRegions();
 		if(result) {
 			plugin.message(sender, "buys-updated");
 		} else {
 			plugin.message(sender, "buys-notUpdated");
 		}							
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		ArrayList<String> result = new ArrayList<String>();
+		return result;
 	}
 
 }

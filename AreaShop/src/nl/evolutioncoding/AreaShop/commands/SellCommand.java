@@ -1,8 +1,11 @@
 package nl.evolutioncoding.AreaShop.commands;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -31,27 +34,42 @@ public class SellCommand extends CommandAreaShop {
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
-		if(args.length <= 1 || args[1] == null) {
-			plugin.message(sender, "sell-help");
-			return;
+		BuyRegion buy = null;
+		if(args.length <= 1) {
+			if(sender instanceof Player) {
+				// get the region by location
+				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
+				if(regions.size() != 1) {
+					plugin.message(sender, "sell-help");
+					return;
+				} else {
+					if(regions.get(0).isBuyRegion()) {
+						buy = (BuyRegion)regions.get(0);
+					}
+				}				
+			} else {
+				plugin.message(sender, "sell-help");
+				return;
+			}			
+		} else {
+			buy = plugin.getFileManager().getBuy(args[1]);
 		}
-		HashMap<String,String> buy = plugin.getFileManager().getBuy(args[1]);
 		if(buy == null) {
 			plugin.message(sender, "sell-notRegistered");
 			return;
 		}
-		if(buy.get(AreaShop.keyPlayerUUID) == null) {
+		if(!buy.isSold()) {
 			plugin.message(sender, "sell-notBought");
 			return;
 		}
 		if(sender.hasPermission("areashop.sell")) {
-			plugin.message(sender, "sell-sold", plugin.toName(buy.get(AreaShop.keyPlayerUUID)));
-			plugin.getFileManager().unBuy(args[1], true);
+			plugin.message(sender, "sell-sold", buy.getPlayerName());
+			buy.sell(true);
 		} else {
 			if(sender.hasPermission("areashop.sellown") && sender instanceof Player) {
-				if(buy.get(AreaShop.keyPlayerUUID).equals(((Player)sender).getUniqueId().toString())) {
+				if(buy.getBuyer().equals(((Player)sender).getUniqueId())) {
 					plugin.message(sender, "sell-soldYours");
-					plugin.getFileManager().unBuy(args[1], true);
+					buy.sell(true);
 				} else {
 					plugin.message(sender, "sell-noPermissionOther");
 				}
@@ -60,4 +78,33 @@ public class SellCommand extends CommandAreaShop {
 			}									
 		}		
 	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		ArrayList<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			for(BuyRegion region : plugin.getFileManager().getBuys()) {
+				if(region.isSold()) {
+					result.add(region.getName());
+				}
+			}
+		}
+		return result;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

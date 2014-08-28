@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +22,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -57,6 +61,71 @@ public abstract class GeneralRegion {
 	private static ArrayList<Material> cannotSpawnBeside = new ArrayList<Material>(Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CACTUS));
 	protected AreaShop plugin = null;
 
+	/* Enum for region types */
+	public enum RegionType {		
+		RENT("rent"),
+		BUY("buy");
+		
+		private final String value;
+		private RegionType(String value) {
+			this.value = value;
+		}
+		public String getValue() {
+			return value;
+		}
+	} 
+	
+	/* Enum for schematic event types */
+	public enum RegionEvent {		
+		CREATED("created"),
+		DELETED("deleted"),
+		RENTED("rented"),
+		EXTENDED("extended"),
+		UNRENTED("unrented"),
+		BOUGHT("bought"),
+		SOLD("sold");
+		
+		private final String value;
+		private RegionEvent(String value) {
+			this.value = value;
+		}
+		public String getValue() {
+			return value;
+		}
+	} 
+	
+	/* Enum for Region states */
+	public enum RegionState {
+		FORRENT("forrent"),
+		RENTED("rented"),
+		FORSALE("forsale"),
+		SOLD("sold");
+		
+		private final String value;
+		private RegionState(String value) {
+			this.value = value;
+		}
+		public String getValue() {
+			return value;
+		}
+	}
+	
+	/* Enum for Region states */
+	public enum ClickType {
+		RIGHTCLICK("rightClick"),
+		LEFTCLICK("leftClick"),
+		SHIFTRIGHTCLICK("shiftRightClick"),
+		SHIFTLEFTCLICK("shiftLeftClick");
+		
+		private final String value;
+		private ClickType(String value) {
+			this.value = value;
+		}
+		public String getValue() {
+			return value;
+		}
+	}
+	
 	public GeneralRegion(AreaShop plugin, YamlConfiguration config) throws RegionCreateException {
 		this.plugin = plugin;
 		this.config = config;
@@ -67,65 +136,108 @@ public abstract class GeneralRegion {
 				|| plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName()) == null) {
 			
 			throw new RegionCreateException("Region of " + getName() + " does not exist anymore");
-		} else {
-			// If the sign is gone remove the rent 
-			if(getSignLocation() == null) {
-				throw new RegionCreateException("Sign of region " + getName() + " does not exist anymore");
-			}				
-			Block block = getWorld().getBlockAt(getSignLocation());
-			if(!(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST)) {
-				throw new RegionCreateException("Sign of region " + getName() + " does not exist anymore");
-			}
 		}
 	}
 	
-	public GeneralRegion(AreaShop plugin, String name, World world, Location signLocation) {
+	public GeneralRegion(AreaShop plugin, String name, World world) {
 		this.plugin = plugin;
 		
 		config = new YamlConfiguration();
-		config.set("name", name);
-		setSetting("world", world.getName());
-		setSetting("signLocation", Utils.locationToConfig(signLocation));
+		config.set("general.name", name);
+		setSetting("general.world", world.getName());
+		setSetting("general.type", getType().getValue().toLowerCase());
 	}
 		
-	// GETTERS
-	public Location getSignLocation() {
-		Location result = null;
+	// ABSTRACT
+	/**
+	 * Get the region type of the region
+	 * @return The RegionType of this region
+	 */
+	public abstract RegionType getType();	
+
+	/**
+	 * Update the region flags according the region data
+	 */
+	public void updateRegionFlags(RegionState toState) {
+		// Get state setting
+		String setting = toState.getValue();
+		ConfigurationSection section = plugin.config().getConfigurationSection("flagProfiles." + getStringSetting("general.flagProfile") + "." + setting);
+		setRegionFlags(section);
+	}
+
+	/**
+	 * Update the region flags according the region data
+	 */
+	public void updateRegionFlags() {
+		// Get state setting
+		RegionState toState = null;
 		if(isRentRegion()) {
-			result = Utils.configToLocation(config.getConfigurationSection("rent.signLocation"));
-		} else {
-			result = Utils.configToLocation(config.getConfigurationSection("buy.signLocation"));
+			if(((RentRegion)this).isRented()) {
+				toState = RegionState.RENTED;
+			} else {
+				toState = RegionState.FORRENT;
+			}	
+		} else if(isBuyRegion()) {
+			if(((BuyRegion)this).isSold()) {
+				toState = RegionState.SOLD;
+			} else {
+				toState = RegionState.FORSALE;
+			}
+		}
+		updateRegionFlags(toState);
+	}
+	
+	/**
+	 * Get the tag replacements, used in commands or signs
+	 * @return A map with strings like '%region%' linking to the value to replace it with
+	 */
+	public abstract HashMap<String, Object> getSpecificReplacements();
+	
+	/**
+	 * Get the state of a region
+	 * @return The RegionState of the region
+	 */
+	public abstract RegionState getState();
+	
+	// GETTERS
+	public List<Location> getSignLocations() {
+		List<Location> result = new ArrayList<Location>();
+		if(config.getConfigurationSection("general.signs") == null) {
+			return result;
+		}
+		for(String signName : config.getConfigurationSection("general.signs").getKeys(false)) {
+			result.add(Utils.configToLocation(config.getConfigurationSection("general.signs." + signName + ".location")));
 		}
 		return result;
 	}
 	
 	public Location getTeleportLocation() {
 		Location result = null;
-		if(isRentRegion()) {
-			result = Utils.configToLocation(config.getConfigurationSection("rent.teleportLocation"));
-		} else {
-			result = Utils.configToLocation(config.getConfigurationSection("buy.teleportLocation"));
-		}
+		result = Utils.configToLocation(config.getConfigurationSection("general.teleportLocation"));
 		return result;
 	}
 	
 	public String getName() {
-		return config.getString("name");
+		return config.getString("general.name");
+	}
+	public String getLowerCaseName() {
+		return getName().toLowerCase();
 	}
 	
-	public String getRestoreSetting() {
-		return getStringSetting("enableRestore");
+	public boolean isRestoreEnabled() {
+		return getBooleanSetting("general.enableRestore");
 	}
 	
 	public String getRestoreProfile() {
-		return getStringSetting("restoreProfile");
+		return getStringSetting("general.schematicProfile");
 	}
 	
 	public String getWorldName() {
-		if(getStringSetting("world") == null) {
+		String world = getStringSetting("general.world");
+		if(world == null) {
 			return null;
 		}
-		return getStringSetting("world");
+		return world;
 	}
 	
 	public World getWorld() {
@@ -146,12 +258,41 @@ public abstract class GeneralRegion {
 		return plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 	}
 	
-	public boolean hasTeleportLocation() {
-		if(isRentRegion()) {
-			return config.isSet("rent.teleportLocation");
-		} else {
-			return config.isSet("buy.teleportLocation");
+	public HashMap<String, Object> getAllReplacements() {
+		HashMap<String, Object> result = getSpecificReplacements();
+		
+		result.put(AreaShop.tagRegionName, getName());
+		result.put(AreaShop.tagRegionType, getType().getValue().toLowerCase());
+		result.put(AreaShop.tagWorldName, getWorldName());
+		// TODO: add more?
+		
+		return result;
+	}
+	
+	/**
+	 * Get the name of the sign at the specified location
+	 * @param location The location to check
+	 * @return The name of the sign if found, otherwise null
+	 */
+	public String getSignName(Location location) {
+		String result = null;
+		if(config.getConfigurationSection("general.signs") == null) {
+			return null;
 		}
+		for(String signName : config.getConfigurationSection("general.signs").getKeys(false)) {
+			if(location.equals(Utils.configToLocation(config.getConfigurationSection("general.signs." + signName + ".location")))) {
+				result = signName;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Check if the region has a teleportLocation specified
+	 * @return true if the region has a teleportlocation, false otherwise
+	 */
+	public boolean hasTeleportLocation() {
+		return config.isSet("general.teleportLocation");
 	}
 	
 	/**
@@ -159,7 +300,7 @@ public abstract class GeneralRegion {
 	 * @return true if this region is a RentRegion otherwise false
 	 */
 	public boolean isRentRegion() {
-		return this instanceof RentRegion;
+		return getType() == RegionType.RENT;
 	}
 	
 	/**
@@ -167,46 +308,186 @@ public abstract class GeneralRegion {
 	 * @return true if this region is a BuyRegion otherwise false
 	 */
 	public boolean isBuyRegion() {
-		return this instanceof BuyRegion;
+		return getType() == RegionType.BUY;
 	}
 	
+	/**
+	 * Add a sign to this region
+	 * @param location The location of the sign
+	 * @param signType The type of the sign (WALL_SIGN or SIGN_POST)
+	 * @param facing The orientation of the sign
+	 * @param profile The profile to use with this sign (null for default)
+	 */
+	public void addSign(Location location, Material signType, BlockFace facing, String profile) {
+		int i = 0;
+		while(config.isSet("general.signs." + i)) {
+			i++;
+		}
+		String signPath = "general.signs." + i + ".";
+		config.set(signPath + "location", Utils.locationToConfig(location));
+		config.set(signPath + "facing", facing.name());
+		config.set(signPath + "signType", signType.name());
+		if(profile != null && profile.length() != 0) {
+			config.set(signPath + "profile", profile);
+		}
+	}
+	
+	/**
+	 * Remove a sign
+	 * @param name Name of the sign to be removed
+	 */
+	public void removeSign(String name) {
+		config.set("general.signs." + name, null);
+	}
+	public void removeSign(Location location) {
+		if(location == null) {
+			return;
+		}
+		String name = getSignName(location);
+		location.getBlock().setType(Material.AIR);
+		if(name != null) {
+			removeSign(name);
+		}
+	}
+	
+	/**
+	 * Checks if there is a sign from this region at the specified location
+	 * @param location Location to check
+	 * @return true if this region has a sign at the location, otherwise false
+	 */
+	public boolean isSignOfRegion(Location location) {
+		Set<String> signs = null;
+		if(config.getConfigurationSection("general.signs") == null) {
+			return false;
+		}
+		signs = config.getConfigurationSection("general.signs").getKeys(false);
+		for(String sign : signs) {
+			Location signLocation = Utils.configToLocation(config.getConfigurationSection("general.signs." + sign + ".location"));
+			if(signLocation != null
+					&& signLocation.getWorld().equals(location.getWorld())
+					&& signLocation.getBlockX() == location.getBlockX()
+					&& signLocation.getBlockY() == location.getBlockY()
+					&& signLocation.getBlockZ() == location.getBlockZ()) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * Update the signs connected to this region
 	 * @return true if the update was successful, otherwise false
 	 */
 	public boolean updateSigns() {
-		boolean result = false;
-		if(getSignLocation() == null || getSignLocation().getWorld() == null) {
-			return false;
+		boolean result = true;
+		Set<String> signs = null;
+		if(config.getConfigurationSection("general.signs") != null) {
+			signs = config.getConfigurationSection("general.signs").getKeys(false);
 		}
-		Block block = getSignLocation().getBlock();			
-		if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
-			Sign sign = (Sign)block.getState();
-			String[] lines = getSignLines();
-			for(int i=0; i<lines.length; i++) {
-				sign.setLine(i, lines[i]);
+		if(signs == null) {
+			return true;
+		}
+		HashMap<String, Object> replacements = getAllReplacements();
+		for(String sign : signs) {
+			AreaShop.debug("sign name: " + sign);
+			Location location = Utils.configToLocation(config.getConfigurationSection("general.signs." + sign + ".location"));
+			if(location == null) {
+				// TODO: Remove the sign if the location is wrong?
+				AreaShop.debug("  location null");
+				result = false;
+				continue;
 			}
-			sign.update();
-			result = true;
-		}		
+			// Get the profile set in the config
+			String profile = config.getString("general.signs." + sign + ".profile");
+			if(profile == null || profile.length() == 0) {
+				profile = getStringSetting("general.signProfile");
+			}			
+			AreaShop.debug("  profile=" + profile);
+			// Get the prefix
+			String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".";			
+			// Get the lines
+			String[] signLines = new String[4];
+			signLines[0] = plugin.config().getString(prefix + "line1");
+			signLines[1] = plugin.config().getString(prefix + "line2");
+			signLines[2] = plugin.config().getString(prefix + "line3");
+			signLines[3] = plugin.config().getString(prefix + "line4");
+				// DEBUG
+				for(String line : signLines) {
+					AreaShop.debug("  signLine: " + line);
+				}
+			// Check if the sign should be present
+			Block block = location.getBlock();
+			if(!plugin.config().isSet(prefix) 
+					|| (	   (signLines[0] == null || signLines[0].length() == 0) 
+							&& (signLines[1] == null || signLines[1].length() == 0) 
+							&& (signLines[2] == null || signLines[2].length() == 0) 
+							&& (signLines[3] == null || signLines[3].length() == 0) )) {
+				AreaShop.debug("  set to air");
+				block.setType(Material.AIR);
+			} else {				
+				Sign signState = null;
+				if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
+					Material signType = null;
+					try {
+						signType = Material.valueOf(config.getString("general.signs." + sign + ".signType"));
+					} catch(NullPointerException | IllegalArgumentException e) {
+						signType = null;
+					}
+					if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
+						block.setType(Material.AIR);
+						AreaShop.debug("  setting sign failed");
+						continue;
+					}
+					block.setType(signType);
+					signState = (Sign)block.getState();
+					org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
+					BlockFace signFace;
+					try {
+						signFace = BlockFace.valueOf(config.getString("general.signs." + sign + ".signType"));
+					} catch(NullPointerException | IllegalArgumentException e) {
+						signFace = null;
+					}
+					if(signFace != null) {
+						signData.setFacingDirection(signFace);
+						signState.setData(signData);
+					}
+				}
+				signState = (Sign)block.getState();
+				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
+				if(!config.isString("general.signs." + sign + ".signType")) {
+					config.set("general.signs." + sign + ".signType", signState.getType().toString());
+					this.save();
+				}
+				if(!config.isString("general.signs." + sign + ".facing")) {
+					config.set("general.signs." + sign + ".facing", signData.getFacing().toString());
+					this.save();
+				}
+				// Apply replacements and color and then set it on the sign
+				for(int i=0; i<signLines.length; i++) {
+					if(signLines[i] == null) {
+						signState.setLine(i, "");
+						continue;
+					}					
+					for(String tag : replacements.keySet()) {
+						if(replacements.get(tag) != null) {
+							signLines[i] = signLines[i].replace(tag, replacements.get(tag).toString());
+						}						
+					}
+					signLines[i] = plugin.fixColors(signLines[i]);		
+					signState.setLine(i, signLines[i]);
+				}
+				signState.update();
+			}		
+		}
 		return result;
 	}
-	
-	/**
-	 * Get the lines for the sign that represent the current state of the region
-	 * @return Array of lines that the sign should have
-	 */
-	public abstract String[] getSignLines();
-
-	public abstract void updateRegionFlags();
 	
 	/**
 	 * Change the restore setting
 	 * @param restore true, false or general
 	 */
 	public void setRestoreSetting(String restore) {
-		setSetting("enableRestore", restore);
+		setSetting("general.enableRestore", restore);
 	}
 	
 	/**
@@ -214,7 +495,7 @@ public abstract class GeneralRegion {
 	 * @param profile default or the name of the profile as set in the config
 	 */
 	public void setRestoreProfile(String profile) {
-		setSetting("restoreProfile", profile);
+		setSetting("general.restoreProfile", profile);
 	}
 	
 	/**
@@ -226,8 +507,8 @@ public abstract class GeneralRegion {
 	 */
 	public boolean saveRegionBlocks(String fileName) {
 		boolean result = true;
-		EditSession editSession = new EditSession(new BukkitWorld(getSignLocation().getWorld()), plugin.config().getInt("maximumBlocks"));
-		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getSignLocation().getWorld()).getRegion(getName());
+		EditSession editSession = new EditSession(new BukkitWorld(getWorld()), plugin.config().getInt("maximumBlocks"));
+		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist in WorldGuard, save failed");
 			return false;
@@ -267,8 +548,8 @@ public abstract class GeneralRegion {
 	 */
 	public boolean restoreRegionBlocks(String fileName) {
 		boolean result = true;
-		EditSession editSession = new EditSession(new BukkitWorld(getSignLocation().getWorld()), plugin.config().getInt("maximumBlocks"));
-		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getSignLocation().getWorld()).getRegion(getName());
+		EditSession editSession = new EditSession(new BukkitWorld(getWorld()), plugin.config().getInt("maximumBlocks"));
+		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist in WorldGuard, restore failed");
 			return false;
@@ -299,6 +580,18 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
+	 * Reset all flags of the region
+	 */
+	public void resetRegionFlags() {
+		ProtectedRegion region = getRegion();
+		if(region != null) {
+			for(Flag<?> flag : DefaultFlag.getFlags()) {
+				region.setFlag(flag, null);			
+			}
+		}
+	}
+	
+	/**
 	 * Set the region flags/options to the values of a ConfigurationSection
 	 * @param player The player that does it
 	 * @param region The region 
@@ -306,9 +599,13 @@ public abstract class GeneralRegion {
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected boolean setRegionFlags(ConfigurationSection flags, Map<String, String> valueReplacements) {
+	protected boolean setRegionFlags(ConfigurationSection flags) {
 		boolean result = true;
 		
+		if(flags == null) {
+			AreaShop.debug("Flags section is null");
+			return false;
+		}
 		Set<String> flagNames = flags.getKeys(false);
 		WorldGuardPlugin worldGuard = plugin.getWorldGuard();
 		Flag<?> flagType = null;
@@ -321,6 +618,8 @@ public abstract class GeneralRegion {
 			return false;
 		}
 		
+		Map<String, Object> replacements = getAllReplacements();
+		
 		Iterator<String> it = flagNames.iterator();
 		while(it.hasNext()) {
 			String flagName = it.next();
@@ -328,9 +627,9 @@ public abstract class GeneralRegion {
 			
 			// Apply replacements
 			if(value != null) {
-				for(String key : valueReplacements.keySet()) {
-					if(valueReplacements.get(key) != null) {
-						value = value.replace(key, valueReplacements.get(key));
+				for(String key : replacements.keySet()) {
+					if(replacements.get(key) != null) {
+						value = value.replace(key, replacements.get(key).toString());
 					}
 				}
 			}
@@ -341,7 +640,9 @@ public abstract class GeneralRegion {
 				String[] names = value.split("\\s*,\\s*");
 				DefaultDomain members = region.getMembers();
 				for(int i=0; i<names.length; i++) {
-					if(names[i].charAt(0) == '+') {
+					if(names[i].equals("clear")) {
+						members.removeAll();
+					} else if(names[i].charAt(0) == '+') {
 						members.addPlayer(names[i].substring(1));;
 					} else if(names[i].charAt(0) == '-') {
 						members.removePlayer(names[i].substring(1));;
@@ -353,7 +654,9 @@ public abstract class GeneralRegion {
 				String[] names = value.split("\\s*,\\s*");
 				DefaultDomain owners = region.getOwners();
 				for(int i=0; i<names.length; i++) {
-					if(names[i].charAt(0) == '+') {
+					if(names[i].equals("clear")) {
+						owners.removeAll();
+					} else if(names[i].charAt(0) == '+') {
 						owners.addPlayer(names[i].substring(1));;
 					} else if(names[i].charAt(0) == '-') {
 						owners.removePlayer(names[i].substring(1));;
@@ -457,6 +760,11 @@ public abstract class GeneralRegion {
 		return result;
 	}
 	
+	/**
+	 * Translate the color codes you put in greeting/farwell messages to the weird color codes of WorldGuard
+	 * @param message The message where the color codes should be translated (this message has bukkit color codes)
+	 * @return The string with the WorldGuard color codes
+	 */
 	public String translateBukkitToWorldGuardColors(String message) {
 		String result = message;
 		result = result.replace("&c", "&r");
@@ -500,24 +808,34 @@ public abstract class GeneralRegion {
 	 */
 	public void setTeleport(Location location) {
 		if(location == null) {
-			setSetting("teleportLocation", null);
+			setSetting("general.teleportLocation", null);
 		} else {
-			setSetting("teleportLocation", Utils.locationToConfig(location, true));
+			setSetting("general.teleportLocation", Utils.locationToConfig(location, true));
 		}
 		this.save();
 	}
+	
 	
 	/**
 	 * Teleport a player to the region
 	 * @param player Player that should be teleported
 	 * @param regionName The name of the region the player should be teleported to
 	 */
-	public boolean teleportPlayer(Player player) {
+	public boolean teleportPlayer(Player player, boolean toSign) {
 		int checked = 1;
 		boolean owner = false;
 		Location startLocation = null;
 		ProtectedRegion region = getRegion();
-		if(this.hasTeleportLocation()) {
+		if(toSign) {
+			List<Location> signs = getSignLocations();
+			if(!signs.isEmpty()) {
+				// Use the location 1 below the sign to prevent weird spawing above the sign
+				startLocation = signs.get(0).subtract(0.0, 1.0, 0.0);
+				startLocation.setPitch(player.getLocation().getPitch());
+				startLocation.setYaw(player.getLocation().getYaw());
+			}
+			
+		} else if(this.hasTeleportLocation()) {
 			startLocation = getTeleportLocation();
 		}
 		if(isRentRegion()) {
@@ -526,10 +844,10 @@ public abstract class GeneralRegion {
 			owner = player.getUniqueId().equals(((BuyRegion)this).getBuyer());
 		}
 		// Check permissions
-		if(!player.hasPermission("areashop.teleport")) {
+		if((!player.hasPermission("areashop.teleport") && !toSign) || (!player.hasPermission("areashop.teleportsign") && toSign)) {
 			plugin.message(player, "teleport-noPermission");
 			return false;
-		} else if(!owner && !player.hasPermission("areashop.teleportall")) {
+		} else if(!owner && !player.hasPermission("areashop.teleportall") && !toSign) {
 			plugin.message(player, "teleport-noPermissionOther");
 			return false;
 		}
@@ -560,22 +878,17 @@ public abstract class GeneralRegion {
 		// radius around that (until no block in the region is found at all cube sides)
 		Location saveLocation = startLocation;
 		int radius = 1;
-		boolean blocksInRegion = region.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
-		boolean done = isSave(saveLocation) && blocksInRegion;
+		boolean done = isSave(saveLocation);
 		boolean north=false, east=false, south=false, west=false, top=false, bottom=false;
 		boolean track;
-		while(blocksInRegion && !done) {
-			blocksInRegion = false;
+		while(!done) {
 			// North side
 			track = false;
 			for(int x=-radius+1; x<=radius && !done && !north; x++) {
 				for(int y=-radius+1; y<radius && !done; y++) {
 					saveLocation = startLocation.clone().add(x, y, -radius);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 			}
@@ -586,11 +899,8 @@ public abstract class GeneralRegion {
 			for(int z=-radius+1; z<=radius && !done && !east; z++) {
 				for(int y=-radius+1; y<radius && !done; y++) {
 					saveLocation = startLocation.clone().add(radius, y, z);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 			}
@@ -601,11 +911,8 @@ public abstract class GeneralRegion {
 			for(int x=radius-1; x>=-radius && !done && !south; x--) {
 				for(int y=-radius+1; y<radius && !done; y++) {
 					saveLocation = startLocation.clone().add(x, y, radius);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 			}
@@ -616,13 +923,8 @@ public abstract class GeneralRegion {
 			for(int z=radius-1; z>=-radius && !done && !west; z--) {
 				for(int y=-radius+1; y<radius && !done; y++) {
 					saveLocation = startLocation.clone().add(-radius, y, z);
-					
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
-					AreaShop.debug(saveLocation.toString());
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 			}
@@ -633,52 +935,37 @@ public abstract class GeneralRegion {
 			// Middle block of the top
 			if(!done && !top) {
 				saveLocation = startLocation.clone().add(0, radius, 0);
-				if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-					done = isSave(saveLocation);
-					blocksInRegion = true;
-					track = true;
-				}
+				done = isSave(saveLocation);
+				track = true;
 				checked++;
 			}
 			for(int r=1; r<=radius && !done && !top; r++) {
 				// North
 				for(int x=-r+1; x<=r && !done; x++) {
 					saveLocation = startLocation.clone().add(x, radius, -r);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 				// East
 				for(int z=-r+1; z<=r && !done; z++) {
 					saveLocation = startLocation.clone().add(r, radius, z);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 				// South side
 				for(int x=r-1; x>=-r && !done; x--) {
 					saveLocation = startLocation.clone().add(x, radius, r);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 				// West side
 				for(int z=r-1; z>=-r && !done; z--) {
 					saveLocation = startLocation.clone().add(-r, radius, z);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}			
+					done = isSave(saveLocation);
+					track = true;		
 					checked++;
 				}			
 			}
@@ -689,52 +976,37 @@ public abstract class GeneralRegion {
 			// Middle block of the bottom
 			if(!done && !bottom) {
 				saveLocation = startLocation.clone().add(0, -radius, 0);
-				if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-					done = isSave(saveLocation);
-					blocksInRegion = true;
-					track = true;
-				}
+				done = isSave(saveLocation);
+				track = true;
 				checked++;
 			}
 			for(int r=1; r<=radius && !done && !bottom; r++) {
 				// North
 				for(int x=-r+1; x<=r && !done; x++) {
 					saveLocation = startLocation.clone().add(x, -radius, -r);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 				// East
 				for(int z=-r+1; z<=r && !done; z++) {
 					saveLocation = startLocation.clone().add(r, -radius, z);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 				// South side
 				for(int x=r-1; x>=-r && !done; x--) {
 					saveLocation = startLocation.clone().add(x, -radius, r);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}
 				// West side
 				for(int z=r-1; z>=-r && !done; z--) {
 					saveLocation = startLocation.clone().add(-r, -radius, z);
-					if(region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) {
-						done = isSave(saveLocation);
-						blocksInRegion = true;
-						track = true;
-					}
+					done = isSave(saveLocation);
+					track = true;
 					checked++;
 				}			
 			}
@@ -743,7 +1015,7 @@ public abstract class GeneralRegion {
 			// Increase cube radius
 			radius++;
 		}
-		if(done) {
+		if(done) {			
 			plugin.message(player, "teleport-success", getName());
 			player.teleport(saveLocation);
 			AreaShop.debug("Found location: " + saveLocation.toString() + " Tries: " + checked);
@@ -753,6 +1025,9 @@ public abstract class GeneralRegion {
 			AreaShop.debug("No location found, checked " + checked + " spots");
 			return false;
 		}	
+	}
+	public boolean teleportPlayer(Player player) {
+		return teleportPlayer(player, false);
 	}
 	
 	/**
@@ -821,11 +1096,6 @@ public abstract class GeneralRegion {
 	
 	// CONFIG
 	public boolean getBooleanSetting(String path) {
-		if(isRentRegion()) {
-			path = "rent." + path;
-		} else {
-			path = "buy." + path;
-		}
 		if(config.isBoolean(path)) {
 			return config.getBoolean(path);
 		}
@@ -845,12 +1115,27 @@ public abstract class GeneralRegion {
 		return this.getFileManager().getDefaultSettings().getBoolean(path);
 	}
 	
-	public double getDoubleSetting(String path) {
-		if(isRentRegion()) {
-			path = "rent." + path;
-		} else {
-			path = "buy." + path;
+	public int getIntegerSetting(String path) {
+		if(config.isInt(path)) {
+			return config.getInt(path);
 		}
+		int result = 0;
+		int priority = Integer.MIN_VALUE;
+		boolean found = false;
+		for(RegionGroup group : plugin.getFileManager().getGroups()) {
+			if(group.isMember(this) && group.getSettings().isInt(path) && group.getPriority() > priority) {
+				result = group.getSettings().getInt(path);
+				priority = group.getPriority();
+				found = true;
+			}
+		}
+		if(found) {
+			return result;
+		}
+		return this.getFileManager().getDefaultSettings().getInt(path);
+	}
+	
+	public double getDoubleSetting(String path) {
 		if(config.isDouble(path)) {
 			return config.getDouble(path);
 		}
@@ -858,7 +1143,7 @@ public abstract class GeneralRegion {
 		int priority = Integer.MIN_VALUE;
 		boolean found = false;
 		for(RegionGroup group : plugin.getFileManager().getGroups()) {
-			if(group.isMember(this) && group.getSettings().isBoolean(path) && group.getPriority() > priority) {
+			if(group.isMember(this) && group.getSettings().isDouble(path) && group.getPriority() > priority) {
 				result = group.getSettings().getDouble(path);
 				priority = group.getPriority();
 				found = true;
@@ -871,11 +1156,6 @@ public abstract class GeneralRegion {
 	}
 	
 	public long getLongSetting(String path) {
-		if(isRentRegion()) {
-			path = "rent." + path;
-		} else {
-			path = "buy." + path;
-		}
 		if(config.isLong(path)) {
 			return config.getLong(path);
 		}
@@ -883,7 +1163,7 @@ public abstract class GeneralRegion {
 		int priority = Integer.MIN_VALUE;
 		boolean found = false;
 		for(RegionGroup group : plugin.getFileManager().getGroups()) {
-			if(group.isMember(this) && group.getSettings().isBoolean(path) && group.getPriority() > priority) {
+			if(group.isMember(this) && group.getSettings().isLong(path) && group.getPriority() > priority) {
 				result = group.getSettings().getLong(path);
 				priority = group.getPriority();
 				found = true;
@@ -896,11 +1176,6 @@ public abstract class GeneralRegion {
 	}
 	
 	public String getStringSetting(String path) {
-		if(isRentRegion()) {
-			path = "rent." + path;
-		} else {
-			path = "buy." + path;
-		}
 		if(config.isString(path)) {
 			return config.getString(path);
 		}
@@ -920,17 +1195,251 @@ public abstract class GeneralRegion {
 		return this.getFileManager().getDefaultSettings().getString(path);
 	}
 	
-	public void setSetting(String path, Object value) {
-		if(isRentRegion()) {
-			path = "rent." + path;
-		} else {
-			path = "buy." + path;
+	public List<String> getStringListSetting(String path) {
+		if(config.isList(path)) {
+			return config.getStringList(path);
 		}
+		List<String> result = null;
+		int priority = Integer.MIN_VALUE;
+		boolean found = false;
+		for(RegionGroup group : plugin.getFileManager().getGroups()) {
+			if(group.isMember(this) && group.getSettings().isString(path) && group.getPriority() > priority) {
+				result = group.getSettings().getStringList(path);
+				priority = group.getPriority();
+				found = true;
+			}
+		}
+		if(found) {
+			return result;
+		}
+		return this.getFileManager().getDefaultSettings().getStringList(path);
+	}
+	
+	public void setSetting(String path, Object value) {
 		config.set(path, value);
 	}
 	
 
+	
+	// LIMIT FUNCTIONS
+	/**
+	 * Get the total number of regions a player has
+	 * @param player The player to check
+	 * @return The total number of regions the player has
+	 */
+	public int getCurrentTotalRegions(Player player) {
+		int result = 0;
+		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
+			if(region.isRentRegion() && ((RentRegion)region).isRenter(player)) {
+				result++;
+			} else if(region.isBuyRegion() && ((BuyRegion)region).isBuyer(player)) {
+				result++;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Get the number of rents a player has
+	 * @param player The player to check
+	 * @return The number of rent regions a player has
+	 */
+	public int getCurrentRentRegions(Player player) {
+		int result = 0;
+		for(RentRegion region : plugin.getFileManager().getRents()) {
+			if(region.isRenter(player)) {
+				result++;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Get the number of buys a player has
+	 * @param player The player to check
+	 * @return The number of buy regions a player has
+	 */
+	public int getCurrentBuyRegions(Player player) {
+		int result = 0;
+		for(BuyRegion region : plugin.getFileManager().getBuys()) {
+			if(region.isBuyer(player)) {
+				result++;
+			}
+		}
+		return result;
+	}
+	
+
+	/**
+	 * Get the total number of regions the player can have
+	 * @param player The player to check
+	 * @return Integer.MAX_VALUE if unlimited, otherwise a number
+	 */
+	public int getMaxRegions(Player player, String setting) {
+		int result = 0;		
+		Set<String> groups = plugin.config().getConfigurationSection("limitGroups").getKeys(false);
+		for(String group : groups) {
+			if(player.hasPermission("areashop.limits." + group)) {
+				int w = plugin.config().getInt("limitGroups." + group + "." + setting);
+				if(w > result) {
+					result = w;
+				} else if(w == -1) {
+					result = Integer.MAX_VALUE;
+				}
+			}
+		}		
+		return result;
+	}	
+	// Functions for accessing the different limits
+	public int getMaxTotalRegions(Player player) {
+		return getMaxRegions(player, "total");
+	}
+	public int getMaxRentRegions(Player player) {
+		return getMaxRegions(player, "rents");
+	}
+	public int getMaxBuyRegions(Player player) {
+		return getMaxRegions(player, "buys");
+	}	
+	
+	
+	
+	
+	/**
+	 * Checks an event and handles saving to and restoring from schematic for it
+	 * @param type The type of event
+	 */
+	public void handleSchematicEvent(RegionEvent type) {
+		// Check for the general killswitch
+		if(!plugin.config().getBoolean("enableSchematics")) {
+			return;
+		}
+		// Check the individual>group>default setting
+		if(!isRestoreEnabled()) {
+			return;
+		}
+		// Get the safe and restore names		
+		String save = plugin.config().getString("schematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".save");
+		String restore = plugin.config().getString("schematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".restore");
+		// Save the region if needed
+		if(save != null && save.length() != 0) {
+			save = save.replace(AreaShop.tagRegionName, getName());
+			save = save.replace(AreaShop.tagRegionType, getType().getValue().toLowerCase());
+			this.saveRegionBlocks(save);			
+		}
+		// Restore the region if needed
+		if(restore != null && restore.length() != 0) {
+			restore = restore.replace(AreaShop.tagRegionName, getName());
+			restore = restore.replace(AreaShop.tagRegionType, getType().getValue().toLowerCase());
+			this.restoreRegionBlocks(restore);		
+		}
+	}	
+	
+	// COMMAND EXECUTING
+	
+	/**
+	 * Run commands as the CommandsSender, replacing all tags with the relevant values
+	 * @param sender The sender that should perform the command
+	 * @param commands A list of the commands to run (without slash and with tags)
+	 */
+	public void runCommands(CommandSender sender, List<String> commands) {
+		if(commands == null || commands.isEmpty()) {
+			return;
+		}
+		
+		boolean postCommandErrors = plugin.config().getBoolean("postCommandErrors");
+		for(String command : commands) {
+			if(command == null || command.length() == 0) {
+				continue;
+			}
+			
+			// Apply replacements
+			HashMap<String, Object> replacements = getAllReplacements();	
+			for(String tag : replacements.keySet()) {
+				Object replacement = replacements.get(tag);
+				if(replacement != null) {
+					command = command.replace(tag, replacement.toString());
+				}
+			}
+			
+			boolean result = false;
+			String error = null;
+			try {
+				result = plugin.getServer().dispatchCommand(sender, command);
+			} catch(CommandException e) {
+				result = false;
+				error = e.getMessage();				
+			}
+			if(error == null) {
+				AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", result=" + result);
+			} else {
+				AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", result=" + result + ", error=" + error);
+			}
+			if(!result && postCommandErrors) {
+				if(error != null) {
+					plugin.getLogger().info("Command execution failed, command=" + command + ", error=" + error);
+				} else {
+					plugin.getLogger().info("Command execution failed, command=" + command);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Run command for a certain event
+	 * @param event The event
+	 * @param before The 'before' or 'after' commands
+	 */
+	public void runEventCommands(RegionEvent event, boolean before) {
+		String profile = getStringSetting("general.eventCommandProfile");
+		if(profile == null || profile.length() == 0) {
+			return;
+		}
+		String path = "eventCommandProfiles." + profile + "." + event.getValue().toLowerCase();
+		if(before) {
+			path += ".before";
+		} else {
+			path += ".after";
+		}
+		List<String> commands = plugin.config().getStringList(path);
+		// Don't waste time if there are no commands to be run
+		if(commands == null || commands.isEmpty()) {
+			return;
+		}		
+		runCommands(Bukkit.getConsoleSender(), commands);
+	}
+	
+	/**
+	 * Run commands when a player clicks a sign
+	 * @param signName The name of the sign
+	 * @param clicker The player that clicked the sign
+	 * @param clickType The type of clicking
+	 */
+	public boolean runSignCommands(String signName, Player clicker, ClickType clickType) {
+		// Get the profile set in the config
+		String profile = config.getString("general.signs." + signName + ".profile");
+		if(profile == null || profile.length() == 0) {
+			profile = getStringSetting("general.signProfile");
+		}	
+		// Run player commands if specified
+		String playerPath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Player";
+		List<String> playerCommands = plugin.config().getStringList(playerPath);
+		runCommands(clicker, playerCommands);
+		
+		// Run console commands if specified
+		String consolePath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Console";
+		List<String> consoleCommands = plugin.config().getStringList(consolePath);
+		runCommands(Bukkit.getConsoleSender(), consoleCommands);		
+		
+		return !playerCommands.isEmpty() || !consoleCommands.isEmpty();
+	}
+	
 }
+
+
+
+
+
+
 
 
 

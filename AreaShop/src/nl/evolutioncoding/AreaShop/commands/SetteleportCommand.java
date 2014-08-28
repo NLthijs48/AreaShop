@@ -1,5 +1,8 @@
 package nl.evolutioncoding.AreaShop.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.evolutioncoding.AreaShop.AreaShop;
 import nl.evolutioncoding.AreaShop.regions.BuyRegion;
 import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
@@ -37,14 +40,24 @@ public class SetteleportCommand extends CommandAreaShop {
 		if (!(sender instanceof Player)) {
 			plugin.message(sender, "onlyByPlayer");
 			return;
-		}	
-		if(args.length <= 1 || args[1] == null) {
-			plugin.message(sender, "setteleport-help");
-			return;
 		}
 		Player player = (Player) sender;
+		GeneralRegion region = null;
+		if(args.length <= 1) {
+			// get the region by location
+			List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
+			if(regions.size() != 1) {
+				plugin.message(sender, "setteleport-help");
+				return;
+			} else {
+				region = regions.get(0);
+			}							
+		} else {
+			region = plugin.getFileManager().getRegion(args[1]);
+		}
+		
 		boolean owner = false;
-		GeneralRegion region = plugin.getFileManager().getRegion(args[1]);
+		
 		if(region == null) {
 			plugin.message(player, "setteleport-noRentOrBuy", args[1]);
 			return;
@@ -65,15 +78,26 @@ public class SetteleportCommand extends CommandAreaShop {
 		ProtectedRegion wgRegion = region.getRegion();
 		if(args.length > 2 && args[2] != null && (args[2].equalsIgnoreCase("reset") || args[2].equalsIgnoreCase("yes") || args[2].equalsIgnoreCase("true"))) {
 			region.setTeleport(null);
-			plugin.message(player, "setteleport-reset", args[1]);
+			plugin.message(player, "setteleport-reset", region.getName());
 			return;
 		}
 		if(!wgRegion.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()) && !player.hasPermission(" areashop.setteleportoutsideregion")) {
-			plugin.message(player, "setteleport-notInside", args[1]);
+			plugin.message(player, "setteleport-notInside", region.getName());
 			return;
 		}
 		region.setTeleport(player.getLocation());
-		plugin.message(player, "setteleport-success", args[1]);
+		plugin.message(player, "setteleport-success", region.getName());
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		ArrayList<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			result.addAll(plugin.getFileManager().getRegionNames());
+		} else if(toComplete == 3) {
+			result.add("reset");
+		}
+		return result;
 	}
 
 }

@@ -1,6 +1,7 @@
 package nl.evolutioncoding.AreaShop;
 
 import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
 import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.Material;
@@ -37,30 +38,25 @@ public final class SignBreakListener implements Listener {
 		Block block = event.getBlock();
 		/* Check if it is a sign */
 		if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
-			Sign sign = (Sign)(block.getState());
 			/* Check if the rent sign is really the same as a saved rent */
-			RentRegion rent = plugin.getFileManager().getRent(sign.getLine(1));
-			BuyRegion buy = plugin.getFileManager().getBuy(sign.getLine(1));
-			if(rent != null && block.getLocation().equals(rent.getSignLocation())) {
+			GeneralRegion region = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
+			if(region == null) {
+				return;
+			}
+			if(region.isRentRegion()) {
 				/* Remove the rent if the player has permission */
 				if(event.getPlayer().hasPermission("areashop.destroyrent")) {
-					rent.handleSchematicEvent(RentRegion.RentEvent.DELETED);
-					boolean result = plugin.getFileManager().removeRent(sign.getLine(1), true);
-					if(result) {
-						plugin.message(event.getPlayer(), "destroy-successRent", sign.getLine(1));
-					}
+					plugin.getFileManager().removeRent((RentRegion)region, true);
+					plugin.message(event.getPlayer(), "destroy-successRent", region.getName());
 				} else { /* Cancel the breaking of the sign */
 					event.setCancelled(true);
 					plugin.message(event.getPlayer(), "destroy-noPermissionRent");
 				}
-			} else if(buy != null && block.getLocation().equals(buy.getSignLocation())) {
+			} else if(region.isBuyRegion()) {
 				/* Remove the buy if the player has permission */
 				if(event.getPlayer().hasPermission("areashop.destroybuy")) {
-					buy.handleSchematicEvent(BuyRegion.BuyEvent.DELETED);
-					boolean result = plugin.getFileManager().removeBuy(sign.getLine(1), true);
-					if(result) {
-						plugin.message(event.getPlayer(), "destroy-successBuy", sign.getLine(1));
-					}
+					plugin.getFileManager().removeBuy((BuyRegion)region, true);
+					plugin.message(event.getPlayer(), "destroy-successBuy", region.getName());
 				} else { /* Cancel the breaking of the sign */
 					event.setCancelled(true);
 					plugin.message(event.getPlayer(), "destroy-noPermissionBuy");
@@ -81,21 +77,12 @@ public final class SignBreakListener implements Listener {
             Block attachedTo = block.getRelative(((org.bukkit.material.Sign)sign.getData()).getAttachedFace());
             if(attachedTo.getType() == Material.AIR){
 				/* Check if the rent sign is really the same as a saved rent */
-				RentRegion rent = plugin.getFileManager().getRent(sign.getLine(1));
-				BuyRegion buy = plugin.getFileManager().getBuy(sign.getLine(1));
-				if(rent != null && block.getLocation().equals(rent.getSignLocation())) {
-					/* Remove the rent */
-					boolean result = plugin.getFileManager().removeRent(sign.getLine(1), true);
-					if(result) {
-						plugin.getLogger().info("Renting of region '" + sign.getLine(1) + "' has been removed by indirectly breaking the sign");
-					}
-				} else if(buy != null && block.getLocation().equals(buy.getSignLocation())) {
-					/* Remove the buy */
-					boolean result = plugin.getFileManager().removeBuy(sign.getLine(1), true);
-					if(result) {
-						plugin.getLogger().info("Buying of region '" + sign.getLine(1) + "' has been removed by indirectly breaking the sign");
-					}
+				GeneralRegion region = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
+				if(region == null) {
+					return;
 				}
+				region.removeSign(block.getLocation());
+				plugin.getLogger().info("A sign of region " + region.getName() + " has been removed by indirectly breaking it (block below/behind is destroyed)");
             }
         }
     }

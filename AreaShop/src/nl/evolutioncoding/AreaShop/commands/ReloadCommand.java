@@ -1,5 +1,8 @@
 package nl.evolutioncoding.AreaShop.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.evolutioncoding.AreaShop.AreaShop;
 
 import org.bukkit.command.Command;
@@ -32,6 +35,12 @@ public class ReloadCommand extends CommandAreaShop {
 		} else {
 			plugin.message(sender, "reload-noPermission");
 		}
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		ArrayList<String> result = new ArrayList<String>();
+		return result;
 	}
 
 }

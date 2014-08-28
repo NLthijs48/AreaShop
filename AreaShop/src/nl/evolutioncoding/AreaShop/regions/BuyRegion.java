@@ -1,7 +1,6 @@
 package nl.evolutioncoding.AreaShop.regions;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.UUID;
 
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -9,35 +8,33 @@ import nl.evolutioncoding.AreaShop.AreaShop;
 import nl.evolutioncoding.AreaShop.Exceptions.RegionCreateException;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class BuyRegion extends GeneralRegion {
-	/* Enum for schematic event types */
-	public enum BuyEvent {		
-		CREATED("created"),
-		DELETED("deleted"),
-		BOUGHT("bought"),
-		SOLD("sold");
-		
-		private final String value;
-		private BuyEvent(String value) {
-			this.value = value;
-		}
-		public String getValue() {
-			return value;
-		}
-	} 
-	
+
 	public BuyRegion(AreaShop plugin, YamlConfiguration config) throws RegionCreateException {
 		super(plugin, config);
 	}
 	
-	public BuyRegion(AreaShop plugin, String name, World world, Location signLocation, double price) {
-		super(plugin, name, world, signLocation);
-		setSetting("price", price);
+	public BuyRegion(AreaShop plugin, String name, World world) {
+		super(plugin, name, world);
+	}
+	
+	@Override
+	public RegionType getType() {
+		return RegionType.BUY;
+	}
+	
+	@Override
+	public RegionState getState() {
+		if(isSold()) {
+			return RegionState.SOLD;
+		} else {
+			return RegionState.FORSALE;
+		}
 	}
 	
 	/**
@@ -45,7 +42,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The UUID of the owner of this region
 	 */
 	public UUID getBuyer() {
-		String buyer = getStringSetting("buyer");
+		String buyer = getStringSetting("buy.buyer");
 		if(buyer != null) {
 			try {
 				return UUID.fromString(buyer);
@@ -54,13 +51,31 @@ public class BuyRegion extends GeneralRegion {
 		return null;
 	}
 	
+	/**
+	 * Check if a player is the buyer of this region
+	 * @param player Player to check
+	 * @return true if this player owns this region, otherwise false
+	 */
+	public boolean isBuyer(Player player) {
+		UUID buyer = getBuyer();
+		if(buyer == null || player == null) {
+			return false;
+		} else {
+			return buyer.equals(player.getUniqueId());
+		}
+	}
+	
+	/**
+	 * Set the buyer of this region
+	 * @param buyer The UUID of the player that should be set as buyer
+	 */
 	public void setBuyer(UUID buyer) {
 		if(buyer == null) {
-			setSetting("buyer", null);
-			setSetting("buyerName", null);
+			setSetting("buy.buyer", null);
+			setSetting("buy.buyerName", null);
 		} else {
-			setSetting("buyer", buyer.toString());
-			setSetting("buyerName", plugin.toName(buyer));
+			setSetting("buy.buyer", buyer.toString());
+			setSetting("buy.buyerName", plugin.toName(buyer));
 		}
 	}
 	
@@ -85,7 +100,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The price of the region
 	 */
 	public double getPrice() {
-		return getDoubleSetting("price");
+		return getDoubleSetting("buy.price");
 	}
 	
 	/**
@@ -101,9 +116,19 @@ public class BuyRegion extends GeneralRegion {
 	 * @param price
 	 */
 	public void setPrice(double price) {
-		setSetting("price", price);
-		updateSigns();
-		updateRegionFlags();
+		setSetting("buy.price", price);
+	}
+	
+	@Override
+	public HashMap<String, Object> getSpecificReplacements() {
+		// Fill the replacements map with things specific to a BuyRegion
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		result.put(AreaShop.tagPrice, getFormattedPrice());
+		result.put(AreaShop.tagPlayerName, getPlayerName());
+		result.put(AreaShop.tagPlayerUUID, getBuyer());
+		// TODO: Add more?
+		
+		return result;
 	}
 	
 	/**
@@ -115,30 +140,15 @@ public class BuyRegion extends GeneralRegion {
 		/* Check if the player has permission */
 		if(player.hasPermission("areashop.buy")) {	
 			if(!isSold()) {				
-				/* Check if the player can still buy */
-				int rentNumber = 0;
-				Iterator<RentRegion> itRent = getFileManager().getRents().iterator();
-				while(itRent.hasNext()) {
-					RentRegion next = itRent.next();
-					if(player.getUniqueId().equals(next.getRenter())) {
-						rentNumber++;
-					}
-				}
-				int buyNumber = 0;
-				Iterator<BuyRegion> itBuy = getFileManager().getBuys().iterator();
-				while(itBuy.hasNext()) {
-					BuyRegion next = itBuy.next();
-					if(player.getUniqueId().equals(next.getBuyer())) {
-						buyNumber++;
-					}
-				}
-				int maximumBuys = Integer.parseInt(plugin.config().getString("maximumBuys"));
-				if(maximumBuys != -1 && buyNumber >= maximumBuys) {
+				// Check if the player can still buy
+				int maximumBuys = getMaxBuyRegions(player);
+				AreaShop.debug("maximumBuys=" + maximumBuys);
+				if(getCurrentBuyRegions(player) >= maximumBuys) {
 					plugin.message(player, "buy-maximum", maximumBuys);
 					return false;
 				}
-				int maximumTotal = Integer.parseInt(plugin.config().getString("maximumTotal"));
-				if(maximumTotal != -1 && (rentNumber+buyNumber) >= maximumTotal) {
+				int maximumTotal = getMaxTotalRegions(player);
+				if(getCurrentTotalRegions(player) >= maximumTotal) {
 					plugin.message(player, "total-maximum", maximumTotal);
 					return false;
 				}
@@ -152,20 +162,24 @@ public class BuyRegion extends GeneralRegion {
 						plugin.message(player, "buy-payError");
 						return false;
 					}										
+					// Run commands
+					this.runEventCommands(RegionEvent.BOUGHT, true);
 					
 					/* Set the owner */
 					setBuyer(player.getUniqueId());
 	
 					/* Update everything */
-					handleSchematicEvent(BuyEvent.BOUGHT);
+					handleSchematicEvent(RegionEvent.BOUGHT);
 					updateSigns();
-					updateRegionFlags();
+					updateRegionFlags(RegionState.SOLD);
 
 					/* Send message to the player */
 					plugin.message(player, "buy-succes", getName());
 					AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + getFormattedPrice());
 					
 					this.save();
+					// Run commands
+					this.runEventCommands(RegionEvent.BOUGHT, false);
 					return true;
 				} else {
 					/* Player has not enough money */
@@ -189,97 +203,44 @@ public class BuyRegion extends GeneralRegion {
 	 * @param regionName
 	 */
 	public void sell(boolean giveMoneyBack) {
+		// Run commands
+		this.runEventCommands(RegionEvent.SOLD, true);
+		
 		/* Give part of the buying price back */
-		double percentage = plugin.config().getDouble("buyMoneyBack") / 100.0;
+		double percentage = getDoubleSetting("buy.moneyBack") / 100.0;
 		double moneyBack =  getPrice() * percentage;
 		if(moneyBack > 0 && giveMoneyBack) {
 			/* Give back the money */
-			EconomyResponse r = plugin.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getBuyer()), moneyBack);
-			if(!r.transactionSuccess()) {
-				plugin.getLogger().info("Something went wrong with paying back money while unrenting");
-			}	
+			OfflinePlayer player = Bukkit.getOfflinePlayer(getBuyer());
+			if(player != null) {
+				EconomyResponse r = null;
+				boolean error = false;
+				try {
+					r = plugin.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getBuyer()), moneyBack);
+				} catch(Exception e) {
+					error = true;
+				}
+				if(error || r == null || !r.transactionSuccess()) {
+					plugin.getLogger().info("Something went wrong with paying back money to " + getPlayerName() + " while selling region " + getName());
+				}	
+			}
 		}
 		
 		/* Debug message */
 		AreaShop.debug(getPlayerName() + " has sold " + getName() + ", got " + plugin.formatCurrency(moneyBack) + " money back");
+
+		/* Update everything */
+		handleSchematicEvent(RegionEvent.SOLD);
+		updateRegionFlags(RegionState.FORSALE);
 		
 		/* Remove the player */
-		setBuyer(null);
+		setBuyer(null);		
 		
-		/* Update everything */
-		handleSchematicEvent(BuyEvent.SOLD);
 		updateSigns();
-		updateRegionFlags();	
+		
 		this.save();
-	}
-	
-	
-	public String[] getSignLines() {
-		String[] lines = new String[3];
-		if(isSold()) {
-			lines[0] = plugin.fixColors(plugin.config().getString("signBuyed"));
-			lines[1] = getName();
-			lines[2] = plugin.toName(getBuyer());
-		} else {			
-			lines[0] = plugin.fixColors(plugin.config().getString("signBuyable"));
-			lines[1] = getName();
-			lines[2] = getFormattedPrice();
-		}		
-		return lines;
-	}
-	
-
-	@Override
-	public void updateRegionFlags() {
-		HashMap<String, String> replacements = new HashMap<String, String>();
-		replacements.put(AreaShop.tagRegionName, getName());
-		replacements.put(AreaShop.tagPrice, getFormattedPrice());
-		replacements.put(AreaShop.tagPlayerName, getPlayerName());
-		if(isSold()) {
-			this.setRegionFlags(plugin.config().getConfigurationSection("flagsSold"), replacements);
-		} else {
-			this.setRegionFlags(plugin.config().getConfigurationSection("flagsForSale"), replacements);
-		}		
-	}
-	
-	
-	/**
-	 * Checks an event and handles saving to and restoring from schematic for it
-	 * @param type The type of event
-	 */
-	public void handleSchematicEvent(BuyEvent type) {
-		// Check for the general killswitch
-		if(!plugin.config().getBoolean("enableSchematics")) {
-			return;
-		}
-		// Check the individual options
-		if("false".equalsIgnoreCase(getRestoreSetting())) {
-			return;
-		} else if("true".equalsIgnoreCase(getRestoreSetting())) {
-		} else {
-			if(!plugin.config().getBoolean("useBuyRestore")) {
-				return;
-			}
-		}
-		// Get the safe and restore names		
-		String save = plugin.config().getString("buySchematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".save");
-		if(save == null) {
-			plugin.config().getString("buySchematicProfiles.default." + type.getValue() + ".save");
-		}
-		String restore = plugin.config().getString("buySchematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".restore");
-		if(restore == null) {
-			plugin.config().getString("buySchematicProfiles.default." + type.getValue() + ".restore");
-		}
-		// Save the region if needed
-		if(save != null && save.length() != 0) {
-			save = save.replace(AreaShop.tagRegionName, getName());
-			this.saveRegionBlocks(save);			
-		}
-		// Restore the region if needed
-		if(restore != null && restore.length() != 0) {
-			restore = restore.replace(AreaShop.tagRegionName, getName());
-			this.restoreRegionBlocks(restore);		
-		}
+		// Run commands
+		this.runEventCommands(RegionEvent.SOLD, false);
 	}
 
 }

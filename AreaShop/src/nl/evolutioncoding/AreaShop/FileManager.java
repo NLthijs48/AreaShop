@@ -17,18 +17,27 @@ import java.util.List;
 import nl.evolutioncoding.AreaShop.Exceptions.RegionCreateException;
 import nl.evolutioncoding.AreaShop.regions.BuyRegion;
 import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion.RegionEvent;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion.RegionType;
 import nl.evolutioncoding.AreaShop.regions.RegionGroup;
 import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import com.google.common.io.Files;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
+import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class FileManager {
 	private static FileManager instance = null;
@@ -144,6 +153,10 @@ public class FileManager {
 		return new ArrayList<GeneralRegion>(regions.values());
 	}
 	
+	/**
+	 * Get a list of names of a certain group of things
+	 * @return A String list with all the names
+	 */
 	public List<String> getBuyNames() {
 		ArrayList<String> result = new ArrayList<String>();
 		for(BuyRegion region : getBuys()) {
@@ -151,11 +164,24 @@ public class FileManager {
 		}
 		return result;
 	}
-	
 	public List<String> getRentNames() {
 		ArrayList<String> result = new ArrayList<String>();
 		for(RentRegion region : getRents()) {
 			result.add(region.getName());
+		}
+		return result;
+	}
+	public List<String> getRegionNames() {
+		ArrayList<String> result = new ArrayList<String>();
+		for(GeneralRegion region : getRegions()) {
+			result.add(region.getName());
+		}
+		return result;
+	}
+	public List<String> getGroupNames() {
+		ArrayList<String> result = new ArrayList<String>();
+		for(RegionGroup group : getGroups()) {
+			result.add(group.getName());
 		}
 		return result;
 	}
@@ -166,6 +192,9 @@ public class FileManager {
 	 * @param rent Map containing all the info for a rent
 	 */
 	public void addRent(RentRegion rent) {
+		if(rent == null) {
+			AreaShop.debug("Tried adding a null rent!");
+		}
 		regions.put(rent.getName().toLowerCase(), rent);
 		rent.save();
 	}
@@ -176,32 +205,52 @@ public class FileManager {
 	 * @param buy Map containing all the info for a buy
 	 */
 	public void addBuy(BuyRegion buy) {
+		if(buy == null) {
+			AreaShop.debug("Tried adding a null buy!");
+		}
 		regions.put(buy.getName().toLowerCase(), buy);
 		buy.save();
+	}
+	
+	public void addGroup(RegionGroup group) {
+		groups.put(group.getName().toLowerCase(), group);
+		String lowGroup = group.getName().toLowerCase();
+		ConfigurationSection result = groupsConfig.getConfigurationSection(lowGroup);
+		if(result == null) {
+			result = groupsConfig.createSection(lowGroup);
+			groupsConfig.set(lowGroup + ".name", group.getName());
+			groupsConfig.set(lowGroup + ".priority", 0);
+		}
+		saveGroups();
 	}
 	
 	/**
 	 * Remove a rent from the list
 	 * @param regionName
 	 */
-	public boolean removeRent(String regionName, boolean giveMoneyBack) {
-		regionName = regionName.toLowerCase();
+	public boolean removeRent(RentRegion rent, boolean giveMoneyBack) {
 		boolean result = false;
-		RentRegion rent = getRent(regionName);
 		if(rent != null) {
 			if(rent.isRented()) {
 				rent.unRent(giveMoneyBack);
 			}
+			// Handle schematics and run commands
+			rent.handleSchematicEvent(RegionEvent.DELETED);
+			rent.runEventCommands(RegionEvent.DELETED, true);
+			
 			/* Delete the sign and the variable */
 			if(rent.getWorld() != null) {
-				rent.getWorld().getBlockAt(rent.getSignLocation()).setType(Material.AIR);
+				for(Location sign : rent.getSignLocations()) {
+					sign.getBlock().setType(Material.AIR);
+				}
 			}
-			if(rent.getRegion() != null) {
-				rent.getRegion().setFlag(DefaultFlag.GREET_MESSAGE, null);
-				rent.getRegion().setFlag(DefaultFlag.FAREWELL_MESSAGE, null);
+			RegionGroup[] groups = getGroups().toArray(new RegionGroup[getGroups().size()]);
+			for(RegionGroup group : groups) {
+				group.removeMember(rent);
 			}
-			regions.remove(regionName);
-			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + regionName + ".yml");
+			rent.resetRegionFlags();
+			regions.remove(rent.getLowerCaseName());
+			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + rent.getLowerCaseName() + ".yml");
 			boolean deleted = true;
 			try {
 				deleted = file.delete();
@@ -211,37 +260,60 @@ public class FileManager {
 			if(!deleted) {
 				plugin.getLogger().warning("File could not be deleted: " + file.toString());
 			}
-			for(RegionGroup group : getGroups()) {
-				group.removeMember(rent);
-			}
+
+			
 			result = true;
+			
+			// Run commands
+			rent.runEventCommands(RegionEvent.DELETED, false);
 		}		
 		return result;
+	}
+	
+	/**
+	 * Get a region by providing a location of the sign
+	 * @param location The locatin of the sign
+	 * @return The generalRegion that has a sign at this location
+ 	 */
+	public GeneralRegion getRegionBySignLocation(Location location) {
+		for(GeneralRegion region : getRegions()) {
+			if(region.isSignOfRegion(location)) {
+				return region;
+			}
+		}
+		return null;
 	}
 	
 	/**
 	 * Remove a buy from the list
 	 * @param regionName
 	 */
-	public boolean removeBuy(String regionName, boolean giveMoneyBack) {
-		regionName = regionName.toLowerCase();
+	public boolean removeBuy(BuyRegion buy, boolean giveMoneyBack) {
 		boolean result = false;
-		BuyRegion buy = getBuy(regionName);
 		if(buy != null) {
 			if(buy.isSold()) {
 				buy.sell(giveMoneyBack);
 			}
+			// Handle schematics and run commands
+			buy.handleSchematicEvent(RegionEvent.DELETED);
+			buy.runEventCommands(RegionEvent.DELETED, true);
+			
 			// Delete the sign and the variable
 			if(buy.getWorld() != null) {
-				buy.getWorld().getBlockAt(buy.getSignLocation()).setType(Material.AIR);
+				for(Location sign : buy.getSignLocations()) {
+					sign.getBlock().setType(Material.AIR);
+				}
 			}			
-			regions.remove(regionName);
-			if(buy.getRegion() != null) {
-				buy.getRegion().setFlag(DefaultFlag.GREET_MESSAGE, null);
-				buy.getRegion().setFlag(DefaultFlag.FAREWELL_MESSAGE, null);
+			regions.remove(buy.getLowerCaseName());
+			buy.resetRegionFlags();
+			
+			// Removing from groups
+			for(RegionGroup group : getGroups()) {
+				group.removeMember(buy);
 			}
+			
 			// Deleting the file
-			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + regionName + ".yml");
+			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + buy.getLowerCaseName() + ".yml");
 			boolean deleted = true;
 			try {
 				deleted = file.delete();
@@ -252,13 +324,22 @@ public class FileManager {
 				plugin.getLogger().warning("File could not be deleted: " + file.toString());
 			}
 			
-			// Removing from groups
-			for(RegionGroup group : getGroups()) {
-				group.removeMember(buy);
-			}
 			result = true;
+			
+			// Run commands
+			buy.runEventCommands(RegionEvent.DELETED, false);
 		}		
 		return result;
+	}
+	
+	/**
+	 * Remove a group
+	 * @param group Group to remove
+	 */
+	public void removeGroup(RegionGroup group) {
+		groups.remove(group.getLowerCaseName());
+		groupsConfig.set(group.getLowerCaseName(), null);
+		saveGroups();
 	}
 	
 	/**
@@ -393,6 +474,10 @@ public class FileManager {
 		}
 	}
 
+	/**
+	 * Load all files from disk
+	 * @return true
+	 */
 	public boolean loadFiles() {
 		boolean result = false;
 		
@@ -406,7 +491,7 @@ public class FileManager {
 			for(File region : file.listFiles()) {
 				if(region.isFile()) {
 					YamlConfiguration config = YamlConfiguration.loadConfiguration(region);					
-					if(config.isSet("rent")) {
+					if(RegionType.RENT.getValue().equals(config.getString("general.type"))) {
 						try {
 							RentRegion rent = new RentRegion(plugin, config);
 							addRent(rent);
@@ -417,12 +502,14 @@ public class FileManager {
 							} catch(Exception e) {}
 						}
 						
-					} else if(config.isSet("buy")) {
+					} else if(RegionType.BUY.getValue().equals(config.getString("general.type"))) {
 						try {
 							BuyRegion buy = new BuyRegion(plugin, config);
 							addBuy(buy);
 						} catch (RegionCreateException exception) {
+							// This prints out a message in the console that indicates why the region cannot be created
 							plugin.getLogger().warning(exception.getMessage());
+							// Catch all exeptions because it just has to try delete the region, if it fails it does not matter
 							try {
 								region.delete();
 							} catch(Exception e) {}
@@ -441,9 +528,6 @@ public class FileManager {
 		}
 		for(String groupName : groupsConfig.getKeys(false)) {
 			RegionGroup group = new RegionGroup(plugin, groupName);
-			for(String region : groupsConfig.getConfigurationSection(groupName).getStringList("regions")) {
-				group.addMember(regions.get(region.toLowerCase()));
-			}
 			groups.put(groupName, group);
 		}
 		
@@ -491,6 +575,8 @@ public class FileManager {
 			return;
 		}
 		
+		plugin.getLogger().info("Conversion to a new version of the file format starts, could take some time");
+		
 		// Convert old rent files
 		if(rentFile.exists()) {
 			if(!oldFolderFile.exists()) {
@@ -507,7 +593,7 @@ public class FileManager {
 		    	rents = (HashMap<String,HashMap<String,String>>)input.readObject();
 				input.close();
 			} catch (IOException | ClassNotFoundException | ClassCastException e) {
-				plugin.getLogger().warning("Error: Something went wrong reading file: " + rentPath);
+				plugin.getLogger().warning("  Error: Something went wrong reading file: " + rentPath);
 			}
 			// Delete the file if it is totally wrong
 			if(rents == null) {
@@ -519,7 +605,7 @@ public class FileManager {
 				try {
 					Files.move(new File(rentPath), new File(oldFolderPath + "rents"));
 				} catch (Exception e) {
-					plugin.getLogger().info("Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
+					plugin.getLogger().info("  Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
 				}
 				// Check if conversion is needed
 				if(versions.get("rents") < 1) {					
@@ -544,10 +630,9 @@ public class FileManager {
 							/* Change to version 0 */
 							versions.put("rents", 0);
 						}
-						plugin.getLogger().info("Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
+						plugin.getLogger().info("  Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
 					}
 					if(versions.get("rents") < 1) {
-						plugin.getLogger().info("Starting UUID conversion of '" + buyPath + "', could take a while");
 						for(String rentName : rents.keySet()) {
 							HashMap<String,String> rent = rents.get(rentName);
 							if(rent.get("player") != null) {
@@ -559,7 +644,7 @@ public class FileManager {
 							/* Change version to 1 */
 							versions.put("rents", 1);
 						}
-						plugin.getLogger().info("Updated version of '" + rentPath + "' from 0 to 1 (switch to UUID's for player identification)");
+						plugin.getLogger().info("  Updated version of '" + rentPath + "' from 0 to 1 (switch to UUID's for player identification)");
 					}				
 				}		
 				// Save rents to new format
@@ -569,27 +654,28 @@ public class FileManager {
 				}
 				for(HashMap<String, String> rent : rents.values()) {
 					YamlConfiguration config = new YamlConfiguration();
-					config.set("name", rent.get("name").toLowerCase());
-					config.set("rent.world", rent.get("world"));
-					config.set("rent.signLocation.world", rent.get("world"));
-					config.set("rent.signLocation.x", Double.parseDouble(rent.get("x")));
-					config.set("rent.signLocation.y", Double.parseDouble(rent.get("y")));
-					config.set("rent.signLocation.z", Double.parseDouble(rent.get("z")));
+					config.set("general.name", rent.get("name").toLowerCase());
+					config.set("general.type", "rent");
+					config.set("general.world", rent.get("world"));
+					config.set("general.signs.0.location.world", rent.get("world"));
+					config.set("general.signs.0.location.x", Double.parseDouble(rent.get("x")));
+					config.set("general.signs.0.location.y", Double.parseDouble(rent.get("y")));
+					config.set("general.signs.0.location.z", Double.parseDouble(rent.get("z")));
 					config.set("rent.price", Double.parseDouble(rent.get("price")));
 					config.set("rent.duration", rent.get("duration"));
 					if(rent.get("restore") != null && !rent.get("restore").equals("general")) {
-						config.set("rent.enableRestore", rent.get("restore"));
+						config.set("general.enableRestore", rent.get("restore"));
 					}
 					if(rent.get("profile") != null && !rent.get("profile").equals("default")) {
-						config.set("rent.restoreProfile", rent.get("profile"));
+						config.set("general.schematicProfile", rent.get("profile"));
 					}
 					if(rent.get("tpx") != null) {
-						config.set("rent.teleportLocation.world", rent.get("world"));
-						config.set("rent.teleportLocation.x", Double.parseDouble(rent.get("tpx")));
-						config.set("rent.teleportLocation.y", Double.parseDouble(rent.get("tpy")));
-						config.set("rent.teleportLocation.z", Double.parseDouble(rent.get("tpz")));
-						config.set("rent.teleportLocation.yaw", Double.parseDouble(rent.get("tpyaw")));
-						config.set("rent.teleportLocation.pitch", Double.parseDouble(rent.get("tppitch")));
+						config.set("general.teleportLocation.world", rent.get("world"));
+						config.set("general.teleportLocation.x", Double.parseDouble(rent.get("tpx")));
+						config.set("general.teleportLocation.y", Double.parseDouble(rent.get("tpy")));
+						config.set("general.teleportLocation.z", Double.parseDouble(rent.get("tpz")));
+						config.set("general.teleportLocation.yaw", rent.get("tpyaw"));
+						config.set("general.teleportLocation.pitch", rent.get("tppitch"));
 					}
 					if(rent.get("playeruuid") != null) {
 						config.set("rent.renter", rent.get("playeruuid"));
@@ -598,9 +684,10 @@ public class FileManager {
 					try {
 						config.save(new File(regionsPath + File.separator + rent.get("name").toLowerCase() + ".yml"));
 					} catch (IOException e) {
-						plugin.getLogger().warning("Error: Could not save region file while converting: " + regionsPath + File.separator + rent.get("name").toLowerCase() + ".yml");
+						plugin.getLogger().warning("  Error: Could not save region file while converting: " + regionsPath + File.separator + rent.get("name").toLowerCase() + ".yml");
 					}
 				}
+				plugin.getLogger().info("  Updated rent regions to new .yml format (check the /regions folder)");
 			}
 			
 			// Change version number
@@ -624,7 +711,7 @@ public class FileManager {
 		    	buys = (HashMap<String,HashMap<String,String>>)input.readObject();
 				input.close();
 			} catch (IOException | ClassNotFoundException | ClassCastException e) {
-				plugin.getLogger().warning("Error: Something went wrong reading file: " + buyPath);
+				plugin.getLogger().warning("  Error: Something went wrong reading file: " + buyPath);
 			}
 			// Delete the file if it is totally wrong
 			if(buys == null) {
@@ -636,7 +723,7 @@ public class FileManager {
 				try {
 					Files.move(new File(buyPath), new File(oldFolderPath + "buys"));
 				} catch (Exception e) {
-					plugin.getLogger().info("Could not create a backup of '" + buyPath + "', check the file permissions (conversion to next version continues)");
+					plugin.getLogger().info("  Could not create a backup of '" + buyPath + "', check the file permissions (conversion to next version continues)");
 				}
 				// Check if conversion is needed
 				if(versions.get("buys") < 1) {				
@@ -661,10 +748,9 @@ public class FileManager {
 							/* Change to version 0 */
 							versions.put("buys", 0);
 						}
-						plugin.getLogger().info("Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
+						plugin.getLogger().info("  Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
 					}
 					if(versions.get("buys") < 1) {
-						plugin.getLogger().info("Starting UUID conversion of '" + buyPath + "', could take a while");
 						for(String buyName : buys.keySet()) {
 							HashMap<String,String> buy = buys.get(buyName);
 							if(buy.get("player") != null) {
@@ -676,7 +762,7 @@ public class FileManager {
 							/* Change version to 1 */
 							versions.put("buys", 1);
 						}
-						plugin.getLogger().info("Updated version of '" + buyPath + "' from 0 to 1 (switch to UUID's for player identification)");
+						plugin.getLogger().info("  Updated version of '" + buyPath + "' from 0 to 1 (switch to UUID's for player identification)");
 					}				
 				}		
 			
@@ -687,27 +773,27 @@ public class FileManager {
 				}
 				for(HashMap<String, String> buy : buys.values()) {
 					YamlConfiguration config = new YamlConfiguration();
-					config.set("name", buy.get("name").toLowerCase());
-					config.set("buy.world", buy.get("world"));
-					config.set("buy.signLocation.world", buy.get("world"));
-					config.set("buy.signLocation.x", Double.parseDouble(buy.get("x")));
-					config.set("buy.signLocation.y", Double.parseDouble(buy.get("y")));
-					config.set("buy.signLocation.z", Double.parseDouble(buy.get("z")));
+					config.set("general.name", buy.get("name").toLowerCase());
+					config.set("general.type", "buy");
+					config.set("general.world", buy.get("world"));
+					config.set("general.signs.0.location.world", buy.get("world"));
+					config.set("general.signs.0.location.x", Double.parseDouble(buy.get("x")));
+					config.set("general.signs.0.location.y", Double.parseDouble(buy.get("y")));
+					config.set("general.signs.0.location.z", Double.parseDouble(buy.get("z")));
 					config.set("buy.price", Double.parseDouble(buy.get("price")));
-					config.set("buy.duration", buy.get("duration"));
 					if(buy.get("restore") != null && !buy.get("restore").equals("general")) {
-						config.set("buy.enableRestore", buy.get("restore"));
+						config.set("general.enableRestore", buy.get("restore"));
 					}
 					if(buy.get("profile") != null && !buy.get("profile").equals("default")) {
-						config.set("buy.restoreProfile", buy.get("profile"));
+						config.set("general.schematicProfile", buy.get("profile"));
 					}
 					if(buy.get("tpx") != null) {
-						config.set("buy.teleportLocation.world", buy.get("world"));
-						config.set("buy.teleportLocation.x", Double.parseDouble(buy.get("tpx")));
-						config.set("buy.teleportLocation.y", Double.parseDouble(buy.get("tpy")));
-						config.set("buy.teleportLocation.z", Double.parseDouble(buy.get("tpz")));
-						config.set("buy.teleportLocation.yaw", Double.parseDouble(buy.get("tpyaw")));
-						config.set("buy.teleportLocation.pitch", Double.parseDouble(buy.get("tppitch")));
+						config.set("general.teleportLocation.world", buy.get("world"));
+						config.set("general.teleportLocation.x", Double.parseDouble(buy.get("tpx")));
+						config.set("general.teleportLocation.y", Double.parseDouble(buy.get("tpy")));
+						config.set("general.teleportLocation.z", Double.parseDouble(buy.get("tpz")));
+						config.set("general.teleportLocation.yaw", buy.get("tpyaw"));
+						config.set("general.teleportLocation.pitch", buy.get("tppitch"));
 					}
 					if(buy.get("playeruuid") != null) {
 						config.set("buy.buyer", buy.get("playeruuid"));
@@ -715,9 +801,10 @@ public class FileManager {
 					try {
 						config.save(new File(regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml"));
 					} catch (IOException e) {
-						plugin.getLogger().warning("Error: Could not save region file while converting: " + regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml");
+						plugin.getLogger().warning("  Error: Could not save region file while converting: " + regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml");
 					}
 				}
+				plugin.getLogger().info("  Updated buy regions to new .yml format (check the /regions folder)");
 			}
 
 			// Change version number
@@ -730,7 +817,10 @@ public class FileManager {
 		try {
 			Files.move(new File(rentPath + ".old"), new File(oldFolderPath + "rents.old"));
 			Files.move(new File(buyPath + ".old"), new File(oldFolderPath + "buys.old"));
+			Files.move(new File(plugin.getDataFolder() + File.separator + "config.yml"), new File(oldFolderPath + "config.yml"));
 		} catch (Exception e) {}
+		
+		plugin.getLogger().info("Conversion to new version of the file format complete, this should not show up anymore next restart/reload");
 	}
 	
 	/**
@@ -741,6 +831,137 @@ public class FileManager {
 	public ConfigurationSection getGroupSettings(String groupName) {
 		return groupsConfig.getConfigurationSection(groupName.toLowerCase());
 	}
+	
+	/**
+	 * Set a setting for a group
+	 * @param group The group to set it for
+	 * @param path The path to set
+	 * @param setting The value to set
+	 */
+	public void setGroupSetting(RegionGroup group, String path, Object setting) {
+		groupsConfig.set(group.getName().toLowerCase() + "." + path, setting);
+	}
+	
+	// UTILITIES
+	/**
+	 * Get all AreaShop regions intersecting with a WorldEdit selection
+	 * @param selection The selection to check
+	 * @return A list with all the AreaShop regions intersecting with the selection
+	 */
+	public List<GeneralRegion> getASRegionsInSelection(Selection selection) {
+		ArrayList<GeneralRegion> result = new ArrayList<GeneralRegion>();
+		for(ProtectedRegion region : getWERegionsInSelection(selection)) {
+			GeneralRegion asRegion = getRegion(region.getId());
+			if(asRegion != null) {
+				result.add(asRegion);
+			}
+		}
+		return result;
+	}	
+	public List<GeneralRegion> getASRegionsByLocation(Location location) {
+		Selection selection = new CuboidSelection(location.getWorld(), location, location);
+		return getASRegionsInSelection(selection);
+	}
+	
+	public List<ProtectedRegion> getWERegionsInSelection(Selection selection) {
+		// Get all regions inside or intersecting with the WorldEdit selection of the player
+		World world = selection.getWorld();
+		RegionManager regionManager = plugin.getWorldGuard().getRegionManager(world);
+		ArrayList<ProtectedRegion> result = new ArrayList<ProtectedRegion>();
+		Location selectionMin = selection.getMinimumPoint();
+		Location selectionMax = selection.getMaximumPoint();
+		for(ProtectedRegion region : regionManager.getRegions().values()) {
+			BlockVector regionMin = region.getMinimumPoint();
+			BlockVector regionMax = region.getMaximumPoint();			
+			if( 
+					(      // x part, resolves to true if the selection and region overlap anywhere on the x-axis
+						   (regionMin.getBlockX() <= selectionMax.getBlockX() && regionMin.getBlockX() >= selectionMin.getBlockX())
+						|| (regionMax.getBlockX() <= selectionMax.getBlockX() && regionMax.getBlockX() >= selectionMin.getBlockX())
+						|| (selectionMin.getBlockX() >= regionMin.getBlockX() && selectionMin.getBlockX() <= regionMax.getBlockX())
+						|| (selectionMax.getBlockX() >= regionMin.getBlockX() && selectionMax.getBlockX() <= regionMax.getBlockX())
+					) && ( // Y part, resolves to true if the selection and region overlap anywhere on the y-axis
+					       (regionMin.getBlockY() <= selectionMax.getBlockY() && regionMin.getBlockY() >= selectionMin.getBlockY())
+						|| (regionMax.getBlockY() <= selectionMax.getBlockY() && regionMax.getBlockY() >= selectionMin.getBlockY())
+						|| (selectionMin.getBlockY() >= regionMin.getBlockY() && selectionMin.getBlockY() <= regionMax.getBlockY())
+						|| (selectionMax.getBlockY() >= regionMin.getBlockY() && selectionMax.getBlockY() <= regionMax.getBlockY())
+					) && ( // Z part, resolves to true if the selection and region overlap anywhere on the z-axis
+				           (regionMin.getBlockZ() <= selectionMax.getBlockZ() && regionMin.getBlockZ() >= selectionMin.getBlockZ())
+						|| (regionMax.getBlockZ() <= selectionMax.getBlockZ() && regionMax.getBlockZ() >= selectionMin.getBlockZ())
+						|| (selectionMin.getBlockZ() >= regionMin.getBlockZ() && selectionMin.getBlockZ() <= regionMax.getBlockZ())
+						|| (selectionMax.getBlockZ() >= regionMin.getBlockZ() && selectionMax.getBlockZ() <= regionMax.getBlockZ())
+					)
+				) {
+				result.add(region);
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Get a list of regions around a location
+	 *  - Returns highest priority, child instead of parent regions
+	 * @param location The location to check for regions
+	 * @return empty list if no regions found, 1 member if 1 region is a priority, more if regions with the same priority
+	 */
+	public List<ProtectedRegion> getApplicableRegions(Location location) {
+		List<ProtectedRegion> result = new ArrayList<ProtectedRegion>();
+		// If the secondLine does not contain a name try to find the region by location
+		ApplicableRegionSet regions = plugin.getWorldGuard().getRegionManager(location.getWorld()).getApplicableRegions(location);
+		if(regions != null) {
+			boolean first = true;
+			for(ProtectedRegion pr : regions) {
+				if(first) {
+					result.add(pr);
+					first = false;
+				} else {
+					if(pr.getPriority() > result.get(0).getPriority()) {
+						result.clear();
+						result.add(pr);
+					} else if(pr.getParent() != null && pr.getParent().equals(result.get(0))) {
+						result.clear();
+						result.add(pr);
+					} else {
+						result.add(pr);
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	public List<GeneralRegion> getApplicalbeASRegions(Location location) {
+		List<GeneralRegion> result = new ArrayList<GeneralRegion>();
+		// If the secondLine does not contain a name try to find the region by location
+		ApplicableRegionSet regions = plugin.getWorldGuard().getRegionManager(location.getWorld()).getApplicableRegions(location);
+		if(regions != null) {
+			List<GeneralRegion> candidates = new ArrayList<GeneralRegion>();
+			for(ProtectedRegion pr : regions) {
+				GeneralRegion region = getRegion(pr.getId());
+				if(region != null) {
+					candidates.add(region);
+				}
+			}		
+			boolean first = true;
+			for(GeneralRegion region : candidates) {
+				if(first) {
+					result.add(region);
+					first = false;
+				} else {
+					if(region.getRegion().getPriority() > result.get(0).getRegion().getPriority()) {
+						result.clear();
+						result.add(region);
+					} else if(region.getRegion().getParent() != null && region.getRegion().getParent().equals(result.get(0))) {
+						result.clear();
+						result.add(region);
+					} else {
+						result.add(region);
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
 }
 
 

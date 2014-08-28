@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,41 +56,14 @@ public final class AreaShop extends JavaPlugin {
 	
 	/* Keys for replacing parts of flags */
 	public static final String tagPlayerName = "%player%";
+	public static final String tagPlayerUUID = "%uuid%";
+	public static final String tagWorldName = "%world%";
 	public static final String tagRegionName = "%region%";
+	public static final String tagRegionType = "%type%";
 	public static final String tagPrice = "%price%";
 	public static final String tagDuration = "%duration%";
 	public static final String tagRentedUntil = "%until%";
-	
-	/* Enum for schematic event types */
-	// TODO delete
-	public enum RegionEventType {		
-		CREATED("Created"),
-		DELETED("Deleted"),
-		BOUGHT("Bought"),
-		SOLD("Sold");
-		
-		private final String value;
-		private RegionEventType(String value) {
-			this.value = value;
-		}
-		public String getValue() {
-			return value;
-		}
-	} 
-	
-	/* Enum for region types */
-	public enum RegionType {
-		SELL("sell"),
-		RENT("rent");
-		
-		private final String value;
-		private RegionType(String value) {
-			this.value = value;
-		}
-		public String getValue() {
-			return value;
-		}
-	}	
+	public static final String tagRentedUntilShort = "%untilshort%";
 	
 	public static AreaShop getInstance() {
 		return AreaShop.instance;
@@ -101,13 +75,11 @@ public final class AreaShop extends JavaPlugin {
 	public void onEnable(){
 		AreaShop.instance = this;
 		boolean error = false;
-		
-		/* Save a copy of the default config.yml if one is not present */
-		this.saveDefaultConfig();
 	
 		/* Check the config, loads default if errors */
-		configOk = this.checkConfig();
-
+		debug = this.getConfig().getBoolean("debug");
+		configOk = true;
+		
 		/* Check if WorldGuard is present */
 		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
 	    if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
@@ -145,26 +117,32 @@ public final class AreaShop extends JavaPlugin {
 	    fileManager = new FileManager(this);
 	    error = error & !fileManager.loadFiles();
 	    fileManager.checkRents();
+		
+		/* Save a copy of the default config.yml if one is not present */
+		this.saveDefaultConfig();
 	    
 		if(error) {
 			this.getLogger().info("The plugin has not started, fix the errors listed above");
 		} else {
-			/* Register the event listeners */
+			// Register the event listeners
 			this.getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 			this.getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
-			this.getServer().getPluginManager().registerEvents(new RightClickListener(this), this);			
+			this.getServer().getPluginManager().registerEvents(new SignClickListener(this), this);			
 			
-	        /* Start thread for checking renting */
+	        // Start thread for checking renting
 	        int checkDelay = Integer.parseInt(this.config().getString("checkDelay"))*20;
 	        new RentCheck(this).runTaskTimer(this, checkDelay, checkDelay);
 		    
-		    /* Bind commands for this plugin */
+		    // Bind commands for this plugin
 	        commandManager = new CommandManager(this);
 			
+	        // Enable Metrics if config allows it
 			if(this.config().getBoolean("sendStats")) {
 				this.startMetrics();
 			}
 			
+			// Register dynamic permission (things declared in config)
+			registerDynamicPermissions();
 		}
 	}
 	
@@ -231,12 +209,27 @@ public final class AreaShop extends JavaPlugin {
 	}
 	
 	/**
+	 * Register dynamic permissions controlled by config settings
+	 */
+	public void registerDynamicPermissions() {
+		// Register limit groups of amount of regions a player can have
+		for(String group : config().getConfigurationSection("limitGroups").getKeys(false)) {
+			if(!"unlimited".equals(group) && !"default".equals(group)) {
+				Permission perm = new Permission("areashop.limits." + group);
+				Bukkit.getPluginManager().addPermission(perm);
+			}
+		}	
+		Bukkit.getPluginManager().recalculatePermissionDefaults(Bukkit.getPluginManager().getPermission("playerwarps.limits"));
+	}
+	
+	/**
 	 * Method to send a message to a CommandSender, using chatprefix if it is a player
 	 * @param target The CommandSender you wan't to send the message to (e.g. a player)
 	 * @param key The key to get the translation
+	 * @param prefix Specify if the message should have a prefix
 	 * @param params The parameters to inject into the message string
 	 */
-	public void message(Object target, String key, Object... params) {
+	public void configurableMessage(Object target, String key, boolean prefix, Object... params) {
 		String langString = this.fixColors(languageManager.getLang(key, params));
 		if(langString == null) {
 			this.getLogger().info("Something is wrong with the language file, could not find key: " + key);
@@ -244,16 +237,33 @@ public final class AreaShop extends JavaPlugin {
 			// Do nothing, message is disabled
 		} else {
 			if(target instanceof Player) {
-				((Player)target).sendMessage(this.fixColors(chatprefix) + langString);
+				if(prefix) {
+					((Player)target).sendMessage(this.fixColors(chatprefix) + langString);
+				} else {
+					((Player)target).sendMessage(langString);
+				}
 			} else if(target instanceof CommandSender) {
+				if(!config().getBoolean("useColorsInConsole")) {
+					langString = ChatColor.stripColor(langString);
+				}
 				((CommandSender)target).sendMessage(langString);
 			}	
 			else if(target instanceof Logger) {
+				if(!config().getBoolean("useColorsInConsole")) {
+					langString = ChatColor.stripColor(langString);
+				}
 				((Logger)target).info(langString);
 			} else {
+				langString = ChatColor.stripColor(langString);
 				this.getLogger().info("Could not send message, target is wrong: " + langString);
 			}
 		}
+	}
+	public void messageNoPrefix(Object target, String key, Object... params) {
+		configurableMessage(target, key, false, params);
+	}
+	public void message(Object target, String key, Object... params) {
+		configurableMessage(target, key, true, params);
 	}
 	
 	/**
@@ -313,192 +323,17 @@ public final class AreaShop extends JavaPlugin {
 		}		
 	}
 	
+	/**
+	 * Start the Metrics stats collection
+	 */
 	private void startMetrics() {
 		try {
 		    Metrics metrics = new Metrics(this);
-		    // Number of rents rented/not rented
-		    /*Graph rentGraph = metrics.createGraph("Rent regions");
-		    rentGraph.addPlotter(new Metrics.Plotter("For rent") {
-	            @Override
-	            public int getValue() {
-	    		    int result = 0;
-	    		    for(String rent : fileManager.getRents().keySet()) {
-	    		    	if(fileManager.getRent(rent).get(keyPlayer) == null) {
-	    		    		result++;
-	    		    	}
-	    		    }
-                    return result;
-	            }
-		    });
-		    rentGraph.addPlotter(new Metrics.Plotter("Rented") {
-	            @Override
-	            public int getValue() {
-	    		    int result = 0;
-	    		    for(String rent : fileManager.getRents().keySet()) {
-	    		    	if(fileManager.getRent(rent).get(keyPlayer) != null) {
-	    		    		result++;
-	    		    	}
-	    		    }
-                    return result;
-	            }
-		    });
-		    // Number of buys bought/not bought
-		    Graph buyGraph = metrics.createGraph("Buy regions");
-		    buyGraph.addPlotter(new Metrics.Plotter("For sale") {
-	            @Override
-	            public int getValue() {
-	    		    int result = 0;
-	    		    for(String buy : fileManager.getBuys().keySet()) {
-	    		    	if(fileManager.getBuy(buy).get(keyPlayer) == null) {
-	    		    		result++;
-	    		    	}
-	    		    }
-                    return result;
-	            }
-		    });
-		    buyGraph.addPlotter(new Metrics.Plotter("Sold") {
-	            @Override
-	            public int getValue() {
-	    		    int result = 0;
-	    		    for(String buy : fileManager.getBuys().keySet()) {
-	    		    	if(fileManager.getBuy(buy).get(keyPlayer) != null) {
-	    		    		result++;
-	    		    	}
-	    		    }
-                    return result;
-	            }
-		    });
-		    */
 		    metrics.start();
 		} catch (IOException e) {
 		    AreaShop.debug("Could not start Metrics");
 		}
-	}
-	
-	
-	
-	/**
-	 * Checks the config for errors, loads default config if they occur
-	 */
-	public boolean checkConfig() {
-		int error = 0;		
-		debug = this.getConfig().getString("debug").equalsIgnoreCase("true");
-		
-		/* GENERAL */
-		String chatPrefix = this.getConfig().getString("chatPrefix");
-		if (chatPrefix.length() == 0) {
-			this.getLogger().info("Config-Error: chatPrefix has length zero");
-			error++;
-		}
-		String maximumTotal = this.getConfig().getString("maximumTotal");
-		try {
-			int maximumTotalInt = Integer.parseInt(maximumTotal);
-			if(maximumTotalInt < -1) {
-				this.getLogger().info("Config-Error: maximumTotal must be -1 or higher");
-				error++;
-			}
-		} catch (NumberFormatException e) {
-			this.getLogger().info("Config-Error: maximumTotal is not a valid number");
-			error++;
-		}
-		
-		/* RENTING */
-		String rentSign = this.getConfig().getString("rentSign");
-		if (rentSign.length() > 15) {
-			this.getLogger().info("Config-Error: rentSign is too long, maximum length is 15 characters");
-			error++;
-		}		
-		String signRentable = this.getConfig().getString("signRentable");
-		if (signRentable.length() > 15) {
-			this.getLogger().info("Config-Error: signRentable is too long, maximum length is 15 characters");
-			error++;
-		}		
-		String signRented = this.getConfig().getString("signRented");
-		if (signRented.length() > 15) {
-			this.getLogger().info("Config-Error: signRented is too long, maximum length is 15 characters");
-			error++;
-		}
-		String maximumRents = this.getConfig().getString("maximumRents");
-		try {
-			int maximumRentsInt = Integer.parseInt(maximumRents);
-			if(maximumRentsInt < -1) {
-				this.getLogger().info("Config-Error: maximumRents must be -1 or higher");
-				error++;
-			}
-		} catch (NumberFormatException e) {
-			this.getLogger().info("Config-Error: maximumRents is not a valid number");
-			error++;
-		}
-		String rentMoneyBack = this.getConfig().getString("rentMoneyBack");
-		try {
-			int rentMoneyBackInt = Integer.parseInt(rentMoneyBack);
-			if(rentMoneyBackInt < 0 || rentMoneyBackInt > 100) {
-				this.getLogger().info("Config-Error: rentMoneyBack must be between 0 and 100");
-				error++;
-			}
-		} catch (NumberFormatException e) {
-			this.getLogger().info("Config-Error: rentMoneyBack is not a valid number");
-			error++;
-		}		
-		String checkDelay = this.getConfig().getString("checkDelay");
-		try {
-			int checkDelayInt = Integer.parseInt(checkDelay);
-			if(checkDelayInt < 1) {
-				this.getLogger().info("Config-Error: checkDelay can't be below 1");
-				error++;
-			}
-		} catch (NumberFormatException e) {
-			this.getLogger().info("Config-Error: checkDelay is not a valid number");
-			error++;
-		}
-		
-		/* BUYING */
-		String buySign = this.getConfig().getString("buySign");
-		if (buySign.length() > 15) {
-			this.getLogger().info("Config-Error: buySign is too long, maximum length is 15 characters");
-			error++;
-		}		
-		String signBuyable = this.getConfig().getString("signBuyable");
-		if (signBuyable.length() > 15) {
-			this.getLogger().info("Config-Error: signBuyable is too long, maximum length is 15 characters");
-			error++;
-		}		
-		String signBuyed = this.getConfig().getString("signBuyed");
-		if (signBuyed.length() > 15) {
-			this.getLogger().info("Config-Error: signBuyed is too long, maximum length is 15 characters");
-			error++;
-		}
-		String maximumBuys = this.getConfig().getString("maximumBuys");
-		try {
-			int maximumBuysInt = Integer.parseInt(maximumBuys);
-			if(maximumBuysInt < -1) {
-				this.getLogger().info("Config-Error: maximumBuys must be -1 or higher");
-				error++;
-			}
-		} catch (NumberFormatException e) {
-			this.getLogger().info("Config-Error: maximumBuys is not a valid number");
-			error++;
-		}
-		String buyMoneyBack = this.getConfig().getString("buyMoneyBack");
-		try {
-			int buyMoneyBackInt = Integer.parseInt(buyMoneyBack);
-			if(buyMoneyBackInt < 0 || buyMoneyBackInt > 100) {
-				this.getLogger().info("Config-Error: buyMoneyBack must be between 0 and 100");
-				error++;
-			}
-		} catch (NumberFormatException e) {
-			this.getLogger().info("Config-Error: buyMoneyBack is not a valid number");
-			error++;
-		}		
-		
-		/* Load default config if errors have occurred */
-		if (error > 0) {
-			this.getLogger().info("The plugin has " + error + " error(s) in the config, default config will be used");
-		}
-		
-		/* return true if no errors, false if there are errors */
-		return (error == 0);
-	}
+	}	
 	
 	/**
 	 * Checks if the string is a correct time period
@@ -544,9 +379,11 @@ public final class AreaShop extends JavaPlugin {
 	public void reload() {
 		this.saveDefaultConfig();
 		this.reloadConfig();
-		configOk = this.checkConfig();
+		configOk = true;
 		chatprefix = this.config().getString("chatPrefix");
+		debug = this.getConfig().getBoolean("debug");
 		languageManager = new LanguageManager(this);
+		fileManager.loadFiles();
 		fileManager.checkRents();
 	}
 	

@@ -8,10 +8,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.Utils;
 import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
 import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -198,43 +201,78 @@ public class InfoCommand extends CommandAreaShop {
 					plugin.message(sender, "info-playerHelp");
 				}
 			} else if(args[1].equalsIgnoreCase("region")) {
-				if(args.length > 2 && args[2] != null) {
-					
-					RentRegion rent = plugin.getFileManager().getRent(args[2]);
-					BuyRegion buy = plugin.getFileManager().getBuy(args[2]);
-					
-					if(rent == null) {
-						plugin.message(sender, "info-regionRenting", args[2]);
-						plugin.message(sender, "info-regionNoRenting", args[2]);
+				if(args.length > 1) {
+					RentRegion rent = null;
+					BuyRegion buy = null;
+					if(args.length > 2) {
+						rent = plugin.getFileManager().getRent(args[2]);
+						buy = plugin.getFileManager().getBuy(args[2]);
 					} else {
+						if(sender instanceof Player) {
+							// get the region by location
+							List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
+							if(regions.size() != 1) {
+								plugin.message(sender, "info-regionHelp");
+								return;
+							} else {
+								if(regions.get(0).isRentRegion()) {
+									rent = (RentRegion)regions.get(0);
+								} else if(regions.get(0).isBuyRegion()) {
+									buy = (BuyRegion)regions.get(0);
+								}
+							}				
+						} else {
+							plugin.message(sender, "info-regionHelp");
+							return;
+						}			
+					}
+					
+					if(rent == null && buy == null) {
+						plugin.message(sender, "info-regionNotExisting", args[2]);
+						return;
+					}
+					if(rent != null) {
 						plugin.message(sender, "info-regionRenting", rent.getName());
-						plugin.message(sender, "info-regionSign", rent.getWorldName(), rent.getSignLocation().getBlockX(), rent.getSignLocation().getBlockY(), rent.getSignLocation().getBlockZ());
+						List<String> signLocations = new ArrayList<String>();
+						for(Location location : rent.getSignLocations()) {
+							signLocations.add(plugin.getLanguageManager().getLang("info-regionSignLocation", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+						}
+						if(signLocations.isEmpty()) {
+							plugin.message(sender, "info-regionNoSign");
+						} else {
+							plugin.message(sender, "info-regionSign", Utils.createCommaSeparatedList(signLocations));
+						}
 						plugin.message(sender, "info-regionPriceDuration", rent.getFormattedPrice(), rent.getDurationString());
 						if(!rent.isRented()) {
 							plugin.message(sender, "info-regionNotRented");
 						} else {
-							SimpleDateFormat dateFull = new SimpleDateFormat("dd MMMMMMMMMMMMMMMMM yyyy HH:mm");
-							plugin.message(sender, "info-regionRentedBy", rent.getPlayerName(), dateFull.format(rent.getDuration()));
+							SimpleDateFormat dateFull = new SimpleDateFormat(plugin.config().getString("timeFormatChat"));
+							plugin.message(sender, "info-regionRentedBy", rent.getPlayerName(), dateFull.format(rent.getRentedUntil()));
 						}
 						if(sender.hasPermission("areashop.rentrestore")) {
-							plugin.message(sender, "info-regionRestore", rent.getRestoreSetting());
+							plugin.message(sender, "info-regionRestore", rent.isRestoreEnabled());
 							plugin.message(sender, "info-regionRestoreProfile", rent.getRestoreProfile());
 						}
 						if(sender.hasPermission("areashop.teleport")) {
 							if(rent.getTeleportLocation() == null) {
 								plugin.message(sender, "info-regionNoTP");
 							} else {
-								plugin.message(sender, "info-regionTPLocation", rent.getTeleportLocation().getWorld().toString(), rent.getTeleportLocation().getBlockX(), rent.getTeleportLocation().getBlockY(), rent.getTeleportLocation().getBlockZ(), rent.getTeleportLocation().getPitch(), rent.getTeleportLocation().getYaw());
+								plugin.message(sender, "info-regionTPLocation", rent.getTeleportLocation().getWorld().getName(), rent.getTeleportLocation().getBlockX(), rent.getTeleportLocation().getBlockY(), rent.getTeleportLocation().getBlockZ(), rent.getTeleportLocation().getPitch(), rent.getTeleportLocation().getYaw());
 							}
 						}
 					}
 					
-					if(buy == null) {
-						plugin.message(sender, "info-regionBuying", args[2]);
-						plugin.message(sender, "info-regionNoBuying", args[2]);
-					} else {
+					if(buy != null) {
 						plugin.message(sender, "info-regionBuying", buy.getName());
-						plugin.message(sender, "info-regionSign", buy.getWorldName(), buy.getSignLocation().getBlockX(), buy.getSignLocation().getBlockY(), buy.getSignLocation().getBlockZ());
+						List<String> signLocations = new ArrayList<String>();
+						for(Location location : buy.getSignLocations()) {
+							signLocations.add(plugin.getLanguageManager().getLang("info-regionSignLocation", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+						}
+						if(signLocations.isEmpty()) {
+							plugin.message(sender, "info-regionNoSign");
+						} else {
+							plugin.message(sender, "info-regionSign", Utils.createCommaSeparatedList(signLocations));
+						}
 						plugin.message(sender, "info-regionPrice", buy.getFormattedPrice());
 						if(!buy.isSold()) {
 							plugin.message(sender, "info-regionNotBought");
@@ -242,7 +280,7 @@ public class InfoCommand extends CommandAreaShop {
 							plugin.message(sender, "info-regionBoughtBy", buy.getPlayerName());
 						}
 						if(sender.hasPermission("areashop.buyrestore")) {
-							plugin.message(sender, "info-regionRestore", buy.getRestoreSetting());
+							plugin.message(sender, "info-regionRestore", buy.isRestoreEnabled());
 							plugin.message(sender, "info-regionRestoreProfile", buy.getRestoreProfile());
 						}
 						if(sender.hasPermission("areashop.teleport")) {

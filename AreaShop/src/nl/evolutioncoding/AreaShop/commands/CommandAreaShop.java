@@ -1,6 +1,5 @@
 package nl.evolutioncoding.AreaShop.commands;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
@@ -39,9 +38,7 @@ public abstract class CommandAreaShop {
 	 * @param start The already given start of the command
 	 * @return A collection with all the possibilities for argument to complete
 	 */
-	public List<String> getTabCompleteList(int toComplete, String[] start) {
-		return new ArrayList<String>();
-	}
+	public abstract List<String> getTabCompleteList(int toComplete, String[] start);
 	
 	/**
 	 * Get the argument that comes after the base command that this command reacts to

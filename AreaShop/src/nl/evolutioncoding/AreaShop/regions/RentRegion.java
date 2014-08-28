@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.UUID;
 
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -13,30 +12,12 @@ import nl.evolutioncoding.AreaShop.AreaShop;
 import nl.evolutioncoding.AreaShop.Exceptions.RegionCreateException;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-public class RentRegion extends GeneralRegion {
-	
-	/* Enum for schematic event types */
-	public enum RentEvent {		
-		CREATED("created"),
-		DELETED("deleted"),
-		RENTED("rented"),
-		UNRENTED("unrented");
-		
-		private final String value;
-		private RentEvent(String value) {
-			this.value = value;
-		}
-		public String getValue() {
-			return value;
-		}
-	} 
-	
+public class RentRegion extends GeneralRegion {	
 	/**
 	 * Constructor
 	 * @param plugin The areashop plugin
@@ -47,10 +28,28 @@ public class RentRegion extends GeneralRegion {
 		super(plugin, config);
 	}
 	
-	public RentRegion(AreaShop plugin, String name, World world, Location signLocation, double price, String duration) {
-		super(plugin, name, world, signLocation);
-		setSetting("price", price);
-		setSetting("duration", duration);
+	/**
+	 * Create a new RentRegion
+	 * @param plugin The AreaShop plugin
+	 * @param name The name of the region (correct casing)
+	 * @param world The world of the WorldGuard region
+	 */
+	public RentRegion(AreaShop plugin, String name, World world) {
+		super(plugin, name, world);
+	}
+	
+	@Override
+	public RegionType getType() {
+		return RegionType.RENT;
+	}
+	
+	@Override
+	public RegionState getState() {
+		if(isRented()) {
+			return RegionState.RENTED;
+		} else {
+			return RegionState.FORRENT;
+		}
 	}
 	
 	/**
@@ -58,7 +57,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The UUID of the renter
 	 */
 	public UUID getRenter() {
-		String renter = getStringSetting("renter");
+		String renter = getStringSetting("rent.renter");
 		if(renter != null) {
 			try {
 				return UUID.fromString(renter);
@@ -67,14 +66,78 @@ public class RentRegion extends GeneralRegion {
 		return null;
 	}
 	
+	/**
+	 * Check if a player is the renter of this region
+	 * @param player Player to check
+	 * @return true if this player rents this region, otherwise false
+	 */
+	public boolean isRenter(Player player) {
+		UUID renter = getRenter();
+		if(player == null || renter == null) {
+			return false;
+		} else {
+			return renter.equals(player.getUniqueId());
+		}
+	}
+	
+	/**
+	 * Set the renter of this region
+	 * @param renter The UUID of the player that should be set as the renter
+	 */
 	public void setRenter(UUID renter) {
 		if(renter == null) {
-			setSetting("renter", null);
-			setSetting("renterName", null);
+			setSetting("rent.renter", null);
+			setSetting("rent.renterName", null);
 		} else {
-			setSetting("renter", renter.toString());
-			setSetting("renterName", plugin.toName(renter));
+			setSetting("rent.renter", renter.toString());
+			setSetting("rent.renterName", plugin.toName(renter));
 		}
+	}
+	
+	/**
+	 * Get the max number of extends of this region
+	 * @return -1 if infinite otherwise the maximum number
+	 */
+	public int getMaxExtends() {
+		return getIntegerSetting("rent.maxExtends");
+	}
+	
+	/**
+	 * Get how many times the rent has already been extended
+	 * @return The number of times extended
+	 */
+	public int getTimesExtended() {
+		return config.getInt("rent.timesExtended");
+	}
+	
+	/**
+	 * Set the number of times the region has been extended
+	 * @param times The number of times the region has been extended
+	 */
+	public void setTimesExtended(int times) {
+		if(times < 0) {
+			config.set("rent.timesExtended", null);
+		} else {
+			config.set("rent.timesExtended", times);
+		}
+	}
+	
+	@Override
+	public HashMap<String, Object> getSpecificReplacements() {
+		// Fill the replacements map with things specific to a RentRegion
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		result.put(AreaShop.tagPrice, getFormattedPrice());
+		result.put(AreaShop.tagDuration, getDurationString());
+		result.put(AreaShop.tagPlayerName, getPlayerName());
+		result.put(AreaShop.tagPlayerUUID, getRenter());
+			SimpleDateFormat date = new SimpleDateFormat(plugin.config().getString("timeFormatChat"));
+			String dateString = date.format(new Date(getRentedUntil()));	
+		result.put(AreaShop.tagRentedUntil, dateString);
+			date = new SimpleDateFormat(plugin.config().getString("timeFormatSign"));
+			dateString = date.format(new Date(getRentedUntil()));	
+		result.put(AreaShop.tagRentedUntilShort, dateString);
+		
+		return result;
 	}
 	
 	/**
@@ -98,14 +161,18 @@ public class RentRegion extends GeneralRegion {
 	 * @return
 	 */
 	public long getRentedUntil() {
-		return getLongSetting("rentedUntil");
+		return getLongSetting("rent.rentedUntil");
 	}
 	
+	/**
+	 * Set the time until the region is rented (milliseconds from 1970, system time)
+	 * @param rentedUntil The time until the region is rented
+	 */
 	public void setRentedUntil(Long rentedUntil) {
 		if(rentedUntil == null) {
-			setSetting("rentedUntil", null);
+			setSetting("rent.rentedUntil", null);
 		} else {
-			setSetting("rentedUntil", rentedUntil);
+			setSetting("rent.rentedUntil", rentedUntil);
 		}
 	}
 	
@@ -114,7 +181,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The price of the region
 	 */
 	public double getPrice() {
-		return getDoubleSetting("price");
+		return getDoubleSetting("rent.price");
 	}
 	
 	/**
@@ -164,7 +231,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The duration string
 	 */
 	public String getDurationString() {
-		return getStringSetting("duration");
+		return getStringSetting("rent.duration");
 	}
 	
 	/**
@@ -172,49 +239,15 @@ public class RentRegion extends GeneralRegion {
 	 * @param price
 	 */
 	public void setPrice(double price) {
-		setSetting("price", price);
-		updateSigns();
-		updateRegionFlags();
+		setSetting("rent.price", price);
 	}
 	
+	/**
+	 * Set the duration of the rent
+	 * @param duration The duration of the rent (as specified on the documentation pages)
+	 */
 	public void setDuration(String duration) {
-		setSetting("duration", duration);
-		updateSigns();
-		updateRegionFlags();
-	}
-	
-	public String[] getSignLines() {
-		String[] lines = new String[4];
-		if(isRented()) {
-			SimpleDateFormat date = new SimpleDateFormat(plugin.config().getString("timeFormatSign"));
-			String dateString = date.format(new Date(getRentedUntil()));					
-
-			lines[0] = plugin.fixColors(plugin.config().getString("signRented"));
-			lines[1] = getName();
-			lines[2] = getPlayerName();
-			lines[3] = dateString;		
-		} else {			
-			lines[0] = plugin.fixColors(plugin.config().getString("signRentable"));
-			lines[1] = getName();
-			lines[2] = getDurationString();
-			lines[3] = getFormattedPrice();			
-		}		
-		return lines;
-	}
-
-	@Override
-	public void updateRegionFlags() {
-		HashMap<String, String> replacements = new HashMap<String, String>();
-		replacements.put(AreaShop.tagRegionName, getName());
-		replacements.put(AreaShop.tagPrice, getFormattedPrice());
-		replacements.put(AreaShop.tagDuration, getDurationString());
-		replacements.put(AreaShop.tagPlayerName, getPlayerName());
-		if(isRented()) {
-			replacements.put(AreaShop.tagRentedUntil, new SimpleDateFormat(plugin.config().getString("timeFormatChat")).format(getRentedUntil()));
-			this.setRegionFlags(plugin.config().getConfigurationSection("flagsRented"), replacements);
-		} else {
-			this.setRegionFlags(plugin.config().getConfigurationSection("flagsForRent"), replacements);
-		}		
+		setSetting("rent.duration", duration);
 	}
 	
 	/**
@@ -223,46 +256,36 @@ public class RentRegion extends GeneralRegion {
 	 * @param regionName The name of the region you want to rent
 	 * @return true if it succeeded and false if not
 	 */
-	public boolean rent(Player player) {
-		Block block = getSignLocation().getBlock();
-		
+	public boolean rent(Player player) {		
 		/* Check if the player has permission */
 		if(player.hasPermission("areashop.rent")) {	
 			boolean extend = false;
 			if(getRenter() != null && player.getUniqueId().equals(getRenter())) {
 				extend = true;
 			}
-			/* Check if the region is available for renting */
+			// Check if the region is available for renting or if the player wants to extend the rent
 			if(!isRented() || extend) {				
 				if(!extend) {
-					/* Check if the player can still rent */
-					int rentNumber = 0;
-					Iterator<RentRegion> itRent = getFileManager().getRents().iterator();
-					while(itRent.hasNext()) {
-						RentRegion next = itRent.next();
-						if(player.getUniqueId().equals(next.getRenter())) {
-							rentNumber++;
-						}
-					}
-					int buyNumber = 0;
-					Iterator<BuyRegion> itBuy = getFileManager().getBuys().iterator();
-					while(itBuy.hasNext()) {
-						BuyRegion next = itBuy.next();
-						if(player.getUniqueId().equals(next.getBuyer())) {
-							buyNumber++;
-						}
-					}
-					int maximumRents = Integer.parseInt(plugin.config().getString("maximumRents"));
-					if(maximumRents != -1 && rentNumber >= maximumRents) {
+					// Check if the player can still rent more regions
+					int maximumRents = getMaxRentRegions(player);
+					if(getCurrentRentRegions(player) >= maximumRents) {
 						plugin.message(player, "rent-maximum", maximumRents);
 						return false;
 					}
-					int maximumTotal = Integer.parseInt(plugin.config().getString("maximumTotal"));
-					if(maximumTotal != -1 && (rentNumber+buyNumber) >= maximumTotal) {
+					int maximumTotal = getMaxTotalRegions(player);
+					if(getCurrentTotalRegions(player) >= maximumTotal) {
 						plugin.message(player, "total-maximum", maximumTotal);
 						return false;
 					}
-				}				
+				}
+				
+				// Check if the player can still extend this rent
+				if(extend && !player.hasPermission("areashop.rentextendbypass")) {
+					if(getMaxExtends() >= 0 && getTimesExtended() >= getMaxExtends()) {
+						plugin.message(player, "rent-maxExtends", getMaxExtends());
+						return false;
+					}
+				}
 
 				if(plugin.getEconomy().has(player, getWorldName(), getPrice())) {
 					/* Substract the money from the players balance */
@@ -271,6 +294,13 @@ public class RentRegion extends GeneralRegion {
 						plugin.message(player, "rent-payError");
 						return false;
 					}										
+					if(!extend) {
+						// Run commands
+						runEventCommands(RegionEvent.RENTED, true);
+					} else {
+						// Run commands
+						runEventCommands(RegionEvent.EXTENDED, true);
+					}
 					
 					/* Get the time until the region will be rented */
 					Calendar calendar = Calendar.getInstance();
@@ -285,13 +315,17 @@ public class RentRegion extends GeneralRegion {
 					setRentedUntil(calendar.getTimeInMillis());
 					setRenter(player.getUniqueId());
 					
+					// Fire schematic event and updated times extended
 					if(!extend) {
-						this.handleSchematicEvent(RentEvent.RENTED);
+						this.handleSchematicEvent(RegionEvent.RENTED);
+						setTimesExtended(0);
+					} else {
+						setTimesExtended(getTimesExtended() + 1);
 					}
 					
 					/* Change the sign and the region flags */
 					updateSigns();
-					updateRegionFlags();
+					updateRegionFlags(RegionState.RENTED);
 					
 					/* Send message to the player */
 					if(extend) {
@@ -303,13 +337,20 @@ public class RentRegion extends GeneralRegion {
 					AreaShop.debug(player.getName() + " has rented region " + getName() + " for " + getFormattedPrice() + " until " + dateFull.format(calendar.getTime()));
 					
 					this.save();
+					if(!extend) {
+						// Run commands
+						this.runEventCommands(RegionEvent.RENTED, false);
+					} else {
+						// Run commands
+						this.runEventCommands(RegionEvent.EXTENDED, false);
+					}
 					return true;
 				} else {
 					/* Player has not enough money */
 					if(extend) {
-						plugin.message(player, "rent-lowMoneyExtend", plugin.formatCurrency(plugin.getEconomy().getBalance(player, block.getWorld().getName())), getFormattedPrice());
+						plugin.message(player, "rent-lowMoneyExtend", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())), getFormattedPrice());
 					} else {
-						plugin.message(player, "rent-lowMoneyRent", plugin.formatCurrency(plugin.getEconomy().getBalance(player, block.getWorld().getName())), getFormattedPrice());
+						plugin.message(player, "rent-lowMoneyRent", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())), getFormattedPrice());
 					}
 				}
 			} else {
@@ -325,80 +366,52 @@ public class RentRegion extends GeneralRegion {
 	 * Unrent a region, reset to unrented
 	 * @param regionName Region that should be unrented
 	 */
-	public void unRent(boolean giveMoneyBack) {	
+	public void unRent(boolean giveMoneyBack) {
+		// Run commands
+		this.runEventCommands(RegionEvent.UNRENTED, true);
 		/* Get the time until the region will be rented */
 		Long currentTime = Calendar.getInstance().getTimeInMillis();
 		Double timeLeft = (double) ((getRentedUntil() - currentTime));
-		double percentage = (plugin.config().getDouble("rentMoneyBack")) / 100.0;
+		double percentage = (getDoubleSetting("rent.moneyBack")) / 100.0;
 
 		Double timePeriod = (double) (getDuration());
 		double periods = timeLeft / timePeriod;
 		double moneyBack =  periods * getPrice() * percentage;
 		if(moneyBack > 0 && giveMoneyBack) {
 			/* Give back the money */
-			EconomyResponse r = plugin.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getRenter()), moneyBack);
-			if(!r.transactionSuccess()) {
-				plugin.getLogger().info("Something went wrong with paying back money while unrenting");
-			}	
+			OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());
+			if(player != null) {
+				EconomyResponse r = null;
+				boolean error = false;
+				try {
+					r = plugin.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getRenter()), moneyBack);
+				} catch(Exception e) {
+					error = true;
+				}
+				if(error || r == null || !r.transactionSuccess()) {
+					plugin.getLogger().info("Something went wrong with paying back to " + getPlayerName() + " money while unrenting region " + getName());
+				}
+			}
 		}
-
 		
 		/* Debug message */
 		AreaShop.debug(getPlayerName() + " has unrented " + getName() + ", got " + plugin.formatCurrency(moneyBack) + " money back");
 		
+		/* Update the signs and region flags */
+		handleSchematicEvent(RegionEvent.UNRENTED);
+		updateRegionFlags(RegionState.FORRENT);
+		
 		/* Remove the player and renteduntil values */
 		setRenter(null);
 		setRentedUntil(null);
+		setTimesExtended(-1);
 		
-		/* Update the signs and region flags */
-		handleSchematicEvent(RentEvent.UNRENTED);
 		updateSigns();
-		updateRegionFlags();
 		
 		this.save();
+		// Run commands
+		this.runEventCommands(RegionEvent.UNRENTED, false);
 	}
-	
-	
-	/**
-	 * Checks an event and handles saving to and restoring from schematic for it
-	 * @param type The type of event
-	 */
-	public void handleSchematicEvent(RentEvent type) {
-		// Check for the general killswitch
-		if(!plugin.config().getBoolean("enableSchematics")) {
-			return;
-		}
-		// Check the individual options
-		if("false".equalsIgnoreCase(getRestoreSetting())) {
-			return;
-		} else if("true".equalsIgnoreCase(getRestoreSetting())) {
-		} else {
-			if(!plugin.config().getBoolean("useRentRestore")) {
-				return;
-			}
-		}
-		// Get the safe and restore names		
-		String save = plugin.config().getString("rentSchematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".save");
-		if(save == null) {
-			plugin.config().getString("rentSchematicProfiles.default." + type.getValue() + ".save");
-		}
-		String restore = plugin.config().getString("rentSchematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".restore");
-		if(restore == null) {
-			plugin.config().getString("rentSchematicProfiles.default." + type.getValue() + ".restore");
-		}
-		// Save the region if needed
-		if(save != null && save.length() != 0) {
-			save = save.replace(AreaShop.tagRegionName, getName());
-			this.saveRegionBlocks(save);			
-		}
-		// Restore the region if needed
-		if(restore != null && restore.length() != 0) {
-			restore = restore.replace(AreaShop.tagRegionName, getName());
-			this.restoreRegionBlocks(restore);		
-		}
-	}
-	
-	
 
 }
 

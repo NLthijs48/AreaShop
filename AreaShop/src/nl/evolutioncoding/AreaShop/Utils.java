@@ -1,5 +1,7 @@
 package nl.evolutioncoding.AreaShop;
 
+import java.util.Collection;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -59,4 +61,36 @@ public class Utils {
 		}
 		return result;
 	}
+	
+	public static String createCommaSeparatedList(Collection<? extends Object> input) {
+		String result = "";
+		boolean first = true;
+		for(Object object : input) {
+			if(first) {
+				first = false;
+				result += object.toString();
+			} else {
+				result += ", " + object.toString();
+			}
+		}		
+		return result;
+	}
+	
+	
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

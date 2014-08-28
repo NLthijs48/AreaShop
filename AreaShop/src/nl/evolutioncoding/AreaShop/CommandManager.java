@@ -5,28 +5,38 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import nl.evolutioncoding.AreaShop.commands.AddCommand;
+import nl.evolutioncoding.AreaShop.commands.AddsignCommand;
 import nl.evolutioncoding.AreaShop.commands.BuyCommand;
-import nl.evolutioncoding.AreaShop.commands.BuypriceCommand;
-import nl.evolutioncoding.AreaShop.commands.BuyrestoreCommand;
 import nl.evolutioncoding.AreaShop.commands.CommandAreaShop;
+import nl.evolutioncoding.AreaShop.commands.DelCommand;
+import nl.evolutioncoding.AreaShop.commands.DelsignCommand;
+import nl.evolutioncoding.AreaShop.commands.FindCommand;
+import nl.evolutioncoding.AreaShop.commands.GroupaddCommand;
+import nl.evolutioncoding.AreaShop.commands.GroupdelCommand;
+import nl.evolutioncoding.AreaShop.commands.GroupinfoCommand;
+import nl.evolutioncoding.AreaShop.commands.GrouplistCommand;
 import nl.evolutioncoding.AreaShop.commands.HelpCommand;
 import nl.evolutioncoding.AreaShop.commands.InfoCommand;
 import nl.evolutioncoding.AreaShop.commands.ReloadCommand;
 import nl.evolutioncoding.AreaShop.commands.RentCommand;
 import nl.evolutioncoding.AreaShop.commands.RentdurationCommand;
-import nl.evolutioncoding.AreaShop.commands.RentpriceCommand;
-import nl.evolutioncoding.AreaShop.commands.RentrestoreCommand;
+import nl.evolutioncoding.AreaShop.commands.SchematiceventCommand;
 import nl.evolutioncoding.AreaShop.commands.SellCommand;
+import nl.evolutioncoding.AreaShop.commands.SetpriceCommand;
+import nl.evolutioncoding.AreaShop.commands.SetrestoreCommand;
 import nl.evolutioncoding.AreaShop.commands.SetteleportCommand;
 import nl.evolutioncoding.AreaShop.commands.TeleportCommand;
 import nl.evolutioncoding.AreaShop.commands.UnrentCommand;
 import nl.evolutioncoding.AreaShop.commands.UpdatebuysCommand;
 import nl.evolutioncoding.AreaShop.commands.UpdaterentsCommand;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
 	AreaShop plugin;
@@ -47,14 +57,22 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new InfoCommand(plugin));
 		commands.add(new TeleportCommand(plugin));
 		commands.add(new SetteleportCommand(plugin));
+		commands.add(new FindCommand(plugin));
 		commands.add(new UpdaterentsCommand(plugin));
 		commands.add(new UpdatebuysCommand(plugin));
-		commands.add(new RentrestoreCommand(plugin));
-		commands.add(new BuyrestoreCommand(plugin));
-		commands.add(new RentpriceCommand(plugin));
-		commands.add(new BuypriceCommand(plugin));
+		commands.add(new SetrestoreCommand(plugin));
+		commands.add(new SetpriceCommand(plugin));
 		commands.add(new RentdurationCommand(plugin));
 		commands.add(new ReloadCommand(plugin));
+		commands.add(new GroupaddCommand(plugin));
+		commands.add(new GroupdelCommand(plugin));
+		commands.add(new GrouplistCommand(plugin));
+		commands.add(new GroupinfoCommand(plugin));
+		commands.add(new SchematiceventCommand(plugin));
+		commands.add(new AddCommand(plugin));
+		commands.add(new DelCommand(plugin));
+		commands.add(new AddsignCommand(plugin));
+		commands.add(new DelsignCommand(plugin));
 		
 		/* Register commands in bukkit */
 		plugin.getCommand("AreaShop").setExecutor(this);	
@@ -87,7 +105,11 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		
 		/* Send the messages to the target */
 		for(String message : messages) {
-			target.sendMessage(plugin.fixColors(message));
+			if(!plugin.config().getBoolean("useColorsInConsole") && !(target instanceof Player)) {
+				target.sendMessage(ChatColor.stripColor(plugin.fixColors(message)));
+			} else {
+				target.sendMessage(plugin.fixColors(message));
+			}
 		}
 	}
 	

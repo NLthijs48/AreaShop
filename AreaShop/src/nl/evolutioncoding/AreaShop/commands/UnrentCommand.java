@@ -1,6 +1,10 @@
 package nl.evolutioncoding.AreaShop.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
 import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.command.Command;
@@ -30,11 +34,26 @@ public class UnrentCommand extends CommandAreaShop {
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
-		if(args.length <= 1 || args[1] == null) {
-			plugin.message(sender, "unrent-help");
-			return;
-		}		
-		RentRegion rent = plugin.getFileManager().getRent(args[1]);
+		RentRegion rent = null;
+		if(args.length <= 1) {
+			if(sender instanceof Player) {
+				// get the region by location
+				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
+				if(regions.size() != 1) {
+					plugin.message(sender, "unrent-help");
+					return;
+				} else {
+					if(regions.get(0).isRentRegion()) {
+						rent = (RentRegion)regions.get(0);
+					}
+				}				
+			} else {
+				plugin.message(sender, "unrent-help");
+				return;
+			}			
+		} else {
+			rent = plugin.getFileManager().getRent(args[1]);
+		}
 		if(rent == null) {
 			plugin.message(sender, "unrent-notRegistered");
 			return;
@@ -58,6 +77,19 @@ public class UnrentCommand extends CommandAreaShop {
 				plugin.message(sender, "unrent-noPermission");
 			}
 		}			
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		ArrayList<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			for(RentRegion region : plugin.getFileManager().getRents()) {
+				if(region.isRented()) {
+					result.add(region.getName());
+				}
+			}
+		}
+		return result;
 	}
 }
 

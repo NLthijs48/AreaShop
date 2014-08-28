@@ -1,7 +1,11 @@
 package nl.evolutioncoding.AreaShop.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.evolutioncoding.AreaShop.AreaShop;
 import nl.evolutioncoding.AreaShop.regions.BuyRegion;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -30,11 +34,26 @@ public class SellCommand extends CommandAreaShop {
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
-		if(args.length <= 1 || args[1] == null) {
-			plugin.message(sender, "sell-help");
-			return;
+		BuyRegion buy = null;
+		if(args.length <= 1) {
+			if(sender instanceof Player) {
+				// get the region by location
+				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
+				if(regions.size() != 1) {
+					plugin.message(sender, "sell-help");
+					return;
+				} else {
+					if(regions.get(0).isBuyRegion()) {
+						buy = (BuyRegion)regions.get(0);
+					}
+				}				
+			} else {
+				plugin.message(sender, "sell-help");
+				return;
+			}			
+		} else {
+			buy = plugin.getFileManager().getBuy(args[1]);
 		}
-		BuyRegion buy = plugin.getFileManager().getBuy(args[1]);
 		if(buy == null) {
 			plugin.message(sender, "sell-notRegistered");
 			return;
@@ -58,6 +77,19 @@ public class SellCommand extends CommandAreaShop {
 				plugin.message(sender, "sell-noPermission");
 			}									
 		}		
+	}
+	
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		ArrayList<String> result = new ArrayList<String>();
+		if(toComplete == 2) {
+			for(BuyRegion region : plugin.getFileManager().getBuys()) {
+				if(region.isSold()) {
+					result.add(region.getName());
+				}
+			}
+		}
+		return result;
 	}
 }
 

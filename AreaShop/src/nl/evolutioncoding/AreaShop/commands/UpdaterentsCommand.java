@@ -1,5 +1,8 @@
 package nl.evolutioncoding.AreaShop.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.evolutioncoding.AreaShop.AreaShop;
 
 import org.bukkit.command.Command;
@@ -39,4 +42,9 @@ public class UpdaterentsCommand extends CommandAreaShop {
 		}
 	}
 
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start) {
+		ArrayList<String> result = new ArrayList<String>();
+		return result;
+	}
 }

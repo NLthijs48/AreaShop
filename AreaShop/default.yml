@@ -13,29 +13,13 @@ general:
   signProfile: 'default'
   ## The profile for the WorldGuard flags as specified in the config
   flagProfile: 'default'
-  runCommands:
-    created:
-      before:
-      after:
-        - "say An AreaShop region has been created: %region%"
-    deleted:
-      before:
-      after:
-    rented:
-      before:
-      after:
-    extended:
-      before:
-      after:
-    unrented:
-      before:
-      after:
-    bought:
-      before:
-      after:
-    sold:
-      before:
-      after:
+  ## The y location within the region to start searching for safe teleport spots (x and z will be in the middle of the region)
+  ## Possible values: bottom, middle, top
+  teleportLocationY: bottom
+  ## If true the teleportation algorithm only allows telportation to inside the region, otherwise it will expand algorithm
+  ## a cube from the starting point to check for safe spots (then it could end outside the region)
+  ## If you set a teleport location outside of the region with /as settp then setting this to true breaks that teleport (players cannot use it)
+  teleportIntoRegion: true
 
 ########## RENTING ##########
 rent:

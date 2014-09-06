@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
 import nl.evolutioncoding.AreaShop.regions.RentRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class RentdurationCommand extends CommandAreaShop {
 
@@ -34,26 +36,45 @@ public class RentdurationCommand extends CommandAreaShop {
 			plugin.message(sender, "rentduration-noPermission");
 			return;
 		}
-		if(args.length < 4 || args[1] == null || args[2] == null || args[3] == null) {
+		if(args.length < 3 || args[1] == null || args[2] == null) {
 			plugin.message(sender, "rentduration-help");
 			return;
 		}
-		RentRegion rent = plugin.getFileManager().getRent(args[1]);
+		RentRegion rent = null;
+		if(args.length <= 3) {
+			if(sender instanceof Player) {
+				// get the region by location
+				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
+				if(regions.size() != 1) {
+					plugin.message(sender, "rentduration-help");
+					return;
+				} else {
+					if(regions.get(0).isRentRegion()) {
+						rent = (RentRegion)regions.get(0);
+					}
+				}				
+			} else {
+				plugin.message(sender, "rentduration-help");
+				return;
+			}			
+		} else {
+			rent = plugin.getFileManager().getRent(args[3]);
+		}
 		if(rent == null) {
-			plugin.message(sender, "rentduration-notRegistered", args[1]);
+			plugin.message(sender, "rentduration-notRegistered", args[3]);
 			return;
 		}
 		try {
-			Integer.parseInt(args[2]);
+			Integer.parseInt(args[1]);
 		} catch(NumberFormatException e) {
-			plugin.message(sender, "rentduration-wrongAmount", args[2]);
+			plugin.message(sender, "rentduration-wrongAmount", args[1]);
 			return;
 		}
-		if(!plugin.checkTimeFormat(args[2] + " " + args[3])) {
-			plugin.message(sender, "rentduration-wrongFormat", args[2]+" "+args[3]);
+		if(!plugin.checkTimeFormat(args[1] + " " + args[2])) {
+			plugin.message(sender, "rentduration-wrongFormat", args[1]+" "+args[2]);
 			return;
 		}					
-		rent.setDuration(args[2]+" "+args[3]);
+		rent.setDuration(args[1]+" "+args[2]);
 		rent.updateRegionFlags();
 		rent.updateSigns();
 		rent.save();

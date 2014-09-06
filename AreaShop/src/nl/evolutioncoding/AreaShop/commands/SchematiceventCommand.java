@@ -33,6 +33,11 @@ public class SchematiceventCommand extends CommandAreaShop {
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.schematicevents")) {
+			plugin.message(sender, "schemevent-noPermission");
+			return;
+		}
+		
 		if(args.length < 3 || args[1] == null || args[2] == null) {
 			plugin.message(sender, "schemevent-help");
 			return;

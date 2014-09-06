@@ -856,7 +856,8 @@ public abstract class GeneralRegion {
 			if(region != null) {
 				// Set to block in the middle, y configured in the config
 				Vector middle = Vector.getMidpoint(region.getMaximumPoint(), region.getMinimumPoint());
-				String configSetting = plugin.config().getString("teleportLocationY");
+				String configSetting = getStringSetting("general.teleportLocationY");
+				AreaShop.debug("teleportLocationY = " + configSetting);
 				if("bottom".equalsIgnoreCase(configSetting)) {
 					middle = middle.setY(region.getMinimumPoint().getBlockY());
 				} else if("top".equalsIgnoreCase(configSetting)) {
@@ -869,6 +870,10 @@ public abstract class GeneralRegion {
 				return false;
 			}
 		}
+		boolean insideRegion = getBooleanSetting("general.teleportIntoRegion");
+		AreaShop.debug("insideRegion = " + insideRegion);
+		int maxTries = plugin.config().getInt("maximumTries");
+		AreaShop.debug("maxTries = " + maxTries);
 		
 		// set location in the center of the block
 		startLocation.setX(startLocation.getBlockX() + 0.5);
@@ -878,18 +883,26 @@ public abstract class GeneralRegion {
 		// radius around that (until no block in the region is found at all cube sides)
 		Location saveLocation = startLocation;
 		int radius = 1;
-		boolean done = isSave(saveLocation);
+		boolean blocksInRegion = region.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
+		boolean done = isSave(saveLocation) && ((blocksInRegion && insideRegion) || (!insideRegion));
 		boolean north=false, east=false, south=false, west=false, top=false, bottom=false;
 		boolean track;
-		while(!done) {
+		while(((blocksInRegion && insideRegion) || (!insideRegion)) && !done) {
+			blocksInRegion = false;
 			// North side
 			track = false;
 			for(int x=-radius+1; x<=radius && !done && !north; x++) {
 				for(int y=-radius+1; y<radius && !done; y++) {
 					saveLocation = startLocation.clone().add(x, y, -radius);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if(saveLocation.getBlockY()>256 || saveLocation.getBlockY()<0) {
+						continue;
+					}
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 			}
 			north = north || !track;
@@ -899,9 +912,15 @@ public abstract class GeneralRegion {
 			for(int z=-radius+1; z<=radius && !done && !east; z++) {
 				for(int y=-radius+1; y<radius && !done; y++) {
 					saveLocation = startLocation.clone().add(radius, y, z);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if(saveLocation.getBlockY()>256 || saveLocation.getBlockY()<0) {
+						continue;
+					}
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 			}
 			east = east || !track;
@@ -911,9 +930,15 @@ public abstract class GeneralRegion {
 			for(int x=radius-1; x>=-radius && !done && !south; x--) {
 				for(int y=-radius+1; y<radius && !done; y++) {
 					saveLocation = startLocation.clone().add(x, y, radius);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if(saveLocation.getBlockY()>256 || saveLocation.getBlockY()<0) {
+						continue;
+					}
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 			}
 			south = south || !track;
@@ -923,50 +948,74 @@ public abstract class GeneralRegion {
 			for(int z=radius-1; z>=-radius && !done && !west; z--) {
 				for(int y=-radius+1; y<radius && !done; y++) {
 					saveLocation = startLocation.clone().add(-radius, y, z);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if(saveLocation.getBlockY()>256 || saveLocation.getBlockY()<0) {
+						continue;
+					}
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 			}
-			west = west || !track;
+			west = west || !west;
 			
 			// Top side
 			track = false;
 			// Middle block of the top
+			if((startLocation.getBlockY() + radius) > 256) {
+				top = true;
+			}
 			if(!done && !top) {
 				saveLocation = startLocation.clone().add(0, radius, 0);
-				done = isSave(saveLocation);
-				track = true;
-				checked++;
+				if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					checked++;
+					done = isSave(saveLocation) || checked > maxTries;
+					blocksInRegion = true;
+					track = true;
+				}
 			}
 			for(int r=1; r<=radius && !done && !top; r++) {
 				// North
 				for(int x=-r+1; x<=r && !done; x++) {
 					saveLocation = startLocation.clone().add(x, radius, -r);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 				// East
 				for(int z=-r+1; z<=r && !done; z++) {
 					saveLocation = startLocation.clone().add(r, radius, z);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 				// South side
 				for(int x=r-1; x>=-r && !done; x--) {
 					saveLocation = startLocation.clone().add(x, radius, r);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 				// West side
 				for(int z=r-1; z>=-r && !done; z--) {
 					saveLocation = startLocation.clone().add(-r, radius, z);
-					done = isSave(saveLocation);
-					track = true;		
-					checked++;
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}			
 			}
 			top = top || !track;
@@ -974,40 +1023,58 @@ public abstract class GeneralRegion {
 			// Bottom side
 			track = false;
 			// Middle block of the bottom
+			if(startLocation.getBlockY() - radius < 0) {
+				bottom = true;
+			}
 			if(!done && !bottom) {
 				saveLocation = startLocation.clone().add(0, -radius, 0);
-				done = isSave(saveLocation);
-				track = true;
-				checked++;
+				if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					checked++;
+					done = isSave(saveLocation) || checked > maxTries;
+					blocksInRegion = true;
+					track = true;
+				}
 			}
 			for(int r=1; r<=radius && !done && !bottom; r++) {
 				// North
 				for(int x=-r+1; x<=r && !done; x++) {
 					saveLocation = startLocation.clone().add(x, -radius, -r);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 				// East
 				for(int z=-r+1; z<=r && !done; z++) {
 					saveLocation = startLocation.clone().add(r, -radius, z);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 				// South side
 				for(int x=r-1; x>=-r && !done; x--) {
 					saveLocation = startLocation.clone().add(x, -radius, r);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}
 				// West side
 				for(int z=r-1; z>=-r && !done; z--) {
 					saveLocation = startLocation.clone().add(-r, -radius, z);
-					done = isSave(saveLocation);
-					track = true;
-					checked++;
+					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+						checked++;
+						done = isSave(saveLocation) || checked > maxTries;
+						blocksInRegion = true;
+						track = true;
+					}
 				}			
 			}
 			bottom = bottom || !track;
@@ -1015,14 +1082,14 @@ public abstract class GeneralRegion {
 			// Increase cube radius
 			radius++;
 		}
-		if(done) {			
+		if(done && isSave(saveLocation)) {
 			plugin.message(player, "teleport-success", getName());
 			player.teleport(saveLocation);
-			AreaShop.debug("Found location: " + saveLocation.toString() + " Tries: " + checked);
+			AreaShop.debug("Found location: " + saveLocation.toString() + " Tries: " + (checked-1));
 			return true;
 		} else {
-			plugin.message(player, "teleport-noSafe", getName());
-			AreaShop.debug("No location found, checked " + checked + " spots");
+			plugin.message(player, "teleport-noSafe", getName(), checked-1, maxTries);
+			AreaShop.debug("No location found, checked " + (checked-1) + " spots of max " + maxTries);
 			return false;
 		}	
 	}
@@ -1089,7 +1156,7 @@ public abstract class GeneralRegion {
 			if(cannotSpawnBeside.contains(material)) {
 				return false;
 			}
-		}		
+		}
 		return true;
 	}
 	

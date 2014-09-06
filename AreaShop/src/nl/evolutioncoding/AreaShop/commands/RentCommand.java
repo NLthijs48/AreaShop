@@ -55,6 +55,7 @@ public class RentCommand extends CommandAreaShop {
 				} else {
 					((RentRegion)regions.get(0)).rent(player);
 				}
+				plugin.saveConfig();
 			}
 		}	
 	}

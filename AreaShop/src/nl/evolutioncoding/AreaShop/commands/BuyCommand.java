@@ -50,7 +50,7 @@ public class BuyCommand extends CommandAreaShop {
 			if(regions.size() != 1) {
 				plugin.message(sender, "buy-help");
 			} else {
-				if(!regions.get(0).isRentRegion()) {
+				if(!regions.get(0).isBuyRegion()) {
 					plugin.message(sender, "buy-notBuyable");
 				} else {
 					((BuyRegion)regions.get(0)).buy(player);

@@ -20,6 +20,8 @@ language: EN
 enableSchematics: true
 ## Maximum number of blocks to save to or restore from a .schemetic
 maximumBlocks: 1000000
+## Maximum number of locations the teleport function should check to find a safe spot
+maximumTries: 50000
 ## Enable sending stats to http://mcstats.org/ (Metrics plugin)
 sendStats: true
 ## Use colors when sending messages to console and log files
@@ -28,9 +30,6 @@ useColorsInConsole: false
 postCommandErrors: true
 ## Version of the config, do not change!
 version: 2.0.0
-## The y location within the region to start searching for safe teleport spots (x and z will be in the middle of the region)
-## Possible values: bottom, middle, top
-teleportLocationY: bottom
 ## The different tags you can write on the sign to trigger the plugin
 signTags:
   ## Tag for adding a rent region

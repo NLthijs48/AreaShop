@@ -36,10 +36,10 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.data.DataException;
+import com.sk89q.worldedit.extension.factory.PatternFactory;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.flags.BooleanFlag;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.DoubleFlag;
@@ -51,6 +51,7 @@ import com.sk89q.worldguard.protection.flags.SetFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.flags.StringFlag;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
@@ -559,13 +560,10 @@ public abstract class GeneralRegion {
 		
 		// The path to save the schematic
 		File saveFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
-		
-		LocalSession localSession = new LocalSession(plugin.getWorldEdit().getLocalConfiguration());
 		editSession.enableQueue();
 		try {
-			localSession.setClipboard(SchematicFormat.MCEDIT.load(saveFile));
-			localSession.getClipboard().place(editSession, origin, false);
-		} catch (MaxChangedBlocksException | EmptyClipboardException | IOException | DataException e) {
+			SchematicFormat.MCEDIT.load(saveFile).place(editSession, origin, false);
+		} catch (MaxChangedBlocksException | IOException | DataException e) {
 			result = false;
 		}
 		editSession.flushQueue();
@@ -754,7 +752,7 @@ public abstract class GeneralRegion {
 
 		try {
 			worldGuard.getRegionManager(getWorld()).save();
-		} catch (ProtectionDatabaseException e) {
+		} catch (StorageException e) {
 			plugin.getLogger().info("Error: regions could not be saved");
 		}
 		return result;

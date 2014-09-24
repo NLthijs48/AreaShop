@@ -6,7 +6,8 @@
 ##############################################
 
 ########## GENERAL ##########
-## Chatprefix used for all messages in the chat
+## Chatprefix used for all messages in the chat. Also check the 'greeting' lines in the 'flagProfiles' section, 
+## these also contain the prefix and you may want to change those to
 chatPrefix: '&2[AreaShop]&r '
 ## The characters used for the prices of regions, will appear before the number, for the euro character use '%euro%'
 moneyCharacter: '$'

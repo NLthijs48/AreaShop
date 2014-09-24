@@ -1,9 +1,12 @@
 package nl.evolutioncoding.AreaShop;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +14,11 @@ import java.util.Set;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.google.common.base.Charsets;
+
 public class LanguageManager {
 	private AreaShop plugin = null;
-	private String languages[] = {"EN", "NL"};
+	private String languages[] = {"EN", "NL", "FR"};
 	private HashMap<String, String> currentLanguage, defaultLanguage;
 	
 	/**
@@ -84,26 +89,38 @@ public class LanguageManager {
 		/* Save the current language file to the HashMap */
 		currentLanguage = new HashMap<String, String>();		
 		File file = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + File.separator + plugin.config().getString("language") + ".yml");
-		ymlFile = YamlConfiguration.loadConfiguration(file);
-		map = ymlFile.getValues(true);
-		set = map.keySet();
+		InputStreamReader reader = null;
 		try {
-			for(String key : set) {
-				currentLanguage.put(key, (String)map.get(key));
-			}
-		} catch(ClassCastException e) {}
+			reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
+		} catch (FileNotFoundException e1) {}
+		if(reader != null) {
+			ymlFile = YamlConfiguration.loadConfiguration(reader);
+			map = ymlFile.getValues(true);
+			set = map.keySet();
+			try {
+				for(String key : set) {
+					currentLanguage.put(key, (String)map.get(key));
+				}
+			} catch(ClassCastException e) {}
+		}
 		
 		/* Save the default strings to the HashMap */
 		defaultLanguage = new HashMap<String, String>();
 		File standard = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + "/" + languages[0]+ ".yml");
-        ymlFile = YamlConfiguration.loadConfiguration(standard);   
-        map = ymlFile.getValues(true);
-		set = map.keySet();
+		InputStreamReader reader2 = null;
 		try {
-			for(String key : set) {
-				defaultLanguage.put(key, (String)map.get(key));
-			}
-		} catch(ClassCastException e) {}
+			reader2 = new InputStreamReader(new FileInputStream(standard), Charsets.UTF_8);
+		} catch (FileNotFoundException e1) {}
+		if(reader2 != null) {
+	        ymlFile = YamlConfiguration.loadConfiguration(reader2);   
+	        map = ymlFile.getValues(true);
+			set = map.keySet();
+			try {
+				for(String key : set) {
+					defaultLanguage.put(key, (String)map.get(key));
+				}
+			} catch(ClassCastException e) {}
+		}
 	}
 	
 	/**

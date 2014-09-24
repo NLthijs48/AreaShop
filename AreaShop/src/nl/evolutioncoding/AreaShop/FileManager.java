@@ -813,10 +813,14 @@ public class FileManager {
 			saveVersions();			
 		}
 		
-		
+		// Separate try-catch blocks to try them all individually (don't stop after 1 has failed)
 		try {
 			Files.move(new File(rentPath + ".old"), new File(oldFolderPath + "rents.old"));
+		} catch (Exception e) {}
+		try {
 			Files.move(new File(buyPath + ".old"), new File(oldFolderPath + "buys.old"));
+		} catch (Exception e) {}
+		try {
 			Files.move(new File(plugin.getDataFolder() + File.separator + "config.yml"), new File(oldFolderPath + "config.yml"));
 		} catch (Exception e) {}
 		

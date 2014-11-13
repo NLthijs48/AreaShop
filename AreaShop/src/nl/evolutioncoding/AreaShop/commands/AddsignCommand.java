@@ -1,12 +1,12 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
-import nl.evolutioncoding.AreaShop.Utils;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -86,7 +86,7 @@ public class AddsignCommand extends CommandAreaShop {
 		String profile = null;
 		if(args.length > 2) {
 			profile = args[2];
-			Set<String> profiles = plugin.config().getConfigurationSection("signProfiles").getKeys(false);
+			Set<String> profiles = plugin.getConfig().getConfigurationSection("signProfiles").getKeys(false);
 			if(!profiles.contains(profile)) {
 				plugin.message(sender, "addsign-wrongProfile", Utils.createCommaSeparatedList(profiles));
 				return;
@@ -105,7 +105,7 @@ public class AddsignCommand extends CommandAreaShop {
 			plugin.message(sender, "addsign-successProfile", region.getName(), profile);
 		}
 		region.updateSigns();
-		region.save();
+		region.saveRequired();
 	}
 	
 	@Override
@@ -114,7 +114,7 @@ public class AddsignCommand extends CommandAreaShop {
 		if(toComplete == 2) {
 			result.addAll(plugin.getFileManager().getRegionNames());
 		} else if(toComplete == 3) {
-			result.addAll(plugin.config().getStringList("signProfiles"));
+			result.addAll(plugin.getConfig().getStringList("signProfiles"));
 		}
 		return result;
 	}

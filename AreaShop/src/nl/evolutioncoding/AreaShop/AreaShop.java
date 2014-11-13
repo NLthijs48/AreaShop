@@ -1,6 +1,8 @@
-package nl.evolutioncoding.AreaShop;
+package nl.evolutioncoding.areashop;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -10,12 +12,13 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -34,7 +37,6 @@ public final class AreaShop extends JavaPlugin {
 	private FileManager fileManager = null;
 	private LanguageManager languageManager = null;
 	private CommandManager commandManager = null;
-	private boolean configOk = false;
 	private boolean debug = false;
 	private String chatprefix = null;
 	
@@ -45,6 +47,7 @@ public final class AreaShop extends JavaPlugin {
 	public static final String regionsFolder = "regions";
 	public static final String groupsFile = "groups.yml";
 	public static final String defaultFile = "default.yml";	
+	public static final String configFile = "config.yml";	
 	public static final String versionFile = "versions";
 	
 	/* Euro tag for in the config */
@@ -64,6 +67,10 @@ public final class AreaShop extends JavaPlugin {
 	public static final String tagDuration = "%duration%";
 	public static final String tagRentedUntil = "%until%";
 	public static final String tagRentedUntilShort = "%untilshort%";
+	public static final String tagWidth = "%width%"; // x-axis
+	public static final String tagHeight = "%height%"; // y-axis
+	public static final String tagDepth = "%depth%"; // z-axis
+	public static final String tagTimeLeft = "%timeleft%";
 	
 	public static AreaShop getInstance() {
 		return AreaShop.instance;
@@ -72,18 +79,14 @@ public final class AreaShop extends JavaPlugin {
 	/**
 	 * Called on start or reload of the server
 	 */
-	public void onEnable(){
+	public void onEnable() {
 		AreaShop.instance = this;
 		boolean error = false;
-	
-		/* Check the config, loads default if errors */
-		debug = this.getConfig().getBoolean("debug");
-		configOk = true;
 		
 		/* Check if WorldGuard is present */
 		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
 	    if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
-	    	this.getLogger().info("Error: WorldGuard plugin is not present or has not loaded correctly");
+	    	this.getLogger().severe("WorldGuard plugin is not present or has not loaded correctly");
 	    	error = true;
 	    } else {
 		    worldGuard = (WorldGuardPlugin)plugin;
@@ -92,7 +95,7 @@ public final class AreaShop extends JavaPlugin {
 		/* Check if WorldEdit is present */
 		plugin = getServer().getPluginManager().getPlugin("WorldEdit");
 	    if (plugin == null || !(plugin instanceof WorldEditPlugin)) {
-	    	this.getLogger().info("Error: WorldEdit plugin is not present or has not loaded correctly");
+	    	this.getLogger().severe("WorldEdit plugin is not present or has not loaded correctly");
 	    	error = true;
 	    } else {
 		    worldEdit = (WorldEditPlugin)plugin;
@@ -101,43 +104,38 @@ public final class AreaShop extends JavaPlugin {
 	    /* Check if Vault is present */
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
         if (economyProvider == null) {
-        	this.getLogger().info("Error: Vault plugin is not present or has not loaded correctly");
+        	this.getLogger().severe("Vault plugin is not present or has not loaded correctly");
         	error = true;
         } else {
             economy = economyProvider.getProvider();
         }
         
-	    /* Create a LanguageMananager */
-	    languageManager = new LanguageManager(this);
-	    
-	    /* Save the chatPrefix */
-	    chatprefix = this.config().getString("chatPrefix");
-
 		/* Load all data from files and check versions */
 	    fileManager = new FileManager(this);
 	    error = error & !fileManager.loadFiles();
-	    fileManager.checkRents();
 		
-		/* Save a copy of the default config.yml if one is not present */
-		this.saveDefaultConfig();
+	    // Set the debug and chatprefix variables
+		debug = this.getConfig().getBoolean("debug");
+	    chatprefix = this.getConfig().getString("chatPrefix");
+        
+	    /* Create a LanguageMananager */
+	    languageManager = new LanguageManager(this);
 	    
 		if(error) {
-			this.getLogger().info("The plugin has not started, fix the errors listed above");
+			this.getLogger().severe("The plugin has not started, fix the errors listed above");
 		} else {
 			// Register the event listeners
 			this.getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 			this.getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
 			this.getServer().getPluginManager().registerEvents(new SignClickListener(this), this);			
 			
-	        // Start thread for checking renting
-	        int checkDelay = Integer.parseInt(this.config().getString("checkDelay"))*20;
-	        new RentCheck(this).runTaskTimer(this, checkDelay, checkDelay);
-		    
-		    // Bind commands for this plugin
+			setupTasks();
+	        
+		    // Startup the CommandManager (registers itself for the command)
 	        commandManager = new CommandManager(this);
 			
 	        // Enable Metrics if config allows it
-			if(this.config().getBoolean("sendStats")) {
+			if(this.getConfig().getBoolean("sendStats")) {
 				this.startMetrics();
 			}
 			
@@ -150,13 +148,14 @@ public final class AreaShop extends JavaPlugin {
 	 *  Called on shutdown or reload of the server 
 	 */
 	public void onDisable() {
+		fileManager.saveRequiredFiles();		
+		Bukkit.getServer().getScheduler().cancelTasks(this);
 		
 		/* set variables to null to prevent memory leaks */
 		worldGuard = null;
 		economy = null;
 		fileManager = null;
 		languageManager = null;
-		configOk = false;
 		debug = false;
 	}
  
@@ -198,10 +197,18 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public Economy getEconomy() {
 	    return economy;
-	}		
+	}	
 	
 	/**
-	 * Method to get the FileManager
+	 * Get the current chatPrefix
+	 * @return
+	 */
+	public String getChatPrefix() {
+		return chatprefix;
+	}
+	
+	/**
+	 * Method to get the FileManager (loads/save regions and can be used to get regions)
 	 * @return The fileManager
 	 */
 	public FileManager getFileManager() {
@@ -213,13 +220,61 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public void registerDynamicPermissions() {
 		// Register limit groups of amount of regions a player can have
-		for(String group : config().getConfigurationSection("limitGroups").getKeys(false)) {
-			if(!"unlimited".equals(group) && !"default".equals(group)) {
+		for(String group : getConfig().getConfigurationSection("limitGroups").getKeys(false)) {
+			if(!"default".equals(group)) {
 				Permission perm = new Permission("areashop.limits." + group);
 				Bukkit.getPluginManager().addPermission(perm);
 			}
 		}	
 		Bukkit.getPluginManager().recalculatePermissionDefaults(Bukkit.getPluginManager().getPermission("playerwarps.limits"));
+	}
+	
+	/**
+	 * Register all required tasks
+	 */
+	public void setupTasks() {
+        // Rent expiration timer
+        int checkDelay = this.getConfig().getInt("expiration.delay")*20;
+        final AreaShop finalPlugin = this;
+        if(checkDelay > 0) {
+	        new BukkitRunnable() {
+				@Override
+				public void run() {
+					finalPlugin.getFileManager().checkRents();
+				}
+	        }.runTaskTimer(this, checkDelay, checkDelay);
+        }
+	    // Inactive unrenting/selling timer
+        int inactiveCheck = this.getConfig().getInt("inactive.delay")*60*20;
+        if(inactiveCheck > 0) {
+	        new BukkitRunnable() {
+				@Override
+				public void run() {
+					finalPlugin.getFileManager().checkForInactiveRegions();
+				}
+	        }.runTaskTimer(this, inactiveCheck, inactiveCheck);	     
+        }	        
+	    // Periodic updating of signs for timeleft tags
+        int periodicUpdate = this.getConfig().getInt("signs.delay")*20;
+        if(periodicUpdate > 0) {
+	        new BukkitRunnable() {
+				@Override
+				public void run() {
+					finalPlugin.getFileManager().performPeriodicSignUpdate();
+				}
+	        }.runTaskTimer(this, periodicUpdate, periodicUpdate);	     
+        }
+        // Saving regions and group settings
+        int saveFiles = this.getConfig().getInt("saving.delay")*20*60;
+        if(saveFiles > 0) {
+	        new BukkitRunnable() {
+				@Override
+				public void run() {
+					finalPlugin.getFileManager().saveRequiredFiles();
+					AreaShop.debug("Saving...");
+				}
+	        }.runTaskTimer(this, saveFiles, saveFiles);	     
+        }
 	}
 	
 	/**
@@ -243,13 +298,13 @@ public final class AreaShop extends JavaPlugin {
 					((Player)target).sendMessage(langString);
 				}
 			} else if(target instanceof CommandSender) {
-				if(!config().getBoolean("useColorsInConsole")) {
+				if(!getConfig().getBoolean("useColorsInConsole")) {
 					langString = ChatColor.stripColor(langString);
 				}
 				((CommandSender)target).sendMessage(langString);
 			}	
 			else if(target instanceof Logger) {
-				if(!config().getBoolean("useColorsInConsole")) {
+				if(!getConfig().getBoolean("useColorsInConsole")) {
 					langString = ChatColor.stripColor(langString);
 				}
 				((Logger)target).info(langString);
@@ -283,7 +338,7 @@ public final class AreaShop extends JavaPlugin {
 			result = result.replaceAll("&r", ChatColor.RESET.toString());	
 			result = result.replaceAll("€", "\u20AC");
 		}		
-		return result;		
+		return result;
 	}
 	
 	/**
@@ -291,17 +346,20 @@ public final class AreaShop extends JavaPlugin {
 	 * @return Currency character format string
 	 * @param amount Amount of money to format
 	 */
-	public String formatCurrency(String amount) {
-		String before = this.config().getString("moneyCharacter");
-		before = before.replace(currencyEuro, "\u20ac");
-		String after = this.config().getString("moneyCharacterAfter");
-		after = after.replace(currencyEuro, "\u20ac");
-		return before + amount + after;
-	}
 	public String formatCurrency(double amount) {
-		return this.formatCurrency("" + amount);
-	}
-	
+		String before = this.getConfig().getString("moneyCharacter");
+		before = before.replace(currencyEuro, "\u20ac");
+		String after = this.getConfig().getString("moneyCharacterAfter");
+		after = after.replace(currencyEuro, "\u20ac");
+		BigDecimal bigDecimal = new BigDecimal(amount);
+	    bigDecimal = bigDecimal.setScale(getConfig().getInt("fractionalNumbers"), RoundingMode.HALF_UP);
+	    amount = bigDecimal.doubleValue();
+		if(getConfig().getBoolean("hideEmptyFractionalPart") && (amount%1.0) == 0.0) {
+			return before + ((int)amount) + after;
+		} else {
+			return before + bigDecimal.toString() + after;
+		}
+	}	
 	
 	/**
 	 * Function for quitting the plugin, NOT USED ATM
@@ -315,12 +373,9 @@ public final class AreaShop extends JavaPlugin {
 	/**
 	 * Return the config configured by the user or the default
 	 */
-	public Configuration config() {
-		if(configOk) {
-			return this.getConfig();
-		} else {
-			return this.getConfig().getDefaults();
-		}		
+	@Override
+	public YamlConfiguration getConfig() {
+		return fileManager.getConfig();
 	}
 	
 	/**
@@ -349,11 +404,11 @@ public final class AreaShop extends JavaPlugin {
 		/* Check if the suffix is one of these values */
 		String suffix = time.substring(time.indexOf(' ')+1, time.length());
 		ArrayList<String> identifiers = new ArrayList<String>();
-		identifiers.addAll(this.config().getStringList("minutes"));
-		identifiers.addAll(this.config().getStringList("hours"));
-		identifiers.addAll(this.config().getStringList("days"));
-		identifiers.addAll(this.config().getStringList("months"));
-		identifiers.addAll(this.config().getStringList("years"));
+		identifiers.addAll(this.getConfig().getStringList("minutes"));
+		identifiers.addAll(this.getConfig().getStringList("hours"));
+		identifiers.addAll(this.getConfig().getStringList("days"));
+		identifiers.addAll(this.getConfig().getStringList("months"));
+		identifiers.addAll(this.getConfig().getStringList("years"));
 		if(!identifiers.contains(suffix)) {
 			return false;
 		}
@@ -374,13 +429,11 @@ public final class AreaShop extends JavaPlugin {
 	}
 	
 	/**
-	 * Reload the config of the plugin
+	 * Reload all files of the plugin
 	 */
 	public void reload() {
-		this.saveDefaultConfig();
-		this.reloadConfig();
-		configOk = true;
-		chatprefix = this.config().getString("chatPrefix");
+		fileManager.saveRequiredFiles();
+		chatprefix = this.getConfig().getString("chatPrefix");
 		debug = this.getConfig().getBoolean("debug");
 		languageManager = new LanguageManager(this);
 		fileManager.loadFiles();

@@ -1,4 +1,4 @@
-package nl.evolutioncoding.AreaShop.Exceptions;
+package nl.evolutioncoding.areashop.exceptions;
 
 public class RegionCreateException extends Exception {
 

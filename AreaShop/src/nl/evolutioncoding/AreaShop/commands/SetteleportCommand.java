@@ -1,12 +1,12 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
-import nl.evolutioncoding.AreaShop.regions.BuyRegion;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
-import nl.evolutioncoding.AreaShop.regions.RentRegion;
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.regions.RentRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -81,7 +81,7 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(player, "setteleport-reset", region.getName());
 			return;
 		}
-		if(!wgRegion.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()) && !player.hasPermission(" areashop.setteleportoutsideregion")) {
+		if(!wgRegion.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()) && !player.hasPermission("areashop.setteleportoutsideregion")) {
 			plugin.message(player, "setteleport-notInside", region.getName());
 			return;
 		}

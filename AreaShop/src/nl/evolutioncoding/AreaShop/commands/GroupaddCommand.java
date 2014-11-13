@@ -1,12 +1,12 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
-import nl.evolutioncoding.AreaShop.Utils;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
-import nl.evolutioncoding.AreaShop.regions.RegionGroup;
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.regions.RegionGroup;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -47,6 +47,7 @@ public class GroupaddCommand extends CommandAreaShop {
 		if(group == null) {
 			group = new RegionGroup(plugin, args[1]);
 			plugin.getFileManager().addGroup(group);
+			group.saveRequired();
 		}
 		if(args.length == 2) {
 			if(!(sender instanceof Player)) {
@@ -79,6 +80,7 @@ public class GroupaddCommand extends CommandAreaShop {
 			if(namesFailed.size() != 0) {
 				plugin.message(player, "groupadd-weFailed", group.getName(), Utils.createCommaSeparatedList(namesFailed));
 			}
+			group.saveRequired();
 		} else {
 			GeneralRegion region = plugin.getFileManager().getRegion(args[2]);
 			if(region == null) {
@@ -90,6 +92,7 @@ public class GroupaddCommand extends CommandAreaShop {
 			} else {
 				plugin.message(sender, "groupadd-failed", region.getName(), group.getName());
 			}
+			group.saveRequired();
 		}
 	}
 	

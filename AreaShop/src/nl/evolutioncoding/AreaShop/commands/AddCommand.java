@@ -1,14 +1,14 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
-import nl.evolutioncoding.AreaShop.Utils;
-import nl.evolutioncoding.AreaShop.regions.BuyRegion;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion.RegionEvent;
-import nl.evolutioncoding.AreaShop.regions.RentRegion;
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.regions.RentRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionEvent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -56,7 +56,7 @@ public class AddCommand extends CommandAreaShop {
 				plugin.message(sender, "cmd-weOnlyByPlayer");
 				return;
 			}
-			Player player = (Player)sender;
+			Player player = (Player)sender;			
 			Selection selection = plugin.getWorldEdit().getSelection(player);
 			if(selection == null) {
 				plugin.message(player, "cmd-noSelection");
@@ -117,6 +117,7 @@ public class AddCommand extends CommandAreaShop {
 					rent.updateRegionFlags();
 					// Run commands
 					rent.runEventCommands(RegionEvent.CREATED, false);
+					rent.saveRequired();
 				} else {
 					BuyRegion buy = new BuyRegion(plugin, region.getId(), world);
 					// Run commands
@@ -128,6 +129,7 @@ public class AddCommand extends CommandAreaShop {
 					buy.updateRegionFlags();						
 					// Run commands
 					buy.runEventCommands(RegionEvent.CREATED, false);
+					buy.saveRequired();
 				}
 			}		
 		}

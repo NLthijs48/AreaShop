@@ -1,11 +1,11 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
-import nl.evolutioncoding.AreaShop.regions.RentRegion;
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.regions.RentRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -77,7 +77,7 @@ public class RentdurationCommand extends CommandAreaShop {
 		rent.setDuration(args[1]+" "+args[2]);
 		rent.updateRegionFlags();
 		rent.updateSigns();
-		rent.save();
+		rent.saveRequired();
 		plugin.message(sender, "rentduration-success", rent.getName(), rent.getDurationString());
 	}
 	
@@ -87,11 +87,11 @@ public class RentdurationCommand extends CommandAreaShop {
 		if(toComplete == 2) {
 			result = plugin.getFileManager().getRentNames();
 		} else if(toComplete == 4) {
-			result.addAll(plugin.config().getStringList("minutes"));
-			result.addAll(plugin.config().getStringList("hours"));
-			result.addAll(plugin.config().getStringList("days"));
-			result.addAll(plugin.config().getStringList("months"));
-			result.addAll(plugin.config().getStringList("years"));
+			result.addAll(plugin.getConfig().getStringList("minutes"));
+			result.addAll(plugin.getConfig().getStringList("hours"));
+			result.addAll(plugin.getConfig().getStringList("days"));
+			result.addAll(plugin.getConfig().getStringList("months"));
+			result.addAll(plugin.getConfig().getStringList("years"));
 		}
 		return result;
 	}

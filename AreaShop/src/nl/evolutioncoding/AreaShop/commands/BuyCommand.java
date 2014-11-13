@@ -1,11 +1,11 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
-import nl.evolutioncoding.AreaShop.regions.BuyRegion;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

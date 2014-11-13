@@ -1,9 +1,9 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.areashop.AreaShop;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,13 +33,7 @@ public class UpdaterentsCommand extends CommandAreaShop {
 			plugin.message(sender, "rents-noPermission");
 			return;
 		}
-		boolean result = plugin.getFileManager().updateRentSigns();
-		plugin.getFileManager().updateRentRegions();
-		if(result) {
-			plugin.message(sender, "rents-updated");
-		} else {
-			plugin.message(sender, "rents-notUpdated");
-		}
+		plugin.getFileManager().updateRentSignsAndFlags(sender);
 	}
 
 	@Override

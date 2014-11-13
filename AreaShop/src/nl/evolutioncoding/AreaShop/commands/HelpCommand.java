@@ -1,9 +1,9 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.areashop.AreaShop;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

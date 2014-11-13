@@ -1,7 +1,7 @@
-package nl.evolutioncoding.AreaShop;
+package nl.evolutioncoding.areashop;
 
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion.ClickType;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion.ClickType;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;

@@ -1,35 +1,37 @@
-package nl.evolutioncoding.AreaShop;
+package nl.evolutioncoding.areashop;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.evolutioncoding.AreaShop.commands.AddCommand;
-import nl.evolutioncoding.AreaShop.commands.AddsignCommand;
-import nl.evolutioncoding.AreaShop.commands.BuyCommand;
-import nl.evolutioncoding.AreaShop.commands.CommandAreaShop;
-import nl.evolutioncoding.AreaShop.commands.DelCommand;
-import nl.evolutioncoding.AreaShop.commands.DelsignCommand;
-import nl.evolutioncoding.AreaShop.commands.FindCommand;
-import nl.evolutioncoding.AreaShop.commands.GroupaddCommand;
-import nl.evolutioncoding.AreaShop.commands.GroupdelCommand;
-import nl.evolutioncoding.AreaShop.commands.GroupinfoCommand;
-import nl.evolutioncoding.AreaShop.commands.GrouplistCommand;
-import nl.evolutioncoding.AreaShop.commands.HelpCommand;
-import nl.evolutioncoding.AreaShop.commands.InfoCommand;
-import nl.evolutioncoding.AreaShop.commands.ReloadCommand;
-import nl.evolutioncoding.AreaShop.commands.RentCommand;
-import nl.evolutioncoding.AreaShop.commands.RentdurationCommand;
-import nl.evolutioncoding.AreaShop.commands.SchematiceventCommand;
-import nl.evolutioncoding.AreaShop.commands.SellCommand;
-import nl.evolutioncoding.AreaShop.commands.SetpriceCommand;
-import nl.evolutioncoding.AreaShop.commands.SetrestoreCommand;
-import nl.evolutioncoding.AreaShop.commands.SetteleportCommand;
-import nl.evolutioncoding.AreaShop.commands.TeleportCommand;
-import nl.evolutioncoding.AreaShop.commands.UnrentCommand;
-import nl.evolutioncoding.AreaShop.commands.UpdatebuysCommand;
-import nl.evolutioncoding.AreaShop.commands.UpdaterentsCommand;
+import nl.evolutioncoding.areashop.commands.AddCommand;
+import nl.evolutioncoding.areashop.commands.AddsignCommand;
+import nl.evolutioncoding.areashop.commands.BuyCommand;
+import nl.evolutioncoding.areashop.commands.CommandAreaShop;
+import nl.evolutioncoding.areashop.commands.DelCommand;
+import nl.evolutioncoding.areashop.commands.DelsignCommand;
+import nl.evolutioncoding.areashop.commands.FindCommand;
+import nl.evolutioncoding.areashop.commands.GroupaddCommand;
+import nl.evolutioncoding.areashop.commands.GroupdelCommand;
+import nl.evolutioncoding.areashop.commands.GroupinfoCommand;
+import nl.evolutioncoding.areashop.commands.GrouplistCommand;
+import nl.evolutioncoding.areashop.commands.HelpCommand;
+import nl.evolutioncoding.areashop.commands.InfoCommand;
+import nl.evolutioncoding.areashop.commands.MeCommand;
+import nl.evolutioncoding.areashop.commands.ReloadCommand;
+import nl.evolutioncoding.areashop.commands.RentCommand;
+import nl.evolutioncoding.areashop.commands.RentdurationCommand;
+import nl.evolutioncoding.areashop.commands.SchematiceventCommand;
+import nl.evolutioncoding.areashop.commands.SellCommand;
+import nl.evolutioncoding.areashop.commands.SetownerCommand;
+import nl.evolutioncoding.areashop.commands.SetpriceCommand;
+import nl.evolutioncoding.areashop.commands.SetrestoreCommand;
+import nl.evolutioncoding.areashop.commands.SetteleportCommand;
+import nl.evolutioncoding.areashop.commands.TeleportCommand;
+import nl.evolutioncoding.areashop.commands.UnrentCommand;
+import nl.evolutioncoding.areashop.commands.UpdatebuysCommand;
+import nl.evolutioncoding.areashop.commands.UpdaterentsCommand;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -54,6 +56,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new UnrentCommand(plugin));
 		commands.add(new BuyCommand(plugin));
 		commands.add(new SellCommand(plugin));
+		commands.add(new MeCommand(plugin));
 		commands.add(new InfoCommand(plugin));
 		commands.add(new TeleportCommand(plugin));
 		commands.add(new SetteleportCommand(plugin));
@@ -62,6 +65,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new UpdatebuysCommand(plugin));
 		commands.add(new SetrestoreCommand(plugin));
 		commands.add(new SetpriceCommand(plugin));
+		commands.add(new SetownerCommand(plugin));
 		commands.add(new RentdurationCommand(plugin));
 		commands.add(new ReloadCommand(plugin));
 		commands.add(new GroupaddCommand(plugin));
@@ -94,8 +98,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 	public void showHelp(CommandSender target) {
 		/* Add all messages to a list */
 		ArrayList<String> messages = new ArrayList<String>();
-		messages.add(plugin.config().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-header"));
-		messages.add(plugin.config().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-alias"));
+		messages.add(plugin.getConfig().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-header"));
+		messages.add(plugin.getConfig().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-alias"));
 		for(CommandAreaShop command : commands) {
 			String help = command.getHelp(target);
 			if(help != null && help.length() != 0) {
@@ -105,7 +109,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		
 		/* Send the messages to the target */
 		for(String message : messages) {
-			if(!plugin.config().getBoolean("useColorsInConsole") && !(target instanceof Player)) {
+			if(!plugin.getConfig().getBoolean("useColorsInConsole") && !(target instanceof Player)) {
 				target.sendMessage(ChatColor.stripColor(plugin.fixColors(message)));
 			} else {
 				target.sendMessage(plugin.fixColors(message));

@@ -1,9 +1,9 @@
-package nl.evolutioncoding.AreaShop.regions;
+package nl.evolutioncoding.areashop.regions;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.areashop.AreaShop;
 
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -36,7 +36,7 @@ public class RegionGroup {
 		}
 		if(newMembers.size() != members.size()) {
 			setSetting("regions", newMembers);
-			save();
+			saveRequired();
 		}
 		if(getMembers().size() == 0) {
 			plugin.getFileManager().removeGroup(this);
@@ -55,7 +55,6 @@ public class RegionGroup {
 		} else {
 			members.add(region.getName());
 			setSetting("regions", members);
-			save();
 			region.updateSigns();
 			region.updateRegionFlags();
 			return true;
@@ -76,7 +75,6 @@ public class RegionGroup {
 		} else {
 			setSetting("regions", members);
 		}
-		save();
 		region.updateSigns();
 		region.updateRegionFlags();
 		return result;
@@ -143,9 +141,16 @@ public class RegionGroup {
 	}
 
 	/**
-	 * Save the group to disk (currently saves all groups because they are all in 1 file)
+	 * Indicates this file needs to be saved, will actually get saved later by a task
 	 */
-	public void save() {
-		plugin.getFileManager().saveGroups();
+	public void saveRequired() {
+		plugin.getFileManager().saveGroupsRequired();
+	}
+	
+	/**
+	 * Save the groups to disk now, normally saveRequired() is preferred because of performance
+	 */
+	public void saveNow() {
+		plugin.getFileManager().saveGroupsNow();
 	}
 }

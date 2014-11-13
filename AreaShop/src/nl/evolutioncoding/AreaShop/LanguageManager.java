@@ -1,4 +1,4 @@
-package nl.evolutioncoding.AreaShop;
+package nl.evolutioncoding.areashop;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,13 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
+
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.google.common.base.Charsets;
 
 public class LanguageManager {
 	private AreaShop plugin = null;
-	private String languages[] = {"EN", "NL", "FR"};
+	private String languages[] = {"EN", "NL", "FR", "DE"};
 	private HashMap<String, String> currentLanguage, defaultLanguage;
 	
 	/**
@@ -88,7 +90,7 @@ public class LanguageManager {
 		
 		/* Save the current language file to the HashMap */
 		currentLanguage = new HashMap<String, String>();		
-		File file = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + File.separator + plugin.config().getString("language") + ".yml");
+		File file = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + File.separator + plugin.getConfig().getString("language") + ".yml");
 		InputStreamReader reader = null;
 		try {
 			reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
@@ -142,10 +144,16 @@ public class LanguageManager {
 		if(result == null) {
 			plugin.getLogger().info("Wrong key for getting translation: " + key);
 		} else {
-			/* Replace all tags,  e.g. %0% */
+			/* Replace all tags like %0% and if given a GeneralRegion apply all replacements */
+			int number=0;
 		    for (int i=0; i<params.length; i++) {
 		    	if(params[i] != null) {
-		    		result = result.replace("%" + i + "%", params[i].toString());
+		    		if(params[i] instanceof GeneralRegion) {
+		    			result = ((GeneralRegion)params[i]).applyAllReplacements(result);
+		    		} else {
+		    			result = result.replace("%" + number + "%", params[i].toString());
+		    			number++;
+		    		}
 		    	}
 		    }
 		}

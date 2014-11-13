@@ -1,11 +1,11 @@
-package nl.evolutioncoding.AreaShop;
+package nl.evolutioncoding.areashop;
 
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.regions.BuyRegion;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion.RegionEvent;
-import nl.evolutioncoding.AreaShop.regions.RentRegion;
+import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.regions.RentRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionEvent;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,7 +44,7 @@ public final class SignChangeListener implements Listener {
 		Player player = event.getPlayer();
 		
 		// Check if the sign is meant for this plugin
-		if(event.getLine(0).contains(plugin.config().getString("signTags.rent"))) {
+		if(event.getLine(0).contains(plugin.getConfig().getString("signTags.rent"))) {
 			if(!player.hasPermission("areashop.createrent")) {
 				plugin.message(player, "setup-noPermissionRent");				
 				return;
@@ -141,8 +141,9 @@ public final class SignChangeListener implements Listener {
 				plugin.message(player, "setup-rentSuccess", rent.getName());
 				// Run commands
 				rent.runEventCommands(RegionEvent.CREATED, false);
+				rent.saveRequired();
 			}
-		} else if (event.getLine(0).contains(plugin.config().getString("signTags.buy"))) {
+		} else if (event.getLine(0).contains(plugin.getConfig().getString("signTags.buy"))) {
 			// Check for permission
 			if(!player.hasPermission("areashop.createbuy")) {
 				plugin.message(player, "setup-noPermissionBuy");				
@@ -232,8 +233,9 @@ public final class SignChangeListener implements Listener {
 				
 				// Run commands
 				buy.runEventCommands(RegionEvent.CREATED, false);
+				buy.saveRequired();
 			}
-		} else if(event.getLine(0).contains(plugin.config().getString("signTags.add"))) {
+		} else if(event.getLine(0).contains(plugin.getConfig().getString("signTags.add"))) {
 			// Check for permission
 			if(!player.hasPermission("areashop.addsign")) {
 				plugin.message(player, "addsign-noPermission");				
@@ -272,7 +274,7 @@ public final class SignChangeListener implements Listener {
 				region.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
 				plugin.message(player, "addsign-successProfile", region.getName(), thirdLine);
 			}
-			region.save();
+			region.saveRequired();
 			
 			// Update the sign later because this event will do it first
 			final GeneralRegion regionUpdate = region;

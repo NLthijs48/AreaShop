@@ -1,8 +1,10 @@
 name: AreaShop
-main: nl.evolutioncoding.AreaShop.AreaShop
-version: 2.0.2
+main: nl.evolutioncoding.areashop.AreaShop
+version: 2.1.0
 depend: [Vault, WorldGuard, WorldEdit]
 softdepend: [Multiverse-Core]
+author: NLThijs48
+website: http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/
 commands:
   AreaShop:
     description: For all commands use /as help 
@@ -29,9 +31,11 @@ permissions:
       areashop.setrestore: true
       areashop.setprice: true
       areashop.rentduration: true
+      areashop.teleport: true
       areashop.teleportall: true
       areashop.setteleportall: true
       areashop.teleportsign: true
+      areashop.teleportsignall: true
       areashop.tabcomplete: true
       areashop.setteleportoutsideregion: true
       areashop.find: true
@@ -39,10 +43,12 @@ permissions:
       areashop.groupdel: true
       areashop.grouplist: true
       areashop.groupinfo: true
-      areashop.limits.unlimited: true
+      areashop.limitbypass: true
       areashop.schematicevents: true
       areashop.addsign: true
       areashop.delsign: true
+      areashop.renttimebypass: true
+      areashop.me: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -102,10 +108,13 @@ permissions:
     default: true
   areashop.teleportall:
     description: Teleport to all regions
-    default: true
+    default: op
   areashop.teleportsign:
-    description: Teleport to signs of regions
+    description: Teleport to signs of regions you own
     default: true
+  areashop.teleportsignall:
+    description: Teleport to signs of all regions
+    default: op
   areashop.setteleport:
     description: Set the teleport spot for your region
     default: true
@@ -139,8 +148,8 @@ permissions:
   areashop.limits.default:
     description: Assign limits as set in the 'default' group in the 'limitGroups' section of the config
     default: not op
-  areashop.limits.unlimited:
-    description: Assign limits as set in the 'unlimited' group in the 'limitGroups' section of the config
+  areashop.limitbypass:
+    description: Bypass the limits for renting/buying regions (how many you can have at the same time)
     default: op
   areashop.schematicevents:
     description: Allows you to trigger schematic events for regions
@@ -150,4 +159,16 @@ permissions:
     default: op
   areashop.delsign:
     description: Allows you to delete signs from existing regions
+    default: op
+  areashop.renttimebypass:
+    description: Bypass the maximum rent time you can have in advance
+    default: op
+  areashop.me:
+    description: Allows you to get information about your regions
+    default: true
+  areashop.setownerrent:
+    description: Allows you to set the owner of rent regions
+    default: op
+  areashop.setownerbuy:
+    description: Allows you to set the owner of buy regions
     default: op

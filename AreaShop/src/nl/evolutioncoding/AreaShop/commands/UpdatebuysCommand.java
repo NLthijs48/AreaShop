@@ -1,9 +1,9 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
+import nl.evolutioncoding.areashop.AreaShop;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,13 +33,7 @@ public class UpdatebuysCommand extends CommandAreaShop {
 			plugin.message(sender, "buys-noPermission");
 			return;
 		}
-		boolean result = plugin.getFileManager().updateBuySigns();
-		plugin.getFileManager().updateBuyRegions();
-		if(result) {
-			plugin.message(sender, "buys-updated");
-		} else {
-			plugin.message(sender, "buys-notUpdated");
-		}							
+		plugin.getFileManager().updateBuySignsAndFlags(sender);						
 	}
 	
 	@Override
@@ -47,5 +41,4 @@ public class UpdatebuysCommand extends CommandAreaShop {
 		ArrayList<String> result = new ArrayList<String>();
 		return result;
 	}
-
 }

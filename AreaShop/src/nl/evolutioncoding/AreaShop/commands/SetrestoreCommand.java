@@ -1,10 +1,10 @@
-package nl.evolutioncoding.AreaShop.commands;
+package nl.evolutioncoding.areashop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -57,7 +57,7 @@ public class SetrestoreCommand extends CommandAreaShop {
 		} else {
 			plugin.message(sender, "setrestore-success", region.getName(), value);
 		}
-		region.save();
+		region.saveRequired();
 	}
 	
 	@Override
@@ -70,7 +70,7 @@ public class SetrestoreCommand extends CommandAreaShop {
 			result.add("false");
 			result.add("general");
 		} else if(toComplete == 4) {
-			result.addAll(plugin.config().getConfigurationSection("schematicProfiles").getKeys(false));
+			result.addAll(plugin.getConfig().getConfigurationSection("schematicProfiles").getKeys(false));
 		}
 		return result;
 	}

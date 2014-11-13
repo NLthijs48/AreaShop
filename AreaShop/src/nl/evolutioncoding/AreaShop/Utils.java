@@ -1,4 +1,4 @@
-package nl.evolutioncoding.AreaShop;
+package nl.evolutioncoding.areashop;
 
 import java.util.Collection;
 

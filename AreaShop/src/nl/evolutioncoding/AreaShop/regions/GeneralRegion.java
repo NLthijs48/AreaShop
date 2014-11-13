@@ -1,4 +1,4 @@
-package nl.evolutioncoding.AreaShop.regions;
+package nl.evolutioncoding.areashop.regions;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,13 +7,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import nl.evolutioncoding.AreaShop.AreaShop;
-import nl.evolutioncoding.AreaShop.FileManager;
-import nl.evolutioncoding.AreaShop.Utils;
-import nl.evolutioncoding.AreaShop.Exceptions.RegionCreateException;
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.FileManager;
+import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -30,13 +31,11 @@ import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.data.DataException;
-import com.sk89q.worldedit.extension.factory.PatternFactory;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -61,6 +60,7 @@ public abstract class GeneralRegion {
 	private static ArrayList<Material> cannotSpawnOn = new ArrayList<Material>(Arrays.asList(Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.CACTUS, Material.IRON_FENCE, Material.FENCE_GATE, Material.THIN_GLASS, Material.NETHER_FENCE, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE, Material.STAINED_GLASS_PANE));
 	private static ArrayList<Material> cannotSpawnBeside = new ArrayList<Material>(Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CACTUS));
 	protected AreaShop plugin = null;
+	private boolean saveRequired = false;
 
 	/* Enum for region types */
 	public enum RegionType {		
@@ -127,11 +127,25 @@ public abstract class GeneralRegion {
 		}
 	}
 	
+	/* Enum for region types */
+	public enum LimitType {		
+		RENTS("rents"),
+		BUYS("buys"),
+		TOTAL("total");
+		
+		private final String value;
+		private LimitType(String value) {
+			this.value = value;
+		}
+		public String getValue() {
+			return value;
+		}
+	} 
+	
 	public GeneralRegion(AreaShop plugin, YamlConfiguration config) throws RegionCreateException {
 		this.plugin = plugin;
 		this.config = config;
 		
-		// If region is gone delete the rent and the sign 
 		if(getWorld() == null 
 				|| plugin.getWorldGuard().getRegionManager(getWorld()) == null 
 				|| plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName()) == null) {
@@ -162,7 +176,7 @@ public abstract class GeneralRegion {
 	public void updateRegionFlags(RegionState toState) {
 		// Get state setting
 		String setting = toState.getValue();
-		ConfigurationSection section = plugin.config().getConfigurationSection("flagProfiles." + getStringSetting("general.flagProfile") + "." + setting);
+		ConfigurationSection section = plugin.getConfig().getConfigurationSection("flagProfiles." + getStringSetting("general.flagProfile") + "." + setting);
 		setRegionFlags(section);
 	}
 
@@ -201,6 +215,10 @@ public abstract class GeneralRegion {
 	public abstract RegionState getState();
 	
 	// GETTERS
+	/**
+	 * Get a list with all sign locations
+	 * @return A List with all sign locations
+	 */
 	public List<Location> getSignLocations() {
 		List<Location> result = new ArrayList<Location>();
 		if(config.getConfigurationSection("general.signs") == null) {
@@ -212,27 +230,57 @@ public abstract class GeneralRegion {
 		return result;
 	}
 	
+	/**
+	 * Get the teleportlocation set for this region
+	 * @return The teleport location, or null if not set
+	 */
 	public Location getTeleportLocation() {
 		Location result = null;
 		result = Utils.configToLocation(config.getConfigurationSection("general.teleportLocation"));
 		return result;
 	}
 	
+	/**
+	 * Get the name of the region
+	 * @return The region name
+	 */
 	public String getName() {
 		return config.getString("general.name");
 	}
+	/**
+	 * Get the lowercase region name
+	 * @return The region name in lowercase
+	 */
 	public String getLowerCaseName() {
 		return getName().toLowerCase();
 	}
 	
+	/**
+	 * Check if restoring is enabled
+	 * @return true if restoring is enabled, otherwise false
+	 */
 	public boolean isRestoreEnabled() {
 		return getBooleanSetting("general.enableRestore");
 	}
-	
+	/**
+	 * Get the restoreprofile as defined in config.yml
+	 * @return The restoreprofile
+	 */
 	public String getRestoreProfile() {
 		return getStringSetting("general.schematicProfile");
 	}
 	
+	/**
+	 * Get the World of the region
+	 * @return The World where the region is located
+	 */
+	public World getWorld() {
+		return Bukkit.getWorld(getWorldName());
+	}
+	/**
+	 * Get the name of the world where the region is located
+	 * @return The name of the world of the region
+	 */
 	public String getWorldName() {
 		String world = getStringSetting("general.world");
 		if(world == null) {
@@ -241,14 +289,27 @@ public abstract class GeneralRegion {
 		return world;
 	}
 	
-	public World getWorld() {
-		return Bukkit.getWorld(getWorldName());
-	}
-	
+	/**
+	 * Get the FileManager from the plugin
+	 * @return The FileManager (responsible for saving/loading regions and getting them)
+	 */
 	public FileManager getFileManager() {
 		return plugin.getFileManager();
 	}
 	
+	/**
+	 * Check if the players is owner of this region
+	 * @param player Player to check ownership for
+	 * @return true if the player currently rents or buys this region
+	 */
+	public boolean isOwner(Player player) {
+		return (isRentRegion() && ((RentRegion)this).isRenter(player)) || (isBuyRegion() && ((BuyRegion)this).isBuyer(player));
+	}
+	
+	/**
+	 * Get the WorldGuard region associated with this AreaShop region
+	 * @return The ProtectedRegion of WorldGuard or null if the region does not exist anymore
+	 */
 	public ProtectedRegion getRegion() {
 		if(getWorld() == null 
 				|| plugin.getWorldGuard() == null 
@@ -259,33 +320,80 @@ public abstract class GeneralRegion {
 		return plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 	}
 	
+	/**
+	 * Get the width of the region (x-axis)
+	 * @return The width of the region (x-axis)
+	 */
+	public int getWidth() {
+		return getRegion().getMaximumPoint().getBlockX() - getRegion().getMinimumPoint().getBlockX();
+	}
+	/**
+	 * Get the depth of the region (z-axis)
+	 * @return The depth of the region (z-axis)
+	 */
+	public int getDepth() {
+		return getRegion().getMaximumPoint().getBlockZ() - getRegion().getMinimumPoint().getBlockZ();
+	}
+	/**
+	 * Get the height of the region (y-axis)
+	 * @return The height of the region (y-axis)
+	 */
+	public int getHeight() {
+		return getRegion().getMaximumPoint().getBlockY() - getRegion().getMinimumPoint().getBlockY();
+	}
+	
+	/**
+	 * Get all the replacements for this region
+	 * @return Map with the keys that need to be replaced with the value of the object
+	 */
 	public HashMap<String, Object> getAllReplacements() {
 		HashMap<String, Object> result = getSpecificReplacements();
 		
 		result.put(AreaShop.tagRegionName, getName());
 		result.put(AreaShop.tagRegionType, getType().getValue().toLowerCase());
 		result.put(AreaShop.tagWorldName, getWorldName());
-		// TODO: add more?
+		result.put(AreaShop.tagWidth, getWidth());
+		result.put(AreaShop.tagDepth, getDepth());
+		result.put(AreaShop.tagHeight, getHeight());
+		
+		// TODO: add more? coordinates?
 		
 		return result;
 	}
 	
 	/**
-	 * Get the name of the sign at the specified location
-	 * @param location The location to check
-	 * @return The name of the sign if found, otherwise null
+	 * Applies all replacements to the given string
+	 * @param source The source string to replace things in
+	 * @return The result string with all the replacements applied
 	 */
-	public String getSignName(Location location) {
-		String result = null;
-		if(config.getConfigurationSection("general.signs") == null) {
-			return null;
+	public String applyAllReplacements(String source) {
+		if(source == null || source.length() == 0) {
+			return "";
 		}
-		for(String signName : config.getConfigurationSection("general.signs").getKeys(false)) {
-			if(location.equals(Utils.configToLocation(config.getConfigurationSection("general.signs." + signName + ".location")))) {
-				result = signName;
+		// Apply language replacements
+		Pattern regex = Pattern.compile("%lang:[^% [-]]+%");
+		Matcher matcher = regex.matcher(source);
+		while(matcher.find()) {
+			String match = matcher.group();
+			String key = match.substring(6, match.length()-1);
+			String languageString;
+			if(key.equalsIgnoreCase("prefix")) {
+				languageString = plugin.getChatPrefix();
+			} else {
+				languageString = plugin.getLanguageManager().getLang(key);
+			}
+			source = source.replace(match, languageString);
+			//AreaShop.debug("match=" + match + ", key=" + key + ", lanString=" + languageString + ", replaced=" + source);
+		}		
+		// Apply static replacements
+		HashMap<String, Object> replacements = getAllReplacements();
+		for(String tag : replacements.keySet()) {
+			Object replacement = replacements.get(tag);
+			if(replacement != null) {
+				source = source.replace(tag, replacement.toString());
 			}
 		}
-		return result;
+		return source;		
 	}
 	
 	/**
@@ -313,6 +421,12 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
+	 * Check now if the player has been inactive for too long, unrent/sell will happen when true
+	 * @return true if the region has been unrented/sold, otherwise false
+	 */
+	public abstract boolean checkInactive();
+	
+	/**
 	 * Add a sign to this region
 	 * @param location The location of the sign
 	 * @param signType The type of the sign (WALL_SIGN or SIGN_POST)
@@ -331,6 +445,24 @@ public abstract class GeneralRegion {
 		if(profile != null && profile.length() != 0) {
 			config.set(signPath + "profile", profile);
 		}
+	}
+	
+	/**
+	 * Get the name of the sign at the specified location
+	 * @param location The location to check
+	 * @return The name of the sign if found, otherwise null
+	 */
+	public String getSignName(Location location) {
+		String result = null;
+		if(config.getConfigurationSection("general.signs") == null) {
+			return null;
+		}
+		for(String signName : config.getConfigurationSection("general.signs").getKeys(false)) {
+			if(location.equals(Utils.configToLocation(config.getConfigurationSection("general.signs." + signName + ".location")))) {
+				result = signName;
+			}
+		}
+		return result;
 	}
 	
 	/**
@@ -376,6 +508,39 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
+	 * Check if a sign needs periodic updating
+	 * @param signName
+	 * @return
+	 */
+	public boolean needsPeriodicUpdating() {
+		if(!isRentRegion()) {
+			return false;
+		}
+		Set<String> signs = null;
+		if(config.getConfigurationSection("general.signs") != null) {
+			signs = config.getConfigurationSection("general.signs").getKeys(false);
+		}
+		for(String sign : signs) {
+			// Get the profile set in the config
+			String profile = config.getString("general.signs." + sign + ".profile");
+			if(profile == null || profile.length() == 0) {
+				profile = getStringSetting("general.signProfile");
+			}			
+			// Get the prefix
+			String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".line";
+			String line = null;
+			// Get the lines
+			for(int i=1; i<5; i++) {
+				line = plugin.getConfig().getString(prefix + i);
+				if(line != null && line.length() != 0 && line.contains(AreaShop.tagTimeLeft)) {
+					return true;
+				}
+			}	
+		}
+		return false;
+	}
+	
+	/**
 	 * Update the signs connected to this region
 	 * @return true if the update was successful, otherwise false
 	 */
@@ -388,7 +553,6 @@ public abstract class GeneralRegion {
 		if(signs == null) {
 			return true;
 		}
-		HashMap<String, Object> replacements = getAllReplacements();
 		for(String sign : signs) {
 			AreaShop.debug("sign name: " + sign);
 			Location location = Utils.configToLocation(config.getConfigurationSection("general.signs." + sign + ".location"));
@@ -408,17 +572,13 @@ public abstract class GeneralRegion {
 			String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".";			
 			// Get the lines
 			String[] signLines = new String[4];
-			signLines[0] = plugin.config().getString(prefix + "line1");
-			signLines[1] = plugin.config().getString(prefix + "line2");
-			signLines[2] = plugin.config().getString(prefix + "line3");
-			signLines[3] = plugin.config().getString(prefix + "line4");
-				// DEBUG
-				for(String line : signLines) {
-					AreaShop.debug("  signLine: " + line);
-				}
+			signLines[0] = plugin.getConfig().getString(prefix + "line1");
+			signLines[1] = plugin.getConfig().getString(prefix + "line2");
+			signLines[2] = plugin.getConfig().getString(prefix + "line3");
+			signLines[3] = plugin.getConfig().getString(prefix + "line4");
 			// Check if the sign should be present
 			Block block = location.getBlock();
-			if(!plugin.config().isSet(prefix) 
+			if(!plugin.getConfig().isSet(prefix) 
 					|| (	   (signLines[0] == null || signLines[0].length() == 0) 
 							&& (signLines[1] == null || signLines[1].length() == 0) 
 							&& (signLines[2] == null || signLines[2].length() == 0) 
@@ -457,11 +617,11 @@ public abstract class GeneralRegion {
 				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 				if(!config.isString("general.signs." + sign + ".signType")) {
 					config.set("general.signs." + sign + ".signType", signState.getType().toString());
-					this.save();
+					this.saveRequired();
 				}
 				if(!config.isString("general.signs." + sign + ".facing")) {
 					config.set("general.signs." + sign + ".facing", signData.getFacing().toString());
-					this.save();
+					this.saveRequired();
 				}
 				// Apply replacements and color and then set it on the sign
 				for(int i=0; i<signLines.length; i++) {
@@ -469,12 +629,9 @@ public abstract class GeneralRegion {
 						signState.setLine(i, "");
 						continue;
 					}					
-					for(String tag : replacements.keySet()) {
-						if(replacements.get(tag) != null) {
-							signLines[i] = signLines[i].replace(tag, replacements.get(tag).toString());
-						}						
-					}
-					signLines[i] = plugin.fixColors(signLines[i]);		
+					signLines[i] = applyAllReplacements(signLines[i]);					
+					signLines[i] = plugin.fixColors(signLines[i]);	
+					AreaShop.debug("  signLine: " + signLines[i]);
 					signState.setLine(i, signLines[i]);
 				}
 				signState.update();
@@ -508,7 +665,7 @@ public abstract class GeneralRegion {
 	 */
 	public boolean saveRegionBlocks(String fileName) {
 		boolean result = true;
-		EditSession editSession = new EditSession(new BukkitWorld(getWorld()), plugin.config().getInt("maximumBlocks"));
+		EditSession editSession = new EditSession(new BukkitWorld(getWorld()), plugin.getConfig().getInt("maximumBlocks"));
 		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist in WorldGuard, save failed");
@@ -549,7 +706,10 @@ public abstract class GeneralRegion {
 	 */
 	public boolean restoreRegionBlocks(String fileName) {
 		boolean result = true;
-		EditSession editSession = new EditSession(new BukkitWorld(getWorld()), plugin.config().getInt("maximumBlocks"));
+		// TODO: test world cast
+		EditSession editSession = plugin.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(new BukkitWorld(getWorld()), plugin.getConfig().getInt("maximumBlocks"));
+		
+		LocalSession localSession = new LocalSession(plugin.getWorldEdit().getLocalConfiguration());
 		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist in WorldGuard, restore failed");
@@ -559,10 +719,40 @@ public abstract class GeneralRegion {
 		Vector origin = new Vector(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
 		
 		// The path to save the schematic
-		File saveFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
+		File restoreFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
+		
+		
+//		// NEW
+//		Closer closer = Closer.create();
+//        try {
+//            FileInputStream fis = closer.register(new FileInputStream(restoreFile));
+//            BufferedInputStream bis = closer.register(new BufferedInputStream(fis));
+//            ClipboardReader reader = ClipboardFormat.SCHEMATIC.getReader(bis);
+//            
+//            WorldData worldData = localSession.getWorld().getWorldData();
+//            Clipboard clipboard = reader.read(editSession.getWorld().getWorldData());
+//            localSession.setBlockChangeLimit(plugin.getConfig().getInt("maximumBlocks"));
+//            editSession.setClipboard(new ClipboardHolder(clipboard, worldData));
+//
+//            log.info(player.getName() + " loaded " + filePath);
+//            player.print(filename + " loaded. Paste it with //paste");
+//            
+//        } catch (IOException e) {
+//            player.printError("Schematic could not read or it does not exist: " + e.getMessage());
+//            log.log(Level.WARNING, "Failed to load a saved clipboard", e);
+//        } finally {
+//            try {
+//                closer.close();
+//            } catch (IOException ignored) {
+//            }
+//        }
+		
+		
+		
+		
 		editSession.enableQueue();
 		try {
-			SchematicFormat.MCEDIT.load(saveFile).place(editSession, origin, false);
+			SchematicFormat.MCEDIT.load(restoreFile).place(editSession, origin, false);
 		} catch (MaxChangedBlocksException | IOException | DataException e) {
 			result = false;
 		}
@@ -615,9 +805,6 @@ public abstract class GeneralRegion {
 			AreaShop.debug("Region '" + getName() + "' does not exist, setting flags failed");
 			return false;
 		}
-		
-		Map<String, Object> replacements = getAllReplacements();
-		
 		Iterator<String> it = flagNames.iterator();
 		while(it.hasNext()) {
 			String flagName = it.next();
@@ -625,11 +812,7 @@ public abstract class GeneralRegion {
 			
 			// Apply replacements
 			if(value != null) {
-				for(String key : replacements.keySet()) {
-					if(replacements.get(key) != null) {
-						value = value.replace(key, replacements.get(key).toString());
-					}
-				}
+				value = applyAllReplacements(value);
 			}
 			
 			/* Check for a couple of options or use as flag */
@@ -786,9 +969,26 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
-	 * Save this region to the disk
+	 * Indicate this region needs to be saved, saving will happen by a repeating task
 	 */
-	public boolean save() {
+	public void saveRequired() {
+		saveRequired = true;
+	}
+	
+	/**
+	 * Check if a save is required
+	 * @return true if a save is required because some data changed, otherwise false
+	 */
+	public boolean isSaveRequired() {
+		return saveRequired;
+	}
+	
+	/**
+	 * Save this region to disk now, using this method could slow down the plugin, normally saveRequired() should be used
+	 * @return true if the region is saved successfully, otherwise false
+	 */
+	public boolean saveNow() {
+		saveRequired = false;
 		File file = new File(plugin.getFileManager().getRegionFolder() + File.separator + getName().toLowerCase() + ".yml");
 		try {
 			config.save(file);
@@ -810,7 +1010,7 @@ public abstract class GeneralRegion {
 		} else {
 			setSetting("general.teleportLocation", Utils.locationToConfig(location, true));
 		}
-		this.save();
+		this.saveRequired();
 	}
 	
 	
@@ -824,6 +1024,32 @@ public abstract class GeneralRegion {
 		boolean owner = false;
 		Location startLocation = null;
 		ProtectedRegion region = getRegion();
+		if(isRentRegion()) {
+			owner = player.getUniqueId().equals(((RentRegion)this).getRenter());
+		} else {
+			owner = player.getUniqueId().equals(((BuyRegion)this).getBuyer());
+		}
+		
+		// Teleport to sign instead if they dont have permission for teleporting to region
+		if(!toSign && owner && !player.hasPermission("areashop.teleport")
+				|| !toSign && !owner && !player.hasPermission("areashop.teleportall")) {
+			toSign = true;
+		}
+		// Check permissions
+		if(owner && !player.hasPermission("areashop.teleport") && !toSign) {
+			plugin.message(player, "teleport-noPermission");
+			return false;
+		} else if(!owner && !player.hasPermission("areashop.teleportall") && !toSign) {
+			plugin.message(player, "teleport-noPermissionOther");
+			return false;
+		} else if(owner && !player.hasPermission("areashop.teleportsign") && toSign) {
+			plugin.message(player, "teleport-noPermissionSign");
+			return false;
+		} else if(!owner && !player.hasPermission("areashop.teleportsignall") && toSign) {
+			plugin.message(player, "teleport-noPermissionOtherSign");
+			return false;
+		}
+		
 		if(toSign) {
 			List<Location> signs = getSignLocations();
 			if(!signs.isEmpty()) {
@@ -835,19 +1061,6 @@ public abstract class GeneralRegion {
 			
 		} else if(this.hasTeleportLocation()) {
 			startLocation = getTeleportLocation();
-		}
-		if(isRentRegion()) {
-			owner = player.getUniqueId().equals(((RentRegion)this).getRenter());
-		} else {
-			owner = player.getUniqueId().equals(((BuyRegion)this).getBuyer());
-		}
-		// Check permissions
-		if((!player.hasPermission("areashop.teleport") && !toSign) || (!player.hasPermission("areashop.teleportsign") && toSign)) {
-			plugin.message(player, "teleport-noPermission");
-			return false;
-		} else if(!owner && !player.hasPermission("areashop.teleportall") && !toSign) {
-			plugin.message(player, "teleport-noPermissionOther");
-			return false;
 		}
 		// Set default startLocation if not set
 		if(startLocation == null) {
@@ -868,9 +1081,14 @@ public abstract class GeneralRegion {
 				return false;
 			}
 		}
-		boolean insideRegion = getBooleanSetting("general.teleportIntoRegion");
+		boolean insideRegion;
+		if(toSign) {
+			insideRegion = getBooleanSetting("general.teleportToSignIntoRegion");
+		} else {
+			insideRegion = getBooleanSetting("general.teleportIntoRegion");
+		}
 		AreaShop.debug("insideRegion = " + insideRegion);
-		int maxTries = plugin.config().getInt("maximumTries");
+		int maxTries = plugin.getConfig().getInt("maximumTries");
 		AreaShop.debug("maxTries = " + maxTries);
 		
 		// set location in the center of the block
@@ -882,6 +1100,10 @@ public abstract class GeneralRegion {
 		Location saveLocation = startLocation;
 		int radius = 1;
 		boolean blocksInRegion = region.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
+		if(!blocksInRegion && insideRegion) {
+			plugin.message(player, "teleport-blocked", getName());
+			return false;
+		}
 		boolean done = isSave(saveLocation) && ((blocksInRegion && insideRegion) || (!insideRegion));
 		boolean north=false, east=false, south=false, west=false, top=false, bottom=false;
 		boolean track;
@@ -1081,7 +1303,11 @@ public abstract class GeneralRegion {
 			radius++;
 		}
 		if(done && isSave(saveLocation)) {
-			plugin.message(player, "teleport-success", getName());
+			if(toSign) {
+				plugin.message(player, "teleport-successSign", getName());
+			} else {
+				plugin.message(player, "teleport-success", getName());
+			}			
 			player.teleport(saveLocation);
 			AreaShop.debug("Found location: " + saveLocation.toString() + " Tries: " + (checked-1));
 			return true;
@@ -1287,85 +1513,302 @@ public abstract class GeneralRegion {
 
 	
 	// LIMIT FUNCTIONS
+	
 	/**
-	 * Get the total number of regions a player has
-	 * @param player The player to check
-	 * @return The total number of regions the player has
+	 * Check if the player can buy this region, detailed info in the result object
+	 * @param player The player to check it for
+	 * @return LimitResult containing if it is allowed, why and limiting factor
 	 */
-	public int getCurrentTotalRegions(Player player) {
-		int result = 0;
+	public LimitResult limitsAllowBuying(Player player) {
+		if(player.hasPermission("areashop.limitbypass")) {
+			return new LimitResult(true, null, 0, 0, null);
+		}		
+		// Get current total regions
+		List<GeneralRegion> totalRegions = new ArrayList<GeneralRegion>();
 		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
-			if(region.isRentRegion() && ((RentRegion)region).isRenter(player)) {
-				result++;
-			} else if(region.isBuyRegion() && ((BuyRegion)region).isBuyer(player)) {
-				result++;
+			if(region.isOwner(player)) {
+				totalRegions.add(region);
 			}
 		}
-		return result;
+		// Get currently bought regions
+		List<BuyRegion> buyRegions = new ArrayList<BuyRegion>();
+		for(GeneralRegion region : totalRegions) {
+			if(region.isBuyRegion()) {
+				buyRegions.add((BuyRegion)region);
+			}
+		}
+		// Check all limitgroups the player has
+		List<String> groups = new ArrayList<String>(plugin.getConfig().getConfigurationSection("limitGroups").getKeys(false));
+		while(!groups.isEmpty()) {
+			String group = groups.get(0);
+			if(player.hasPermission("areashop.limits." + group) && this.matchesLimitGroup(group)) {
+				int totalLimit = plugin.getConfig().getInt("limitGroups." + group + ".total");
+				int buysLimit = plugin.getConfig().getInt("limitGroups." + group + ".buys");
+				int totalCurrent = hasRegionsInLimitGroup(player, group, totalRegions);
+				int buysCurrent = hasBuyRegionsInLimitGroup(player, group, buyRegions);
+				if(totalLimit == -1) {
+					totalLimit = Integer.MAX_VALUE;
+				}
+				if(buysLimit == -1) {
+					buysLimit = Integer.MAX_VALUE;
+				}
+				String totalHighestGroup = group;
+				String buysHighestGroup = group;
+				groups.remove(group);
+				// Get the highest number from the groups of the same category
+				List<String> groupsCopy = new ArrayList<String>(groups);
+				for(String checkGroup : groupsCopy) {
+					if(player.hasPermission("areashop.limits." + checkGroup) && this.matchesLimitGroup(checkGroup)) {
+						if(limitGroupsOfSameCategory(group, checkGroup)) {
+							groups.remove(checkGroup);
+							int totalLimitOther = plugin.getConfig().getInt("limitGroups." + checkGroup + ".total");
+							int buyLimitOther = plugin.getConfig().getInt("limitGroups." + checkGroup + ".buys");
+							if(totalLimitOther > totalLimit) {
+								totalLimit = totalLimitOther; 
+								totalHighestGroup = checkGroup;
+							} else if(totalLimitOther == -1) {
+								totalLimit = Integer.MAX_VALUE;
+							}
+							if(buyLimitOther > buysLimit) {
+								buysLimit = buyLimitOther;
+								buysHighestGroup = checkGroup;
+							} else if(buyLimitOther == -1) {
+								buysLimit = Integer.MAX_VALUE;
+							}
+						}
+					} else {
+						groups.remove(checkGroup);
+					}
+				}
+				// Check if the limits stop the player from buying the region
+				if(totalCurrent >= totalLimit) {
+					return new LimitResult(false, LimitType.TOTAL, totalLimit, totalCurrent, totalHighestGroup);					
+				}
+				if(buysCurrent >= buysLimit) {
+					return new LimitResult(false, LimitType.BUYS, buysLimit, buysCurrent, buysHighestGroup);					
+				}				
+			}
+			groups.remove(group);
+		}		
+		return new LimitResult(true, null, 0, 0, null);
 	}
 	
 	/**
-	 * Get the number of rents a player has
-	 * @param player The player to check
-	 * @return The number of rent regions a player has
+	 * Check if the player can rent this region, detailed info in the result object
+	 * @param player The player to check it for
+	 * @return LimitResult containing if it is allowed, why and limiting factor
 	 */
-	public int getCurrentRentRegions(Player player) {
-		int result = 0;
-		for(RentRegion region : plugin.getFileManager().getRents()) {
-			if(region.isRenter(player)) {
-				result++;
+	public LimitResult limitsAllowRenting(Player player) {
+		if(player.hasPermission("areashop.limitbypass")) {
+			return new LimitResult(true, null, 0, 0, null);
+		}
+		// Get current total regions
+		List<GeneralRegion> totalRegions = new ArrayList<GeneralRegion>();
+		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
+			if(region.isOwner(player)) {
+				totalRegions.add(region);
 			}
 		}
-		return result;
+		// Get currently bought regions
+		List<RentRegion> rentRegions = new ArrayList<RentRegion>();
+		for(GeneralRegion region : totalRegions) {
+			if(region.isRentRegion()) {
+				rentRegions.add((RentRegion)region);
+			}
+		}
+		// Check all limitgroups the player has
+		List<String> groups = new ArrayList<String>(plugin.getConfig().getConfigurationSection("limitGroups").getKeys(false));
+		while(!groups.isEmpty()) {
+			String group = groups.get(0);
+			if(player.hasPermission("areashop.limits." + group) && this.matchesLimitGroup(group)) {
+				AreaShop.debug("  has group: " + group);
+				int totalLimit = plugin.getConfig().getInt("limitGroups." + group + ".total");
+				int rentsLimit = plugin.getConfig().getInt("limitGroups." + group + ".rents");
+				int totalCurrent = hasRegionsInLimitGroup(player, group, totalRegions);
+				int rentsCurrent = hasRentRegionsInLimitGroup(player, group, rentRegions);
+				if(totalLimit == -1) {
+					totalLimit = Integer.MAX_VALUE;
+				}
+				if(rentsLimit == -1) {
+					rentsLimit = Integer.MAX_VALUE;
+				}
+				String totalHighestGroup = group;
+				String rentsHighestGroup = group;
+				groups.remove(group);
+				// Get the highest number from the groups of the same category
+				List<String> groupsCopy = new ArrayList<String>(groups);
+				for(String checkGroup : groupsCopy) {
+					if(player.hasPermission("areashop.limits." + checkGroup) && this.matchesLimitGroup(checkGroup)) {
+						if(limitGroupsOfSameCategory(group, checkGroup)) {
+							groups.remove(checkGroup);
+							int totalLimitOther = plugin.getConfig().getInt("limitGroups." + checkGroup + ".total");
+							int rentLimitOther = plugin.getConfig().getInt("limitGroups." + checkGroup + ".rents");
+							if(totalLimitOther > totalLimit) {
+								totalLimit = totalLimitOther; 
+								totalHighestGroup = checkGroup;
+							} else if(totalLimitOther == -1) {
+								totalLimit = Integer.MAX_VALUE;
+							}
+							if(rentLimitOther > rentsLimit) {
+								rentsLimit = rentLimitOther;
+								rentsHighestGroup = checkGroup;
+							} else if(rentLimitOther == -1) {
+								rentsLimit = Integer.MAX_VALUE;
+							}
+						}
+					} else {
+						groups.remove(checkGroup);
+					}
+				}
+				// Check if the limits stop the player from buying the region
+				if(totalCurrent >= totalLimit) {
+					return new LimitResult(false, LimitType.TOTAL, totalLimit, totalCurrent, totalHighestGroup);					
+				}
+				if(rentsCurrent >= rentsLimit) {
+					return new LimitResult(false, LimitType.RENTS, rentsLimit, rentsCurrent, rentsHighestGroup);					
+				}				
+			}
+			groups.remove(group);
+		}		
+		return new LimitResult(true, null, 0, 0, null);
 	}
-
+	
 	/**
-	 * Get the number of buys a player has
-	 * @param player The player to check
-	 * @return The number of buy regions a player has
+	 * Class to store the result of a limits check
 	 */
-	public int getCurrentBuyRegions(Player player) {
+	public class LimitResult {
+		private boolean actionAllowed;
+		private LimitType limitingFactor;
+		private int maximum;
+		private int current;
+		private String limitingGroup;
+		public LimitResult(boolean actionAllowed, LimitType limitingFactor, int maximum, int current, String limitingGroup) {
+			this.actionAllowed = actionAllowed;
+			this.limitingFactor = limitingFactor;
+			this.maximum = maximum;
+			this.current = current;
+			this.limitingGroup = limitingGroup;
+		}
+		public boolean actionAllowed() {
+			return actionAllowed;
+		}		
+		public LimitType getLimitingFactor() {
+			return limitingFactor;
+		}
+		public int getMaximum() {
+			return maximum;
+		}
+		public int getCurrent() {
+			return current;
+		}
+		public String getLimitingGroup() {
+			return limitingGroup;
+		}
+		
+		@Override
+		public String toString() {
+			return "actionAllowed=" + actionAllowed + ", limitingFactor=" + limitingFactor + ", maximum=" + maximum + ", current=" + current + ", limitingGroup=" + limitingGroup;
+		}
+	}
+	
+	/**
+	 * Checks if two limitGroups are of the same category (same groups and worlds lists)
+	 * @param firstGroup The first group
+	 * @param secondGroup The second group
+	 * @return true if the groups and worlds lists are the same, otherwise false
+	 */
+	private boolean limitGroupsOfSameCategory(String firstGroup, String secondGroup) {
+		List<String> firstGroups = plugin.getConfig().getStringList("limitGroups." + firstGroup + ".groups");
+		List<String> secondGroups = plugin.getConfig().getStringList("limitGroups." + secondGroup + ".groups");
+		if(!firstGroups.containsAll(secondGroups) || !secondGroups.containsAll(firstGroups)) {
+			return false;
+		}
+		List<String> firstWorlds = plugin.getConfig().getStringList("limitGroups." + firstGroup + ".worlds");
+		List<String> secondWorlds = plugin.getConfig().getStringList("limitGroups." + secondGroup + ".worlds");
+		if(!firstWorlds.containsAll(secondWorlds) || !secondWorlds.containsAll(firstWorlds)) {
+			return false;
+		}		
+		return true;
+	}
+	
+	/**
+	 * Get the amount of buy regions a player has matching a certain limits group (config.yml > limitGroups)
+	 * @param player The player to check the amount for
+	 * @param limitGroup The group to check
+	 * @param buyRegions All the regions a player has bought
+	 * @return The number of regions that the player has bought matching the limit group (worlds and groups filters)
+	 */
+	public int hasBuyRegionsInLimitGroup(Player player, String limitGroup, List<BuyRegion> buyRegions) {
 		int result = 0;
-		for(BuyRegion region : plugin.getFileManager().getBuys()) {
+		for(BuyRegion region : buyRegions) {
 			if(region.isBuyer(player)) {
-				result++;
-			}
-		}
-		return result;
-	}
-	
-
-	/**
-	 * Get the total number of regions the player can have
-	 * @param player The player to check
-	 * @return Integer.MAX_VALUE if unlimited, otherwise a number
-	 */
-	public int getMaxRegions(Player player, String setting) {
-		int result = 0;		
-		Set<String> groups = plugin.config().getConfigurationSection("limitGroups").getKeys(false);
-		for(String group : groups) {
-			if(player.hasPermission("areashop.limits." + group)) {
-				int w = plugin.config().getInt("limitGroups." + group + "." + setting);
-				if(w > result) {
-					result = w;
-				} else if(w == -1) {
-					result = Integer.MAX_VALUE;
+				if(region.matchesLimitGroup(limitGroup)) {
+					result++;
 				}
 			}
-		}		
+		}
 		return result;
-	}	
-	// Functions for accessing the different limits
-	public int getMaxTotalRegions(Player player) {
-		return getMaxRegions(player, "total");
 	}
-	public int getMaxRentRegions(Player player) {
-		return getMaxRegions(player, "rents");
-	}
-	public int getMaxBuyRegions(Player player) {
-		return getMaxRegions(player, "buys");
-	}	
 	
+	/**
+	 * Get the amount of rent regions a player has matching a certain limits group (config.yml > limitGroups)
+	 * @param player The player to check the amount for
+	 * @param limitGroup The group to check
+	 * @param rentRegions All the regions a player has bought
+	 * @return The number of regions that the player has rented matching the limit group (worlds and groups filters)
+	 */
+	public int hasRentRegionsInLimitGroup(Player player, String limitGroup, List<RentRegion> rentRegions) {
+		int result = 0;
+		for(RentRegion region : rentRegions) {
+			if(region.isRenter(player)) {
+				if(region.matchesLimitGroup(limitGroup)) {
+					result++;
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Get the amount of regions a player has matching a certain limits group (config.yml > limitGroups)
+	 * @param player The player to check the amount for
+	 * @param limitGroup The group to check
+	 * @param buyRegions All the regions a player has bought or rented
+	 * @return The number of regions that the player has bought or rented matching the limit group (worlds and groups filters)
+	 */
+	public int hasRegionsInLimitGroup(Player player, String limitGroup, List<GeneralRegion> regions) {
+		int result = 0;
+		for(GeneralRegion region : regions) {
+			if(region.isOwner(player)) {
+				if(region.matchesLimitGroup(limitGroup)) {
+					result++;
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Check if this region matches the filters of a limit group
+	 * @param group The group to check
+	 * @return true if the region applies to the limit group, otherwise false
+	 */
+	public boolean matchesLimitGroup(String group) {
+		List<String> worlds = plugin.getConfig().getStringList("limitGroups." + group + ".worlds");
+		List<String> groups = plugin.getConfig().getStringList("limitGroups." + group + ".groups");
+		if((worlds == null || worlds.isEmpty() || worlds.contains(getWorldName()))) {
+			if(groups == null || groups.isEmpty()) {
+				return true;
+			} else {
+				boolean inGroups = false;
+				for(RegionGroup checkGroup : plugin.getFileManager().getGroups()) {
+					inGroups = inGroups || (groups.contains(checkGroup.getName()) && checkGroup.isMember(this));
+				}
+				return inGroups;					
+			}
+		}
+		return false;
+	}
 	
 	
 	
@@ -1375,7 +1818,7 @@ public abstract class GeneralRegion {
 	 */
 	public void handleSchematicEvent(RegionEvent type) {
 		// Check for the general killswitch
-		if(!plugin.config().getBoolean("enableSchematics")) {
+		if(!plugin.getConfig().getBoolean("enableSchematics")) {
 			return;
 		}
 		// Check the individual>group>default setting
@@ -1383,24 +1826,21 @@ public abstract class GeneralRegion {
 			return;
 		}
 		// Get the safe and restore names		
-		String save = plugin.config().getString("schematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".save");
-		String restore = plugin.config().getString("schematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".restore");
+		String save = plugin.getConfig().getString("schematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".save");
+		String restore = plugin.getConfig().getString("schematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".restore");
 		// Save the region if needed
 		if(save != null && save.length() != 0) {
-			save = save.replace(AreaShop.tagRegionName, getName());
-			save = save.replace(AreaShop.tagRegionType, getType().getValue().toLowerCase());
+			save = applyAllReplacements(save);
 			this.saveRegionBlocks(save);			
 		}
 		// Restore the region if needed
 		if(restore != null && restore.length() != 0) {
-			restore = restore.replace(AreaShop.tagRegionName, getName());
-			restore = restore.replace(AreaShop.tagRegionType, getType().getValue().toLowerCase());
+			restore = applyAllReplacements(save);
 			this.restoreRegionBlocks(restore);		
 		}
-	}	
+	}
 	
-	// COMMAND EXECUTING
-	
+	// COMMAND EXECUTING	
 	/**
 	 * Run commands as the CommandsSender, replacing all tags with the relevant values
 	 * @param sender The sender that should perform the command
@@ -1411,20 +1851,12 @@ public abstract class GeneralRegion {
 			return;
 		}
 		
-		boolean postCommandErrors = plugin.config().getBoolean("postCommandErrors");
+		boolean postCommandErrors = plugin.getConfig().getBoolean("postCommandErrors");
 		for(String command : commands) {
 			if(command == null || command.length() == 0) {
 				continue;
-			}
-			
-			// Apply replacements
-			HashMap<String, Object> replacements = getAllReplacements();	
-			for(String tag : replacements.keySet()) {
-				Object replacement = replacements.get(tag);
-				if(replacement != null) {
-					command = command.replace(tag, replacement.toString());
-				}
-			}
+			}			
+			command = applyAllReplacements(command);
 			
 			boolean result = false;
 			String error = null;
@@ -1465,7 +1897,7 @@ public abstract class GeneralRegion {
 		} else {
 			path += ".after";
 		}
-		List<String> commands = plugin.config().getStringList(path);
+		List<String> commands = plugin.getConfig().getStringList(path);
 		// Don't waste time if there are no commands to be run
 		if(commands == null || commands.isEmpty()) {
 			return;
@@ -1487,17 +1919,16 @@ public abstract class GeneralRegion {
 		}	
 		// Run player commands if specified
 		String playerPath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Player";
-		List<String> playerCommands = plugin.config().getStringList(playerPath);
+		List<String> playerCommands = plugin.getConfig().getStringList(playerPath);
 		runCommands(clicker, playerCommands);
 		
 		// Run console commands if specified
 		String consolePath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Console";
-		List<String> consoleCommands = plugin.config().getStringList(consolePath);
+		List<String> consoleCommands = plugin.getConfig().getStringList(consolePath);
 		runCommands(Bukkit.getConsoleSender(), consoleCommands);		
 		
 		return !playerCommands.isEmpty() || !consoleCommands.isEmpty();
 	}
-	
 }
 
 

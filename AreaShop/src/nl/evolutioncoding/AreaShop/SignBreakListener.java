@@ -1,8 +1,8 @@
-package nl.evolutioncoding.AreaShop;
+package nl.evolutioncoding.areashop;
 
-import nl.evolutioncoding.AreaShop.regions.BuyRegion;
-import nl.evolutioncoding.AreaShop.regions.GeneralRegion;
-import nl.evolutioncoding.AreaShop.regions.RentRegion;
+import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.regions.RentRegion;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -69,9 +69,12 @@ public final class SignBreakListener implements Listener {
 	 * Called when the physics of a block change
 	 * @param event The event
 	 */
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.MONITOR)
     public void onIndirectSignBreak(BlockPhysicsEvent event){
         Block block = event.getBlock();
+        if(event.isCancelled()) {
+        	return;
+        }
         if(block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN){
             Sign sign = (Sign)block.getState();
             Block attachedTo = block.getRelative(((org.bukkit.material.Sign)sign.getData()).getAttachedFace());

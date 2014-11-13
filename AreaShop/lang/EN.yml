@@ -8,7 +8,7 @@
 ###################################################
 
 ########## General strings
-total-maximum: "You can't rent and buy more than %0% region(s) in total"
+total-maximum: "You can't rent and buy more than %0% region(s) in total (you already have %1% in group '%2%')"
 
 cmd-notValid: "That command is not valid, use '/as help' for info"
 cmd-onlyByPlayer: "This command can only be run by a player"
@@ -31,8 +31,8 @@ help-sellOwn: "&6/as sell &7-&r Sell your own region"
 help-updaterents: "&6/as updaterents &7-&r Update all rent signs and regions"
 help-updatebuys: "&6/as updatebuys &7-&r Update all buy signs and regions"
 help-reload: "&6/as reload &7-&r Reload the config and languages"
-help-setrestore: "&6/as setrestore &7-&r Set the profile for restoring and on/off "
-help-setprice: "&6/as setprice &7-&r Change the price of a rent region"
+help-setrestore: "&6/as setrestore &7-&r Set restoring on/off and choose profile"
+help-setprice: "&6/as setprice &7-&r Change the price of a region"
 help-rentduration: "&6/as rentduration &7-&r Change the duration of a rent region"
 help-teleport: "&6/as tp &7-&r Teleport to your bought/rented regions"
 help-teleportAll: "&6/as tp &7-&r Teleport to a rent/buy region"
@@ -48,11 +48,13 @@ help-add: "&6/as add &7-&r Register a region as rent or buy"
 help-del: "&6/as del &7-&r Delete a registered region from AreaShop"
 help-addsign: "&6/as addsign &7-&r Add a sign to an existing region"
 help-delsign: "&6/as delsign &7-&r Delete the sign you are looking at"
+help-me: "&6/as me &7-&r Check which regions you have (+expiration)"
+help-setowner: "&6/as setowner &7-&r Set region owner or extend the rent"
 
 ############ Other command strings
 rent-help: "/as rent [regionname], the region you stand in will be used if not specified"
 rent-noPermission: "You don't have permission to rent a region"
-rent-maximum: "You can't rent more than %0% region(s)"
+rent-maximum: "You can't rent more than %0% region(s) (you already have %1% in group '%2%')"
 rent-payError: "Something went wrong with paying, try again later"
 rent-rented: "You rented %0% until %1%"
 rent-extended: "You extended your rent of %0% until %1%" 
@@ -62,16 +64,21 @@ rent-lowMoneyRent: "You don't have enough money to rent this region (you have %0
 rent-someoneElse: "Someone else already rented this region"
 rent-notRentable: "That region is not available for renting"
 rent-maxExtends: "You cannot extend this rent anymore (the maximum is %0% times), however after the rent is over you can rent this region again"
+rent-maxRentTime: "You cannot rent this region more time in advance, the maximum time is %0% minutes and you have currently rented it for %1% minutes"
+rent-restrictedToWorld: "You need to be in the '%0%' world to rent this region (you are in '%1%')"
+rent-restrictedToRegion: "You need to be inside '%0%' to rent it"
 
 buy-help: "/as buy [regionname], the region you stand in will be used if not specified"
 buy-noPermission: "You don't have permission to buy a region"
 buy-notBuyable: "That region is not available for buying"
-buy-maximum: "You can't buy more than %0% region(s)"
+buy-maximum: "You can't buy more than %0% region(s) (you already have %1% in group '%2%')"
 buy-payError: "Something went wrong with paying, try again later"
 buy-succes: "You succesfully bought %0%"
 buy-lowMoney: "You don't have enough money to buy this region (you have %0% and you need %1%)"
 buy-yours: "You already own this region"
 buy-someoneElse: "Someone else already bought this region"
+buy-restrictedToWorld: "You need to be in the '%0%' world to buy this region (you are in '%1%')"
+buy-restrictedToRegion: "You need to be inside '%0%' to buy it"
 
 unrent-help: "/as unrent [regionname], the region you stand in will be used if not specified"
 unrent-noPermission: "You don't have permission to unrent a region"
@@ -91,12 +98,12 @@ sell-noPermission: "You don't have permission to sell a region"
 sell-noPermissionOther: "You don't have permission to sell another region"
 
 rents-updated: "All signs and regions for renting have been updated"
-rents-notUpdated: "Not all signs have been updated, maybe reload fixes it"
 rents-noPermission: "You don't have permission to update all rent signs and regions"
+rents-notUpdated: "Not all signs have been updated, maybe reload fixes it"
 
 buys-updated: "All signs and regions for selling have been updated"
-buys-notUpdated: "Not all signs have been updated, maybe reload fixes it"
 buys-noPermission: "You don't have permission to update all buy signs and regions"
+buys-notUpdated: "Not all signs have been updated, maybe reload fixes it"
 
 reload-reloaded: "The config has been reloaded successfully"
 reload-noPermission: "You don't have permission to reload the config"
@@ -181,26 +188,32 @@ destroy-successBuy: "Buying of %0% successfully removed"
 
 teleport-help: "/as tp <region> [sign]"
 teleport-noRentOrBuy: "Region '%0%' is not registered as rent or buy"
-teleport-noPermission: "You don't have permission to teleport to a region"
-teleport-noPermissionOther: "You don't have permission to teleport to region you do not own"
+teleport-noPermission: "You don't have permission to teleport to your region"
+teleport-noPermissionOther: "You don't have permission to teleport to regions you do not own"
+teleport-noPermissionSign: "You don't have permission to teleport to the sign of your region"
+teleport-noPermissionOtherSign: "You don't have permission to teleport to signs of regions you do not own"
 teleport-success: "You teleported to %0%"
+teleport-successSign: "You teleported to the sign of %0%"
 teleport-noSafe: "No safe position found in region %0%, no spots in region left or maximum tries exceeded (%1%/%2%)"
+teleport-blocked: "You can't teleport because the position is outside the region and you are forced to teleport inside"
 
 setteleport-help: "/as settp [region] [reset], the region you stand in will be used if not specified"
 setteleport-noPermission: "You don't have permission to set the teleport location"
-setteleport-noPermissionAll: "You don't have permission to set the teleport location for a region you do not own"
+setteleport-noPermissionOther: "You don't have permission to set the teleport location for a region you do not own"
 setteleport-noRentOrBuy: "Region '%0%' is not registered as rent or buy"
 setteleport-success: "Teleport location of %0% set"
 setteleport-notInside: "The location has to be inside the region"
 setteleport-reset: "Teleport location of %0% has been reset"
 
-find-help: "/as find <buy|rent> [maxprice]"
+find-help: "/as find <buy|rent> [maxprice] [group]"
 find-noPermission: "You don't have permission to teleport to signs, so you can't use find"
-find-success: "Found a %0% region: %1%, while searching with a max price of your balance: %2%"
-find-successMax: "Found a %0% region: %1%, while searching with a max price of %2%"
+find-success: "Found a %0% region: %1%, while searching with a max price of your balance: %2%%3%"
+find-successMax: "Found a %0% region: %1%, while searching with a max price of %2%%3%"
 find-wrongMaxPrice: "The specified maximum price is not a correct number: %0%"
-find-noneFound: "No %0% region found while searching with a max price of your balance: %1%"
-find-noneFoundMax: "No %0% region found while searching with a max price of %1%"
+find-wrongGroup: "The specified group does not exist: %0%"
+find-noneFound: "No %0% region found while searching with a max price of your balance: %1%%2%"
+find-noneFoundMax: "No %0% region found while searching with a max price of %1%%2%"
+find-onlyInGroup: ", only searched for regions in group: %0%"
 
 groupadd-help: "/as groupadd <group> [region], if no region specified all regions from your WorldEdit selection are used"
 groupadd-noPermission: "You don't have permission to add regions to groups"
@@ -263,6 +276,64 @@ delsign-noSign: "You are not looking at a sign"
 delsign-noPermission: "You don't have permission to delete a sign"
 delsign-noRegion: "That sign does not belong to an AreaShop region"
 delsign-success: "The sign has been removed from region %0%"
+
+me-noPermission: "You don't have permission to check which regions you have"
+me-notAPlayer: "You are not a player so you can't have any regions"
+me-noRentRegions: "You have not rented any rent regions"
+me-noBuyRegions: "You have not bought any buy regions"
+me-rentRegions: "You have rented the following regions:"
+me-buyRegions: "You have bought the following regions:"
+me-rentLine: "%region% until %until% (%timeleft% left)"
+me-buyLine: "%region%"
+
+setowner-help: "/as setowner <player> [region], the region you stand in will be used if not specified"
+setowner-noPermission: "You don't have permission to set the owner of a region"
+setowner-noPermissionRent: "You don't have permission to set the owner of rent regions"
+setowner-noPermissionBuy: "You don't have permission to set the owner of buy regions"
+setowner-notRegistered: "The specified region is not registered, owner cannot be set"
+setowner-noPlayer: "Could not get the UUID of the specified player: %0%"
+setowner-succesRent: "Owner of %region% succesfully changed to %player%, rented until %until% (%timeleft% left)"
+setowner-succesRentExtend: "Owner was already %player%, rent extended with '%duration%', now rented until %until% (%timeleft% left)"
+setowner-succesBuy: "Owner of %region% succesfully changed to %player%"
+
+############ Sign, greeting and other strings
+timeleft-years: "%0% years"
+timeleft-months: "%0% months"
+timeleft-days: "%0% days"
+timeleft-hours: "%0% hours"
+timeleft-minutes: "%0% minutes"
+timeleft-second: "%0% second"
+timeleft-seconds: "%0% seconds"
+timeleft-ended: "Expired"
+
+greeting-forrent: "%region% can be rented for %price% per %duration%"
+greeting-rented: "%region% is rented by %player% until %until%"
+greeting-forsale: "%region% can be bought for %price%"
+greeting-bought: "%region% is bought by %player%"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

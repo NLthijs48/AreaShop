@@ -1,7 +1,9 @@
 ### All settings below are default settings and can be overridden
 ### by group settings or region settings (copy a section to a region or group and change them there)
 
-########## GENERAL ##########  
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ GENERAL: Options for all regions                                                                                           │
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  
 general:
   ## Set this to true to enable saving/restoring for regions as specified in the profile below, which is specified in the config
   enableRestore: false
@@ -20,8 +22,17 @@ general:
   ## a cube from the starting point to check for safe spots (then it could end outside the region)
   ## If you set a teleport location outside of the region with /as settp then setting this to true breaks that teleport (players cannot use it)
   teleportIntoRegion: true
+  ## Same as above, but then for when you teleport to the sign of a region instead of the region itself
+  teleportToSignIntoRegion: false
+  ## Restricts the /as buy and /as rent commands to the world of the region 
+  ## Usefull if you have diffrent economies for different worlds
+  restrictedToWorld: false
+  ## Restricts the /as buy and /as rent commands to the region itself (player needs to be inside)
+  restrictedToRegion: false
 
-########## RENTING ##########
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ RENT: Options for rent regions                                                                                             │
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 rent:
   ## The default price of a renting region
   price: 1000
@@ -31,10 +42,33 @@ rent:
   moneyBack: 100
   ## Maximum number of extends a player can do (-1 for infinite, 0 for no extending)
   maxExtends: -1
+  ## The Maximum time they can have the region rented in advance (minutes, -1 for infinite)
+  ## If you set this higher then the duration players will not be able to rent the region 
+  maxRentTime: -1
+  ## Automatically unrent the region after the specified number of minutes between the last login time of the renter and the current time
+  ## -1 means never, 1440 is one day, 43200 is one month, 525600 is one year
+  inactiveTimeUntilUnrent: -1
 
-########## BUYING ##########
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUY: Options for buy regions                                                                                               │
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 buy:
   ## The default price of a buying region
   price: 1000
   ## The percentage of the buying price you get back if you sell the region
   moneyBack: 100
+  ## Automatically sell the region after the specified number of minutes between the last login time of the buyer and the current time
+  ## -1 mean never, 1440 is one day, 43200 is one month, 525600 is one year
+  inactiveTimeUntilSell: -1
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

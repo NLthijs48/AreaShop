@@ -1,2 +1,6 @@
 /.project
 /.classpath
+/bin
+.metadata
+.classpath
+.project

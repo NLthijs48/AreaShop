@@ -382,7 +382,9 @@ public abstract class GeneralRegion {
 			} else {
 				languageString = plugin.getLanguageManager().getLang(key);
 			}
-			source = source.replace(match, languageString);
+			if(languageString != null) {
+				source = source.replace(match, languageString);
+			}
 			//AreaShop.debug("match=" + match + ", key=" + key + ", lanString=" + languageString + ", replaced=" + source);
 		}		
 		// Apply static replacements
@@ -1835,7 +1837,7 @@ public abstract class GeneralRegion {
 		}
 		// Restore the region if needed
 		if(restore != null && restore.length() != 0) {
-			restore = applyAllReplacements(save);
+			restore = applyAllReplacements(restore);
 			this.restoreRegionBlocks(restore);		
 		}
 	}

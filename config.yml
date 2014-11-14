@@ -209,13 +209,13 @@ flagProfiles:
       greeting: '%lang:prefix%%lang:greeting-forrent%'
     rented:
       members: +%player%
-      greeting: '%lang:prefix%%lang:greeting-forrent%'
+      greeting: '%lang:prefix%%lang:greeting-rented%'
     forsale:
       members: -%player%
-      greeting: '%lang:prefix%%lang:greeting-forrent%'
+      greeting: '%lang:prefix%%lang:greeting-forsale%'
     sold:
       members: +%player%
-      greeting: '%lang:prefix%%lang:greeting-forrent%'
+      greeting: '%lang:prefix%%lang:greeting-bought%'
         
       
       

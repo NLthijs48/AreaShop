@@ -39,8 +39,11 @@ public final class SignChangeListener implements Listener {
 	 * Called when a sign is changed
 	 * @param event The event
 	 */
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onSignChange(SignChangeEvent event) {
+		if(event.isCancelled()) {
+			return;
+		}
 		Player player = event.getPlayer();
 		
 		// Check if the sign is meant for this plugin

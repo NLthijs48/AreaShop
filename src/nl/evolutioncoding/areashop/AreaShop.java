@@ -128,6 +128,7 @@ public final class AreaShop extends JavaPlugin {
 			this.getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 			this.getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
 			this.getServer().getPluginManager().registerEvents(new SignClickListener(this), this);			
+			this.getServer().getPluginManager().registerEvents(new PlayerLoginListener(this), this);
 			
 			setupTasks();
 	        
@@ -148,14 +149,17 @@ public final class AreaShop extends JavaPlugin {
 	 *  Called on shutdown or reload of the server 
 	 */
 	public void onDisable() {
-		fileManager.saveRequiredFiles();		
+		fileManager.saveRequiredFilesAtOnce();		
 		Bukkit.getServer().getScheduler().cancelTasks(this);
 		
 		/* set variables to null to prevent memory leaks */
 		worldGuard = null;
+		worldEdit = null;
 		economy = null;
 		fileManager = null;
 		languageManager = null;
+		commandManager = null;
+		chatprefix = null;
 		debug = false;
 	}
  

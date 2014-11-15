@@ -465,7 +465,7 @@ public class FileManager {
 	
 	
 	/**
-	 * Save all region related files
+	 * Save all region related files spread over time (low load)
 	 */
 	public void saveRequiredFiles() {
 		if(isSaveGroupsRequired()) {
@@ -491,6 +491,20 @@ public class FileManager {
 				}
 			}
 		}.runTaskTimer(plugin, 1, 1);
+	}
+	
+	/**
+	 * Save all region related files directly (only for cases like onDisable())
+	 */
+	public void saveRequiredFilesAtOnce() {
+		if(isSaveGroupsRequired()) {
+			saveGroupsNow();
+		}
+		for(GeneralRegion region : getRegions()) {
+			if(region.isSaveRequired()) {
+				region.saveNow();
+			}						
+		}
 	}
 	
 	public String getRegionFolder() {

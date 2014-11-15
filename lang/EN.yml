@@ -67,6 +67,7 @@ rent-maxExtends: "You cannot extend this rent anymore (the maximum is %0% times)
 rent-maxRentTime: "You cannot rent this region more time in advance, the maximum time is %0% minutes and you have currently rented it for %1% minutes"
 rent-restrictedToWorld: "You need to be in the '%0%' world to rent this region (you are in '%1%')"
 rent-restrictedToRegion: "You need to be inside '%0%' to rent it"
+rent-loginExpireWarning: "Your region %region% has only %timeleft% left, be sure to extend it if you want to keep it"
 
 buy-help: "/as buy [regionname], the region you stand in will be used if not specified"
 buy-noPermission: "You don't have permission to buy a region"

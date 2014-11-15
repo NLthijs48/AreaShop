@@ -35,6 +35,9 @@ public final class SignBreakListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onSignBreak(BlockBreakEvent event) {
+		if(event.isCancelled()) {
+			return;
+		}
 		Block block = event.getBlock();
 		/* Check if it is a sign */
 		if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {

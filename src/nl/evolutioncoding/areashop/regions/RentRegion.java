@@ -203,9 +203,19 @@ public class RentRegion extends GeneralRegion {
 	 * Get the duration of 1 rent period
 	 * @return The duration in milliseconds of 1 rent period
 	 */
-	public long getDuration() {
-		/* Get the time until the region will be rented */
-		String duration = getDurationString();
+	public long getDuration() {		
+		return durationStringToLong(getDurationString());
+	}
+	
+	/**
+	 * Methode to tranlate a duration string to a millisecond value
+	 * @param duration The duration string
+	 * @return The duration in milliseconds translated from the durationstring, or if it is invalid then 0
+	 */
+	public long durationStringToLong(String duration) {
+		if(duration == null) {
+			return 0;
+		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(0);
 
@@ -216,7 +226,10 @@ public class RentRegion extends GeneralRegion {
 		ArrayList<String> years = new ArrayList<String>(plugin.getConfig().getStringList("years"));
 		
 		String durationString = duration.substring(duration.indexOf(' ')+1, duration.length());
-		int durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));
+		int durationInt = 0;
+		try {
+			durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));
+		} catch(NumberFormatException exception) {}
 		
 		if(minutes.contains(durationString)) {
 			calendar.add(Calendar.MINUTE, durationInt);

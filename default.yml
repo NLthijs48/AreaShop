@@ -36,7 +36,7 @@ general:
 rent:
   ## The default price of a renting region
   price: 1000
-  ## The default duration of a renting region
+  ## The default duration of a renting region, you can find all time indicators in config.yml below the RENTING header
   duration: '1 day'
   ## The percentage of the renting price you get back if you unrent the region (price of time left will be multiplied by this/100)
   moneyBack: 100
@@ -48,6 +48,9 @@ rent:
   ## Automatically unrent the region after the specified number of minutes between the last login time of the renter and the current time
   ## -1 means never, 1440 is one day, 43200 is one month, 525600 is one year
   inactiveTimeUntilUnrent: -1
+  ## If a region of a player has less then this time left when he joins the server he will get a warning
+  ## You can find all time indicators in config.yml below the RENTING header, change to '' to disable
+  warningOnLoginTime: '1 day'
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUY: Options for buy regions                                                                                               │

@@ -37,10 +37,10 @@ sendStats: true
 useColorsInConsole: false
 ## Post error messages in the console when a command run from the config fails (from the 'runCommands' section for example)
 postCommandErrors: true
-## Enables / disables debug messages in the console, no need to change
+## Enables / disables debug messages in the console, could be useful to figure out where errors come from
 debug: false
 ## Version of the config, do not change!
-version: 2.1.1
+version: 2.1.0
 
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -216,19 +216,23 @@ flagProfiles:
     sold:
       members: +%player%
       greeting: '%lang:prefix%%lang:greeting-bought%'
-        
-      
-      
- ## TODO
-# rentWarningProfiles:
-#  default:
-#    10:
-#      commands: 
-#      messages: 
-      
-      
-      
-      
+## Profiles that specify when players should get messages about rent that almost run out
+## The numbers that start sections in the profile specify how time before it actually runs out it should be executed
+## When warnPlayer is set to true a message will be send that is specified in the language file
+## All commands in the list below 'commands:' will execute together with the warning, all normal variables can be used
+expirationWarningProfiles:
+  default:
+    "1 day":
+      warnPlayer: true
+      commands:
+  ##  - "say %region% is about to expire for %player%: %timeleft% left"
+    "1 hour":
+      warnPlayer: true
+      commands:
+    "5 minutes":
+      warnPlayer: true
+      commands:
+     
   
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ LIMITS AND TIMINGS: Options for limits and the frequencies for certain functions (be very carefull with these!)            │
@@ -249,9 +253,15 @@ saving:
 ## Timings for rent expiration checking
 expiration:
   ## Time between checking if rent regions have been expired (seconds)
-  delay: 60
+  delay: 59
   ## Number of rent regions to check per tick (there are 20 ticks in a second)
   regionsPerTick: 5
+## Timings for expiration warning to online players
+expireWarning:
+  ## The time between checking if expiration warning need to be sent
+  delay: 5
+  ## Number of regions to update per tick (there are 20 ticks in a second)
+  regionsPerTick: 1
 ## Timings for updating signs and region flags (/as updaterents or /as updatebuys)
 update:
   ## Number of regions to update per tick (there are 20 ticks in a second)

@@ -51,6 +51,8 @@ rent:
   ## If a region of a player has less then this time left when he joins the server he will get a warning
   ## You can find all time indicators in config.yml below the RENTING header, change to '' to disable
   warningOnLoginTime: '1 day'
+  ## The profile for the expiration warnings as specified in the config
+  expirationWarningProfile: 'default'
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUY: Options for buy regions                                                                                               │

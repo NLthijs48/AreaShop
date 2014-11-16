@@ -205,6 +205,7 @@ public class FileManager {
 	public void addRent(RentRegion rent) {
 		if(rent == null) {
 			AreaShop.debug("Tried adding a null rent!");
+			return;
 		}
 		regions.put(rent.getName().toLowerCase(), rent);
 	}
@@ -217,6 +218,7 @@ public class FileManager {
 	public void addBuy(BuyRegion buy) {
 		if(buy == null) {
 			AreaShop.debug("Tried adding a null buy!");
+			return;
 		}
 		regions.put(buy.getName().toLowerCase(), buy);
 	}
@@ -368,13 +370,36 @@ public class FileManager {
 							regions.get(current).updateSigns();
 						}
 						current++;
-					} 
+					}
 				}
 				if(current >= regions.size()) {
 					this.cancel();
 				}
 			}
 		}.runTaskTimer(plugin, 1, 1);		
+	}
+	
+	/**
+	 * Send out rent expire warnings
+	 */
+	public void sendRentExpireWarnings() {
+		final List<RentRegion> regions = new ArrayList<RentRegion>(getRents());
+		new BukkitRunnable() {
+			private int current = 0;
+			
+			@Override
+			public void run() {
+				for(int i=0; i<plugin.getConfig().getInt("expireWarning.regionsPerTick"); i++) {
+					if(current < regions.size()) {
+						regions.get(current).sendExpirationWarnings();
+						current++;
+					}
+				}
+				if(current >= regions.size()) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(plugin, 1, 1);
 	}
 	
 	/**

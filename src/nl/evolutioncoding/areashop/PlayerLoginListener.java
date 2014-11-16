@@ -51,7 +51,7 @@ public final class PlayerLoginListener implements Listener {
 			        new BukkitRunnable() {
 						@Override
 						public void run() {
-							finalPlugin.message(finalPlayer, "rent-loginExpireWarning", finalRegion);
+							finalPlugin.message(finalPlayer, "rent-expireWarning", finalRegion);
 						}
 			        }.runTaskLater(plugin, 2);			        
 				}				

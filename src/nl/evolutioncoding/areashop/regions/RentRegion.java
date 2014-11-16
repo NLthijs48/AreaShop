@@ -14,10 +14,13 @@ import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class RentRegion extends GeneralRegion {	
+	private long warningsDoneUntil = Calendar.getInstance().getTimeInMillis();
+	
 	/**
 	 * Constructor
 	 * @param plugin The areashop plugin
@@ -338,6 +341,42 @@ public class RentRegion extends GeneralRegion {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Send the expiration warnings from the selected profile which is specified in the config
+	 * Sends all warnings since previous call until now+<normal delay>, delay can be found in the config as well
+	 */
+	public void sendExpirationWarnings() {
+		// send from warningsDoneUntil to current+delay
+		if(!isRented()) {
+			return;
+		}
+		Player player = Bukkit.getPlayer(getRenter());
+		if(player != null) {
+			long sendUntil = Calendar.getInstance().getTimeInMillis() + (plugin.getConfig().getInt("expireWarning.delay") * 60 * 1000);
+			// loop through warning defined in the config for the profile that is set for this region
+			String configPath = "expirationWarningProfiles." + getStringSetting("rent.expirationWarningProfile");
+			ConfigurationSection section = plugin.getConfig().getConfigurationSection(configPath);
+			if(section == null) {
+				return;
+			}
+			for(String timeBefore : section.getKeys(false)) {
+				long timeBeforeParsed = this.durationStringToLong(timeBefore);
+				if(timeBeforeParsed <= 0) {
+					return;
+				}
+				long checkTime = getRentedUntil() - timeBeforeParsed;
+				
+				if(checkTime > warningsDoneUntil && checkTime <= sendUntil) {
+					if(plugin.getConfig().getBoolean(configPath + "." + timeBefore + ".warnPlayer")) {
+						plugin.message(player, "rent-expireWarning", this);
+					}
+					this.runCommands(Bukkit.getConsoleSender(), plugin.getConfig().getStringList(configPath + "." + timeBefore + ".commands"));					
+				}		
+			}
+			warningsDoneUntil = sendUntil;
+		}		
 	}
 	
 	/**

@@ -556,7 +556,6 @@ public abstract class GeneralRegion {
 			return true;
 		}
 		for(String sign : signs) {
-			AreaShop.debug("sign name: " + sign);
 			Location location = Utils.configToLocation(config.getConfigurationSection("general.signs." + sign + ".location"));
 			if(location == null) {
 				// TODO: Remove the sign if the location is wrong?
@@ -568,8 +567,7 @@ public abstract class GeneralRegion {
 			String profile = config.getString("general.signs." + sign + ".profile");
 			if(profile == null || profile.length() == 0) {
 				profile = getStringSetting("general.signProfile");
-			}			
-			AreaShop.debug("  profile=" + profile);
+			}
 			// Get the prefix
 			String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".";			
 			// Get the lines
@@ -585,7 +583,6 @@ public abstract class GeneralRegion {
 							&& (signLines[1] == null || signLines[1].length() == 0) 
 							&& (signLines[2] == null || signLines[2].length() == 0) 
 							&& (signLines[3] == null || signLines[3].length() == 0) )) {
-				AreaShop.debug("  set to air");
 				block.setType(Material.AIR);
 			} else {				
 				Sign signState = null;
@@ -633,7 +630,6 @@ public abstract class GeneralRegion {
 					}					
 					signLines[i] = applyAllReplacements(signLines[i]);					
 					signLines[i] = plugin.fixColors(signLines[i]);	
-					AreaShop.debug("  signLine: " + signLines[i]);
 					signState.setLine(i, signLines[i]);
 				}
 				signState.update();

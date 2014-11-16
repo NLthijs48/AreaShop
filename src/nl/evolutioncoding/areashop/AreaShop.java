@@ -238,15 +238,16 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public void setupTasks() {
         // Rent expiration timer
-        int checkDelay = this.getConfig().getInt("expiration.delay")*20;
+        int expirationCheck = this.getConfig().getInt("expiration.delay")*20;
         final AreaShop finalPlugin = this;
-        if(checkDelay > 0) {
+        if(expirationCheck > 0) {
 	        new BukkitRunnable() {
 				@Override
 				public void run() {
 					finalPlugin.getFileManager().checkRents();
+					AreaShop.debug("Checking rent expirations...");
 				}
-	        }.runTaskTimer(this, checkDelay, checkDelay);
+	        }.runTaskTimer(this, expirationCheck, expirationCheck);
         }
 	    // Inactive unrenting/selling timer
         int inactiveCheck = this.getConfig().getInt("inactive.delay")*60*20;
@@ -255,6 +256,7 @@ public final class AreaShop extends JavaPlugin {
 				@Override
 				public void run() {
 					finalPlugin.getFileManager().checkForInactiveRegions();
+					AreaShop.debug("Checking for regions with players that are inactive too long...");
 				}
 	        }.runTaskTimer(this, inactiveCheck, inactiveCheck);	     
         }	        
@@ -265,6 +267,7 @@ public final class AreaShop extends JavaPlugin {
 				@Override
 				public void run() {
 					finalPlugin.getFileManager().performPeriodicSignUpdate();
+					AreaShop.debug("Performing periodic sign update...");
 				}
 	        }.runTaskTimer(this, periodicUpdate, periodicUpdate);	     
         }
@@ -275,9 +278,20 @@ public final class AreaShop extends JavaPlugin {
 				@Override
 				public void run() {
 					finalPlugin.getFileManager().saveRequiredFiles();
-					AreaShop.debug("Saving...");
+					AreaShop.debug("Saving required files...");
 				}
 	        }.runTaskTimer(this, saveFiles, saveFiles);	     
+        }
+        // Sending warnings about rent regions to online players
+        int expireWarning = this.getConfig().getInt("expireWarning.delay")*20*60;
+        if(expireWarning > 0) {
+	        new BukkitRunnable() {
+				@Override
+				public void run() {
+					finalPlugin.getFileManager().sendRentExpireWarnings();
+					AreaShop.debug("Sending rent expire warnings...");
+				}
+	        }.runTaskTimer(this, expireWarning, expireWarning);	     
         }
 	}
 	

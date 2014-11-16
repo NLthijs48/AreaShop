@@ -30,7 +30,7 @@ permissions:
       areashop.reload: true
       areashop.setrestore: true
       areashop.setprice: true
-      areashop.rentduration: true
+      areashop.setduration: true
       areashop.teleport: true
       areashop.teleportall: true
       areashop.setteleportall: true
@@ -100,7 +100,7 @@ permissions:
   areashop.setprice:
     description: Allows you to change the price
     default: op
-  areashop.rentduration:
+  areashop.setduration:
     description: Allows you to change the duration of a rent
     default: op
   areashop.teleport:

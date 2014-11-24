@@ -130,11 +130,7 @@ public class SetownerCommand extends CommandAreaShop {
 				result.add(player.getName());
 			}
 		} else if(toComplete == 3) {
-			for(RentRegion region : plugin.getFileManager().getRents()) {
-				if(region.isRented()) {
-					result.add(region.getName());
-				}
-			}
+			result.addAll(plugin.getFileManager().getRegionNames());
 		}
 		return result;
 	}

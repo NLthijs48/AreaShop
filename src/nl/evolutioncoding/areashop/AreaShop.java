@@ -72,6 +72,7 @@ public final class AreaShop extends JavaPlugin {
 	public static final String tagDepth = "%depth%"; // z-axis
 	public static final String tagTimeLeft = "%timeleft%";
 	public static final String tagClicker = "%clicker%";
+	public static final String tagResellPrice = "%resellprice%";
 	
 	public static AreaShop getInstance() {
 		return AreaShop.instance;
@@ -451,7 +452,7 @@ public final class AreaShop extends JavaPlugin {
 	 * Reload all files of the plugin
 	 */
 	public void reload() {
-		fileManager.saveRequiredFiles();
+		fileManager.saveRequiredFilesAtOnce();
 		chatprefix = this.getConfig().getString("chatPrefix");
 		debug = this.getConfig().getBoolean("debug");
 		languageManager = new LanguageManager(this);

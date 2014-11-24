@@ -49,6 +49,7 @@ permissions:
       areashop.delsign: true
       areashop.renttimebypass: true
       areashop.me: true
+      areashop.resellall: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -172,3 +173,10 @@ permissions:
   areashop.setownerbuy:
     description: Allows you to set the owner of buy regions
     default: op
+  areashop.resell:
+    description: Allows you to set your region to sell mode for selling to other players
+    default: true
+  areashop.resellall:
+    description: Allows you to set any region into selling mode
+    default: op
+    

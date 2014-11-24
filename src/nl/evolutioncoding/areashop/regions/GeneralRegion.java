@@ -84,7 +84,8 @@ public abstract class GeneralRegion {
 		EXTENDED("extended"),
 		UNRENTED("unrented"),
 		BOUGHT("bought"),
-		SOLD("sold");
+		SOLD("sold"),
+		RESELL("resell");
 		
 		private final String value;
 		private RegionEvent(String value) {
@@ -100,7 +101,8 @@ public abstract class GeneralRegion {
 		FORRENT("forrent"),
 		RENTED("rented"),
 		FORSALE("forsale"),
-		SOLD("sold");
+		SOLD("sold"),
+		RESELL("resell");
 		
 		private final String value;
 		private RegionState(String value) {

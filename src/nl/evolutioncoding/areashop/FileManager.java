@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
@@ -248,7 +249,7 @@ public class FileManager {
 			rent.handleSchematicEvent(RegionEvent.DELETED);
 			rent.runEventCommands(RegionEvent.DELETED, true);
 			
-			/* Delete the sign and the variable */
+			/* Delete the signs and the variable */
 			if(rent.getWorld() != null) {
 				for(Location sign : rent.getSignLocations()) {
 					sign.getBlock().setType(Material.AIR);
@@ -960,6 +961,7 @@ public class FileManager {
 					}
 					if(rent.get("playeruuid") != null) {
 						config.set("rent.renter", rent.get("playeruuid"));
+						config.set("rent.renterName", plugin.toName(rent.get("playeruuid")));
 						config.set("rent.rentedUntil", Long.parseLong(rent.get("rented")));
 					}
 					try {
@@ -1078,6 +1080,7 @@ public class FileManager {
 					}
 					if(buy.get("playeruuid") != null) {
 						config.set("buy.buyer", buy.get("playeruuid"));
+						config.set("buy.buyerName", plugin.toName(buy.get("playeruuid")));
 					}
 					try {
 						config.save(new File(regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml"));

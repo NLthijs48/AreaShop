@@ -97,6 +97,7 @@ limitGroups:
 ## %height%         The height of the region (amount of blocks on the y-axis)
 ## %timeleft%       The time left on the rent (uses the unit of time that fits best, minutes used from 121 seconds till 120 minutes)
 ## %clicker%        The name of the player that clicked the sign (only to be used in the signProfiles section)
+## %resellprice%    The price of a region when it is in resell mode
   
 ## Below are profiles for the signs, you can assign profiles to regions 
 ## by setting 'general.signProfile' in default.yml, groups or individual regions
@@ -131,6 +132,15 @@ signProfiles:
       line2: '%region%'
       line3: '%price%'
       line4:
+      rightClickPlayer:
+      - 'areashop buy %region%'
+      leftClickPlayer:
+      - 'areashop info region %region%'
+    resell:
+      line1: '&9&l[Resale]'
+      line2: '%region%'
+      line3: '%resellprice%'
+      line4: '&8%player%'
       rightClickPlayer:
       - 'areashop buy %region%'
       leftClickPlayer:
@@ -175,6 +185,9 @@ eventCommandProfiles:
     sold:
       before:
       after:
+    resell:
+      before:
+      after:
 ## For the following events you can specify if you want to restore or save the region to a schematic
 ## After 'save:' or 'restore:' you enter the name of the file to restore from/to
 ## If you want your regions all looking the same then you can leave out the %region% part to use the same schematic for all
@@ -200,23 +213,29 @@ schematicProfiles:
     sold:
       save: ''
       restore: '%type%-%region%'
+    resell:
+      save: ''
+      restore: ''
 ## Flag profiles to specify what flags should be set on the WorldGuard regions
 ## All normal region flags as present in WorldGuard can be used, and also members, owners, priority and parent
 ## Use 'clear' for members or owners to remove all players. Use '' for a normal flag to reset it.
 flagProfiles:
   default:
     forrent:
-      members: -%player%
+      members: clear
       greeting: '%lang:prefix%%lang:greeting-forrent%'
     rented:
-      members: +%player%
+      members: clear, +%player%
       greeting: '%lang:prefix%%lang:greeting-rented%'
     forsale:
-      members: -%player%
+      members: clear
       greeting: '%lang:prefix%%lang:greeting-forsale%'
     sold:
-      members: +%player%
+      members: clear, +%player%
       greeting: '%lang:prefix%%lang:greeting-bought%'
+    resale:
+      members: clear, +%player%
+      greetin: '%lang:prefix%%lang:greeting-resale%'
 ## Profiles that specify when players should get messages about rent that almost run out
 ## The numbers that start sections in the profile specify how time before it actually runs out it should be executed
 ## When warnPlayer is set to true a message will be send that is specified in the language file

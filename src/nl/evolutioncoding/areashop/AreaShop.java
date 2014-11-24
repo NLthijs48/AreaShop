@@ -71,6 +71,7 @@ public final class AreaShop extends JavaPlugin {
 	public static final String tagHeight = "%height%"; // y-axis
 	public static final String tagDepth = "%depth%"; // z-axis
 	public static final String tagTimeLeft = "%timeleft%";
+	public static final String tagClicker = "%clicker%";
 	
 	public static AreaShop getInstance() {
 		return AreaShop.instance;

@@ -96,6 +96,7 @@ limitGroups:
 ## %depth%          The depth of the region (amount of blocks on the z-axis)
 ## %height%         The height of the region (amount of blocks on the y-axis)
 ## %timeleft%       The time left on the rent (uses the unit of time that fits best, minutes used from 121 seconds till 120 minutes)
+## %clicker%        The name of the player that clicked the sign (only to be used in the signProfiles section)
   
 ## Below are profiles for the signs, you can assign profiles to regions 
 ## by setting 'general.signProfile' in default.yml, groups or individual regions

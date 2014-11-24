@@ -1855,6 +1855,9 @@ public abstract class GeneralRegion {
 				continue;
 			}			
 			command = applyAllReplacements(command);
+			if(sender instanceof Player) {
+				command = command.replace(AreaShop.tagClicker, sender.getName());
+			}
 			
 			boolean result = false;
 			String error = null;

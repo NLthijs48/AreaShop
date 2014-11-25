@@ -1922,12 +1922,18 @@ public abstract class GeneralRegion {
 		}	
 		// Run player commands if specified
 		String playerPath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Player";
-		List<String> playerCommands = plugin.getConfig().getStringList(playerPath);
+		List<String> playerCommands = new ArrayList<String>();
+		for(String command : plugin.getConfig().getStringList(playerPath)) {
+			playerCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));
+		}
 		runCommands(clicker, playerCommands);
 		
 		// Run console commands if specified
 		String consolePath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Console";
-		List<String> consoleCommands = plugin.getConfig().getStringList(consolePath);
+		List<String> consoleCommands = new ArrayList<String>();
+		for(String command : plugin.getConfig().getStringList(consolePath)) {
+			consoleCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));
+		}
 		runCommands(Bukkit.getConsoleSender(), consoleCommands);		
 		
 		return !playerCommands.isEmpty() || !consoleCommands.isEmpty();

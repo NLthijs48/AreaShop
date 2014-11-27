@@ -43,19 +43,22 @@ public class SetpriceCommand extends CommandAreaShop {
 		}		
 		GeneralRegion region = null;
 		if(args.length < 3) {
-			if(sender instanceof Player) {
+			if (sender instanceof Player) {
 				// get the region by location
-				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
-				if(regions.size() != 1) {
-					plugin.message(sender, "setprice-help");
+				List<GeneralRegion> regions = plugin.getFileManager().getAllApplicableRegions(((Player) sender).getLocation());
+				if (regions.isEmpty()) {
+					plugin.message(sender, "cmd-noRegionsAtLocation");
+					return;
+				} else if (regions.size() > 1) {
+					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
 					region = regions.get(0);
-				}				
+				}
 			} else {
-				plugin.message(sender, "setprice-help");
+				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}			
+			}		
 		} else {
 			region = plugin.getFileManager().getRegion(args[2]);
 		}		

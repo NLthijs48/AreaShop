@@ -5,7 +5,6 @@ import java.util.List;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
-import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -25,66 +24,72 @@ public class StopresellCommand extends CommandAreaShop {
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.stopresell")) {
+		if(target.hasPermission("areashop.stopresellall")) {
+			return plugin.getLanguageManager().getLang("help-stopResellAll");
+		} else if(target.hasPermission("areashop.stopresell")) {
 			return plugin.getLanguageManager().getLang("help-stopResell");
-		} else if(target.hasPermission("areashop.stopresellall")) {
-			plugin.getLanguageManager().getLang("help-stopResellAll");
 		}
 		return null;
 	}
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.stopresell") && !sender.hasPermission("areashop.stopresellall")) {
+			plugin.message(sender, "stopresell-noPermissionOther");
+			return;
+		}
+		
 		BuyRegion buy = null;
 		if(args.length <= 1) {
-			if(sender instanceof Player) {
+			if (sender instanceof Player) {
 				// get the region by location
-				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
-				if(regions.size() != 1) {
-					plugin.message(sender, "stopResell-help");
+				List<BuyRegion> regions = plugin.getFileManager().getApplicableBuyRegions(((Player) sender).getLocation());
+				if (regions.isEmpty()) {
+					plugin.message(sender, "cmd-noRegionsAtLocation");
+					return;
+				} else if (regions.size() > 1) {
+					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
-					if(regions.get(0).isBuyRegion()) {
-						buy = (BuyRegion)regions.get(0);
-					}
-				}				
+					buy = (BuyRegion) regions.get(0);
+				}
 			} else {
-				plugin.message(sender, "stopResell-help");
+				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}			
+			}		
 		} else {
 			buy = plugin.getFileManager().getBuy(args[1]);
 			if(buy == null) {
-				plugin.message(sender, "stopResell-notRegistered", args[1]);
+				plugin.message(sender, "stopresell-notRegistered", args[1]);
 				return;
 			}
 		}
 		if(buy == null) {
-			plugin.message(sender, "stopResell-noRegionFound");
+			plugin.message(sender, "stopresell-noRegionFound");
 			return;
 		}
 		if(!buy.isInResellingMode()) {
-			plugin.message(sender, "stopResell-notResell", buy);
+			plugin.message(sender, "stopresell-notResell", buy);
 			return;
 		}
 		if(sender.hasPermission("areashop.stopresellall")) {
 			buy.disableReselling();
 			buy.saveRequired();
-			plugin.message(sender, "stopResell-success", buy);
+			plugin.message(sender, "stopresell-success", buy);
 			buy.updateSigns();
 			buy.updateRegionFlags();
 		} else if(sender.hasPermission("areashop.stopresell") && sender instanceof Player) {
 			if(buy.isOwner((Player)sender)) {
 				buy.disableReselling();
 				buy.saveRequired();
-				plugin.message(sender, "stopResell-success", buy);
+				plugin.message(sender, "stopresell-success", buy);
 				buy.updateSigns();
 				buy.updateRegionFlags();
 			} else {
-				plugin.message(sender, "stopResell-noPermissionOther");
+				plugin.message(sender, "stopresell-noPermissionOther");
 			}
 		} else {
-			plugin.message(sender, "stopResell-noPermission");
+			plugin.message(sender, "stopresell-noPermission");
 		}	
 	}
 	

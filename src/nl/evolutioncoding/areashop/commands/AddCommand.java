@@ -40,6 +40,11 @@ public class AddCommand extends CommandAreaShop {
 
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.createrent") && !sender.hasPermission("areashop.createbuy")) {
+			plugin.message(sender, "add-noPermission");
+			return;
+		}
+		
 		if(args.length < 2 || args[1] == null || (!"rent".equals(args[1].toLowerCase()) && !"buy".equals(args[1].toLowerCase()))) {
 			plugin.message(sender, "add-help");
 			return;

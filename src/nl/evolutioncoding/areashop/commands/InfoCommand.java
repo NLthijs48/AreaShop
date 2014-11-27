@@ -40,6 +40,10 @@ public class InfoCommand extends CommandAreaShop {
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.info")) {
+			plugin.message(sender, "info-noPermission");
+			return;
+		}
 		if(args.length > 1 && args[1] != null) {
 			/* List of all regions */
 			if(args[1].equalsIgnoreCase("all")) {
@@ -208,11 +212,14 @@ public class InfoCommand extends CommandAreaShop {
 						rent = plugin.getFileManager().getRent(args[2]);
 						buy = plugin.getFileManager().getBuy(args[2]);
 					} else {
-						if(sender instanceof Player) {
+						if (sender instanceof Player) {
 							// get the region by location
-							List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
-							if(regions.size() != 1) {
-								plugin.message(sender, "info-regionHelp");
+							List<GeneralRegion> regions = plugin.getFileManager().getAllApplicableRegions(((Player) sender).getLocation());
+							if (regions.isEmpty()) {
+								plugin.message(sender, "cmd-noRegionsAtLocation");
+								return;
+							} else if (regions.size() > 1) {
+								plugin.message(sender, "cmd-moreRegionsAtLocation");
 								return;
 							} else {
 								if(regions.get(0).isRentRegion()) {
@@ -220,11 +227,11 @@ public class InfoCommand extends CommandAreaShop {
 								} else if(regions.get(0).isBuyRegion()) {
 									buy = (BuyRegion)regions.get(0);
 								}
-							}				
+							}
 						} else {
-							plugin.message(sender, "info-regionHelp");
+							plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 							return;
-						}			
+						}
 					}
 					
 					if(rent == null && buy == null) {

@@ -5,7 +5,6 @@ import java.util.List;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
-import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -24,16 +23,21 @@ public class ResellCommand extends CommandAreaShop {
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.resell")) {
+		if(target.hasPermission("areashop.resellall")) {
+			return plugin.getLanguageManager().getLang("help-resellAll");
+		} else if(target.hasPermission("areashop.resell")) {
 			return plugin.getLanguageManager().getLang("help-resell");
-		} else if(target.hasPermission("areashop.resellall")) {
-			plugin.getLanguageManager().getLang("help-resellAll");
 		}
 		return null;
 	}
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.resell") && !sender.hasPermission("areashop.resellall")) {
+			plugin.message(sender, "resell-noPermissionOther");
+			return;
+		}
+		
 		if(args.length <= 1) {
 			plugin.message(sender, "resell-help");
 			return;
@@ -47,21 +51,22 @@ public class ResellCommand extends CommandAreaShop {
 		}
 		BuyRegion buy = null;
 		if(args.length <= 2) {
-			if(sender instanceof Player) {
+			if (sender instanceof Player) {
 				// get the region by location
-				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
-				if(regions.size() != 1) {
-					plugin.message(sender, "resell-help");
+				List<BuyRegion> regions = plugin.getFileManager().getApplicableBuyRegions(((Player) sender).getLocation());
+				if (regions.isEmpty()) {
+					plugin.message(sender, "cmd-noRegionsAtLocation");
+					return;
+				} else if (regions.size() > 1) {
+					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
-					if(regions.get(0).isBuyRegion()) {
-						buy = (BuyRegion)regions.get(0);
-					}
-				}				
+					buy = regions.get(0);
+				}
 			} else {
-				plugin.message(sender, "resell-help");
+				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}			
+			}		
 		} else {
 			buy = plugin.getFileManager().getBuy(args[2]);
 			if(buy == null) {

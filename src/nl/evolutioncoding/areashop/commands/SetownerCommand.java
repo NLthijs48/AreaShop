@@ -37,30 +37,32 @@ public class SetownerCommand extends CommandAreaShop {
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
-		GeneralRegion region;
-		if(args.length < 2) {
-			plugin.message(sender, "setowner-help");
-			return;
-		}
 		if(!sender.hasPermission("areashop.setownerrent") && !sender.hasPermission("areashop.setownerbuy")) {
 			plugin.message(sender, "setowner-noPermission");
 			return;
 		}
-		
+		GeneralRegion region;
+		if(args.length < 2) {
+			plugin.message(sender, "setowner-help");
+			return;
+		}		
 		if(args.length == 2) {
-			if(sender instanceof Player) {
+			if (sender instanceof Player) {
 				// get the region by location
-				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
-				if(regions.size() != 1) {
-					plugin.message(sender, "setowner-help");
+				List<GeneralRegion> regions = plugin.getFileManager().getAllApplicableRegions(((Player) sender).getLocation());
+				if (regions.isEmpty()) {
+					plugin.message(sender, "cmd-noRegionsAtLocation");
+					return;
+				} else if (regions.size() > 1) {
+					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
 					region = regions.get(0);
-				}				
+				}
 			} else {
-				plugin.message(sender, "setowner-help");
+				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}			
+			}
 		} else {
 			region = plugin.getFileManager().getRegion(args[2]);
 		}

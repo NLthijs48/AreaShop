@@ -5,7 +5,6 @@ import java.util.List;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
-import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -32,6 +31,10 @@ public class BuyCommand extends CommandAreaShop {
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.buy")) {
+			plugin.message(sender, "buy-noPermission");
+			return;
+		}
 		if (!(sender instanceof Player)) {
 			plugin.message(sender, "cmd-onlyByPlayer");
 			return;
@@ -46,15 +49,15 @@ public class BuyCommand extends CommandAreaShop {
 			}
 		} else {
 			// get the region by location
-			List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(player.getLocation());
-			if(regions.size() != 1) {
-				plugin.message(sender, "buy-help");
+			List<BuyRegion> regions = plugin.getFileManager().getApplicableBuyRegions(((Player) sender).getLocation());
+			if (regions.isEmpty()) {
+				plugin.message(sender, "cmd-noRegionsAtLocation");
+				return;
+			} else if (regions.size() > 1) {
+				plugin.message(sender, "cmd-moreRegionsAtLocation");
+				return;
 			} else {
-				if(!regions.get(0).isBuyRegion()) {
-					plugin.message(sender, "buy-notBuyable");
-				} else {
-					((BuyRegion)regions.get(0)).buy(player);
-				}
+				regions.get(0).buy(player);
 			}
 		}
 	}

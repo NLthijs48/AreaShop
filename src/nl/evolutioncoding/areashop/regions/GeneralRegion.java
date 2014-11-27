@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +33,6 @@ import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -54,6 +55,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
+@SuppressWarnings("deprecation")
 public abstract class GeneralRegion {
 	protected YamlConfiguration config;
 	private static ArrayList<Material> canSpawnIn  = new ArrayList<Material>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
@@ -425,6 +427,51 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
+	 * Add a friend to the region
+	 * @param player The UUID of the player to add
+	 */
+	public void addFriend(UUID player) {
+		Set<String> friends = new HashSet<String>(config.getStringList("general.friends"));
+		friends.add(player.toString());
+		List<String> list = new ArrayList<String>(friends);
+		config.set("general.friends", list);
+	}
+	
+	/**
+	 * Delete a friend from the region
+	 * @param player The UUID of the player to delete
+	 */
+	public void deleteFriend(UUID player) {
+		Set<String> friends = new HashSet<String>(config.getStringList("general.friends"));
+		friends.remove(player.toString());
+		List<String> list = new ArrayList<String>(friends);
+		if(list.isEmpty()) {
+			config.set("general.friends", null);
+		} else {
+			config.set("general.friends", list);
+		}
+	}
+	
+	/**
+	 * Get the list of friends added to this region
+	 * @return Friends added to this region
+	 */
+	public Set<UUID> getFriendList() {
+		HashSet<UUID> result = new HashSet<UUID>();
+		for(String friend : config.getStringList("general.friends")) {
+			try {
+				UUID id = UUID.fromString(friend);
+				if(id != null) {
+					result.add(id);
+				}
+			} catch(IllegalArgumentException e) {
+				// Don't add it
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * Check now if the player has been inactive for too long, unrent/sell will happen when true
 	 * @return true if the region has been unrented/sold, otherwise false
 	 */
@@ -708,8 +755,6 @@ public abstract class GeneralRegion {
 		boolean result = true;
 		// TODO: test world cast
 		EditSession editSession = plugin.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(new BukkitWorld(getWorld()), plugin.getConfig().getInt("maximumBlocks"));
-		
-		LocalSession localSession = new LocalSession(plugin.getWorldEdit().getLocalConfiguration());
 		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist in WorldGuard, restore failed");

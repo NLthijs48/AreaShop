@@ -61,7 +61,7 @@ public class FileManager {
 	
 	private HashMap<String,Integer> versions = null;
 	private String versionPath = null;
-	private String schemFolder = null;
+	private String schemFolder = null;	
 	
 	/**
 	 * Constructor, initialize variabeles
@@ -1216,15 +1216,35 @@ public class FileManager {
 		return result;
 	}
 	
-	public List<GeneralRegion> getApplicalbeASRegions(Location location) {
+	// Methods to get the most important AreaShop regions at a certain location
+	public List<RentRegion> getApplicableRentRegions(Location location) {
+		List<RentRegion> result = new ArrayList<RentRegion>();
+		for(GeneralRegion region : getApplicableASRegions(location, RegionType.RENT)) {
+			result.add((RentRegion)region);
+		}
+		return result;
+	}
+	public List<BuyRegion> getApplicableBuyRegions(Location location) {
+		List<BuyRegion> result = new ArrayList<BuyRegion>();
+		for(GeneralRegion region : getApplicableASRegions(location, RegionType.BUY)) {
+			result.add((BuyRegion)region);
+		}
+		return result;
+	}
+	public List<GeneralRegion> getAllApplicableRegions(Location location) {
+		return getApplicableASRegions(location, null);
+	}	
+	public List<GeneralRegion> getApplicableASRegions(Location location, RegionType type) {
 		List<GeneralRegion> result = new ArrayList<GeneralRegion>();
-		// If the secondLine does not contain a name try to find the region by location
 		ApplicableRegionSet regions = plugin.getWorldGuard().getRegionManager(location.getWorld()).getApplicableRegions(location);
 		if(regions != null) {
 			List<GeneralRegion> candidates = new ArrayList<GeneralRegion>();
 			for(ProtectedRegion pr : regions) {
 				GeneralRegion region = getRegion(pr.getId());
-				if(region != null) {
+				if(region != null && (
+						(type == RegionType.RENT && region.isRentRegion())
+						|| (type == RegionType.BUY && region.isBuyRegion())
+						|| type == null)) {
 					candidates.add(region);
 				}
 			}		
@@ -1246,7 +1266,7 @@ public class FileManager {
 				}
 			}
 		}
-		return result;
+		return new ArrayList<GeneralRegion>(result);
 	}
 	
 }

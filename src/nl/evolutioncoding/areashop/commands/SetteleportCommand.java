@@ -37,23 +37,26 @@ public class SetteleportCommand extends CommandAreaShop {
 
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.setteleport") && !sender.hasPermission("areashop.setteleportall")) {
+			plugin.message(sender, "setteleport-noPermission");
+			return;
+		}
 		if (!(sender instanceof Player)) {
 			plugin.message(sender, "onlyByPlayer");
 			return;
 		}
 		Player player = (Player) sender;
 		GeneralRegion region = null;
-		if(args.length <= 1) {
-			// get the region by location
-			List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
-			if(regions.size() != 1) {
-				plugin.message(sender, "setteleport-help");
-				return;
-			} else {
-				region = regions.get(0);
-			}							
+		// get the region by location
+		List<GeneralRegion> regions = plugin.getFileManager().getAllApplicableRegions(((Player) sender).getLocation());
+		if (regions.isEmpty()) {
+			plugin.message(sender, "cmd-noRegionsAtLocation");
+			return;
+		} else if (regions.size() > 1) {
+			plugin.message(sender, "cmd-moreRegionsAtLocation");
+			return;
 		} else {
-			region = plugin.getFileManager().getRegion(args[1]);
+			region = (BuyRegion) regions.get(0);
 		}
 		
 		boolean owner = false;

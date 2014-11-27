@@ -5,7 +5,6 @@ import java.util.List;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
-import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -27,30 +26,35 @@ public class SellCommand extends CommandAreaShop {
 		if(target.hasPermission("areashop.sell")) {
 			return plugin.getLanguageManager().getLang("help-sell");
 		} else if(target.hasPermission("areashop.sellown")) {
-			plugin.getLanguageManager().getLang("help-sellOwn");
+			return plugin.getLanguageManager().getLang("help-sellOwn");
 		}
 		return null;
 	}
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.sell") && !sender.hasPermission("areashop.sellown")) {
+			plugin.message(sender, "sell-noPermission");
+			return;
+		}
 		BuyRegion buy = null;
 		if(args.length <= 1) {
-			if(sender instanceof Player) {
+			if (sender instanceof Player) {
 				// get the region by location
-				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
-				if(regions.size() != 1) {
-					plugin.message(sender, "sell-help");
+				List<BuyRegion> regions = plugin.getFileManager().getApplicableBuyRegions(((Player) sender).getLocation());
+				if (regions.isEmpty()) {
+					plugin.message(sender, "cmd-noRegionsAtLocation");
+					return;
+				} else if (regions.size() > 1) {
+					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
-					if(regions.get(0).isBuyRegion()) {
-						buy = (BuyRegion)regions.get(0);
-					}
-				}				
+					buy = regions.get(0);
+				}
 			} else {
-				plugin.message(sender, "sell-help");
+				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}			
+			}		
 		} else {
 			buy = plugin.getFileManager().getBuy(args[1]);
 		}

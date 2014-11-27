@@ -17,6 +17,9 @@ cmd-noSelection: "You don't have a WorldEdit selection"
 cmd-noRegionsFound: "No regions registered in AreaShop are found in your selection"
 cmd-noWERegionsFound: "No WorldEdit regions intersecting your selection are found"
 cmd-notRegistered: "%0% is not registered in AreaShop"
+cmd-noRegionsAtLocation: "No regions found at your location, specify the region as argument"
+cmd-moreRegionsAtLocation: "More than one region has been found at your location, specify the region as argument"
+cmd-automaticRegionOnlyByPlayer: "Automatically determining the region is only possible for players, specify the region as argument"
 
 ########## Help command strings
 help-header: "Help page, commands that you can execute"
@@ -55,6 +58,8 @@ help-resell: "&6/as resell &7-&r Put one of your regions into resell mode"
 help-resellAll: "&6/as resell &7-&r Put a region into resell mode"
 help-stopResell: "&6/as stopresell &7-&r Put your region back into sold mode"
 help-stopResellAll: "&6/as stopresell &7-&r Put a region back into sold mode"
+help-addFriend: "&6/as addfriend &7-&r Add a friend to your region"
+help-addFriendAll: "&6/as addfriend &7-&r Add a friend to a region"
 
 ############ Other command strings
 rent-help: "/as rent [regionname], the region you stand in will be used if not specified"
@@ -117,6 +122,7 @@ reload-reloaded: "The config has been reloaded successfully"
 reload-noPermission: "You don't have permission to reload the config"
 
 info-help: "/as info <all|rented|forrent|sold|forsale|player|region>"
+info-noPermission: "You don't have permission to get information about regions";
 info-all-rents: "Regions registered for renting: &7%0%"
 info-all-noRents: "There are no regions registered for renting"
 info-all-buys: "Regions registered for buying: &7%0%"
@@ -313,13 +319,19 @@ resell-success: "%region% is successfully put into reselling mode for %resellpri
 resell-noPermission: "You don't have permission to set your region in reselling mode"
 resell-noPermissionOther: "You don't have permission to set regions in reselling mode"
 
-stopResell-help: "/as stopResell [region], the region you stand in will be used if not specified"
-stopResell-notRegistered: "%0% is not registered in AreaShop"
-stopResell-noRegionFound: "No AreaShop region could be found at your location, try specifying the region as argument"
-stopResell-notResell: "You can't stop reselling %region% because it is not in resell mode"
-stopResell-success: "%region% is successfully put back into sold mode"
-stopResell-noPermission: "You don't have permission to set your region back to sold mode"
-stopResell-noPermissionOther: "You don't have permission to set regions back to sold mode"
+stopresell-help: "/as stopresell [region], the region you stand in will be used if not specified"
+stopresell-notRegistered: "%0% is not registered in AreaShop"
+stopresell-noRegionFound: "No AreaShop region could be found at your location, try specifying the region as argument"
+stopresell-notResell: "You can't stop reselling %region% because it is not in resell mode"
+stopresell-success: "%region% is successfully put back into sold mode"
+stopresell-noPermission: "You don't have permission to set your region back to sold mode"
+stopresell-noPermissionOther: "You don't have permission to set regions back to sold mode"
+
+addfriend-help: "/as addfriend <player> [region], the region you stand in will be used if not specified"
+addfriend-noPermission: "You don't have permission to add friends to regions"
+addfriend-noPermissionOther: "You don't have permission to add friends to your region"
+addfriend-notRegistered: "%0% is not registered in AreaShop"
+addfriend-noRegionFound: 
 
 ############ Sign, greeting and other strings
 timeleft-years: "%0% years"

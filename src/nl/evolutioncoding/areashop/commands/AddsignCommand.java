@@ -39,15 +39,16 @@ public class AddsignCommand extends CommandAreaShop {
 
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.addsign")) {
+			plugin.message(sender, "addsign-noPermission");
+			return;
+		}		
 		if (!(sender instanceof Player)) {
 			plugin.message(sender, "cmd-onlyByPlayer");
 			return;
-		}			
+		}	
 		Player player = (Player)sender;
-		if(!player.hasPermission("areashop.addsign")) {
-			plugin.message(sender, "addsign-noPermission");
-			return;
-		}
+
 		// Get the sign
 		Block block = null;
 		BlockIterator blockIterator = new BlockIterator(player, 100);

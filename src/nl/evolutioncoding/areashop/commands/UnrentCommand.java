@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.evolutioncoding.areashop.AreaShop;
-import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 
 import org.bukkit.command.Command;
@@ -34,21 +33,26 @@ public class UnrentCommand extends CommandAreaShop {
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
+		if(!sender.hasPermission("areashop.unrent") && !sender.hasPermission("areashop.unrentown")) {
+			plugin.message(sender, "unrent-noPermission");
+			return;
+		}
 		RentRegion rent = null;
 		if(args.length <= 1) {
-			if(sender instanceof Player) {
+			if (sender instanceof Player) {
 				// get the region by location
-				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
-				if(regions.size() != 1) {
-					plugin.message(sender, "unrent-help");
+				List<RentRegion> regions = plugin.getFileManager().getApplicableRentRegions(((Player) sender).getLocation());
+				if (regions.isEmpty()) {
+					plugin.message(sender, "cmd-noRegionsAtLocation");
+					return;
+				} else if (regions.size() > 1) {
+					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
-					if(regions.get(0).isRentRegion()) {
-						rent = (RentRegion)regions.get(0);
-					}
-				}				
+					rent = regions.get(0);
+				}
 			} else {
-				plugin.message(sender, "unrent-help");
+				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
 			}			
 		} else {

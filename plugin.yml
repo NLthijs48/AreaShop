@@ -50,6 +50,9 @@ permissions:
       areashop.renttimebypass: true
       areashop.me: true
       areashop.resellall: true
+      areashop.stopresellall: true
+      areashop.addfriendall: true
+      areashop.delfriendall: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -184,5 +187,17 @@ permissions:
     default: true
   areashop.stopresellall:
     description: Allows you to set any region into normal mode if it is in sell mode
+    default: op
+  areashop.addfriend:
+    description: Allows you to add friends to your regions
+    default: true
+  areashop.addfriendall:
+    description: Allows you to add friends to all regions
+    default: op
+  areashop.delfriend: 
+    description: Allows you to delete friends from your regions
+    default: true
+  areashop.delfriendall: 
+    description: Allows you to delete friends from all regions
     default: op
     

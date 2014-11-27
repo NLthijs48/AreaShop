@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 import nl.evolutioncoding.areashop.regions.BuyRegion;

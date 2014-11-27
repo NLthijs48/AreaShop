@@ -145,6 +145,8 @@ signProfiles:
       - 'areashop buy %region%'
       leftClickPlayer:
       - 'areashop info region %region%'
+      shiftRightClickPlayer:
+      - 'areashop stopresell %region%'
     sold:
       line1: '&4&l[Sold]'
       line2: '%region%'

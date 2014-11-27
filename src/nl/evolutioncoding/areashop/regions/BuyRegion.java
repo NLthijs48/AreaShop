@@ -222,8 +222,8 @@ public class BuyRegion extends GeneralRegion {
 				
 				/* Check if the player has enough money */
 				if(plugin.getEconomy().has(player, getWorldName(), getPrice())) {
-					if(isResell) {
-						UUID oldOwner = getBuyer();
+					UUID oldOwner = getBuyer();
+					if(isResell && oldOwner != null) {
 						double resellPrice = getResellPrice();
 						/* Transfer the money to the previous owner */
 						EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getWorldName(), getResellPrice());
@@ -312,6 +312,7 @@ public class BuyRegion extends GeneralRegion {
 		// Run commands
 		this.runEventCommands(RegionEvent.SOLD, true);
 		
+		disableReselling();
 		/* Give part of the buying price back */
 		double percentage = getDoubleSetting("buy.moneyBack") / 100.0;
 		double moneyBack =  getPrice() * percentage;

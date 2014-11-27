@@ -16,6 +16,7 @@ cmd-weOnlyByPlayer: "Using a WorldEdit selection is only possible as a player, s
 cmd-noSelection: "You don't have a WorldEdit selection"
 cmd-noRegionsFound: "No regions registered in AreaShop are found in your selection"
 cmd-noWERegionsFound: "No WorldEdit regions intersecting your selection are found"
+cmd-notRegistered: "%0% is not registered in AreaShop"
 
 ########## Help command strings
 help-header: "Help page, commands that you can execute"
@@ -52,6 +53,8 @@ help-me: "&6/as me &7-&r Check which regions you have (+expiration)"
 help-setowner: "&6/as setowner &7-&r Set region owner or extend the rent"
 help-resell: "&6/as resell &7-&r Put one of your regions into resell mode"
 help-resellAll: "&6/as resell &7-&r Put a region into resell mode"
+help-stopResell: "&6/as stopresell &7-&r Put your region back into sold mode"
+help-stopResellAll: "&6/as stopresell &7-&r Put a region back into sold mode"
 
 ############ Other command strings
 rent-help: "/as rent [regionname], the region you stand in will be used if not specified"
@@ -309,6 +312,14 @@ resell-notBought: "You can't resell %region% because it is not sold yet"
 resell-success: "%region% is successfully put into reselling mode for %resellprice%"
 resell-noPermission: "You don't have permission to set your region in reselling mode"
 resell-noPermissionOther: "You don't have permission to set regions in reselling mode"
+
+stopResell-help: "/as stopResell [region], the region you stand in will be used if not specified"
+stopResell-notRegistered: "%0% is not registered in AreaShop"
+stopResell-noRegionFound: "No AreaShop region could be found at your location, try specifying the region as argument"
+stopResell-notResell: "You can't stop reselling %region% because it is not in resell mode"
+stopResell-success: "%region% is successfully put back into sold mode"
+stopResell-noPermission: "You don't have permission to set your region back to sold mode"
+stopResell-noPermissionOther: "You don't have permission to set regions back to sold mode"
 
 ############ Sign, greeting and other strings
 timeleft-years: "%0% years"

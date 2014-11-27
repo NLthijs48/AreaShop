@@ -29,6 +29,7 @@ import nl.evolutioncoding.areashop.commands.SetownerCommand;
 import nl.evolutioncoding.areashop.commands.SetpriceCommand;
 import nl.evolutioncoding.areashop.commands.SetrestoreCommand;
 import nl.evolutioncoding.areashop.commands.SetteleportCommand;
+import nl.evolutioncoding.areashop.commands.StopresellCommand;
 import nl.evolutioncoding.areashop.commands.TeleportCommand;
 import nl.evolutioncoding.areashop.commands.UnrentCommand;
 import nl.evolutioncoding.areashop.commands.UpdatebuysCommand;
@@ -63,6 +64,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new SetteleportCommand(plugin));
 		commands.add(new FindCommand(plugin));
 		commands.add(new ResellCommand(plugin));
+		commands.add(new StopresellCommand(plugin));
 		commands.add(new UpdaterentsCommand(plugin));
 		commands.add(new UpdatebuysCommand(plugin));
 		commands.add(new SetrestoreCommand(plugin));

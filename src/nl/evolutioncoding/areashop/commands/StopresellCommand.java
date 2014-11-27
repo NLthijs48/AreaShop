@@ -11,47 +11,37 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ResellCommand extends CommandAreaShop {
+// TODO ALL
+public class StopresellCommand extends CommandAreaShop {
 
-	public ResellCommand(AreaShop plugin) {
+	public StopresellCommand(AreaShop plugin) {
 		super(plugin);
 	}	
 	
 	@Override
 	public String getCommandStart() {
-		return "areashop resell";
+		return "areashop stopresell";
 	}
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.resell")) {
-			return plugin.getLanguageManager().getLang("help-resell");
-		} else if(target.hasPermission("areashop.resellall")) {
-			plugin.getLanguageManager().getLang("help-resellAll");
+		if(target.hasPermission("areashop.stopresell")) {
+			return plugin.getLanguageManager().getLang("help-stopResell");
+		} else if(target.hasPermission("areashop.stopresellall")) {
+			plugin.getLanguageManager().getLang("help-stopResellAll");
 		}
 		return null;
 	}
 	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
-		if(args.length <= 1) {
-			plugin.message(sender, "resell-help");
-			return;
-		}
-		double price = 0.0;
-		try {
-			price = Double.parseDouble(args[1]);
-		} catch(NumberFormatException e) {
-			plugin.message(sender, "resell-wrongPrice", args[1]);
-			return;
-		}
 		BuyRegion buy = null;
-		if(args.length <= 2) {
+		if(args.length <= 1) {
 			if(sender instanceof Player) {
 				// get the region by location
 				List<GeneralRegion> regions = plugin.getFileManager().getApplicalbeASRegions(((Player)sender).getLocation());
 				if(regions.size() != 1) {
-					plugin.message(sender, "resell-help");
+					plugin.message(sender, "stopResell-help");
 					return;
 				} else {
 					if(regions.get(0).isBuyRegion()) {
@@ -59,51 +49,51 @@ public class ResellCommand extends CommandAreaShop {
 					}
 				}				
 			} else {
-				plugin.message(sender, "resell-help");
+				plugin.message(sender, "stopResell-help");
 				return;
 			}			
 		} else {
-			buy = plugin.getFileManager().getBuy(args[2]);
+			buy = plugin.getFileManager().getBuy(args[1]);
 			if(buy == null) {
-				plugin.message(sender, "resell-notRegistered", args[2]);
+				plugin.message(sender, "stopResell-notRegistered", args[1]);
 				return;
 			}
 		}
 		if(buy == null) {
-			plugin.message(sender, "resell-noRegionFound");
+			plugin.message(sender, "stopResell-noRegionFound");
 			return;
 		}
-		if(!buy.isSold()) {
-			plugin.message(sender, "resell-notBought", buy);
+		if(!buy.isInResellingMode()) {
+			plugin.message(sender, "stopResell-notResell", buy);
 			return;
 		}
-		if(sender.hasPermission("areashop.resellall")) {
-			buy.enableReselling(price);
+		if(sender.hasPermission("areashop.stopresellall")) {
+			buy.disableReselling();
 			buy.saveRequired();
-			plugin.message(sender, "resell-success", buy);
+			plugin.message(sender, "stopResell-success", buy);
 			buy.updateSigns();
 			buy.updateRegionFlags();
-		} else if(sender.hasPermission("areashop.resell") && sender instanceof Player) {
+		} else if(sender.hasPermission("areashop.stopresell") && sender instanceof Player) {
 			if(buy.isOwner((Player)sender)) {
-				buy.enableReselling(price);
+				buy.disableReselling();
 				buy.saveRequired();
-				plugin.message(sender, "resell-success", buy);
+				plugin.message(sender, "stopResell-success", buy);
 				buy.updateSigns();
 				buy.updateRegionFlags();
 			} else {
-				plugin.message(sender, "resell-noPermissionOther");
+				plugin.message(sender, "stopResell-noPermissionOther");
 			}
 		} else {
-			plugin.message(sender, "resell-noPermission");
+			plugin.message(sender, "stopResell-noPermission");
 		}	
 	}
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start) {
 		ArrayList<String> result = new ArrayList<String>();
-		if(toComplete == 3) {
+		if(toComplete == 2) {
 			for(BuyRegion region : plugin.getFileManager().getBuys()) {
-				if(region.isSold() && !region.isInResellingMode()) {
+				if(region.isSold() && region.isInResellingMode()) {
 					result.add(region.getName());
 				}
 			}

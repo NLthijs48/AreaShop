@@ -14,23 +14,23 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class AddfriendCommand extends CommandAreaShop {
+public class DelfriendCommand extends CommandAreaShop {
 
-	public AddfriendCommand(AreaShop plugin) {
+	public DelfriendCommand(AreaShop plugin) {
 		super(plugin);
 	}
 	
 	@Override
 	public String getCommandStart() {
-		return "areashop addfriend";
+		return "areashop delfriend";
 	}
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.addfriendall")) {
-			return plugin.getLanguageManager().getLang("help-addFriendAll");
-		} else if(target.hasPermission("areashop.addfriend")) {
-			return plugin.getLanguageManager().getLang("help-addFriend");
+		if(target.hasPermission("areashop.delfriendall")) {
+			return plugin.getLanguageManager().getLang("help-delFriendAll");
+		} else if(target.hasPermission("areashop.delfriend")) {
+			return plugin.getLanguageManager().getLang("help-delFriend");
 		}
 		return null;
 	}
@@ -38,16 +38,14 @@ public class AddfriendCommand extends CommandAreaShop {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
-		if(!sender.hasPermission("areashop.addfriend") && !sender.hasPermission("areashop.addfriendall")) {
-			plugin.message(sender, "addfriend-noPermission");
+		if(!sender.hasPermission("areashop.delfriend") && !sender.hasPermission("areashop.delfriendall")) {
+			plugin.message(sender, "delfriend-noPermission");
 			return;
-		}
-		
+		}		
 		if(args.length < 2) {
-			plugin.message(sender, "addfriend-help");
+			plugin.message(sender, "delfriend-help");
 			return;
-		}
-		
+		}		
 		GeneralRegion region = null;
 		if(args.length <= 2) {
 			if (sender instanceof Player) {
@@ -73,48 +71,40 @@ public class AddfriendCommand extends CommandAreaShop {
 				return;
 			}
 		}
-		if(sender.hasPermission("areashop.addfriendall")) {
+		if(sender.hasPermission("areashop.delfriendall")) {
 			if((region.isRentRegion() && !((RentRegion)region).isRented())
 					|| (region.isBuyRegion() && !((BuyRegion)region).isSold())) {
-				plugin.message(sender, "addfriend-noOwner");
+				plugin.message(sender, "delfriend-noOwner");
 				return;
-			}	
+			}		
 			OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
-			if(region.getFriendList().contains(friend.getUniqueId())) {
-				plugin.message(sender, "addfriend-alreadyAdded", friend.getName());
+			if(!region.getFriendList().contains(friend.getUniqueId())) {
+				plugin.message(sender, "delfriend-notAdded", friend.getName());
 				return;
 			}
-			if(region.isOwner(friend.getUniqueId())) {
-				plugin.message(sender, "addfriend-self", friend.getName());
-				return;
-			}
-			region.addFriend(friend.getUniqueId());
+			region.deleteFriend(friend.getUniqueId());
 			region.saveRequired();
 			region.updateRegionFlags();
 			region.updateSigns();
-			plugin.message(sender, "addfriend-successOther", friend.getName(), region.getName());
+			plugin.message(sender, "delfriend-successOther", friend.getName(), region.getName());
 		} else {
-			if(sender.hasPermission("areashop.addfriend") && sender instanceof Player) {
+			if(sender.hasPermission("areashop.delfriend") && sender instanceof Player) {
 				if(region.isOwner((Player)sender)) {
 					OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
-					if(region.getFriendList().contains(friend.getUniqueId())) {
-						plugin.message(sender, "addfriend-alreadyAdded", friend.getName());
+					if(!region.getFriendList().contains(friend.getUniqueId())) {
+						plugin.message(sender, "delfriend-notAdded", friend.getName());
 						return;
 					}
-					if(region.isOwner(friend.getUniqueId())) {
-						plugin.message(sender, "addfriend-self", friend.getName());
-						return;
-					}
-					region.addFriend(friend.getUniqueId());
+					region.deleteFriend(friend.getUniqueId());
 					region.saveRequired();
 					region.updateRegionFlags();
 					region.updateSigns();
-					plugin.message(sender, "addfriend-success", friend.getName(), region.getName());
+					plugin.message(sender, "delfriend-success", friend.getName(), region.getName());
 				} else {
-					plugin.message(sender, "addfriend-noPermissionOther");
+					plugin.message(sender, "delfriend-noPermissionOther");
 				}
 			} else {
-				plugin.message(sender, "addfriend-noPermission");
+				plugin.message(sender, "delfriend-noPermission");
 			}
 		}
 	}

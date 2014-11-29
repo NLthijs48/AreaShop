@@ -60,6 +60,8 @@ help-stopResell: "&6/as stopresell &7-&r Put your region back into sold mode"
 help-stopResellAll: "&6/as stopresell &7-&r Put a region back into sold mode"
 help-addFriend: "&6/as addfriend &7-&r Add a friend to your region"
 help-addFriendAll: "&6/as addfriend &7-&r Add a friend to a region"
+help-delFriend: "&6/as delfriend &7-&r Delete a friend from your region"
+help-delFriendAll: "&6/as delfriend &7-&r Delete a friend from a region"
 
 ############ Other command strings
 rent-help: "/as rent [regionname], the region you stand in will be used if not specified"
@@ -330,11 +332,19 @@ stopresell-noPermissionOther: "You don't have permission to set regions back to 
 addfriend-help: "/as addfriend <player> [region], the region you stand in will be used if not specified"
 addfriend-noPermissionOther: "You don't have permission to add friends to regions that are not yours"
 addfriend-noPermission: "You don't have permission to add friends to your region"
-addfriend-notRegistered: "%0% is not registered in AreaShop"
 addfriend-successOther: "%0% has been added as friend to region %1%"
 addfriend-success: "%0% has been added as friend to your region %1%"
 addfriend-alreadyAdded: "%0% is already added as friend for this region"
 addfriend-self: "Adding the owner of the region as friend would be pointless"
+addfriend-noOwner: "You cannot add friends to a region without owner"
+
+delfriend-help: "/as delfriend <player> [region], the region you stand in will be used if not specified"
+delfriend-noPermissionOther: "You don't have permission to delete friends from regions that are not yours"
+delfriend-noPermission: "You don't have permission to delete friends from your region"
+delfriend-successOther: "%0% has been deleted as friend from region %1%"
+delfriend-success: "%0% has been deleted as friend from your region %1%"
+delfriend-notAdded: "%0% is not added as friend for this region"
+delfriend-noOwner: "You cannot remove friends from a region without owner"
 
 ############ Sign, greeting and other strings
 timeleft-years: "%0% years"

@@ -11,6 +11,7 @@ import nl.evolutioncoding.areashop.commands.AddsignCommand;
 import nl.evolutioncoding.areashop.commands.BuyCommand;
 import nl.evolutioncoding.areashop.commands.CommandAreaShop;
 import nl.evolutioncoding.areashop.commands.DelCommand;
+import nl.evolutioncoding.areashop.commands.DelfriendCommand;
 import nl.evolutioncoding.areashop.commands.DelsignCommand;
 import nl.evolutioncoding.areashop.commands.FindCommand;
 import nl.evolutioncoding.areashop.commands.GroupaddCommand;
@@ -64,6 +65,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new TeleportCommand(plugin));
 		commands.add(new SetteleportCommand(plugin));
 		commands.add(new AddfriendCommand(plugin));
+		commands.add(new DelfriendCommand(plugin));
 		commands.add(new FindCommand(plugin));
 		commands.add(new ResellCommand(plugin));
 		commands.add(new StopresellCommand(plugin));

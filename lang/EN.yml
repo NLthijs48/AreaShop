@@ -37,7 +37,7 @@ help-updatebuys: "&6/as updatebuys &7-&r Update all buy signs and regions"
 help-reload: "&6/as reload &7-&r Reload the config and languages"
 help-setrestore: "&6/as setrestore &7-&r Set restoring on/off and choose profile"
 help-setprice: "&6/as setprice &7-&r Change the price of a region"
-help-rentduration: "&6/as rentduration &7-&r Change the duration of a rent region"
+help-setduration: "&6/as setduration &7-&r Change the duration of a rent region"
 help-teleport: "&6/as tp &7-&r Teleport to your bought/rented regions"
 help-teleportAll: "&6/as tp &7-&r Teleport to a rent/buy region"
 help-setteleport: "&6/as settp &7-&r Set teleport position for bought/rented regions"
@@ -122,7 +122,7 @@ reload-reloaded: "The config has been reloaded successfully"
 reload-noPermission: "You don't have permission to reload the config"
 
 info-help: "/as info <all|rented|forrent|sold|forsale|player|region>"
-info-noPermission: "You don't have permission to get information about regions";
+info-noPermission: "You don't have permission to get information about regions"
 info-all-rents: "Regions registered for renting: &7%0%"
 info-all-noRents: "There are no regions registered for renting"
 info-all-buys: "Regions registered for buying: &7%0%"
@@ -328,10 +328,13 @@ stopresell-noPermission: "You don't have permission to set your region back to s
 stopresell-noPermissionOther: "You don't have permission to set regions back to sold mode"
 
 addfriend-help: "/as addfriend <player> [region], the region you stand in will be used if not specified"
-addfriend-noPermission: "You don't have permission to add friends to regions"
-addfriend-noPermissionOther: "You don't have permission to add friends to your region"
+addfriend-noPermissionOther: "You don't have permission to add friends to regions that are not yours"
+addfriend-noPermission: "You don't have permission to add friends to your region"
 addfriend-notRegistered: "%0% is not registered in AreaShop"
-addfriend-noRegionFound: 
+addfriend-successOther: "%0% has been added as friend to region %1%"
+addfriend-success: "%0% has been added as friend to your region %1%"
+addfriend-alreadyAdded: "%0% is already added as friend for this region"
+addfriend-self: "Adding the owner of the region as friend would be pointless"
 
 ############ Sign, greeting and other strings
 timeleft-years: "%0% years"

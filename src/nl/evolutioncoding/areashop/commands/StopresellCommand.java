@@ -51,7 +51,7 @@ public class StopresellCommand extends CommandAreaShop {
 					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
-					buy = (BuyRegion) regions.get(0);
+					buy = regions.get(0);
 				}
 			} else {
 				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");

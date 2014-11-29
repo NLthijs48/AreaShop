@@ -340,7 +340,8 @@ public class BuyRegion extends GeneralRegion {
 		handleSchematicEvent(RegionEvent.SOLD);
 		updateRegionFlags(RegionState.FORSALE);
 		
-		/* Remove the player */
+		/* Remove friends and the owner */
+		clearFriends();
 		setBuyer(null);		
 		
 		updateSigns();
@@ -356,13 +357,12 @@ public class BuyRegion extends GeneralRegion {
 			return false;
 		}
 		OfflinePlayer player = Bukkit.getOfflinePlayer(getBuyer());
+		//AreaShop.debug("inactive checking for " + getName() + ", player=" + player.getName() + ", currenttime=" + Calendar.getInstance().getTimeInMillis() + ", lastPlayed=" + player.getLastPlayed() + ", diff=" + (Calendar.getInstance().getTimeInMillis() - player.getLastPlayed()));
 		int inactiveSetting = getIntegerSetting("buy.inactiveTimeUntilSell");
 		if(inactiveSetting <= 0 || player.isOp()) {
 			return false;
 		}
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(player.getLastPlayed() + inactiveSetting * 60 * 1000);
-		if(Calendar.getInstance().getTimeInMillis() > calendar.getTimeInMillis()) {
+		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting * 60 * 1000)) {
 			plugin.getLogger().info("Region " + getName() + " sold because of inactivity for player " + getPlayerName());
 			this.sell(true);
 			return true;

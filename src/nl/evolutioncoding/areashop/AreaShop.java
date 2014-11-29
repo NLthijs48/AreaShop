@@ -1,6 +1,5 @@
 package nl.evolutioncoding.areashop;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -110,7 +109,7 @@ public final class AreaShop extends JavaPlugin {
         	error = true;
         } else {
             economy = economyProvider.getProvider();
-        }
+        }        
         
 		/* Load all data from files and check versions */
 	    fileManager = new FileManager(this);
@@ -405,7 +404,7 @@ public final class AreaShop extends JavaPlugin {
 		try {
 		    Metrics metrics = new Metrics(this);
 		    metrics.start();
-		} catch (IOException e) {
+		} catch (Exception e) {
 		    AreaShop.debug("Could not start Metrics");
 		}
 	}	

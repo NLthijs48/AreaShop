@@ -560,7 +560,8 @@ public class RentRegion extends GeneralRegion {
 		handleSchematicEvent(RegionEvent.UNRENTED);
 		updateRegionFlags(RegionState.FORRENT);
 		
-		/* Remove the player and renteduntil values */
+		/* Remove friends, the owner and renteduntil values */
+		clearFriends();
 		setRenter(null);
 		setRentedUntil(null);
 		setTimesExtended(-1);
@@ -577,14 +578,13 @@ public class RentRegion extends GeneralRegion {
 		if(!isRented()) {
 			return false;
 		}
-		int inactiveSetting = getIntegerSetting("rent.inactiveTimeUntilSell");
-		if(inactiveSetting <= 0) {
+		OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());
+		//AreaShop.debug("inactive checking for " + getName() + ", player=" + player.getName() + ", currenttime=" + Calendar.getInstance().getTimeInMillis() + ", lastPlayed=" + player.getLastPlayed() + ", diff=" + (Calendar.getInstance().getTimeInMillis() - player.getLastPlayed()));
+		int inactiveSetting = getIntegerSetting("rent.inactiveTimeUntilUnrent");
+		if(inactiveSetting <= 0 || player.isOp()) {
 			return false;
 		}
-		OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(player.getLastPlayed() + inactiveSetting * 60 * 1000);
-		if(Calendar.getInstance().getTimeInMillis() > calendar.getTimeInMillis()) {
+		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting * 60 * 1000)) {
 			plugin.getLogger().info("Region " + getName() + " unrented because of inactivity for player " + getPlayerName());
 			this.unRent(true);
 			return true;

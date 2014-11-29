@@ -56,7 +56,7 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(sender, "cmd-moreRegionsAtLocation");
 			return;
 		} else {
-			region = (BuyRegion) regions.get(0);
+			region = regions.get(0);
 		}
 		
 		boolean owner = false;

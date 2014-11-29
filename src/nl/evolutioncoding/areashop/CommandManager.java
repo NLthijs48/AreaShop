@@ -6,6 +6,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import nl.evolutioncoding.areashop.commands.AddCommand;
+import nl.evolutioncoding.areashop.commands.AddfriendCommand;
 import nl.evolutioncoding.areashop.commands.AddsignCommand;
 import nl.evolutioncoding.areashop.commands.BuyCommand;
 import nl.evolutioncoding.areashop.commands.CommandAreaShop;
@@ -62,6 +63,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new InfoCommand(plugin));
 		commands.add(new TeleportCommand(plugin));
 		commands.add(new SetteleportCommand(plugin));
+		commands.add(new AddfriendCommand(plugin));
 		commands.add(new FindCommand(plugin));
 		commands.add(new ResellCommand(plugin));
 		commands.add(new StopresellCommand(plugin));

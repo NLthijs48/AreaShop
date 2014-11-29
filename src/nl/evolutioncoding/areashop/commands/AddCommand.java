@@ -136,7 +136,7 @@ public class AddCommand extends CommandAreaShop {
 					buy.runEventCommands(RegionEvent.CREATED, false);
 					buy.saveRequired();
 				}
-			}		
+			}
 		}
 		if(namesSuccess.size() != 0) {
 			plugin.message(sender, "add-success", args[1], Utils.createCommaSeparatedList(namesSuccess));

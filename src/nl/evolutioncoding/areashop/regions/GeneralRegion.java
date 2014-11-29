@@ -307,6 +307,15 @@ public abstract class GeneralRegion {
 	 * @return true if the player currently rents or buys this region
 	 */
 	public boolean isOwner(Player player) {
+		return isOwner(player.getUniqueId());
+	}
+	
+	/**
+	 * Check if the players is owner of this region
+	 * @param player Player to check ownership for
+	 * @return true if the player currently rents or buys this region
+	 */
+	public boolean isOwner(UUID player) {
 		return (isRentRegion() && ((RentRegion)this).isRenter(player)) || (isBuyRegion() && ((BuyRegion)this).isBuyer(player));
 	}
 	
@@ -469,6 +478,13 @@ public abstract class GeneralRegion {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * Remove all friends that are added to this region
+	 */
+	public void clearFriends() {
+		config.set("general.friends", null);
 	}
 	
 	/**

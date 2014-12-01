@@ -144,7 +144,7 @@ public class RegionGroup {
 	 * Indicates this file needs to be saved, will actually get saved later by a task
 	 */
 	public void saveRequired() {
-		plugin.getFileManager().saveGroupsRequired();
+		plugin.getFileManager().saveGroupsIsRequired();
 	}
 	
 	/**

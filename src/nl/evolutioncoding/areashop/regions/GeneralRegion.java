@@ -44,7 +44,6 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
@@ -864,9 +863,6 @@ public abstract class GeneralRegion {
 	 * @return
 	 */
 	protected boolean setRegionFlags(ConfigurationSection flags) {
-		// TODO A lot of testing + delete lines below
-		// https://github.com/sk89q/WorldGuard/blob/master/src/main/java/com/sk89q/worldguard/bukkit/commands/region/RegionCommands.java#L461
-		// https://github.com/sk89q/WorldGuard/blob/master/src/main/java/com/sk89q/worldguard/bukkit/commands/region/RegionCommandsBase.java#L393
 		boolean result = true;		
 		if(flags == null) {
 			AreaShop.debug("Flags section is null");
@@ -1007,12 +1003,8 @@ public abstract class GeneralRegion {
 		        }
 			}
 		}
-		try {
-			// TODO include into periodic saving program
-			worldGuard.getRegionManager(getWorld()).save();
-		} catch (StorageException e) {
-			plugin.getLogger().info("Error: regions could not be saved");
-		}
+		// Indicate that the regions needs to be saved
+		plugin.getFileManager().saveIsRequiredForRegionWorld(getWorldName());
 		return result;
 	}
 	

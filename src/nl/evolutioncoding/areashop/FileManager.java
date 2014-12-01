@@ -13,7 +13,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
@@ -40,6 +42,7 @@ import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class FileManager {
@@ -58,10 +61,11 @@ public class FileManager {
 	private String defaultPath = null;
 	private YamlConfiguration defaultConfig = null;
 	private boolean saveGroupsRequired = false;
+	private Set<String> worldRegionsRequireSaving;
 	
 	private HashMap<String,Integer> versions = null;
 	private String versionPath = null;
-	private String schemFolder = null;	
+	private String schemFolder = null;
 	
 	/**
 	 * Constructor, initialize variabeles
@@ -77,6 +81,7 @@ public class FileManager {
 		defaultPath = plugin.getDataFolder() + File.separator + AreaShop.defaultFile;
 		versionPath = plugin.getDataFolder().getPath() + File.separator + AreaShop.versionFile;
 		schemFolder = plugin.getDataFolder() + File.separator + AreaShop.schematicFolder;
+		worldRegionsRequireSaving = new HashSet<String>();
 		File schemFile = new File(schemFolder);
 		if(!schemFile.exists()) {
 			schemFile.mkdirs();
@@ -258,7 +263,7 @@ public class FileManager {
 			for(RegionGroup group : groups) {
 				group.removeMember(rent);
 			}
-			saveGroupsRequired();
+			saveGroupsIsRequired();
 			rent.resetRegionFlags();
 			regions.remove(rent.getLowerCaseName());
 			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + rent.getLowerCaseName() + ".yml");
@@ -322,7 +327,7 @@ public class FileManager {
 			for(RegionGroup group : getGroups()) {
 				group.removeMember(buy);
 			}
-			saveGroupsRequired();
+			saveGroupsIsRequired();
 			
 			// Deleting the file
 			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + buy.getLowerCaseName() + ".yml");
@@ -351,7 +356,7 @@ public class FileManager {
 	public void removeGroup(RegionGroup group) {
 		groups.remove(group.getLowerCaseName());
 		groupsConfig.set(group.getLowerCaseName(), null);
-		saveGroupsRequired();
+		saveGroupsIsRequired();
 	}
 	
 	/**
@@ -472,7 +477,7 @@ public class FileManager {
 	/**
 	 * Save the group file to disk
 	 */
-	public void saveGroupsRequired() {
+	public void saveGroupsIsRequired() {
 		saveGroupsRequired = true;
 	}
 	public boolean isSaveGroupsRequired() {
@@ -496,6 +501,7 @@ public class FileManager {
 		if(isSaveGroupsRequired()) {
 			saveGroupsNow();
 		}
+		this.saveWorldGuardRegions();
 		
 		final List<GeneralRegion> regions = new ArrayList<GeneralRegion>(getRegions());
 		new BukkitRunnable() {
@@ -530,8 +536,40 @@ public class FileManager {
 				region.saveNow();
 			}						
 		}
+		this.saveWorldGuardRegions();
 	}
 	
+	/**
+	 * Indicates that a/multiple WorldGuard regions need to be saved
+	 * @param worldName The world where the regions that should be saved is in
+	 */
+	public void saveIsRequiredForRegionWorld(String worldName) {
+		worldRegionsRequireSaving.add(worldName);
+	}
+	
+	/**
+	 * Save all worldGuard regions that need saving
+	 */
+	public void saveWorldGuardRegions() {
+		for(String world : worldRegionsRequireSaving) {
+			World bukkitWorld = Bukkit.getWorld(world);
+			if(bukkitWorld != null) {
+				RegionManager manager = plugin.getWorldGuard().getRegionManager(bukkitWorld);
+				if(manager != null) {
+					try {
+						manager.saveChanges();
+					} catch(StorageException e) {
+						plugin.getLogger().info("Error: WorldGuard regions in world " + world + " could not be saved");
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Get the folder the region files are located in
+	 * @return The folder where the <region>.yml files are in
+	 */
 	public String getRegionFolder() {
 		return regionsPath;
 	}
@@ -559,6 +597,9 @@ public class FileManager {
 		}.runTaskTimer(plugin, 1, 1);
 	}
 	
+	/**
+	 * Check all regions and unrent/sell them if the player is inactive for too long
+	 */
 	public void checkForInactiveRegions() {
 		final List<GeneralRegion> regions = new ArrayList<GeneralRegion>(getRegions());
 		new BukkitRunnable() {

@@ -452,7 +452,7 @@ public class RentRegion extends GeneralRegion {
 					if(!r.transactionSuccess()) {
 						plugin.message(player, "rent-payError");
 						return false;
-					}										
+					}
 					if(!extend) {
 						// Run commands
 						runEventCommands(RegionEvent.RENTED, true);
@@ -467,8 +467,8 @@ public class RentRegion extends GeneralRegion {
 						calendar.setTimeInMillis(getRentedUntil());
 					}
 					calendar.setTimeInMillis(calendar.getTimeInMillis() + getDuration());
-			
 					SimpleDateFormat dateFull = new SimpleDateFormat(plugin.getConfig().getString("timeFormatChat"));
+					AreaShop.debug(player.getName() + " has rented region " + getName() + " for " + getFormattedPrice() + " until " + dateFull.format(calendar.getTime()));					
 					
 					/* Add values to the rent and send it to FileManager */
 					setRentedUntil(calendar.getTimeInMillis());
@@ -493,8 +493,7 @@ public class RentRegion extends GeneralRegion {
 						plugin.message(player, "rent-rented", getName(), dateFull.format(calendar.getTime()));
 						plugin.message(player, "rent-extend");
 					}
-					AreaShop.debug(player.getName() + " has rented region " + getName() + " for " + getFormattedPrice() + " until " + dateFull.format(calendar.getTime()));
-					
+
 					this.saveRequired();
 					if(!extend) {
 						// Run commands

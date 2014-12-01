@@ -72,6 +72,8 @@ public final class AreaShop extends JavaPlugin {
 	public static final String tagTimeLeft = "%timeleft%";
 	public static final String tagClicker = "%clicker%";
 	public static final String tagResellPrice = "%resellprice%";
+	public static final String tagFriends = "%friends%";
+	public static final String tagFriendsUUID = "%friendsuuid%";
 	
 	public static AreaShop getInstance() {
 		return AreaShop.instance;

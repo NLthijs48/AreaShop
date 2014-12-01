@@ -268,6 +268,8 @@ public class BuyRegion extends GeneralRegion {
 							plugin.message(player, "buy-payError");
 							return false;
 						}
+						AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + getFormattedPrice());
+						
 						// Run commands
 						this.runEventCommands(RegionEvent.BOUGHT, true);
 						// Set the owner
@@ -280,8 +282,6 @@ public class BuyRegion extends GeneralRegion {
 
 						// Send message to the player
 						plugin.message(player, "buy-succes", getName());
-						AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + getFormattedPrice());
-						
 						this.saveRequired();
 						// Run commands
 						this.runEventCommands(RegionEvent.BOUGHT, false);

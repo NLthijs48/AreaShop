@@ -1,6 +1,7 @@
-### All settings below are default settings and can be overridden
-### by group settings or region settings (copy a section to a region or group and change them there)
-
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ default.yml file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop ║
+# ║ All settings below are default settings and can be overridden by group settings or individual region settings              ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ GENERAL: Options for all regions                                                                                           │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  
@@ -30,6 +31,7 @@ general:
   ## Restricts the /as buy and /as rent commands to the region itself (player needs to be inside)
   restrictedToRegion: false
 
+
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ RENT: Options for rent regions                                                                                             │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -53,6 +55,7 @@ rent:
   warningOnLoginTime: '1 day'
   ## The profile for the expiration warnings as specified in the config
   expirationWarningProfile: 'default'
+
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUY: Options for buy regions                                                                                               │

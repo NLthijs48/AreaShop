@@ -40,17 +40,10 @@ import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.BooleanFlag;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.DoubleFlag;
-import com.sk89q.worldguard.protection.flags.EnumFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.IntegerFlag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import com.sk89q.worldguard.protection.flags.SetFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag.State;
-import com.sk89q.worldguard.protection.flags.StringFlag;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
@@ -368,6 +361,8 @@ public abstract class GeneralRegion {
 		result.put(AreaShop.tagWidth, getWidth());
 		result.put(AreaShop.tagDepth, getDepth());
 		result.put(AreaShop.tagHeight, getHeight());
+		result.put(AreaShop.tagFriends, Utils.createCommaSeparatedList(getFriendNames()));
+		result.put(AreaShop.tagFriendsUUID, Utils.createCommaSeparatedList(getFriends()));
 		
 		// TODO: add more? coordinates?
 		
@@ -465,13 +460,32 @@ public abstract class GeneralRegion {
 	 * Get the list of friends added to this region
 	 * @return Friends added to this region
 	 */
-	public Set<UUID> getFriendList() {
+	public Set<UUID> getFriends() {
 		HashSet<UUID> result = new HashSet<UUID>();
 		for(String friend : config.getStringList("general.friends")) {
 			try {
 				UUID id = UUID.fromString(friend);
 				if(id != null) {
 					result.add(id);
+				}
+			} catch(IllegalArgumentException e) {
+				// Don't add it
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Get the list of friends added to this region
+	 * @return Friends added to this region
+	 */
+	public Set<String> getFriendNames() {
+		HashSet<String> result = new HashSet<String>();
+		for(String friend : config.getStringList("general.friends")) {
+			try {
+				UUID id = UUID.fromString(friend);
+				if(id != null) {
+					result.add(Bukkit.getOfflinePlayer(id).getName());
 				}
 			} catch(IllegalArgumentException e) {
 				// Don't add it
@@ -806,10 +820,7 @@ public abstract class GeneralRegion {
 //                closer.close();
 //            } catch (IOException ignored) {
 //            }
-//        }
-		
-		
-		
+//        }		
 		
 		editSession.enableQueue();
 		try {
@@ -840,6 +851,11 @@ public abstract class GeneralRegion {
 		}
 	}
 	
+	protected static <V> void setFlag(ProtectedRegion region, Flag<V> flag, CommandSender sender, String value) throws InvalidFlagFormat {
+        region.setFlag(flag, flag.parseInput(WorldGuardPlugin.inst(), sender, value));
+    }
+	
+	
 	/**
 	 * Set the region flags/options to the values of a ConfigurationSection
 	 * @param player The player that does it
@@ -847,69 +863,74 @@ public abstract class GeneralRegion {
 	 * @param flags
 	 * @return
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected boolean setRegionFlags(ConfigurationSection flags) {
-		boolean result = true;
-		
+		// TODO A lot of testing + delete lines below
+		// https://github.com/sk89q/WorldGuard/blob/master/src/main/java/com/sk89q/worldguard/bukkit/commands/region/RegionCommands.java#L461
+		// https://github.com/sk89q/WorldGuard/blob/master/src/main/java/com/sk89q/worldguard/bukkit/commands/region/RegionCommandsBase.java#L393
+		boolean result = true;		
 		if(flags == null) {
 			AreaShop.debug("Flags section is null");
 			return false;
 		}
 		Set<String> flagNames = flags.getKeys(false);
-		WorldGuardPlugin worldGuard = plugin.getWorldGuard();
-		Flag<?> flagType = null;
-		Object flagValue = null;		
+		WorldGuardPlugin worldGuard = plugin.getWorldGuard();		
 		
-		/* Get the region */
+		// Get the region
 		ProtectedRegion region = getRegion();
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist, setting flags failed");
 			return false;
 		}
 		Iterator<String> it = flagNames.iterator();
+		// Loop through all flags that are set in the config
 		while(it.hasNext()) {
 			String flagName = it.next();
 			String value = flags.getString(flagName);
-			
-			// Apply replacements
-			if(value != null) {
-				value = applyAllReplacements(value);
-			}
-			
-			/* Check for a couple of options or use as flag */
+			value = applyAllReplacements(value);
+    		value = translateBukkitToWorldGuardColors(value);
 			if(flagName.equalsIgnoreCase("members")) {
-				/* Split the string and parse all values */
-				String[] names = value.split("\\s*,\\s*");
+				// Split the string and parse all values
+				String[] names = value.split(", ");
 				DefaultDomain members = region.getMembers();
-				for(int i=0; i<names.length; i++) {
-					if(names[i].equals("clear")) {
-						members.removeAll();
-					} else if(names[i].charAt(0) == '+') {
-						members.addPlayer(names[i].substring(1));;
-					} else if(names[i].charAt(0) == '-') {
-						members.removePlayer(names[i].substring(1));;
+				members.clear();
+				for(String name : names) {
+					if(name != null && !name.isEmpty()) {
+						// Check for groups
+						if(name.startsWith("g:")) {
+							if(name.length() > 2) {
+								members.addGroup(name.substring(2));
+							}
+						} else {
+							members.addPlayer(name);
+						}
 					}
 				}
 				region.setMembers(members);
+				AreaShop.debug("  Flag " + flagName + " set: " + members.toUserFriendlyString());
 			} else if(flagName.equalsIgnoreCase("owners")) {
-				/* Split the string and parse all values */
-				String[] names = value.split("\\s*,\\s*");
+				// Split the string and parse all values
+				String[] names = value.split(" ");
 				DefaultDomain owners = region.getOwners();
-				for(int i=0; i<names.length; i++) {
-					if(names[i].equals("clear")) {
-						owners.removeAll();
-					} else if(names[i].charAt(0) == '+') {
-						owners.addPlayer(names[i].substring(1));;
-					} else if(names[i].charAt(0) == '-') {
-						owners.removePlayer(names[i].substring(1));;
+				owners.clear();
+				for(String name : names) {
+					if(name != null && !name.isEmpty()) {
+						// Check for groups
+						if(name.startsWith("g:")) {
+							if(name.length() > 2) {
+								owners.addGroup(name.substring(2));
+							}
+						} else {
+							owners.addPlayer(name);
+						}
 					}
 				}
 				region.setOwners(owners);
+				AreaShop.debug("  Flag " + flagName + " set: " + owners.toUserFriendlyString());
 			} else if(flagName.equalsIgnoreCase("priority")) {
 				try {
 					int priority = Integer.parseInt(value);
 					region.setPriority(priority);				
-					AreaShop.debug("Flag set: " + flagName + " --> " + value);
+					AreaShop.debug("  Flag " + flagName + " set: " + value);
 				} catch(NumberFormatException e) {
 					plugin.getLogger().info("The value of flag " + flagName + " is not a number");
 					result = false;
@@ -919,82 +940,75 @@ public abstract class GeneralRegion {
 				if(parentRegion != null) {
 					try {
 						region.setParent(parentRegion);
+						AreaShop.debug("  Flag " + flagName + " set: " + value);
 					} catch (CircularInheritanceException e) {
 						plugin.getLogger().info("The parent set in the config is not correct (circular inheritance)");
 					}
 				} else {
 					plugin.getLogger().info("The parent set in the config is not correct (region does not exist)");
 				}				
-			} else {
-				flagType = null;
-				flagValue = null;
-			
-				try {
-					flagType = DefaultFlag.fuzzyMatchFlag(flagName);
-					if(flagType != null && !(value.equals("") || value.equals("none"))) {
-						flagValue = flagType.parseInput(worldGuard, null, value);
-					}
-				} catch (InvalidFlagFormat e) {
-					plugin.getLogger().info("The value of flag " + flagName + " is wrong");
-					result = false;
-				}
-				if(flagType != null) {
-					if(flagType instanceof StateFlag) {
-						if(value.equals("")) {
-							region.setFlag((StateFlag)flagType, null);
-						} else {
-							region.setFlag((StateFlag)flagType, (State)flagValue);
-						}
-					} else if(flagType instanceof BooleanFlag) {
-						if(value.equals("")) {
-							region.setFlag((BooleanFlag)flagType, null);
-						} else {
-							region.setFlag((BooleanFlag)flagType, (Boolean)flagValue);
-						}
-					} else if(flagType instanceof IntegerFlag) {
-						if(value.equals("")) {
-							region.setFlag((IntegerFlag)flagType, null);
-						} else {
-							region.setFlag((IntegerFlag)flagType, (Integer)flagValue);
-						}
-					} else if(flagType instanceof DoubleFlag) {
-						if(value.equals("")) {
-							region.setFlag((DoubleFlag)flagType, null);
-						} else {
-							region.setFlag((DoubleFlag)flagType, (Double)flagValue);
-						}
-					} else if(flagType instanceof StringFlag) {
-						if(value.equals("")) {
-							region.setFlag((StringFlag)flagType, null);
-						} else {
-							String coloredValue = translateBukkitToWorldGuardColors((String)flagValue);
-							region.setFlag((StringFlag)flagType, coloredValue);
-						}
-					} else if(flagType instanceof SetFlag<?>) {
-						if(value.equals("")) {
-							region.setFlag((SetFlag)flagType, null);
-						} else {
-							region.setFlag((SetFlag)flagType, (Set<String>)flagValue);
-						}
-					} /* else if(flagType instanceof LocationFlag) {
-						region.setFlag((LocationFlag)flagType, (Location)flagValue);
-					} */ else if(flagType instanceof EnumFlag) {
-						if(value.equals("")) {
-							region.setFlag((EnumFlag)flagType, null);
-						} else {
-							region.setFlag((EnumFlag)flagType, (Enum)flagValue);
-						}
-					} else {
-						result = false;
-					}
-					AreaShop.debug("Region " + region.getId() + ", flag " + flagName + " --> " + value);
-				} else {
-					result = false;
-				}
-			}			
+			} else {		
+				// Parse all other normal flags (groups are also handled)
+				String flagSetting = null;
+				com.sk89q.worldguard.protection.flags.RegionGroup groupValue = null;
+	
+		        Flag<?> foundFlag = DefaultFlag.fuzzyMatchFlag(flagName);
+		        if(foundFlag == null) {
+		        	plugin.getLogger().info("Found wrong flag in flagProfiles section: " + flagName + ", check if that is the correct WorldGuard flag");
+		        	continue;
+		        }
+	            RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
+		        if(value == null || value.isEmpty()) {
+		        	region.setFlag(foundFlag, null);
+		            if (groupFlag != null) {
+		                region.setFlag(groupFlag, null);
+		            }
+	                AreaShop.debug("  Flag " + flagName + " reset (+ possible group of flag)");
+		        	continue;
+		        } else {
+		        	if(groupFlag == null) {
+		        		flagSetting = value;
+		        	} else {
+			        	for(String part : value.split(" ")) {
+			        		if(part.startsWith("g:")) {
+			    	            if(part.length() > 2) {
+			    	            	try {
+			    	            		groupValue = groupFlag.parseInput(worldGuard, null, part.substring(2));
+			    	            	} catch(InvalidFlagFormat e) {
+			    	            		plugin.getLogger().info("Found wrong group value for flag " + flagName);
+			    	            	}
+			    	            }
+			        		} else {
+			        			if(flagSetting == null) {
+			        				flagSetting = part;
+			        			} else {
+			        				flagSetting += " " + part;
+			        			}
+			        		}
+			        	}
+		        	}
+		        	if (flagSetting != null) {
+			            try {
+			                setFlag(region, foundFlag, null, flagSetting);
+			                AreaShop.debug("  Flag " + flagName + " set: " + flagSetting);
+			            } catch (InvalidFlagFormat e) {
+			            	plugin.getLogger().info("Found wrong value for flag " + flagName);
+			            }
+			        } 
+		        	if(groupValue != null) {
+		        		if(groupValue == groupFlag.getDefault()) {
+		        			region.setFlag(groupFlag, null);
+		        			AreaShop.debug("    Group of flag " + flagName + " set to default: " + groupValue);
+		        		} else {
+		        			region.setFlag(groupFlag, groupValue);
+		        			AreaShop.debug("    Group of flag " + flagName + " set: " + groupValue);
+		        		}
+		        	}
+		        }
+			}
 		}
-
 		try {
+			// TODO include into periodic saving program
 			worldGuard.getRegionManager(getWorld()).save();
 		} catch (StorageException e) {
 			plugin.getLogger().info("Error: regions could not be saved");

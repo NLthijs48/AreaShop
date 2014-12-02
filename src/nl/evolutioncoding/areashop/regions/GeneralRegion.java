@@ -348,6 +348,32 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
+	 * Get the groups that this region is added to
+	 * @return A Set with all groups of this region
+	 */
+	public Set<RegionGroup> getGroups() {
+		Set<RegionGroup> result = new HashSet<RegionGroup>();
+		for(RegionGroup group : plugin.getFileManager().getGroups()) {
+			if(group.isMember(this)) {
+				result.add(group);
+			}
+		}	
+		return result;
+	}
+	
+	/**
+	 * Get a list of names from groups this region is in
+	 * @return A list of groups this region is part of
+	 */
+	public List<String> getGroupNames() {
+		List<String> result = new ArrayList<String>();
+		for(RegionGroup group : getGroups()) {
+			result.add(group.getName());
+		}
+		return result;
+	}
+	
+	/**
 	 * Get all the replacements for this region
 	 * @return Map with the keys that need to be replaced with the value of the object
 	 */
@@ -428,6 +454,22 @@ public abstract class GeneralRegion {
 	public boolean isBuyRegion() {
 		return getType() == RegionType.BUY;
 	}
+	
+	/**
+	 * Check if for renting this region you should be inside of it
+	 * @return true if you need to be inside, otherwise false
+	 */
+	public boolean restrictedToRegion() {
+		return getBooleanSetting("general.restrictedToRegion");
+	}
+	
+	/**
+	 * Check if for renting you need to be in the correct world
+	 * @return true if you need to be in the same world as the region, otherwise false
+	 */
+	public boolean restrictedToWorld() {
+		return getBooleanSetting("general.restrictedToWorld") || restrictedToRegion();
+	}	
 	
 	/**
 	 * Add a friend to the region
@@ -839,6 +881,47 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
+	 * Convert milliseconds to a human readable format
+	 * @param milliseconds The amount of milliseconds to convert
+	 * @return A formatted string based on the language file
+	 */
+	public String millisToHumanFormat(long milliseconds) {
+		long timeLeft = milliseconds + 500;
+		// To seconds
+		timeLeft = timeLeft/1000;
+		if(timeLeft <= 0) {
+			return plugin.getLanguageManager().getLang("timeleft-ended");
+		} else if(timeLeft == 1) {
+			return plugin.getLanguageManager().getLang("timeleft-second", timeLeft);
+		} else if(timeLeft <= 120) {
+			return plugin.getLanguageManager().getLang("timeleft-seconds", timeLeft);
+		}
+		// To minutes
+		timeLeft = timeLeft/60;
+		if(timeLeft <= 120) {
+			return plugin.getLanguageManager().getLang("timeleft-minutes", timeLeft);
+		}
+		// To hours
+		timeLeft = timeLeft/60;
+		if(timeLeft <= 48) {
+			return plugin.getLanguageManager().getLang("timeleft-hours", timeLeft);
+		}
+		// To days
+		timeLeft = timeLeft/24;
+		if(timeLeft <= 60) {
+			return plugin.getLanguageManager().getLang("timeleft-days", timeLeft);
+		}
+		// To months
+		timeLeft = timeLeft/30;
+		if(timeLeft <= 24) {
+			return plugin.getLanguageManager().getLang("timeleft-months", timeLeft);
+		}
+		// To years
+		timeLeft = timeLeft/12;
+		return plugin.getLanguageManager().getLang("timeleft-years", timeLeft);
+	}
+	
+	/**
 	 * Reset all flags of the region
 	 */
 	public void resetRegionFlags() {
@@ -850,8 +933,15 @@ public abstract class GeneralRegion {
 		}
 	}
 	
-	protected static <V> void setFlag(ProtectedRegion region, Flag<V> flag, CommandSender sender, String value) throws InvalidFlagFormat {
-        region.setFlag(flag, flag.parseInput(WorldGuardPlugin.inst(), sender, value));
+	/**
+	 * Set a WorldGuard regin flag
+	 * @param region The WorldGuard region to set
+	 * @param flag The flag to set
+	 * @param value The value to set the flag to
+	 * @throws InvalidFlagFormat When the value of the flag is wrong
+	 */
+	protected static <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value) throws InvalidFlagFormat {
+        region.setFlag(flag, flag.parseInput(WorldGuardPlugin.inst(), null, value));
     }
 	
 	
@@ -985,7 +1075,7 @@ public abstract class GeneralRegion {
 		        	}
 		        	if (flagSetting != null) {
 			            try {
-			                setFlag(region, foundFlag, null, flagSetting);
+			                setFlag(region, foundFlag, flagSetting);
 			                AreaShop.debug("  Flag " + flagName + " set: " + flagSetting);
 			            } catch (InvalidFlagFormat e) {
 			            	plugin.getLogger().info("Found wrong value for flag " + flagName);

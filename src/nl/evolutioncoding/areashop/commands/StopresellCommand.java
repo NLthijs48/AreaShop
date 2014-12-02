@@ -10,7 +10,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-// TODO ALL
 public class StopresellCommand extends CommandAreaShop {
 
 	public StopresellCommand(AreaShop plugin) {

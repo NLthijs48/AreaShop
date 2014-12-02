@@ -147,6 +147,17 @@ public class RentRegion extends GeneralRegion {
 			dateString = date.format(new Date(getRentedUntil()));	
 		result.put(AreaShop.tagRentedUntilShort, dateString);
 		result.put(AreaShop.tagTimeLeft, getTimeLeftString());
+		result.put(AreaShop.tagMoneyBackAmount, getFormattedMoneyBackAmount());
+		double moneyBackPercent = getMoneyBackPercentage();
+		if((moneyBackPercent%1.0) == 0.0) {
+			result.put(AreaShop.tagMoneyBackPercentage, (int)moneyBackPercent);
+		} else {
+			result.put(AreaShop.tagMoneyBackPercentage, moneyBackPercent);
+		}
+		result.put(AreaShop.tagMaxExtends, this.getMaxExtends());
+		result.put(AreaShop.tagExtendsLeft, getMaxExtends() - getTimesExtended());
+		result.put(AreaShop.tagMaxRentTime, this.millisToHumanFormat(getMaxRentTime()*60*1000));
+		result.put(AreaShop.tagMaxInactiveTime, this.getFormattedInactiveTimeUntilUnrent());
 		return result;
 	}
 	
@@ -274,39 +285,23 @@ public class RentRegion extends GeneralRegion {
 	 * @return Time left on the rent, for example '29 days', '3 months', '1 second'
 	 */
 	public String getTimeLeftString() {
-		long timeLeft = getTimeLeft() + 500;
-		// To seconds
-		timeLeft = timeLeft/1000;
-		if(timeLeft <= 0) {
-			return plugin.getLanguageManager().getLang("timeleft-ended");
-		} else if(timeLeft == 1) {
-			return plugin.getLanguageManager().getLang("timeleft-second", timeLeft);
-		} else if(timeLeft <= 120) {
-			return plugin.getLanguageManager().getLang("timeleft-seconds", timeLeft);
-		}
-		// To minutes
-		timeLeft = timeLeft/60;
-		if(timeLeft <= 120) {
-			return plugin.getLanguageManager().getLang("timeleft-minutes", timeLeft);
-		}
-		// To hours
-		timeLeft = timeLeft/60;
-		if(timeLeft <= 48) {
-			return plugin.getLanguageManager().getLang("timeleft-hours", timeLeft);
-		}
-		// To days
-		timeLeft = timeLeft/24;
-		if(timeLeft <= 60) {
-			return plugin.getLanguageManager().getLang("timeleft-days", timeLeft);
-		}
-		// To months
-		timeLeft = timeLeft/30;
-		if(timeLeft <= 24) {
-			return plugin.getLanguageManager().getLang("timeleft-months", timeLeft);
-		}
-		// To years
-		timeLeft = timeLeft/12;
-		return plugin.getLanguageManager().getLang("timeleft-years", timeLeft);
+		return millisToHumanFormat(getTimeLeft());
+	}
+	
+	/**
+	 * Minutes until automatic unrent when player is offline
+	 * @return The number of minutes until the region is unrented while player is offline
+	 */
+	public long getInactiveTimeUntilUnrent() {
+		return getIntegerSetting("rent.inactiveTimeUntilUnrent");
+	}
+	
+	/**
+	 * Get a human readable string indicating how long the player can be offline until automatic unrent
+	 * @return String indicating the inactive time until unrent
+	 */
+	public String getFormattedInactiveTimeUntilUnrent() {
+		return this.millisToHumanFormat(getInactiveTimeUntilUnrent()*60*1000);
 	}
 	
 	/**
@@ -323,6 +318,44 @@ public class RentRegion extends GeneralRegion {
 	 */
 	public void setDuration(String duration) {
 		setSetting("rent.duration", duration);
+	}
+	
+	/**
+	 * Get the moneyBack percentage
+	 * @return The % of money the player will get back when unrenting
+	 */
+	public double getMoneyBackPercentage() {
+		return getDoubleSetting("rent.moneyBack");
+	}
+	
+	/**
+	 * Get the amount of money that should be paid to the player when unrenting the region
+	 * @return The amount of money the player should get back
+	 */
+	public double getMoneyBackAmount() {
+		Long currentTime = Calendar.getInstance().getTimeInMillis();
+		Double timeLeft = (double) ((getRentedUntil() - currentTime));
+		double percentage = (getMoneyBackPercentage()) / 100.0;
+		Double timePeriod = (double) (getDuration());
+		double periods = timeLeft / timePeriod;
+		double moneyBack =  periods * getPrice() * percentage;
+		return moneyBack;
+	}
+	
+	/**
+	 * Get the formatted string of the amount of the moneyBack amount
+	 * @return String with currency symbols and proper fractional part
+	 */
+	public String getFormattedMoneyBackAmount() {
+		return plugin.formatCurrency(getMoneyBackAmount());
+	}
+	
+	/**
+	 * Get the maximum time the player can rent the region in advance (minutes)
+	 * @return The maximum rent time in minutes
+	 */
+	public long getMaxRentTime() {
+		return this.getLongSetting("rent.maxRentTime");
 	}
 	
 	/**
@@ -395,14 +428,13 @@ public class RentRegion extends GeneralRegion {
 			// Check if the region is available for renting or if the player wants to extend the rent
 			if(!isRented() || extend) {
 				// Check if the players needs to be in the world or region for buying
-				if(!player.getWorld().getName().equals(getWorldName()) && getBooleanSetting("general.restrictedToWorld")) {
-					plugin.message(player, "rent-restrictedToWorld", getWorldName(), player.getWorld().getName());
+				if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName()) 
+						|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
+					plugin.message(player, "rent-restrictedToRegion", getName());
 					return false;
 				}
-				if((!player.getWorld().getName().equals(getWorldName()) 
-						|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ())
-					) && getBooleanSetting("general.restrictedToRegion")) {
-					plugin.message(player, "rent-restrictedToRegion", getName());
+				if(restrictedToWorld() && !player.getWorld().getName().equals(getWorldName())) {
+					plugin.message(player, "rent-restrictedToWorld", getWorldName(), player.getWorld().getName());
 					return false;
 				}				
 				// Check region limits if this is not extending				
@@ -434,7 +466,7 @@ public class RentRegion extends GeneralRegion {
 				// Check if there is enough time left before hitting maxRentTime
 				long timeNow = Calendar.getInstance().getTimeInMillis();
 				long timeRented = 0;
-				long maxRentTime = this.getLongSetting("rent.maxRentTime");
+				long maxRentTime = getMaxRentTime();
 				if(isRented()) {
 					timeRented = getRentedUntil() - timeNow;
 				}
@@ -527,14 +559,7 @@ public class RentRegion extends GeneralRegion {
 	public void unRent(boolean giveMoneyBack) {
 		// Run commands
 		this.runEventCommands(RegionEvent.UNRENTED, true);
-		/* Get the time until the region will be rented */
-		Long currentTime = Calendar.getInstance().getTimeInMillis();
-		Double timeLeft = (double) ((getRentedUntil() - currentTime));
-		double percentage = (getDoubleSetting("rent.moneyBack")) / 100.0;
-
-		Double timePeriod = (double) (getDuration());
-		double periods = timeLeft / timePeriod;
-		double moneyBack =  periods * getPrice() * percentage;
+		double moneyBack =  getMoneyBackAmount();
 		if(moneyBack > 0 && giveMoneyBack) {
 			/* Give back the money */
 			OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());

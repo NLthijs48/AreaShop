@@ -74,6 +74,12 @@ public final class AreaShop extends JavaPlugin {
 	public static final String tagResellPrice = "%resellprice%";
 	public static final String tagFriends = "%friends%";
 	public static final String tagFriendsUUID = "%friendsuuid%";
+	public static final String tagMoneyBackPercentage = "%moneybackpercent%";
+	public static final String tagMoneyBackAmount = "%moneyback%";
+	public static final String tagMaxExtends = "%maxextends%";
+	public static final String tagExtendsLeft = "%extendsleft%";
+	public static final String tagMaxRentTime = "%maxrenttime%";
+	public static final String tagMaxInactiveTime = "%inactivetime%";
 	
 	public static AreaShop getInstance() {
 		return AreaShop.instance;
@@ -350,13 +356,7 @@ public final class AreaShop extends JavaPlugin {
 	public String fixColors(String input) {
 		String result = null;
 		if(input != null) {
-			result = input.replaceAll("(&([a-f0-9]))", "\u00A7$2");
-			result = result.replaceAll("&k", ChatColor.MAGIC.toString());
-			result = result.replaceAll("&l", ChatColor.BOLD.toString());
-			result = result.replaceAll("&m", ChatColor.STRIKETHROUGH.toString());
-			result = result.replaceAll("&n", ChatColor.UNDERLINE.toString());
-			result = result.replaceAll("&o", ChatColor.ITALIC.toString());
-			result = result.replaceAll("&r", ChatColor.RESET.toString());	
+			result =  ChatColor.translateAlternateColorCodes('&', input);	
 			result = result.replaceAll("€", "\u20AC");
 		}		
 		return result;

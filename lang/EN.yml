@@ -142,7 +142,39 @@ info-playerRents: "Regions rented by %0%: &7%1%"
 info-playerNoRents: "%0% has not rented a region"
 info-playerBuys: "Regions bought by %0%: &7%1%" 
 info-playerNoBuys: "%0% has not bought a region"
+
+
+
 info-regionHelp: "/as info region [name], the region you stand in will be used if not specified"
+
+info-regionHeader: "&2Information about %region%:"
+
+info-regionRented: "&2&l►&r Rented by %player% until: &7%until%"
+info-regionExtending: "&2&l►&r Price to extend: &7%price% per %duration%"
+info-regionCanBeRented: "&2&l►&r Price to rent: &7%price% per %duration%"
+info-regionFriends: "&2&l►&r Added friends: &7%friends%"
+info-regionMoneyBackBuy: "&2&l►&r Selling payback: &7%moneyback% (%moneybackpercent%% of the price)"
+info-regionMoneyBackRent: "&2&l►&r Unrenting payback &7%moneyback% (%moneybackpercent%% of the remaining time)"
+info-regionMaxExtends: "&2&l►&r Maximum times extending: &7%maxextends% time(s)"
+info-regionNoExtending: "&2&l►&r Rent cannot be extended"
+info-regionExtendsLeft: "&2&l►&r Extending left: &7%extendsleft% time(s) out of %maxextends%"
+info-regionMaxRentTime: "&2&l►&r In advance renting: &7%maxrenttime% at maximum"
+info-regionNoTeleport: "&2&l►&r Teleport location not set%0%"
+info-regionTeleportHint: " &7(use '/as settp' for a better spot)"
+info-regionTeleportAt: "&2&l►&r Teleport set at: &7(%0%, %1%, %2%, %3%), pitch: %4%, yaw: %5%"
+info-regionSigns: "&2&l►&r Connected signs: &7%0%"
+info-regionSignLocation: "&7(%0%, %1%, %2%, %3%)&r"
+info-regionGroups: "&2&l►&r Assigned groups: &7%0%"
+info-regionInactiveUnrent: "&2&l►&r Auto unrent after: &7%inactivetime% of inactivity by the player"
+info-regionRestrictedRegionRent: "&2&l►&r To rent it you need to be inside the region"
+info-regionRestrictedWorldRent: "&2&l►&r To rent it you need to be inside world '%world%'"
+info-regionRestoringRent: "&2&l►&r Restoring is enabled &7(region will reset at unrent)%0%"
+info-regionRestoringProfile: " (profile: %0%)"
+info-regionFooter: ""
+
+
+
+
 info-regionNoRenting: "%0% is not registered for renting"
 info-regionRenting: "&6Renting details for %0%:"
 info-regionRentedBy: "Rented by: &7%0% until %1%"
@@ -152,7 +184,7 @@ info-regionNoBuying: "%0% is not registered for buying"
 info-regionNotBought: "Currently not sold"
 info-regionBoughtBy: "Bought by: &7%0%"
 info-regionSign: "Sign location(s): %0%"
-info-regionSignLocation: "&7(%0%, %1%, %2%, %3%)&r"
+
 info-regionNoSign: "There is no sign registered for this region"
 info-regionPriceDuration: "Price: &7%0% for each %1%"
 info-regionPrice: "Price: &7%0%"

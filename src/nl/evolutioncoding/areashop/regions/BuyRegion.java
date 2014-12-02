@@ -170,6 +170,30 @@ public class BuyRegion extends GeneralRegion {
 		config.set("buy.resellPrice", null);
 	}
 	
+	/**
+	 * Get the moneyBack percentage
+	 * @return The % of money the player will get back when selling
+	 */
+	public double getMoneyBackPercentage() {
+		return getDoubleSetting("buy.moneyBack");
+	}
+	
+	/**
+	 * Get the amount of money that should be paid to the player when selling the region
+	 * @return The amount of money the player should get back
+	 */
+	public double getMoneyBackAmount() {
+		return getPrice() * (getMoneyBackPercentage() / 100.0);
+	}
+	
+	/**
+	 * Get the formatted string of the amount of the moneyBack amount
+	 * @return String with currency symbols and proper fractional part
+	 */
+	public String getFormattedMoneyBackAmount() {
+		return plugin.formatCurrency(getMoneyBackAmount());
+	}
+	
 	@Override
 	public HashMap<String, Object> getSpecificReplacements() {
 		// Fill the replacements map with things specific to a BuyRegion
@@ -178,9 +202,30 @@ public class BuyRegion extends GeneralRegion {
 		result.put(AreaShop.tagPlayerName, getPlayerName());
 		result.put(AreaShop.tagPlayerUUID, getBuyer());
 		result.put(AreaShop.tagResellPrice, getFormattedResellPrice());
-		// TODO: Add more?
-		
+		double moneyBackPercent = getMoneyBackPercentage();
+		if((moneyBackPercent%1.0) == 0.0) {
+			result.put(AreaShop.tagMoneyBackPercentage, (int)moneyBackPercent);
+		} else {
+			result.put(AreaShop.tagMoneyBackPercentage, moneyBackPercent);
+		}
+		result.put(AreaShop.tagMaxInactiveTime, this.getFormattedInactiveTimeUntilSell());
 		return result;
+	}
+	
+	/**
+	 * Minutes until automatic unrent when player is offline
+	 * @return The number of minutes until the region is unrented while player is offline
+	 */
+	public long getInactiveTimeUntilSell() {
+		return getIntegerSetting("buy.inactiveTimeUntilSell");
+	}
+	
+	/**
+	 * Get a human readable string indicating how long the player can be offline until automatic unrent
+	 * @return String indicating the inactive time until unrent
+	 */
+	public String getFormattedInactiveTimeUntilSell() {
+		return this.millisToHumanFormat(getInactiveTimeUntilSell()*60*1000);
 	}
 	
 	/**
@@ -194,16 +239,15 @@ public class BuyRegion extends GeneralRegion {
 			if(!isSold() || (isInResellingMode() && !isBuyer(player))) {
 				boolean isResell = isInResellingMode();
 				// Check if the players needs to be in the world or region for buying
-				if(!player.getWorld().getName().equals(getWorldName()) && getBooleanSetting("general.restrictedToWorld")) {
-					plugin.message(player, "buy-restrictedToWorld", getWorldName(), player.getWorld().getName());
-					return false;
-				}
-				if((!player.getWorld().getName().equals(getWorldName()) 
-						|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ())
-					) && getBooleanSetting("general.restrictedToRegion")) {
+				if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName()) 
+						|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
 					plugin.message(player, "buy-restrictedToRegion", getName());
 					return false;
-				}				
+				}	
+				if(restrictedToWorld() && !player.getWorld().getName().equals(getWorldName())) {
+					plugin.message(player, "buy-restrictedToWorld", getWorldName(), player.getWorld().getName());
+					return false;
+				}			
 				// Check region limits
 				LimitResult limitResult = this.limitsAllowBuying(player);
 				AreaShop.debug("LimitResult: " + limitResult.toString());
@@ -314,8 +358,7 @@ public class BuyRegion extends GeneralRegion {
 		
 		disableReselling();
 		/* Give part of the buying price back */
-		double percentage = getDoubleSetting("buy.moneyBack") / 100.0;
-		double moneyBack =  getPrice() * percentage;
+		double moneyBack =  getMoneyBackAmount();
 		if(moneyBack > 0 && giveMoneyBack) {
 			/* Give back the money */
 			OfflinePlayer player = Bukkit.getOfflinePlayer(getBuyer());

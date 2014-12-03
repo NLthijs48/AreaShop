@@ -239,7 +239,7 @@ public class InfoCommand extends CommandAreaShop {
 					}					
 					
 					if(rent != null) {
-						plugin.message(sender, "info-regionHeader", rent);
+						plugin.message(sender, "info-regionHeaderRent", rent);
 						if(rent.isRented()) {
 							plugin.messageNoPrefix(sender, "info-regionRented", rent);
 							plugin.messageNoPrefix(sender, "info-regionExtending", rent);
@@ -287,13 +287,6 @@ public class InfoCommand extends CommandAreaShop {
 						if(sender.hasPermission("areashop.groupinfo") && !rent.getGroupNames().isEmpty()) {
 							plugin.messageNoPrefix(sender, "info-regionGroups", Utils.createCommaSeparatedList(rent.getGroupNames()));
 						}
-						if(!rent.isRented()) {
-							if(rent.restrictedToRegion()) {
-								plugin.messageNoPrefix(sender, "info-regionRestrictedRegionRent", rent);
-							} else if(rent.restrictedToWorld()) {
-								plugin.messageNoPrefix(sender, "info-regionRestrictedWorldRent", rent);
-							}
-						}
 						if(rent.isRestoreEnabled()) {
 							if(sender.hasPermission("areashop.setrestore")) {
 								plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent, plugin.getLanguageManager().getLang("info-regionRestoringProfile", rent.getRestoreProfile()));
@@ -301,35 +294,65 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent, "");
 							}
 						}
-						plugin.messageNoPrefix(sender, "info-regionFooter", rent);
+						if(!rent.isRented()) {
+							if(rent.restrictedToRegion()) {
+								plugin.messageNoPrefix(sender, "info-regionRestrictedRegionRent", rent);
+							} else if(rent.restrictedToWorld()) {
+								plugin.messageNoPrefix(sender, "info-regionRestrictedWorldRent", rent);
+							}
+						}
+						plugin.messageNoPrefix(sender, "info-regionFooterRent", rent);
 					} else if(buy != null) {
-						plugin.message(sender, "info-regionBuying", buy.getName());
+						plugin.message(sender, "info-regionHeaderBuy", buy);
+						if(buy.isSold()) {
+							plugin.messageNoPrefix(sender, "info-regionBought", buy);
+							plugin.messageNoPrefix(sender, "info-regionMoneyBackBuy", buy);
+							if(!buy.getFriendNames().isEmpty()) {
+								plugin.messageNoPrefix(sender, "info-regionFriends", buy);
+							}
+						} else {
+							plugin.messageNoPrefix(sender, "info-regionCanBeBought", buy);
+						}
+						if(buy.getInactiveTimeUntilSell() != -1) {
+							plugin.messageNoPrefix(sender, "info-regionInactiveSell", buy);			
+						}
+						if(sender.hasPermission("areashop.teleport") || sender.hasPermission("areashop.teleportall")) {
+							Location teleport = buy.getTeleportLocation();
+							if(teleport == null) {
+								if(buy.isSold()) {
+									plugin.messageNoPrefix(sender, "info-regionNoTeleport", buy, plugin.getLanguageManager().getLang("info-regionTeleportHint", buy));
+								} else {
+									plugin.messageNoPrefix(sender, "info-regionNoTeleport", buy, "");
+								}
+							} else {
+								plugin.messageNoPrefix(sender, "info-regionTeleportAt", buy, teleport.getWorld().getName(), teleport.getBlockX(), teleport.getBlockY(), teleport.getBlockZ(), (int)teleport.getPitch(), (int)teleport.getYaw());
+							}
+						}
 						List<String> signLocations = new ArrayList<String>();
 						for(Location location : buy.getSignLocations()) {
 							signLocations.add(plugin.getLanguageManager().getLang("info-regionSignLocation", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 						}
-						if(signLocations.isEmpty()) {
-							plugin.message(sender, "info-regionNoSign");
-						} else {
-							plugin.message(sender, "info-regionSign", Utils.createCommaSeparatedList(signLocations));
+						if(!signLocations.isEmpty()) {
+							plugin.messageNoPrefix(sender, "info-regionSigns", Utils.createCommaSeparatedList(signLocations));
 						}
-						plugin.message(sender, "info-regionPrice", buy.getFormattedPrice());
-						if(!buy.isSold()) {
-							plugin.message(sender, "info-regionNotBought");
-						} else {
-							plugin.message(sender, "info-regionBoughtBy", buy.getPlayerName());
+						if(sender.hasPermission("areashop.groupinfo") && !buy.getGroupNames().isEmpty()) {
+							plugin.messageNoPrefix(sender, "info-regionGroups", Utils.createCommaSeparatedList(buy.getGroupNames()));
 						}
-						if(sender.hasPermission("areashop.buyrestore")) {
-							plugin.message(sender, "info-regionRestore", buy.isRestoreEnabled());
-							plugin.message(sender, "info-regionRestoreProfile", buy.getRestoreProfile());
-						}
-						if(sender.hasPermission("areashop.teleport")) {
-							if(buy.getTeleportLocation() == null) {
-								plugin.message(sender, "info-regionNoTP");
+						if(buy.isRestoreEnabled()) {
+							if(sender.hasPermission("areashop.setrestore")) {
+								plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy, plugin.getLanguageManager().getLang("info-regionRestoringProfile", buy.getRestoreProfile()));
 							} else {
-								plugin.message(sender, "info-regionTPLocation", buy.getTeleportLocation().getWorld().toString(), buy.getTeleportLocation().getBlockX(), buy.getTeleportLocation().getBlockY(), buy.getTeleportLocation().getBlockZ(), buy.getTeleportLocation().getPitch(), buy.getTeleportLocation().getYaw());
+								plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy, "");
 							}
 						}
+						if(!buy.isSold()) {
+							if(buy.restrictedToRegion()) {
+								plugin.messageNoPrefix(sender, "info-regionRestrictedRegionBuy", buy);
+							} else if(buy.restrictedToWorld()) {
+								plugin.messageNoPrefix(sender, "info-regionRestrictedWorldBuy", buy);
+							}
+						}
+						plugin.messageNoPrefix(sender, "info-regionFooterBuy", buy);
 					}
 				} else {
 					plugin.message(sender, "info-regionHelp");

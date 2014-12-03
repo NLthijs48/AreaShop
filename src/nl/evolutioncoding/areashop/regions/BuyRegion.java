@@ -202,6 +202,7 @@ public class BuyRegion extends GeneralRegion {
 		result.put(AreaShop.tagPlayerName, getPlayerName());
 		result.put(AreaShop.tagPlayerUUID, getBuyer());
 		result.put(AreaShop.tagResellPrice, getFormattedResellPrice());
+		result.put(AreaShop.tagMoneyBackAmount, getFormattedMoneyBackAmount());
 		double moneyBackPercent = getMoneyBackPercentage();
 		if((moneyBackPercent%1.0) == 0.0) {
 			result.put(AreaShop.tagMoneyBackPercentage, (int)moneyBackPercent);

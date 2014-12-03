@@ -88,7 +88,7 @@ public class FindCommand extends CommandAreaShop {
 					} else {
 						plugin.message(player, "find-success", "buy", region.getName(), balance, onlyInGroup);
 					}
-					region.teleportPlayer(player, true);					
+					region.teleportPlayer(player, true, false);					
 					return;
 				}
 			}		
@@ -123,7 +123,7 @@ public class FindCommand extends CommandAreaShop {
 					} else {
 						plugin.message(player, "find-success", "rent", region.getName(), balance, onlyInGroup);
 					}
-					region.teleportPlayer(player, true);					
+					region.teleportPlayer(player, true, false);					
 					return;
 				}
 			}	

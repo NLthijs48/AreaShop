@@ -714,7 +714,6 @@ public abstract class GeneralRegion {
 						signType = null;
 					}
 					if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
-						block.setType(Material.AIR);
 						AreaShop.debug("  setting sign failed");
 						continue;
 					}
@@ -723,7 +722,7 @@ public abstract class GeneralRegion {
 					org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 					BlockFace signFace;
 					try {
-						signFace = BlockFace.valueOf(config.getString("general.signs." + sign + ".signType"));
+						signFace = BlockFace.valueOf(config.getString("general.signs." + sign + ".facing"));
 					} catch(NullPointerException | IllegalArgumentException e) {
 						signFace = null;
 					}
@@ -732,7 +731,9 @@ public abstract class GeneralRegion {
 						signState.setData(signData);
 					}
 				}
-				signState = (Sign)block.getState();
+				if(signState == null) {
+					signState = (Sign)block.getState();
+				}
 				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 				if(!config.isString("general.signs." + sign + ".signType")) {
 					config.set("general.signs." + sign + ".signType", signState.getType().toString());
@@ -1175,8 +1176,9 @@ public abstract class GeneralRegion {
 	 * Teleport a player to the region
 	 * @param player Player that should be teleported
 	 * @param regionName The name of the region the player should be teleported to
+	 * @param checkPermissions Set to true if teleport permissions should be checked, false otherwise
 	 */
-	public boolean teleportPlayer(Player player, boolean toSign) {
+	public boolean teleportPlayer(Player player, boolean toSign, boolean checkPermissions) {
 		int checked = 1;
 		boolean owner = false;
 		Location startLocation = null;
@@ -1192,19 +1194,21 @@ public abstract class GeneralRegion {
 				|| !toSign && !owner && !player.hasPermission("areashop.teleportall")) {
 			toSign = true;
 		}
-		// Check permissions
-		if(owner && !player.hasPermission("areashop.teleport") && !toSign) {
-			plugin.message(player, "teleport-noPermission");
-			return false;
-		} else if(!owner && !player.hasPermission("areashop.teleportall") && !toSign) {
-			plugin.message(player, "teleport-noPermissionOther");
-			return false;
-		} else if(owner && !player.hasPermission("areashop.teleportsign") && toSign) {
-			plugin.message(player, "teleport-noPermissionSign");
-			return false;
-		} else if(!owner && !player.hasPermission("areashop.teleportsignall") && toSign) {
-			plugin.message(player, "teleport-noPermissionOtherSign");
-			return false;
+		if(checkPermissions) {
+			// Check permissions
+			if(owner && !player.hasPermission("areashop.teleport") && !toSign) {
+				plugin.message(player, "teleport-noPermission");
+				return false;
+			} else if(!owner && !player.hasPermission("areashop.teleportall") && !toSign) {
+				plugin.message(player, "teleport-noPermissionOther");
+				return false;
+			} else if(owner && !player.hasPermission("areashop.teleportsign") && toSign) {
+				plugin.message(player, "teleport-noPermissionSign");
+				return false;
+			} else if(!owner && !player.hasPermission("areashop.teleportsignall") && toSign) {
+				plugin.message(player, "teleport-noPermissionOtherSign");
+				return false;
+			}
 		}
 		
 		if(toSign) {
@@ -1474,8 +1478,11 @@ public abstract class GeneralRegion {
 			return false;
 		}	
 	}
+	public boolean teleportPlayer(Player player, boolean toSign) {
+		return teleportPlayer(player, toSign, true);
+	}
 	public boolean teleportPlayer(Player player) {
-		return teleportPlayer(player, false);
+		return teleportPlayer(player, false, true);
 	}
 	
 	/**

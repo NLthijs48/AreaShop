@@ -55,6 +55,7 @@ public abstract class GeneralRegion {
 	private static ArrayList<Material> cannotSpawnBeside = new ArrayList<Material>(Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CACTUS));
 	protected AreaShop plugin = null;
 	private boolean saveRequired = false;
+	private boolean deleted = false;
 
 	/* Enum for region types */
 	public enum RegionType {		
@@ -234,6 +235,21 @@ public abstract class GeneralRegion {
 		Location result = null;
 		result = Utils.configToLocation(config.getConfigurationSection("general.teleportLocation"));
 		return result;
+	}
+	
+	/**
+	 * Check if the region has been deleted
+	 * @return
+	 */
+	public boolean isDeleted() {
+		return deleted;
+	}
+	
+	/**
+	 * Indicate that this region has been deleted
+	 */
+	public void setDeleted() {
+		deleted = true;
 	}
 	
 	/**
@@ -635,7 +651,7 @@ public abstract class GeneralRegion {
 	 * @return
 	 */
 	public boolean needsPeriodicUpdating() {
-		if(!isRentRegion()) {
+		if(isDeleted() || !isRentRegion()) {
 			return false;
 		}
 		Set<String> signs = null;
@@ -667,6 +683,9 @@ public abstract class GeneralRegion {
 	 * @return true if the update was successful, otherwise false
 	 */
 	public boolean updateSigns() {
+		if(isDeleted()) {
+			return false;
+		}
 		boolean result = true;
 		Set<String> signs = null;
 		if(config.getConfigurationSection("general.signs") != null) {
@@ -1138,7 +1157,7 @@ public abstract class GeneralRegion {
 	 * @return true if a save is required because some data changed, otherwise false
 	 */
 	public boolean isSaveRequired() {
-		return saveRequired;
+		return saveRequired && !isDeleted();
 	}
 	
 	/**
@@ -1146,6 +1165,9 @@ public abstract class GeneralRegion {
 	 * @return true if the region is saved successfully, otherwise false
 	 */
 	public boolean saveNow() {
+		if(isDeleted()) {
+			return false;
+		}
 		saveRequired = false;
 		File file = new File(plugin.getFileManager().getRegionFolder() + File.separator + getName().toLowerCase() + ".yml");
 		try {

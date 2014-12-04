@@ -397,7 +397,7 @@ public class BuyRegion extends GeneralRegion {
 
 	@Override
 	public boolean checkInactive() {
-		if(!isSold()) {
+		if(isDeleted() || !isSold()) {
 			return false;
 		}
 		OfflinePlayer player = Bukkit.getOfflinePlayer(getBuyer());

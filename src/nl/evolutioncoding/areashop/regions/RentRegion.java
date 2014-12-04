@@ -364,7 +364,7 @@ public class RentRegion extends GeneralRegion {
 	 */
 	public boolean checkExpiration() {
 		long now = Calendar.getInstance().getTimeInMillis();
-		if(isRented() && now > getRentedUntil()) {
+		if(!isDeleted() && isRented() && now > getRentedUntil()) {
 			/* Send message to the player if online */
 			Player player = Bukkit.getPlayer(getRenter());
 			if(player != null) {
@@ -382,7 +382,7 @@ public class RentRegion extends GeneralRegion {
 	 */
 	public void sendExpirationWarnings() {
 		// send from warningsDoneUntil to current+delay
-		if(!isRented()) {
+		if(isDeleted() || !isRented()) {
 			return;
 		}
 		Player player = Bukkit.getPlayer(getRenter());
@@ -599,7 +599,7 @@ public class RentRegion extends GeneralRegion {
 	
 	@Override
 	public boolean checkInactive() {
-		if(!isRented()) {
+		if(isDeleted() || !isRented()) {
 			return false;
 		}
 		OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());

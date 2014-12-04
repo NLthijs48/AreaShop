@@ -246,6 +246,7 @@ public class FileManager {
 	public boolean removeRent(RentRegion rent, boolean giveMoneyBack) {
 		boolean result = false;
 		if(rent != null) {
+			rent.setDeleted();
 			if(rent.isRented()) {
 				rent.unRent(giveMoneyBack);
 			}
@@ -257,6 +258,7 @@ public class FileManager {
 			if(rent.getWorld() != null) {
 				for(Location sign : rent.getSignLocations()) {
 					sign.getBlock().setType(Material.AIR);
+					AreaShop.debug("Removed sign at: " + sign.toString());
 				}
 			}
 			RegionGroup[] groups = getGroups().toArray(new RegionGroup[getGroups().size()]);
@@ -268,16 +270,16 @@ public class FileManager {
 			regions.remove(rent.getLowerCaseName());
 			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + rent.getLowerCaseName() + ".yml");
 			boolean deleted = true;
-			try {
-				deleted = file.delete();
-			} catch(Exception e) {
-				deleted = false;
+			if(file.exists()) {
+				try {
+					deleted = file.delete();
+				} catch(Exception e) {
+					deleted = false;
+				}
+				if(!deleted) {
+					plugin.getLogger().warning("File could not be deleted: " + file.toString());
+				}
 			}
-			if(!deleted) {
-				plugin.getLogger().warning("File could not be deleted: " + file.toString());
-			}
-
-			
 			result = true;
 			
 			// Run commands
@@ -307,6 +309,7 @@ public class FileManager {
 	public boolean removeBuy(BuyRegion buy, boolean giveMoneyBack) {
 		boolean result = false;
 		if(buy != null) {
+			buy.setDeleted();
 			if(buy.isSold()) {
 				buy.sell(giveMoneyBack);
 			}
@@ -319,7 +322,7 @@ public class FileManager {
 				for(Location sign : buy.getSignLocations()) {
 					sign.getBlock().setType(Material.AIR);
 				}
-			}			
+			}
 			regions.remove(buy.getLowerCaseName());
 			buy.resetRegionFlags();
 			
@@ -332,13 +335,15 @@ public class FileManager {
 			// Deleting the file
 			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + buy.getLowerCaseName() + ".yml");
 			boolean deleted = true;
-			try {
-				deleted = file.delete();
-			} catch(Exception e) {
-				deleted = false;
-			}
-			if(!deleted) {
-				plugin.getLogger().warning("File could not be deleted: " + file.toString());
+			if(file.exists()) {
+				try {
+					deleted = file.delete();
+				} catch(Exception e) {
+					deleted = false;
+				}
+				if(!deleted) {
+					plugin.getLogger().warning("File could not be deleted: " + file.toString());
+				}
 			}
 			
 			result = true;

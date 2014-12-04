@@ -280,7 +280,7 @@ public class BuyRegion extends GeneralRegion {
 						if(oldOwnerPlayer != null) {
 							r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
 							if(!r.transactionSuccess()) {
-								plugin.getLogger().info("Something went wrong with paying '" + oldOwnerPlayer.getName() + "' for his resell of region " + getName());
+								plugin.getLogger().warning("Something went wrong with paying '" + oldOwnerPlayer.getName() + "' for his resell of region " + getName());
 							}
 						}
 						// Resell is done, disable that now
@@ -372,7 +372,7 @@ public class BuyRegion extends GeneralRegion {
 					error = true;
 				}
 				if(error || response == null || !response.transactionSuccess()) {
-					plugin.getLogger().info("Something went wrong with paying back money to " + getPlayerName() + " while selling region " + getName());
+					plugin.getLogger().warning("Something went wrong with paying back money to " + getPlayerName() + " while selling region " + getName());
 				}	
 			}
 		}

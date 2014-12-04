@@ -88,7 +88,7 @@ public final class SignBreakListener implements Listener {
 					return;
 				}
 				region.removeSign(block.getLocation());
-				plugin.getLogger().info("A sign of region " + region.getName() + " has been removed by indirectly breaking it (block below/behind is destroyed)");
+				plugin.getLogger().warning("A sign of region " + region.getName() + " has been removed by indirectly breaking it (block below/behind is destroyed)");
             }
         }
     }

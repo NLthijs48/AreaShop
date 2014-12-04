@@ -564,7 +564,7 @@ public class FileManager {
 					try {
 						manager.saveChanges();
 					} catch(StorageException e) {
-						plugin.getLogger().info("Error: WorldGuard regions in world " + world + " could not be saved");
+						plugin.getLogger().warning("WorldGuard regions in world " + world + " could not be saved");
 					}
 				}
 			}
@@ -639,7 +639,7 @@ public class FileManager {
 		    	versions = (HashMap<String,Integer>)input.readObject();
 				input.close();
 			} catch (IOException | ClassNotFoundException | ClassCastException e) {
-				plugin.getLogger().info("Error: Something went wrong reading file: " + versionPath);
+				plugin.getLogger().warning("Something went wrong reading file: " + versionPath);
 				versions = null;
 			}
 		}
@@ -662,7 +662,7 @@ public class FileManager {
 			output.writeObject(versions);
 			output.close();
 		} catch (IOException e) {
-			plugin.getLogger().info("File could not be saved: " + versionPath);
+			plugin.getLogger().warning("File could not be saved: " + versionPath);
 		}
 	}
 
@@ -932,7 +932,7 @@ public class FileManager {
 				try {
 					Files.move(new File(rentPath), new File(oldFolderPath + "rents"));
 				} catch (Exception e) {
-					plugin.getLogger().info("  Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
+					plugin.getLogger().warning("  Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
 				}
 				// Check if conversion is needed
 				if(versions.get("rents") < 1) {					
@@ -1039,7 +1039,7 @@ public class FileManager {
 		    	buys = (HashMap<String,HashMap<String,String>>)input.readObject();
 				input.close();
 			} catch (IOException | ClassNotFoundException | ClassCastException e) {
-				plugin.getLogger().warning("  Error: Something went wrong reading file: " + buyPath);
+				plugin.getLogger().warning("  Something went wrong reading file: " + buyPath);
 			}
 			// Delete the file if it is totally wrong
 			if(buys == null) {
@@ -1051,7 +1051,7 @@ public class FileManager {
 				try {
 					Files.move(new File(buyPath), new File(oldFolderPath + "buys"));
 				} catch (Exception e) {
-					plugin.getLogger().info("  Could not create a backup of '" + buyPath + "', check the file permissions (conversion to next version continues)");
+					plugin.getLogger().warning("  Could not create a backup of '" + buyPath + "', check the file permissions (conversion to next version continues)");
 				}
 				// Check if conversion is needed
 				if(versions.get("buys") < 1) {				

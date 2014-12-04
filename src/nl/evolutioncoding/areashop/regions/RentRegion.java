@@ -572,7 +572,7 @@ public class RentRegion extends GeneralRegion {
 					error = true;
 				}
 				if(error || r == null || !r.transactionSuccess()) {
-					plugin.getLogger().info("Something went wrong with paying back to " + getPlayerName() + " money while unrenting region " + getName());
+					plugin.getLogger().warning("Something went wrong with paying back to " + getPlayerName() + " money while unrenting region " + getName());
 				}
 			}
 		}

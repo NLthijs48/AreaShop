@@ -74,7 +74,7 @@ public class LanguageManager {
 					output.close();
 				} catch (IOException e1) {} catch (NullPointerException e2) {}
 				
-				plugin.getLogger().info("Something went wrong saving a default language file: " + langFile.getPath());
+				plugin.getLogger().warning("Something went wrong saving a default language file: " + langFile.getPath());
 			}
 		}
 		
@@ -142,7 +142,7 @@ public class LanguageManager {
 		}
 		
 		if(result == null) {
-			plugin.getLogger().info("Wrong key for getting translation: " + key);
+			plugin.getLogger().info("Wrong key for getting translation: " + key + ", please contact the author about this");
 		} else {
 			/* Replace all tags like %0% and if given a GeneralRegion apply all replacements */
 			int number=0;

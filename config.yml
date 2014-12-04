@@ -225,7 +225,8 @@ schematicProfiles:
       restore: ''
 ## Flag profiles to specify what flags should be set on the WorldGuard regions
 ## All normal region flags as present in WorldGuard can be used, and also members, owners, priority and parent
-## For the members and owners flags you can add groups by using 'g:<groupname>', so for example: '%player%, %friends%, g:vip'
+## The members and owners flag normally take a list of UUID's separated by 'comma space', adding by name is possible with 'n:<name>'
+## You can add groups by using 'g:<groupname>', so in total you could use: '%uuid%, %friendsuuid%, g:vip, n:cool-guy'
 ## For flags like 'entry' and 'exit' you can add group setting by using 'g:<scope>' behind it, <scope> is one of the following:
 ## members, non_members, owners, non_owners, all. Example, only owners can enter the region: 
 ##   entry: 'deny g:non_owners'
@@ -236,16 +237,16 @@ flagProfiles:
       members: ''
       greeting: '%lang:prefix%%lang:greeting-forrent%'
     rented:
-      members: '%player%, %friends%'
+      members: '%uuid%, %friendsuuid%'
       greeting: '%lang:prefix%%lang:greeting-rented%'
     forsale:
       members: ''
       greeting: '%lang:prefix%%lang:greeting-forsale%'
     sold:
-      members: '%player%, %friends%'
+      members: '%uuid%, %friendsuuid%'
       greeting: '%lang:prefix%%lang:greeting-bought%'
     resale:
-      members: '%player%, %friends%'
+      members: '%uuid%, %friendsuuid%'
       greetin: '%lang:prefix%%lang:greeting-resale%'
 ## Profiles that specify when players should get messages about rent that almost run out
 ## The numbers that start sections in the profile specify how time before it actually runs out it should be executed

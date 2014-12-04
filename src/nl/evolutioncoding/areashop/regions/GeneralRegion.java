@@ -346,21 +346,21 @@ public abstract class GeneralRegion {
 	 * @return The width of the region (x-axis)
 	 */
 	public int getWidth() {
-		return getRegion().getMaximumPoint().getBlockX() - getRegion().getMinimumPoint().getBlockX();
+		return getRegion().getMaximumPoint().getBlockX() - getRegion().getMinimumPoint().getBlockX() +1;
 	}
 	/**
 	 * Get the depth of the region (z-axis)
 	 * @return The depth of the region (z-axis)
 	 */
 	public int getDepth() {
-		return getRegion().getMaximumPoint().getBlockZ() - getRegion().getMinimumPoint().getBlockZ();
+		return getRegion().getMaximumPoint().getBlockZ() - getRegion().getMinimumPoint().getBlockZ() +1;
 	}
 	/**
 	 * Get the height of the region (y-axis)
 	 * @return The height of the region (y-axis)
 	 */
 	public int getHeight() {
-		return getRegion().getMaximumPoint().getBlockY() - getRegion().getMinimumPoint().getBlockY();
+		return getRegion().getMaximumPoint().getBlockY() - getRegion().getMinimumPoint().getBlockY() +1;
 	}
 	
 	/**
@@ -885,8 +885,18 @@ public abstract class GeneralRegion {
 		
 		editSession.enableQueue();
 		try {
-			SchematicFormat.MCEDIT.load(restoreFile).place(editSession, origin, false);
-		} catch (MaxChangedBlocksException | IOException | DataException e) {
+			CuboidClipboard clipBoard = SchematicFormat.MCEDIT.load(restoreFile);
+			if(clipBoard.getHeight() != getHeight()
+					|| clipBoard.getWidth() != getWidth()
+					|| clipBoard.getLength() != getDepth()) {
+				plugin.getLogger().warning("Size of the region " + getName() + " is not the same as the schematic to restore!");
+				AreaShop.debug("schematic|region, x:" + clipBoard.getWidth() + "|" + getWidth() + ", y:" + clipBoard.getHeight() + "|" + getHeight() + ", z:" + clipBoard.getLength() + "|" + getDepth());
+			}
+			clipBoard.place(editSession, origin, false);
+		} catch(MaxChangedBlocksException e) {
+			plugin.getLogger().warning("Exeeded the block limit while restoring schematic of " + getName());
+			result = false;
+		} catch(IOException | DataException e) {
 			result = false;
 		}
 		editSession.flushQueue();
@@ -999,15 +1009,28 @@ public abstract class GeneralRegion {
 				String[] names = value.split(", ");
 				DefaultDomain members = region.getMembers();
 				members.clear();
-				for(String name : names) {
-					if(name != null && !name.isEmpty()) {
+				for(String member : names) {
+					if(member != null && !member.isEmpty()) {
 						// Check for groups
-						if(name.startsWith("g:")) {
-							if(name.length() > 2) {
-								members.addGroup(name.substring(2));
+						if(member.startsWith("g:")) {
+							if(member.length() > 2) {
+								members.addGroup(member.substring(2));
 							}
+						} else if(member.startsWith("n:")) {
+							if(member.length() > 2) {
+								members.addPlayer(member);
+							}							
 						} else {
-							members.addPlayer(name);
+							UUID uuid;						
+							try {
+								uuid = UUID.fromString(member);
+							} catch(IllegalArgumentException e) {
+								plugin.getLogger().warning("Tried using '" + member + "' as uuid for a region member, is your flagProfiles section correct?");
+								uuid = null;
+							}
+							if(uuid != null) {
+								members.addPlayer(uuid);
+							}
 						}
 					}
 				}
@@ -1018,15 +1041,29 @@ public abstract class GeneralRegion {
 				String[] names = value.split(" ");
 				DefaultDomain owners = region.getOwners();
 				owners.clear();
-				for(String name : names) {
-					if(name != null && !name.isEmpty()) {
+				for(String owner : names) {
+					if(owner != null && !owner.isEmpty()) {
 						// Check for groups
-						if(name.startsWith("g:")) {
-							if(name.length() > 2) {
-								owners.addGroup(name.substring(2));
+						if(owner.startsWith("g:")) {
+							if(owner.length() > 2) {
+								owners.addGroup(owner.substring(2));
 							}
+						} else if(owner.startsWith("n:")) {
+							if(owner.length() > 2) {
+								owners.addPlayer(owner);
+							}							
 						} else {
-							owners.addPlayer(name);
+						
+							UUID uuid;						
+							try {
+								uuid = UUID.fromString(owner);
+							} catch(IllegalArgumentException e) {
+								plugin.getLogger().warning("Tried using '" + owner + "' as uuid for a region owner, is your flagProfiles section correct?");
+								uuid = null;
+							}
+							if(uuid != null) {
+								owners.addPlayer(uuid);
+							}
 						}
 					}
 				}
@@ -1038,7 +1075,7 @@ public abstract class GeneralRegion {
 					region.setPriority(priority);				
 					AreaShop.debug("  Flag " + flagName + " set: " + value);
 				} catch(NumberFormatException e) {
-					plugin.getLogger().info("The value of flag " + flagName + " is not a number");
+					plugin.getLogger().warning("The value of flag " + flagName + " is not a number");
 					result = false;
 				}
 			} else if(flagName.equalsIgnoreCase("parent")) {
@@ -1048,10 +1085,10 @@ public abstract class GeneralRegion {
 						region.setParent(parentRegion);
 						AreaShop.debug("  Flag " + flagName + " set: " + value);
 					} catch (CircularInheritanceException e) {
-						plugin.getLogger().info("The parent set in the config is not correct (circular inheritance)");
+						plugin.getLogger().warning("The parent set in the config is not correct (circular inheritance)");
 					}
 				} else {
-					plugin.getLogger().info("The parent set in the config is not correct (region does not exist)");
+					plugin.getLogger().warning("The parent set in the config is not correct (region does not exist)");
 				}				
 			} else {		
 				// Parse all other normal flags (groups are also handled)
@@ -1060,7 +1097,7 @@ public abstract class GeneralRegion {
 	
 		        Flag<?> foundFlag = DefaultFlag.fuzzyMatchFlag(flagName);
 		        if(foundFlag == null) {
-		        	plugin.getLogger().info("Found wrong flag in flagProfiles section: " + flagName + ", check if that is the correct WorldGuard flag");
+		        	plugin.getLogger().warning("Found wrong flag in flagProfiles section: " + flagName + ", check if that is the correct WorldGuard flag");
 		        	continue;
 		        }
 	            RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
@@ -1081,7 +1118,7 @@ public abstract class GeneralRegion {
 			    	            	try {
 			    	            		groupValue = groupFlag.parseInput(worldGuard, null, part.substring(2));
 			    	            	} catch(InvalidFlagFormat e) {
-			    	            		plugin.getLogger().info("Found wrong group value for flag " + flagName);
+			    	            		plugin.getLogger().warning("Found wrong group value for flag " + flagName);
 			    	            	}
 			    	            }
 			        		} else {
@@ -1098,7 +1135,7 @@ public abstract class GeneralRegion {
 			                setFlag(region, foundFlag, flagSetting);
 			                AreaShop.debug("  Flag " + flagName + " set: " + flagSetting);
 			            } catch (InvalidFlagFormat e) {
-			            	plugin.getLogger().info("Found wrong value for flag " + flagName);
+			            	plugin.getLogger().warning("Found wrong value for flag " + flagName);
 			            }
 			        } 
 		        	if(groupValue != null) {
@@ -2059,9 +2096,9 @@ public abstract class GeneralRegion {
 			}
 			if(!result && postCommandErrors) {
 				if(error != null) {
-					plugin.getLogger().info("Command execution failed, command=" + command + ", error=" + error);
+					plugin.getLogger().warning("Command execution failed, command=" + command + ", error=" + error);
 				} else {
-					plugin.getLogger().info("Command execution failed, command=" + command);
+					plugin.getLogger().warning("Command execution failed, command=" + command);
 				}
 			}
 		}

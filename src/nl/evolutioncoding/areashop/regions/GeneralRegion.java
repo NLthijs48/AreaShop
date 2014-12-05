@@ -1240,6 +1240,7 @@ public abstract class GeneralRegion {
 	public boolean teleportPlayer(Player player, boolean toSign, boolean checkPermissions) {
 		int checked = 1;
 		boolean owner = false;
+		boolean friend = getFriends().contains(player.getUniqueId());
 		Location startLocation = null;
 		ProtectedRegion region = getRegion();
 		if(isRentRegion()) {
@@ -1248,24 +1249,31 @@ public abstract class GeneralRegion {
 			owner = player.getUniqueId().equals(((BuyRegion)this).getBuyer());
 		}
 		
-		// Teleport to sign instead if they dont have permission for teleporting to region
-		if(!toSign && owner && !player.hasPermission("areashop.teleport")
-				|| !toSign && !owner && !player.hasPermission("areashop.teleportall")) {
-			toSign = true;
-		}
 		if(checkPermissions) {
+			// Teleport to sign instead if they dont have permission for teleporting to region
+			if(!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
+					|| !toSign && !owner && !friend && !player.hasPermission("areashop.teleportall") && player.hasPermission("areashop.teleportsignall")
+					|| !toSign && !owner && friend && !player.hasPermission("areashop.teleportfriend") && player.hasPermission("areashop.teleportfriendsign")) {
+				toSign = true;
+			}
 			// Check permissions
 			if(owner && !player.hasPermission("areashop.teleport") && !toSign) {
 				plugin.message(player, "teleport-noPermission");
 				return false;
-			} else if(!owner && !player.hasPermission("areashop.teleportall") && !toSign) {
+			} else if(!owner && !player.hasPermission("areashop.teleportall") && !toSign && !friend) {
 				plugin.message(player, "teleport-noPermissionOther");
+				return false;
+			} else if(!owner && !player.hasPermission("areashop.teleportfriend") && !toSign && friend) {
+				plugin.message(player, "teleport-noPermissionFriend");
 				return false;
 			} else if(owner && !player.hasPermission("areashop.teleportsign") && toSign) {
 				plugin.message(player, "teleport-noPermissionSign");
 				return false;
-			} else if(!owner && !player.hasPermission("areashop.teleportsignall") && toSign) {
+			} else if(!owner && !player.hasPermission("areashop.teleportsignall") && toSign && !friend) {
 				plugin.message(player, "teleport-noPermissionOtherSign");
+				return false;
+			} else if(!owner && !player.hasPermission("areashop.teleportfriendsign") && toSign && friend) {
+				plugin.message(player, "teleport-noPermissionFriendSign");
 				return false;
 			}
 		}

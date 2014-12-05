@@ -7,6 +7,7 @@ import java.util.Set;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 
 import org.bukkit.command.Command;
@@ -62,7 +63,7 @@ public class MeCommand extends CommandAreaShop {
 		} else {
 			plugin.message(player, "me-rentRegions");
 			for(RentRegion region : rentRegions) {
-				plugin.configurableMessage(player, "me-rentLine", false, region);
+				plugin.messageNoPrefix(player, "me-rentLine", region);
 			}
 		}
 		if(buyRegions.isEmpty()) {
@@ -70,9 +71,24 @@ public class MeCommand extends CommandAreaShop {
 		} else {
 			plugin.message(player, "me-buyRegions");
 			for(BuyRegion region : buyRegions) {
-				plugin.configurableMessage(player, "me-buyLine", false, region);
+				plugin.messageNoPrefix(player, "me-buyLine", region);
 			}
-		}		
+		}
+		Set<GeneralRegion> friendRegions = new HashSet<GeneralRegion>();
+		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
+			if(region.getFriends().contains(player.getUniqueId())) {
+				friendRegions.add(region);
+			}
+		}
+		if(friendRegions.isEmpty()) {
+			plugin.message(player, "me-noFriendRegions");
+		} else {
+			plugin.message(player, "me-friendRegions");
+			for(GeneralRegion region : friendRegions) {
+				plugin.messageNoPrefix(player, "me-friendLine", region);
+			}
+		}
+		
 	}
 	
 	@Override

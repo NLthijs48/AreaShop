@@ -119,6 +119,12 @@ permissions:
   areashop.teleportsignall:
     description: Teleport to signs of all regions
     default: op
+  areashop.teleportfriend:
+    description: Teleport to regions where you are added as friend
+    default: true
+  areashop.teleportfriendsign:
+    description: Teleport to the sign of regions where you are added as friend
+    default: true
   areashop.setteleport:
     description: Set the teleport spot for your region
     default: true

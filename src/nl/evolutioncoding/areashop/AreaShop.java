@@ -313,10 +313,8 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public void configurableMessage(Object target, String key, boolean prefix, Object... params) {
 		String langString = this.fixColors(languageManager.getLang(key, params));
-		if(langString == null) {
-			this.getLogger().info("Something is wrong with the language file, could not find key: " + key);
-		} else if(langString.equals("")) {
-			// Do nothing, message is disabled
+		if(langString == null || langString.equals("")) {
+			// Do nothing, message is not available or disabled
 		} else {
 			if(target instanceof Player) {
 				if(prefix) {

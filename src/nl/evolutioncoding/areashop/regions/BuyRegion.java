@@ -269,6 +269,7 @@ public class BuyRegion extends GeneralRegion {
 				if(plugin.getEconomy().has(player, getWorldName(), getPrice())) {
 					UUID oldOwner = getBuyer();
 					if(isResell && oldOwner != null) {
+						clearFriends();
 						double resellPrice = getResellPrice();
 						/* Transfer the money to the previous owner */
 						EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getWorldName(), getResellPrice());

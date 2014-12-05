@@ -1,13 +1,11 @@
-###################################################
-# English language file for the AreaShop plugin   #
-# Latest update: V2.0.2                           #
-###################################################
-# Copy this file and change the strings to your   #
-# favor. Then change the 'language' setting in    #
-# the config to the filename (excluding .yml)     #
-###################################################
-
-########## General strings
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
+# ║ Language: English, Version: V2.1.0, Percentage translated: 100% (source), author(s): NLThijs48                             ║
+# ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
+# ║ 1: Make a copy of this file                                                                                                ║
+# ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
+# ║ 3: Change the 'language' setting in config.yml to '<servername>', do not include '.yml'                                    ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 total-maximum: "You can't rent and buy more than %0% region(s) in total (you already have %1% in group '%2%')"
 
 cmd-notValid: "That command is not valid, use '/as help' for info"
@@ -21,7 +19,6 @@ cmd-noRegionsAtLocation: "No regions found at your location, specify the region 
 cmd-moreRegionsAtLocation: "More than one region has been found at your location, specify the region as argument"
 cmd-automaticRegionOnlyByPlayer: "Automatically determining the region is only possible for players, specify the region as argument"
 
-########## Help command strings
 help-header: "Help page, commands that you can execute"
 help-alias: "Command aliases: /areashop, /as"
 help-help: "&6/as help &7-&r Shows this help page"
@@ -63,7 +60,6 @@ help-addFriendAll: "&6/as addfriend &7-&r Add a friend to a region"
 help-delFriend: "&6/as delfriend &7-&r Delete a friend from your region"
 help-delFriendAll: "&6/as delfriend &7-&r Delete a friend from a region"
 
-############ Other command strings
 rent-help: "/as rent [regionname], the region you stand in will be used if not specified"
 rent-noPermission: "You don't have permission to rent a region"
 rent-maximum: "You can't rent more than %0% region(s) (you already have %1% in group '%2%')"
@@ -373,7 +369,6 @@ delfriend-success: "%0% has been deleted as friend from your region %1%"
 delfriend-notAdded: "%0% is not added as friend for this region"
 delfriend-noOwner: "You cannot remove friends from a region without owner"
 
-############ Sign, greeting and other strings
 timeleft-years: "%0% years"
 timeleft-months: "%0% months"
 timeleft-days: "%0% days"
@@ -388,37 +383,3 @@ greeting-rented: "%region% is rented by %player% until %until%"
 greeting-forsale: "%region% can be bought for %price%"
 greeting-bought: "%region% is bought by %player%"
 greeting-resale: "%region% can be bought for %resaleprice% from %player%"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

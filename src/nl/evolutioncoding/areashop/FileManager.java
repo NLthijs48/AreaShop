@@ -483,6 +483,7 @@ public class FileManager {
 	 * Save the group file to disk
 	 */
 	public void saveGroupsIsRequired() {
+		AreaShop.debug("saveGroupsRequired() set");
 		saveGroupsRequired = true;
 	}
 	public boolean isSaveGroupsRequired() {
@@ -490,6 +491,7 @@ public class FileManager {
 	}
 	
 	public void saveGroupsNow() {
+		AreaShop.debug("saveGroupsNow() done");
 		saveGroupsRequired = false;
 		try {
 			groupsConfig.save(groupsPath);

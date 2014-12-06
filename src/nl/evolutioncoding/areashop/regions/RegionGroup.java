@@ -23,6 +23,7 @@ public class RegionGroup {
 		setSetting("name", name);
 		// Delete duplicates
 		List<String> members = getMembers();
+		int previousCount = members.size();
 		List<String> newMembers = new ArrayList<String>();
 		while(!members.isEmpty()) {
 			String member = members.remove(0);
@@ -34,8 +35,9 @@ public class RegionGroup {
 				members.remove(member);
 			}
 		}
-		if(newMembers.size() != members.size()) {
+		if(newMembers.size() != previousCount) {
 			setSetting("regions", newMembers);
+			AreaShop.debug("group save required because of changed member size");
 			saveRequired();
 		}
 		if(getMembers().size() == 0) {
@@ -55,8 +57,6 @@ public class RegionGroup {
 		} else {
 			members.add(region.getName());
 			setSetting("regions", members);
-			region.updateSigns();
-			region.updateRegionFlags();
 			return true;
 		}
 	}
@@ -75,8 +75,6 @@ public class RegionGroup {
 		} else {
 			setSetting("regions", members);
 		}
-		region.updateSigns();
-		region.updateRegionFlags();
 		return result;
 	}
 	

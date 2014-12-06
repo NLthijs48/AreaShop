@@ -904,8 +904,10 @@ public class FileManager {
 		
 		plugin.getLogger().info("Conversion to a new version of the file format starts, could take some time");
 		
+		boolean rentFileFound = false;
 		// Convert old rent files
 		if(rentFile.exists()) {
+			rentFileFound = true;
 			if(!oldFolderFile.exists()) {
 				oldFolderFile.mkdirs();
 			}
@@ -1023,8 +1025,10 @@ public class FileManager {
 			versions.put(AreaShop.versionFiles, AreaShop.versionFilesCurrent);			
 			saveVersions();			
 		}
+		boolean buyFileFound = false;
 		
 		if(buyFile.exists()) {
+			buyFileFound = true;
 			if(!oldFolderFile.exists()) {
 				oldFolderFile.mkdirs();
 			}
@@ -1140,6 +1144,11 @@ public class FileManager {
 			versions.remove("buys");
 			versions.put(AreaShop.versionFiles, AreaShop.versionFilesCurrent);			
 			saveVersions();			
+		}
+		if(!buyFileFound && !rentFileFound) {
+			versions.put(AreaShop.versionFiles, AreaShop.versionFilesCurrent);			
+			saveVersions();
+			return;			
 		}
 		
 		// Separate try-catch blocks to try them all individually (don't stop after 1 has failed)

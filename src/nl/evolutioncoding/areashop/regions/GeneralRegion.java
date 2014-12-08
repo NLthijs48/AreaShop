@@ -1038,7 +1038,7 @@ public abstract class GeneralRegion {
 				AreaShop.debug("  Flag " + flagName + " set: " + members.toUserFriendlyString());
 			} else if(flagName.equalsIgnoreCase("owners")) {
 				// Split the string and parse all values
-				String[] names = value.split(" ");
+				String[] names = value.split(", ");
 				DefaultDomain owners = region.getOwners();
 				owners.clear();
 				for(String owner : names) {

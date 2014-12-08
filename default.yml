@@ -45,7 +45,8 @@ rent:
   ## Maximum number of extends a player can do (-1 for infinite, 0 for no extending)
   maxExtends: -1
   ## The Maximum time they can have the region rented in advance (minutes, -1 for infinite)
-  ## If you set this higher then the duration players will not be able to rent the region 
+  ## If you set this lower then the rent duration then players will not be able to rent the region 
+  ## (because it always exceeds the maxRentTime in that case) 
   maxRentTime: -1
   ## Automatically unrent the region after the specified number of minutes between the last login time of the renter and the current time
   ## -1 means never, 1440 is one day, 43200 is one month, 525600 is one year

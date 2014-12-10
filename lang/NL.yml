@@ -5,6 +5,8 @@
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
 # ║ 3: Change the 'language' setting in config.yml to '<servername>', do not include '.yml'                                    ║
+# ║ 4: Change the strings in the new file to your liking and save the file                                                     ║
+# ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 total-maximum: "Je kunt niet meer dan %0% gebied(en) kopen en huren in totaal (je hebt er al %1% in groep '%2%')"
 cmd-notValid: "Dat commando is niet geldig , gebruik '/as help' voor informatie"

@@ -16,7 +16,7 @@ moneyCharacterAfter: ''
 fractionalNumbers: 2
 ## Set this to true if you want to hide '.0' for a number like '15.0' ('4.50' will still stay '4.50')
 hideEmptyFractionalPart: true
-## The .yml language file that should be used, provided by this plugin: EN, NL
+## The .yml language file that should be used, provided by this plugin: EN, NL, FR, DE, PL
 language: EN
 ## Enable Schematic saving and restoring in general
 enableSchematics: true

@@ -454,8 +454,8 @@ public final class AreaShop extends JavaPlugin {
 		fileManager.saveRequiredFilesAtOnce();
 		chatprefix = this.getConfig().getString("chatPrefix");
 		debug = this.getConfig().getBoolean("debug");
-		languageManager = new LanguageManager(this);
 		fileManager.loadFiles();
+		languageManager = new LanguageManager(this);
 		fileManager.checkRents();
 	}
 	

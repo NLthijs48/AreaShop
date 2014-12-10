@@ -1618,14 +1618,14 @@ public abstract class GeneralRegion {
 	
 	// CONFIG
 	public boolean getBooleanSetting(String path) {
-		if(config.isBoolean(path)) {
+		if(config.isSet(path)) {
 			return config.getBoolean(path);
 		}
 		boolean result = false;
 		int priority = Integer.MIN_VALUE;
 		boolean found = false;
 		for(RegionGroup group : plugin.getFileManager().getGroups()) {
-			if(group.isMember(this) && group.getSettings().isBoolean(path) && group.getPriority() > priority) {
+			if(group.isMember(this) && group.getSettings().isSet(path) && group.getPriority() > priority) {
 				result = group.getSettings().getBoolean(path);
 				priority = group.getPriority();
 				found = true;
@@ -1638,14 +1638,14 @@ public abstract class GeneralRegion {
 	}
 	
 	public int getIntegerSetting(String path) {
-		if(config.isInt(path)) {
+		if(config.isSet(path)) {
 			return config.getInt(path);
 		}
 		int result = 0;
 		int priority = Integer.MIN_VALUE;
 		boolean found = false;
 		for(RegionGroup group : plugin.getFileManager().getGroups()) {
-			if(group.isMember(this) && group.getSettings().isInt(path) && group.getPriority() > priority) {
+			if(group.isMember(this) && group.getSettings().isSet(path) && group.getPriority() > priority) {
 				result = group.getSettings().getInt(path);
 				priority = group.getPriority();
 				found = true;
@@ -1658,14 +1658,20 @@ public abstract class GeneralRegion {
 	}
 	
 	public double getDoubleSetting(String path) {
-		if(config.isDouble(path)) {
+		AreaShop.debug("getDoubleSetting(" + path + "):");
+		AreaShop.debug("  config.isDouble() = " + config.isDouble(path));
+		AreaShop.debug("  config.getDouble() = " + config.getDouble(path));
+		AreaShop.debug("  config.isInteger() = " + config.isInt(path));
+		AreaShop.debug("  config.getInteger() = " + config.getInt(path));
+		AreaShop.debug("  config.isSet() = " + config.isSet(path));
+		if(config.isSet(path)) {
 			return config.getDouble(path);
 		}
 		double result = 0;
 		int priority = Integer.MIN_VALUE;
 		boolean found = false;
 		for(RegionGroup group : plugin.getFileManager().getGroups()) {
-			if(group.isMember(this) && group.getSettings().isDouble(path) && group.getPriority() > priority) {
+			if(group.isMember(this) && group.getSettings().isSet(path) && group.getPriority() > priority) {
 				result = group.getSettings().getDouble(path);
 				priority = group.getPriority();
 				found = true;
@@ -1678,14 +1684,14 @@ public abstract class GeneralRegion {
 	}
 	
 	public long getLongSetting(String path) {
-		if(config.isLong(path)) {
+		if(config.isSet(path)) {
 			return config.getLong(path);
 		}
 		long result = 0;
 		int priority = Integer.MIN_VALUE;
 		boolean found = false;
 		for(RegionGroup group : plugin.getFileManager().getGroups()) {
-			if(group.isMember(this) && group.getSettings().isLong(path) && group.getPriority() > priority) {
+			if(group.isMember(this) && group.getSettings().isSet(path) && group.getPriority() > priority) {
 				result = group.getSettings().getLong(path);
 				priority = group.getPriority();
 				found = true;
@@ -1698,14 +1704,14 @@ public abstract class GeneralRegion {
 	}
 	
 	public String getStringSetting(String path) {
-		if(config.isString(path)) {
+		if(config.isSet(path)) {
 			return config.getString(path);
 		}
 		String result = null;
 		int priority = Integer.MIN_VALUE;
 		boolean found = false;
 		for(RegionGroup group : plugin.getFileManager().getGroups()) {
-			if(group.isMember(this) && group.getSettings().isString(path) && group.getPriority() > priority) {
+			if(group.isMember(this) && group.getSettings().isSet(path) && group.getPriority() > priority) {
 				result = group.getSettings().getString(path);
 				priority = group.getPriority();
 				found = true;
@@ -1718,14 +1724,14 @@ public abstract class GeneralRegion {
 	}
 	
 	public List<String> getStringListSetting(String path) {
-		if(config.isList(path)) {
+		if(config.isSet(path)) {
 			return config.getStringList(path);
 		}
 		List<String> result = null;
 		int priority = Integer.MIN_VALUE;
 		boolean found = false;
 		for(RegionGroup group : plugin.getFileManager().getGroups()) {
-			if(group.isMember(this) && group.getSettings().isString(path) && group.getPriority() > priority) {
+			if(group.isMember(this) && group.getSettings().isSet(path) && group.getPriority() > priority) {
 				result = group.getSettings().getStringList(path);
 				priority = group.getPriority();
 				found = true;

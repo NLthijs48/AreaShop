@@ -67,13 +67,17 @@ public class GroupaddCommand extends CommandAreaShop {
 			}			
 			ArrayList<String> namesSuccess = new ArrayList<String>();
 			ArrayList<String> namesFailed = new ArrayList<String>();
+			ArrayList<GeneralRegion> toUpdate = new ArrayList<GeneralRegion>();
 			for(GeneralRegion region : regions) {
 				if(group.addMember(region)) {
 					namesSuccess.add(region.getName());
+					toUpdate.add(region);
 				} else {
 					namesFailed.add(region.getName());
 				}
 			}
+			// Update all regions, this does it in a task, updating them without lag
+			plugin.getFileManager().updateRegions(toUpdate);
 			if(namesSuccess.size() != 0) {
 				plugin.message(player, "groupadd-weSuccess", group.getName(), Utils.createCommaSeparatedList(namesSuccess));
 			}
@@ -88,6 +92,8 @@ public class GroupaddCommand extends CommandAreaShop {
 				return;
 			}
 			if(group.addMember(region)) {
+				region.updateRegionFlags();
+				region.updateSigns();
 				plugin.message(sender, "groupadd-success", region.getName(), group.getName(), group.getMembers().size());
 			} else {
 				plugin.message(sender, "groupadd-failed", region.getName(), group.getName());

@@ -480,6 +480,29 @@ public class FileManager {
 	}
 	
 	/**
+	 * Update regions in a task to minimize lag
+	 * @param regions Regions to update
+	 */
+	public void updateRegions(final List<GeneralRegion> regions) {
+		new BukkitRunnable() {
+			private int current = 0;
+			@Override
+			public void run() {
+				for(int i=0; i<plugin.getConfig().getInt("update.regionsPerTick"); i++) {
+					if(current < regions.size()) {
+						regions.get(current).updateSigns();
+						regions.get(current).updateRegionFlags();
+						current++;
+					} 
+				}
+				if(current >= regions.size()) {
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(plugin, 1, 1);
+	}
+	
+	/**
 	 * Save the group file to disk
 	 */
 	public void saveGroupsIsRequired() {

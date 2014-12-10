@@ -1658,12 +1658,6 @@ public abstract class GeneralRegion {
 	}
 	
 	public double getDoubleSetting(String path) {
-		AreaShop.debug("getDoubleSetting(" + path + "):");
-		AreaShop.debug("  config.isDouble() = " + config.isDouble(path));
-		AreaShop.debug("  config.getDouble() = " + config.getDouble(path));
-		AreaShop.debug("  config.isInteger() = " + config.isInt(path));
-		AreaShop.debug("  config.getInteger() = " + config.getInt(path));
-		AreaShop.debug("  config.isSet() = " + config.isSet(path));
 		if(config.isSet(path)) {
 			return config.getDouble(path);
 		}

@@ -45,19 +45,28 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(sender, "onlyByPlayer");
 			return;
 		}
-		Player player = (Player) sender;
+		Player player = (Player)sender;
 		GeneralRegion region = null;
-		// get the region by location
-		List<GeneralRegion> regions = plugin.getFileManager().getAllApplicableRegions(((Player) sender).getLocation());
-		if (regions.isEmpty()) {
-			plugin.message(sender, "cmd-noRegionsAtLocation");
-			return;
-		} else if (regions.size() > 1) {
-			plugin.message(sender, "cmd-moreRegionsAtLocation");
-			return;
+		if(args.length < 2) {
+			if (sender instanceof Player) {
+				// get the region by location
+				List<GeneralRegion> regions = plugin.getFileManager().getAllApplicableRegions(((Player) sender).getLocation());
+				if (regions.isEmpty()) {
+					plugin.message(sender, "cmd-noRegionsAtLocation");
+					return;
+				} else if (regions.size() > 1) {
+					plugin.message(sender, "cmd-moreRegionsAtLocation");
+					return;
+				} else {
+					region = regions.get(0);
+				}
+			} else {
+				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
+				return;
+			}		
 		} else {
-			region = regions.get(0);
-		}
+			region = plugin.getFileManager().getRegion(args[1]);
+		}	
 		
 		boolean owner = false;
 		

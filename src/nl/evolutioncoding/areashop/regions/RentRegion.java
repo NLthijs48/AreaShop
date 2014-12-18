@@ -293,7 +293,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The number of minutes until the region is unrented while player is offline
 	 */
 	public long getInactiveTimeUntilUnrent() {
-		return getIntegerSetting("rent.inactiveTimeUntilUnrent");
+		return getLongSetting("rent.inactiveTimeUntilUnrent");
 	}
 	
 	/**
@@ -603,11 +603,11 @@ public class RentRegion extends GeneralRegion {
 			return false;
 		}
 		OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());
-		//AreaShop.debug("inactive checking for " + getName() + ", player=" + player.getName() + ", currenttime=" + Calendar.getInstance().getTimeInMillis() + ", lastPlayed=" + player.getLastPlayed() + ", diff=" + (Calendar.getInstance().getTimeInMillis() - player.getLastPlayed()));
-		int inactiveSetting = getIntegerSetting("rent.inactiveTimeUntilUnrent");
+		long inactiveSetting = getInactiveTimeUntilUnrent();
 		if(inactiveSetting <= 0 || player.isOp()) {
 			return false;
 		}
+		AreaShop.debug("inactivetimemillis: " + inactiveSetting * 60 * 1000);
 		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting * 60 * 1000)) {
 			plugin.getLogger().info("Region " + getName() + " unrented because of inactivity for player " + getPlayerName());
 			this.unRent(true);

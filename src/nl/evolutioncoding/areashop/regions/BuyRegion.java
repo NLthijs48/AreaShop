@@ -218,7 +218,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The number of minutes until the region is unrented while player is offline
 	 */
 	public long getInactiveTimeUntilSell() {
-		return getIntegerSetting("buy.inactiveTimeUntilSell");
+		return getLongSetting("buy.inactiveTimeUntilSell");
 	}
 	
 	/**
@@ -402,11 +402,11 @@ public class BuyRegion extends GeneralRegion {
 			return false;
 		}
 		OfflinePlayer player = Bukkit.getOfflinePlayer(getBuyer());
-		//AreaShop.debug("inactive checking for " + getName() + ", player=" + player.getName() + ", currenttime=" + Calendar.getInstance().getTimeInMillis() + ", lastPlayed=" + player.getLastPlayed() + ", diff=" + (Calendar.getInstance().getTimeInMillis() - player.getLastPlayed()));
-		int inactiveSetting = getIntegerSetting("buy.inactiveTimeUntilSell");
+		long inactiveSetting = getInactiveTimeUntilSell();
 		if(inactiveSetting <= 0 || player.isOp()) {
 			return false;
 		}
+		AreaShop.debug("inactivetimemillis: " + inactiveSetting * 60 * 1000);
 		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting * 60 * 1000)) {
 			plugin.getLogger().info("Region " + getName() + " sold because of inactivity for player " + getPlayerName());
 			this.sell(true);

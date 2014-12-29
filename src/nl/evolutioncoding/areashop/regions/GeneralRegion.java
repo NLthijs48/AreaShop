@@ -654,7 +654,7 @@ public abstract class GeneralRegion {
 		if(isDeleted() || !isRentRegion()) {
 			return false;
 		}
-		Set<String> signs = null;
+		Set<String> signs = new HashSet<String>();
 		if(config.getConfigurationSection("general.signs") != null) {
 			signs = config.getConfigurationSection("general.signs").getKeys(false);
 		}

@@ -406,7 +406,7 @@ public class BuyRegion extends GeneralRegion {
 		if(inactiveSetting <= 0 || player.isOp()) {
 			return false;
 		}
-		AreaShop.debug("inactivetimemillis: " + inactiveSetting * 60 * 1000);
+		//AreaShop.debug("inactivetimemillis: " + inactiveSetting * 60 * 1000);
 		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting * 60 * 1000)) {
 			plugin.getLogger().info("Region " + getName() + " sold because of inactivity for player " + getPlayerName());
 			this.sell(true);

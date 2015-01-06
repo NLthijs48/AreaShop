@@ -48,7 +48,6 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
-@SuppressWarnings("deprecation")
 public abstract class GeneralRegion {
 	protected YamlConfiguration config;
 	private static ArrayList<Material> canSpawnIn  = new ArrayList<Material>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
@@ -841,7 +840,6 @@ public abstract class GeneralRegion {
 	 */
 	public boolean restoreRegionBlocks(String fileName) {
 		boolean result = true;
-		// TODO: test world cast
 		EditSession editSession = plugin.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(new BukkitWorld(getWorld()), plugin.getConfig().getInt("maximumBlocks"));
 		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 		if(region == null) {
@@ -854,7 +852,10 @@ public abstract class GeneralRegion {
 		// The path to save the schematic
 		File restoreFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
 		
-		
+		if(!restoreFile.exists() || !restoreFile.isFile()) {
+			plugin.getLogger().info("Did not restore region " + getName() + ", file does not exist: " + restoreFile);
+			return false;
+		}
 //		// NEW
 //		Closer closer = Closer.create();
 //        try {
@@ -894,6 +895,7 @@ public abstract class GeneralRegion {
 			plugin.getLogger().warning("Exeeded the block limit while restoring schematic of " + getName());
 			result = false;
 		} catch(IOException | DataException e) {
+			AreaShop.debug(e.getMessage());
 			result = false;
 		}
 		editSession.flushQueue();

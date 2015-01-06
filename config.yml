@@ -40,7 +40,7 @@ postCommandErrors: true
 ## Enables / disables debug messages in the console, could be useful to figure out where errors come from
 debug: false
 ## Version of the config, do not change!
-version: 2.1.1
+version: 2.1.2
 
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

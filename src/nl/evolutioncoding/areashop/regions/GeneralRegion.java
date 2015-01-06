@@ -21,6 +21,7 @@ import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -538,14 +539,10 @@ public abstract class GeneralRegion {
 	 */
 	public Set<String> getFriendNames() {
 		HashSet<String> result = new HashSet<String>();
-		for(String friend : config.getStringList("general.friends")) {
-			try {
-				UUID id = UUID.fromString(friend);
-				if(id != null) {
-					result.add(Bukkit.getOfflinePlayer(id).getName());
-				}
-			} catch(IllegalArgumentException e) {
-				// Don't add it
+		for(UUID friend : getFriends()) {
+			OfflinePlayer player = Bukkit.getOfflinePlayer(friend);
+			if(player != null) {
+				result.add(player.getName());
 			}
 		}
 		return result;

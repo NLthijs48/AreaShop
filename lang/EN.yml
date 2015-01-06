@@ -385,3 +385,5 @@ greeting-rented: "%region% is rented by %player% until %until%"
 greeting-forsale: "%region% can be bought for %price%"
 greeting-bought: "%region% is bought by %player%"
 greeting-resale: "%region% can be bought for %resaleprice% from %player%"
+
+update-playerNotify: "&2Update from AreaShop V%0% to %1% available, get the latest version at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/"

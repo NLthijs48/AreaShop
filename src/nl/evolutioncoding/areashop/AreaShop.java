@@ -7,6 +7,8 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
+import nl.evolutioncoding.areashop.Updater.UpdateResult;
+import nl.evolutioncoding.areashop.Updater.UpdateType;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -38,6 +40,8 @@ public final class AreaShop extends JavaPlugin {
 	private CommandManager commandManager = null;
 	private boolean debug = false;
 	private String chatprefix = null;
+	private Updater updater = null;
+	private boolean updateAvailable = false;
 	
 	/* Folders and file names */
 	public static final String languageFolder = "lang";
@@ -151,6 +155,22 @@ public final class AreaShop extends JavaPlugin {
 			
 			// Register dynamic permission (things declared in config)
 			registerDynamicPermissions();
+			
+			// Dont initialize the updatechecker if disabled in the config
+			if(this.getConfig().getBoolean("checkForUpdates")) {
+				try {
+					updater = new Updater(this, 76518, null, UpdateType.NO_DOWNLOAD, false);
+					AreaShop.debug("Result=" + updater.getResult().toString() + ", Latest=" + updater.getLatestName() + ", Type=" + updater.getLatestType());
+					updateAvailable = updater.getResult() == UpdateResult.UPDATE_AVAILABLE;
+					if(updateAvailable) {
+						this.getLogger().info("Update from AreaShop V" + this.getDescription().getVersion() + " to " + updater.getLatestName() + " available, get the latest version at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/");
+					}
+				} catch(Exception e) {
+					AreaShop.debug("Something went wrong with the Updater:");
+					AreaShop.debug(e.getMessage());
+					updateAvailable = false;
+				}
+			}
 		}
 	}
 	
@@ -170,6 +190,7 @@ public final class AreaShop extends JavaPlugin {
 		commandManager = null;
 		chatprefix = null;
 		debug = false;
+		updater = null;
 	}
  
 	/**
@@ -226,6 +247,22 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public FileManager getFileManager() {
 		return fileManager;
+	}
+	
+	/**
+	 * Get the updater (check the update result)
+	 * @return The updater
+	 */
+	public Updater getUpdater() {
+		return updater;
+	}
+	
+	/**
+	 * Check if an update for AreaShop is available
+	 * @return true if an update is available, otherwise false
+	 */
+	public boolean updateAvailable() {
+		return updateAvailable;
 	}
 	
 	/**

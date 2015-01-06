@@ -1,6 +1,6 @@
 name: AreaShop
 main: nl.evolutioncoding.areashop.AreaShop
-version: 2.1.1
+version: 2.1.2
 depend: [Vault, WorldGuard, WorldEdit]
 softdepend: [Multiverse-Core]
 author: NLThijs48
@@ -53,6 +53,7 @@ permissions:
       areashop.stopresellall: true
       areashop.addfriendall: true
       areashop.delfriendall: true
+      areashop.nofityupdate: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -206,4 +207,6 @@ permissions:
   areashop.delfriendall: 
     description: Allows you to delete friends from all regions
     default: op
-    
+  areashop.nofityupdate:
+    description: Will notify this player when an update is available
+    default: op

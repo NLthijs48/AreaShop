@@ -34,8 +34,8 @@ public final class PlayerLoginListener implements Listener {
 		if(event.getResult() != Result.ALLOWED) {
 			return;
 		}
-		Player player = event.getPlayer();
-		
+		final Player player = event.getPlayer();
+		// Notify for rents that almost run out
 		for(RentRegion region : plugin.getFileManager().getRents()) {
 			if(region.isRenter(player)) {
 				String warningSetting = region.getStringSetting("rent.warningOnLoginTime");
@@ -45,17 +45,24 @@ public final class PlayerLoginListener implements Listener {
 				long warningTime = region.durationStringToLong(warningSetting);
 				if(region.getTimeLeft() < warningTime) {
 					// Send the warning message later to let it appear after general MOTD messages
-					final Player finalPlayer = player;
-					final AreaShop finalPlugin = plugin;
 					final RentRegion finalRegion = region;
 			        new BukkitRunnable() {
 						@Override
 						public void run() {
-							finalPlugin.message(finalPlayer, "rent-expireWarning", finalRegion);
+							AreaShop.getInstance().message(player, "rent-expireWarning", finalRegion);
 						}
 			        }.runTaskLater(plugin, 2);			        
 				}				
 			}
+		}
+		// Notify admins for plugin updates
+		if(plugin.updateAvailable() && player.hasPermission("areashop.notifyupdate")) {
+	        new BukkitRunnable() {
+				@Override
+				public void run() {
+					AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());
+				}
+	        }.runTaskLater(plugin, 20);			
 		}
 	}
 }

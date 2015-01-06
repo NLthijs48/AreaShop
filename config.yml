@@ -30,6 +30,9 @@ signTags:
   add: '[as]'
 ## Enable sending stats to http://mcstats.org/ (Metrics plugin)
 sendStats: true
+## If enabled it will check for updates when loading the plugin, it will never download files, it will only notify about it
+## A message will be printed in the console when an update is available and OPs will be notified when joining the server
+checkForUpdates: true
 ## Use colors when sending messages to console and log files
 useColorsInConsole: false
 ## Post error messages in the console when a command run from the config fails (from the 'runCommands' section for example)
@@ -225,11 +228,12 @@ schematicProfiles:
       restore: ''
 ## Flag profiles to specify what flags should be set on the WorldGuard regions
 ## All normal region flags as present in WorldGuard can be used, and also members, owners, priority and parent
+## Each line represents a WorldGuard setting that should be set to a certain value when the region is in the specified state
 ## The members and owners flag normally take a list of UUID's separated by 'comma space', adding by name is possible with 'n:<name>'
 ## You can add groups by using 'g:<groupname>', so in total you could use: '%uuid%, %friendsuuid%, g:vip, n:cool-guy'
 ## For flags like 'entry' and 'exit' you can add group setting by using 'g:<scope>' behind it, <scope> is one of the following:
 ## members, non_members, owners, non_owners, all. Example, only owners can enter the region: 
-##   entry: 'deny g:non_owners'
+##   entry: 'allow g:owners'
 ## Use '' for a flag to reset it.
 flagProfiles:
   default:
@@ -247,7 +251,7 @@ flagProfiles:
       greeting: '%lang:prefix%%lang:greeting-bought%'
     resale:
       members: '%uuid%, %friendsuuid%'
-      greetin: '%lang:prefix%%lang:greeting-resale%'
+      greeting: '%lang:prefix%%lang:greeting-resale%'
 ## Profiles that specify when players should get messages about rent that almost run out
 ## The numbers that start sections in the profile specify how time before it actually runs out it should be executed
 ## When warnPlayer is set to true a message will be send that is specified in the language file

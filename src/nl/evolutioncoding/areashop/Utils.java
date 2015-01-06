@@ -66,11 +66,13 @@ public class Utils {
 		String result = "";
 		boolean first = true;
 		for(Object object : input) {
-			if(first) {
-				first = false;
-				result += object.toString();
-			} else {
-				result += ", " + object.toString();
+			if(object != null) {
+				if(first) {
+					first = false;
+					result += object.toString();
+				} else {
+					result += ", " + object.toString();
+				}
 			}
 		}		
 		return result;

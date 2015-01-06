@@ -1005,7 +1005,7 @@ public abstract class GeneralRegion {
 				// Split the string and parse all values
 				String[] names = value.split(", ");
 				DefaultDomain members = region.getMembers();
-				members.clear();
+				members.removeAll();
 				for(String member : names) {
 					if(member != null && !member.isEmpty()) {
 						// Check for groups
@@ -1026,7 +1026,19 @@ public abstract class GeneralRegion {
 								uuid = null;
 							}
 							if(uuid != null) {
-								members.addPlayer(uuid);
+								// Detect WorldGuard version 5
+								if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {
+									AreaShop.debug("  Added player by name");
+									OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+									if(offlinePlayer != null) {
+										members.addPlayer(offlinePlayer.getName());
+									}
+								} 
+								// Assume a newer version
+								else {
+									AreaShop.debug("  Added player by UUID");
+									members.addPlayer(uuid);
+								}
 							}
 						}
 					}
@@ -1037,7 +1049,7 @@ public abstract class GeneralRegion {
 				// Split the string and parse all values
 				String[] names = value.split(", ");
 				DefaultDomain owners = region.getOwners();
-				owners.clear();
+				owners.removeAll();
 				for(String owner : names) {
 					if(owner != null && !owner.isEmpty()) {
 						// Check for groups
@@ -1059,7 +1071,19 @@ public abstract class GeneralRegion {
 								uuid = null;
 							}
 							if(uuid != null) {
-								owners.addPlayer(uuid);
+								// Detect WorldGuard version 5
+								if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {
+									//AreaShop.debug("  Added player by name");
+									OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+									if(offlinePlayer != null) {
+										owners.addPlayer(offlinePlayer.getName());
+									}
+								} 
+								// Assume a newer version
+								else {
+									//AreaShop.debug("  Added player by UUID");
+									owners.addPlayer(uuid);
+								}
 							}
 						}
 					}

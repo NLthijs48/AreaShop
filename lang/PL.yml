@@ -1,6 +1,6 @@
 # ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Polish (Polski), Version: V2.1.0, Percentage translated: 63%, author(s): Rexlu                                   ║
+# ║ Language: Polish (Polski), Version: V2.1.2, Percentage translated: 65%, author(s): Rexlu                                   ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -13,6 +13,8 @@ cmd-onlyByPlayer: "Ta komenda moze byc uzywana tylko przez gracza"
 cmd-weOnlyByPlayer: "Uzywanie zaznaczenia WorldEdit jest mozliwe tylko podczas bycia graczem, sprecyzuj nazwe miejsca jako dodatkowy argument"
 cmd-noSelection: "Nie zaznaczyles terenu pluginem WorldEdit"
 cmd-noRegionsFound: "Nie znaleziono miejsc AreShop w zaznaczeniu"
+cmd-noRegionsAtLocation: "Brak regionow w twojej lokalizacji, uzyj nazwy regionu jako argumentu."
+cmd-moreRegionsAtLocation: "Wiecej niz jeden region znaleziono w twojej lokalizacji, uzyj nazwy regionu jako argumentu."
 help-header: "Strona pomocy, komendy ktore moga zostac uzzte"
 help-alias: "Aby wyswietlic ta strone: /areashop, /as"
 help-help: "&6/as help &7-&r Pokazuje stone pomocy"
@@ -26,6 +28,9 @@ help-sellOwn: "&6/as sell &7-&r Sprzedaje miejsce"
 help-updaterents: "&6/as updaterents &7-&r Aktualizuje wszystkie miejsca wynajmu oraz tabliczki"
 help-updatebuys: "&6/as updatebuys &7-&r Aktualizuje wszystkie miejsca do kupienia oraz tabliczki"
 help-reload: "&6/as reload &7-&r Laduje ponownie ustawienia oraz pliki jezykowe"
+help-setrestore: "&6/as setrestore &7-&r Wlacz/wylacz przywracanie oraz wybierz profil"
+help-setprice: "&6/as setprice &7-&r Zmiana ceny regionu"
+help-setduration: "&6/as setduration &7-&r Zmiana czasu wynajmu"
 help-teleport: "&6/as tp &7-&r Teleportuje do kupionych/wynajetych miejsc"
 help-teleportAll: "&6/as tp &7-&r Teleportuje do wynajmowanego/kupionego miejsca"
 help-setteleport: "&6/as settp &7-&r Ustawia koordynaty teleportacji dla kupionego/wynajetego miejsca"
@@ -35,6 +40,7 @@ help-groupadd: "&6/as groupadd &7-&r Dodaje miejsce do grupy"
 help-groupdel: "&6/as groupdel &7-&r Usuwa miejsce z grupy"
 help-grouplist: "&6/as grouplist &7-&r Wyswietla wszystkie grupy"
 help-groupinfo: "&6/as groupinfo &7-&r Wyswietla informacje o grupie"
+help-schemevent: "&6/as schemevent &7-&r Ustawianie schematu dla regionu"
 help-add: "&6/as add &7-&r Dodaje region do wynajmu lub zakupu"
 help-del: "&6/as del &7-&r Usuwa dane miejsce z AreaShop"
 help-addsign: "&6/as addsign &7-&r Dodaje tabliczke do istniejacego miejsca"
@@ -224,3 +230,4 @@ greeting-forrent: "%region% moze zostac wynajety za %price% za %duration%"
 greeting-rented: "%region% jest wynajety graczowi %player% do %until%"
 greeting-forsale: "%region% moze zostac kupiony za %price%"
 greeting-bought: "%region% zostal zakupiony przez gracza %player%"
+

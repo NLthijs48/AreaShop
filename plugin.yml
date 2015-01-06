@@ -8,7 +8,7 @@ website: http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/
 commands:
   AreaShop:
     description: For all commands use /as help 
-    usage: /AreaShop or /AS
+    usage: AreaShop has not started correctly, check the console and correct any errors
     permission: areashop.help
     permission-message: You don't have <permission>
     aliases: [as]

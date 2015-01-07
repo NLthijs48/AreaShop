@@ -1028,19 +1028,8 @@ public abstract class GeneralRegion {
 								uuid = null;
 							}
 							if(uuid != null) {
-								// Detect WorldGuard version 5
-								if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {
-									AreaShop.debug("  Added player by name");
-									OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-									if(offlinePlayer != null) {
-										members.addPlayer(offlinePlayer.getName());
-									}
-								} 
-								// Assume a newer version
-								else {
-									AreaShop.debug("  Added player by UUID");
-									members.addPlayer(uuid);
-								}
+								//AreaShop.debug("  Added player by UUID");
+								members.addPlayer(uuid);
 							}
 						}
 					}
@@ -1073,19 +1062,8 @@ public abstract class GeneralRegion {
 								uuid = null;
 							}
 							if(uuid != null) {
-								// Detect WorldGuard version 5
-								if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {
-									//AreaShop.debug("  Added player by name");
-									OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-									if(offlinePlayer != null) {
-										owners.addPlayer(offlinePlayer.getName());
-									}
-								} 
-								// Assume a newer version
-								else {
-									//AreaShop.debug("  Added player by UUID");
-									owners.addPlayer(uuid);
-								}
+								//AreaShop.debug("  Added player by UUID");
+								owners.addPlayer(uuid);
 							}
 						}
 					}

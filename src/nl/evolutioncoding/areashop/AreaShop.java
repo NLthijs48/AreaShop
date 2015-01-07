@@ -105,6 +105,11 @@ public final class AreaShop extends JavaPlugin {
 		    worldGuard = (WorldGuardPlugin)plugin;
 	    }
 	    
+	    if(getWorldGuard() != null && getWorldGuard().getDescription().getVersion().startsWith("5.")) {
+	    	getLogger().severe("This version of AreaShop is not meant for WorldGuard 5.x, use the correct version matching your WorldGuard version");
+	    	error = true;
+	    }
+	    
 		/* Check if WorldEdit is present */
 		plugin = getServer().getPluginManager().getPlugin("WorldEdit");
 	    if (plugin == null || !(plugin instanceof WorldEditPlugin)) {

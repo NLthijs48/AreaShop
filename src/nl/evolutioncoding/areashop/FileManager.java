@@ -586,18 +586,9 @@ public class FileManager {
 				RegionManager manager = plugin.getWorldGuard().getRegionManager(bukkitWorld);
 				if(manager != null) {
 					try {
-						String version = plugin.getWorldGuard().getDescription().getVersion();
-						AreaShop.debug("WorldGuard version: " + version);
-						// Detect WorldGuard version 5
-						if(version.startsWith("5.")) {
-							//AreaShop.debug("  Saved the old way");
-							manager.save();
-						} 
-						// Assume a newer version
-						else {
-							//AreaShop.debug("  Saved the new way");
-							manager.saveChanges();
-						}
+						//String version = plugin.getWorldGuard().getDescription().getVersion();
+						//AreaShop.debug("WorldGuard version: " + version);
+						manager.saveChanges();
 					} catch(Exception e) {
 						plugin.getLogger().warning("WorldGuard regions in world " + world + " could not be saved");
 					}

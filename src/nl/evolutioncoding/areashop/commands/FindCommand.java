@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
@@ -72,72 +73,85 @@ public class FindCommand extends CommandAreaShop {
 		}
 		if(args[1].equalsIgnoreCase("buy")) {
 			List<BuyRegion> regions = plugin.getFileManager().getBuys();
+			List<BuyRegion> results = new ArrayList<BuyRegion>();
 			for(BuyRegion region : regions) {
 				if(!region.isSold() 
 						&& ((region.getPrice() <= balance && !maxPriceSet) || (region.getPrice() <= maxPrice && maxPriceSet)) 
 						&& (group == null || group.isMember(region))) {
-					BigDecimal bigDecimal = new BigDecimal(balance);
-				    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-				    balance = bigDecimal.doubleValue();
-				    String onlyInGroup = "";
-					if(group != null) {
-						onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
-					}
-					if(maxPriceSet) {
-						plugin.message(player, "find-successMax", "buy", region.getName(), maxPrice, onlyInGroup);
-					} else {
-						plugin.message(player, "find-success", "buy", region.getName(), balance, onlyInGroup);
-					}
-					region.teleportPlayer(player, true, false);					
-					return;
+					results.add(region);
 				}
-			}		
-			BigDecimal bigDecimal = new BigDecimal(balance);
-		    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-		    balance = bigDecimal.doubleValue();
-		    String onlyInGroup = "";
-			if(group != null) {
-				onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
 			}
-			if(maxPriceSet) {
-				plugin.message(player, "find-noneFound", "buy", maxPrice, onlyInGroup);
+			if(!results.isEmpty()) {
+				// Draw a random one
+				BuyRegion region = results.get(new Random().nextInt(results.size()));
+				
+				BigDecimal bigDecimal = new BigDecimal(balance);
+			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+			    balance = bigDecimal.doubleValue();
+			    String onlyInGroup = "";
+				if(group != null) {
+					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
+				}
+				if(maxPriceSet) {
+					plugin.message(player, "find-successMax", "buy", region.getName(), maxPrice, onlyInGroup);
+				} else {
+					plugin.message(player, "find-success", "buy", region.getName(), balance, onlyInGroup);
+				}
+				region.teleportPlayer(player, true, false);		
 			} else {
-				plugin.message(player, "find-noneFoundMax", "buy", balance, onlyInGroup);
+				BigDecimal bigDecimal = new BigDecimal(balance);
+			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+			    balance = bigDecimal.doubleValue();
+			    String onlyInGroup = "";
+				if(group != null) {
+					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
+				}
+				if(maxPriceSet) {
+					plugin.message(player, "find-noneFound", "buy", maxPrice, onlyInGroup);
+				} else {
+					plugin.message(player, "find-noneFoundMax", "buy", balance, onlyInGroup);
+				}
 			}
-
 		} else {
 			List<RentRegion> regions = plugin.getFileManager().getRents();
+			List<RentRegion> results = new ArrayList<RentRegion>();
 			for(RentRegion region : regions) {
 				if(!region.isRented() 
 						&& ((region.getPrice() <= balance && !maxPriceSet) || (region.getPrice() <= maxPrice && maxPriceSet))
 						&& (group == null || group.isMember(region))) {
-					BigDecimal bigDecimal = new BigDecimal(balance);
-				    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-				    balance = bigDecimal.doubleValue();
-				    String onlyInGroup = "";
-					if(group != null) {
-						onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
-					}
-					if(maxPriceSet) {
-						plugin.message(player, "find-successMax", "rent", region.getName(), maxPrice, onlyInGroup);
-					} else {
-						plugin.message(player, "find-success", "rent", region.getName(), balance, onlyInGroup);
-					}
-					region.teleportPlayer(player, true, false);					
-					return;
+					results.add(region);
 				}
-			}	
-			BigDecimal bigDecimal = new BigDecimal(balance);
-		    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-		    balance = bigDecimal.doubleValue();
-		    String onlyInGroup = "";
-			if(group != null) {
-				onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
 			}
-			if(maxPriceSet) {
-				plugin.message(player, "find-noneFound", "rent", maxPrice, onlyInGroup);
+			if(!results.isEmpty()) {
+				// Draw a random one
+				RentRegion region = results.get(new Random().nextInt(results.size()));
+								
+				BigDecimal bigDecimal = new BigDecimal(balance);
+			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+			    balance = bigDecimal.doubleValue();
+			    String onlyInGroup = "";
+				if(group != null) {
+					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
+				}
+				if(maxPriceSet) {
+					plugin.message(player, "find-successMax", "rent", region.getName(), maxPrice, onlyInGroup);
+				} else {
+					plugin.message(player, "find-success", "rent", region.getName(), balance, onlyInGroup);
+				}
+				region.teleportPlayer(player, true, false);		
 			} else {
-				plugin.message(player, "find-noneFoundMax", "rent", balance, onlyInGroup);
+				BigDecimal bigDecimal = new BigDecimal(balance);
+			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+			    balance = bigDecimal.doubleValue();
+			    String onlyInGroup = "";
+				if(group != null) {
+					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
+				}
+				if(maxPriceSet) {
+					plugin.message(player, "find-noneFound", "rent", maxPrice, onlyInGroup);
+				} else {
+					plugin.message(player, "find-noneFoundMax", "rent", balance, onlyInGroup);
+				}
 			}
 		}
 

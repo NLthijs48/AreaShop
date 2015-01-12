@@ -233,7 +233,7 @@ schematicProfiles:
 ## You can add groups by using 'g:<groupname>', so in total you could use: '%uuid%, %friendsuuid%, g:vip, n:cool-guy'
 ## For flags like 'entry' and 'exit' you can add group setting by using 'g:<scope>' behind it, <scope> is one of the following:
 ## members, non_members, owners, non_owners, all. Example, only owners can enter the region: 
-##   entry: 'allow g:owners'
+##   entry: 'deny g:non_owners'
 ## Use '' for a flag to reset it.
 flagProfiles:
   default:

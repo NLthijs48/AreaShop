@@ -1,6 +1,6 @@
 name: AreaShop
 main: nl.evolutioncoding.areashop.AreaShop
-version: 2.1.3
+version: 2.1.4
 depend: [Vault, WorldGuard, WorldEdit]
 softdepend: [Multiverse-Core]
 author: NLThijs48
@@ -9,8 +9,6 @@ commands:
   AreaShop:
     description: For all commands use /as help 
     usage: AreaShop has not started correctly, check the console and correct any errors
-    permission: areashop.help
-    permission-message: You don't have <permission>
     aliases: [as]
 permissions:
   areashop.*:
@@ -53,7 +51,7 @@ permissions:
       areashop.stopresellall: true
       areashop.addfriendall: true
       areashop.delfriendall: true
-      areashop.nofityupdate: true
+      areashop.notifyupdate: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -207,6 +205,6 @@ permissions:
   areashop.delfriendall: 
     description: Allows you to delete friends from all regions
     default: op
-  areashop.nofityupdate:
+  areashop.notifyupdate:
     description: Will notify this player when an update is available
     default: op

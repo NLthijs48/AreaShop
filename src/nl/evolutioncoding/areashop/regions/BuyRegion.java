@@ -266,7 +266,7 @@ public class BuyRegion extends GeneralRegion {
 				}
 				
 				/* Check if the player has enough money */
-				if(plugin.getEconomy().has(player, getWorldName(), getPrice())) {
+				if((!isResell && plugin.getEconomy().has(player, getWorldName(), getPrice())) || (isResell && plugin.getEconomy().has(player, getWorldName(), getResellPrice()))) {
 					UUID oldOwner = getBuyer();
 					if(isResell && oldOwner != null) {
 						clearFriends();
@@ -335,7 +335,13 @@ public class BuyRegion extends GeneralRegion {
 					return true;
 				} else {
 					/* Player has not enough money */
-					plugin.message(player, "buy-lowMoney", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())), getFormattedPrice());
+					String requiredMoney = "";
+					if(isResell) {
+						requiredMoney = getFormattedResellPrice();
+					} else {
+						requiredMoney = getFormattedPrice();
+					}					
+					plugin.message(player, "buy-lowMoney", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())), requiredMoney);
 				}
 			} else {
 				if(isBuyer(player)) {

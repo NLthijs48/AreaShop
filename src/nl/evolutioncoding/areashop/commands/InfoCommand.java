@@ -305,7 +305,12 @@ public class InfoCommand extends CommandAreaShop {
 					} else if(buy != null) {
 						plugin.message(sender, "info-regionHeaderBuy", buy);
 						if(buy.isSold()) {
-							plugin.messageNoPrefix(sender, "info-regionBought", buy);
+							if(buy.isInResellingMode()) {
+								plugin.messageNoPrefix(sender, "info-regionReselling", buy);
+								plugin.messageNoPrefix(sender, "info-regionReselPrice", buy);
+							} else {
+								plugin.messageNoPrefix(sender, "info-regionBought", buy);
+							}
 							plugin.messageNoPrefix(sender, "info-regionMoneyBackBuy", buy);
 							if(!buy.getFriendNames().isEmpty()) {
 								plugin.messageNoPrefix(sender, "info-regionFriends", buy);

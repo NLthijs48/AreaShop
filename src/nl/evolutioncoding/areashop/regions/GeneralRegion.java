@@ -1028,7 +1028,6 @@ public abstract class GeneralRegion {
 								uuid = null;
 							}
 							if(uuid != null) {
-								//AreaShop.debug("  Added player by UUID");
 								members.addPlayer(uuid);
 							}
 						}
@@ -1062,7 +1061,6 @@ public abstract class GeneralRegion {
 								uuid = null;
 							}
 							if(uuid != null) {
-								//AreaShop.debug("  Added player by UUID");
 								owners.addPlayer(uuid);
 							}
 						}

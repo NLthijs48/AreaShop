@@ -1,6 +1,6 @@
-# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: French (Français), Version: V2.1.2, Percentage translated: 100%, author(s): BlaZingHope, Yaelknown, Dydy69       ║
+# ║ Language: French, Version: V2.1.4, Percentage translated: 100%                                                             ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -9,6 +9,7 @@
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 total-maximum: "Vous ne pouvez pas louer ou acheter plus de %0% région(s) au total (vous possédez déjà %1% dans le groupe '%2%')."
+
 cmd-notValid: "Cette commande est incorrecte, utilisez '/as help' pour plus de détails."
 cmd-onlyByPlayer: "Cette commande ne peut être utilisée que par un joueur."
 cmd-weOnlyByPlayer: "Utiliser une sélection WorldEdit n'est possible qu'en tant que joueur. Spécifiez le nom de la région en argument supplémentaire."
@@ -19,6 +20,7 @@ cmd-notRegistered: "'%0%' n'est pas enregistrée dans AreaShop."
 cmd-noRegionsAtLocation: "Aucune région trouvée à votre emplacement, spécifiez la région comme un argument."
 cmd-moreRegionsAtLocation: "Plus d'une région ont été trouvées à votre emplacement, spécifiez la région comme un argument."
 cmd-automaticRegionOnlyByPlayer: "Déterminer la région automatiquement est disponible uniquement pour les joueurs, spécifiez la région comme un argument."
+
 help-header: "Page d'aide, commandes que vous pouvez exécuter."
 help-alias: "Alias des commandes : /areashop, /as"
 help-help: "&6/as help &7-&r Affiche la page d'aide."
@@ -59,6 +61,7 @@ help-addFriend: "&6/as addfriend &7-&r Ajouter un ami à votre région."
 help-addFriendAll: "&6/as addfriend &7-&r Ajouter un ami à une région."
 help-delFriend: "&6/as delfriend &7-&r Supprimer un ami de votre région."
 help-delFriendAll: "&6/as delfriend &7-&r Supprimer un ami d'une région."
+
 rent-help: "/as rent [regionname], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 rent-noPermission: "Vous n'avez pas la permission de louer une région."
 rent-maximum: "Vous ne pouvez pas louer plus de %0% région(s) au total (vous possédez déjà %1% dans le groupe '%2%')."
@@ -75,6 +78,7 @@ rent-maxRentTime: "Vous ne pouvez pas louer plus longtemps à l'avance, le maxim
 rent-restrictedToWorld: "Vous devez être dans le monde '%0%' pour louer cette région (vous êtes dans '%1%')."
 rent-restrictedToRegion: "Vous devez être dans la région '%0%' pour la louer."
 rent-expireWarning: "Votre région '%region%' n'a plus que %timeleft% de temps de location, soyez sûr d'allonger ce temps de location si vous voulez la conserver."
+
 buy-help: "/as buy [regionname], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 buy-noPermission: "Vous n'avez pas la permission d'acheter une région."
 buy-notBuyable: "Cette région n'est pas disponible à l'achat."
@@ -88,6 +92,7 @@ buy-yours: "Vous avez déjà acheté cette région."
 buy-someoneElse: "Quelqu'un a déjà acheté cette région."
 buy-restrictedToWorld: "Vous devez être dans le monde '%0%' pour acheter cette région (vous êtes dans '%1%')."
 buy-restrictedToRegion: "Vous devez être dans '%0%' pour l'acheter."
+
 unrent-help: "/as unrent [regionname], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 unrent-noPermission: "Vous n'avez pas la permission de dé-louer une région."
 unrent-noPermissionOther: "Vous n'avez pas la permission de dé-louer une autre région."
@@ -96,6 +101,7 @@ unrent-notRented: "La région ne peut pas être dé-louée car elle n'est pas lo
 unrent-unrented: "Votre région a été dé-louée."
 unrent-other: "La région du joueur %0% a été dé-louée."
 unrent-expired: "Votre location de '%0%' a expiré."
+
 sell-help: "/as sell [regionname], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 sell-notRegistered: "La région ne peut pas être vendue car elle n'est pas enregistrée comme achetée."
 sell-notBought: "La région ne peut pas être vendue car elle n'est pas la propriété de quelqu'un."
@@ -103,14 +109,18 @@ sell-sold: "Cette région a été vendue au joueur %0%."
 sell-soldYours: "Votre région a été vendue."
 sell-noPermission: "Vous n'avez pas la permission de vendre une région."
 sell-noPermissionOther: "Vous n'avez pas la permission de vendre une autre région."
+
 rents-updated: "Tout les panneaux et régions en location ont été mis à jour."
 rents-noPermission: "Vous n'avez pas la permission de mettre à jour les panneaux et régions en location."
 rents-notUpdated: "Tout les panneaux n'ont pas été mis à jour. Recharger le serveur peut corriger le problème."
+
 buys-updated: "Tous les panneaux et régions en vente ont été mis à jour."
 buys-noPermission: "Vous n'avez pas la permission de mettre à jour les panneaux et régions en vente."
 buys-notUpdated: "Tous les panneaux n'ont pas été mis à jour. Recharger le serveur peut corriger le problème."
+
 reload-reloaded: "La configuration a bien été rechargée."
 reload-noPermission: "Vous n'avez pas la permission de recharger la configuration."
+
 info-help: "/as info <all|rented|forrent|sold|forsale|player|region>"
 info-noPermission: "Vous n'avez pas la permission d'avoir des informations à propos des régions."
 info-all-rents: "Régions enregistrées en location : &7%0%"
@@ -168,24 +178,28 @@ info-regionRestoreProfile: "Profil de restauration : &7%0%"
 info-regionTPLocation: "Lieu de téléportation : &7World=%0%, X=%1%, Y=%2%, Z=%3%, Pitch=%4%, Yaw=%5%"
 info-regionNoTP: "Aucun lieu de téléportation défini."
 info-regionNotExisting: "La région '%0%' n'est pas enregistrée."
+
 setrestore-help: "/as setrestore <region> <true|false|general> [profile]"
 setrestore-noPermission: "Vous n'avez pas la permission de restaurer les paramètres."
 setrestore-notRegistered: "'%0%' n'est pas enregistré."
 setrestore-invalidSetting: "'%0%' est invalide. Doit être true, false ou general."
 setrestore-success: "Paramètre de restauration défini de %0% à %1% avec succès."
 setrestore-successProfile: "Paramètre de restauration défini de %0% à %1% et le profil à '%2%'  avec succès."
+
 setprice-noPermission: "Vous n'avez pas la permission de changer le prix d'une région."
 setprice-help: "/as setprice <price> [region], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 setprice-notRegistered: "%0% n'est pas enregistrée dans AreaShop."
 setprice-wrongPrice: "'%0%' n'est pas un prix valide."
 setprice-successRent: "Prix de la région '%0%' changé de %1% à %2%."
 setprice-successBuy: "Prix de la région '%0%' changé à %1%."
+
 setduration-noPermission: "Vous n'avez pas la permission de changer le temps d'une location."
 setduration-help: "/as setduration <amount> <identifier> [region], la région dans laquelle vous vous trouvez sera utilisée si vous ne précisez pas quelle région doit être utilisée."
 setduration-notRegistered: "%0% n'est pas enregistrée comme à louer."
 setduration-wrongAmount: "'%0%' n'est pas un montant valide, utilisez un nombre entier."
 setduration-wrongFormat: "'%0%' n'est pas un format de temps valide, regardez la documentation de Bukkit."
 setduration-success: "Temps de location de la région '%0%' changé à '%1%'."
+
 setup-noRegion: "Vous n'avez pas spécifié de région à la seconde ligne."
 setup-wrongRegion: "La région que vous avez spécifiée n'existe pas."
 setup-alreadyRentSign: "La région que vous avez spécifiée possède déjà un panneau de location."
@@ -199,10 +213,12 @@ setup-buySuccess: "L'achat de la région '%0%' est correctement configuré."
 setup-noPermissionRent: "Vous n'avez pas la permission de mettre en place la location de régions."
 setup-noPermissionBuy: "Vous n'avez pas la permission de mettre en place l'achat de régions."
 setup-couldNotDetect: "Multiples régions trouvées avec la même priorité et/ou étant de même nature : parent ou enfant. Spécifiez-en une sur la deuxième ligne. (2 des régions trouvées:  %0% et %1%)."
+
 destroy-noPermissionRent: "Vous n'avez pas la permission de détruire le panneau de location d'une région."
 destroy-noPermissionBuy: "Vous n'avez pas la permission de détruire le panneau de vente d'une région."
 destroy-successRent: "Location de '%0%' supprimée."
 destroy-successBuy: "Achat de '%0%' supprimé."
+
 teleport-help: "/as tp <region> [sign]"
 teleport-noRentOrBuy: "La région '%0%' n'est pas enregistrée comme location ou achat."
 teleport-noPermission: "Vous n'avez pas la permission de vous téléporter à votre région."
@@ -215,6 +231,7 @@ teleport-success: "Vous avez été téléporté à '%0%'."
 teleport-successSign: "Vous vous téléportez à la pancarte de '%0%'."
 teleport-noSafe: "Aucune position sécurisée trouvée dans la région '%0%'. Pas de point restant, ou tentatives maximales dépassées (%1%/%2%)."
 teleport-blocked: "Vous ne pouvez pas vous téléporter car la position est en dehors de la région et vous êtes obligé de vous téléporter à l'intérieur."
+
 setteleport-help: "/as settp [region] [reset], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 setteleport-noPermission: "Vous n'avez pas la permission de définir un point de téléportation."
 setteleport-noPermissionOther: "Vous n'avez pas la permission de définir l'emplacement de téléportation d'une région que vous ne possédez pas."
@@ -222,6 +239,7 @@ setteleport-noRentOrBuy: "La région '%0%' n'est pas enregistrée comme location
 setteleport-success: "Lieu de téléportation de '%0%' défini."
 setteleport-notInside: "Le lieu doit se trouver dans votre région."
 setteleport-reset: "Le lieu de téléportation de '%0%' a été réinitialisé."
+
 find-help: "/as find <buy|rent> [prix maximum] [group]"
 find-noPermission: "Vous n'avez pas la permission de rechercher des régions et de vous y téléporter."
 find-success: "Trouvé une région %0% : %1%, en recherchant avec un prix maximum de: %2%%3%."
@@ -231,6 +249,7 @@ find-wrongGroup: "Le groupe spécifié n'existe pas : %0%."
 find-noneFound: "Aucune région %0% trouvée ayant pour un prix maximum : %1%%2%."
 find-noneFoundMax: "Aucune région %0% trouvée en cherchant à un prix maximum de %1%%2%."
 find-onlyInGroup: ", recherche de régions uniquement dans le groupe: %0%."
+
 groupadd-help: "/as groupadd <group> [region], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 groupadd-noPermission: "Vous n'avez pas la permission d'ajouter des régions aux groupes."
 groupadd-noRegion: "La région spécifiée n'est pas enregistrée : %0%."
@@ -238,6 +257,7 @@ groupadd-success: "La région '%0%' a été ajoutée au groupe '%1%'. Ce groupe 
 groupadd-failed: "La région '%0%' est déjà membre du groupe '%1%'."
 groupadd-weSuccess: "Ajouté au groupe %0% : &7%1%."
 groupadd-weFailed: "Nous étions déjà dans le groupe %0% : &7%1%."
+
 groupdel-help: "/as groupdel <group> [region], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 groupdel-noPermission: "Vous n'avez pas la permission de supprimer des régions depuis les groupes."
 groupdel-noRegion: "La région spécifiée n'est pas enregistrée : %0%."
@@ -245,19 +265,23 @@ groupdel-success: "La région '%0%' a été supprimée du groupe '%1%', ce group
 groupdel-failed: "La région '%0%' n'est pas membre du groupe '%1%'."
 groupdel-weSuccess: "Supprimée du groupe %0% : &7%1%."
 groupdel-weFailed: "Nous ne sommes de toute façon pas dans le groupe %0% : &7%1%."
+
 grouplist-noPermission: "Vous n'avez pas l'autorisation d'afficher les groupes enregistrés."
 grouplist-noGroups: "Il n'y a actuellement aucun groupe enregistré."
 grouplist-success: "Les groupes suivants sont enregistrés : &7%0%."
+
 groupinfo-help: "/as groupinfo <group>"
 groupinfo-noPermission: "Vous n'avez pas la permission d'afficher des informations sur un groupe."
 groupinfo-noGroup: "Il n'y a pas de groupe enregistré sous le nom '%0%', utilisez /as grouplist pour vérifier les groupes."
 groupinfo-members: "Les régions suivantes sont membres du groupe %0% : &7%1%."
 groupinfo-noMembers: "Le groupe %0% ne possède aucun membre."
+
 schemevent-help: "/as schemevent <region> <created|deleted|rented|unrented|bought|sold>"
 schemevent-noRegion: "La région spécifiée n'est pas enregistrée : %0%."
 schemevent-wrongEvent: "L'évent spécifié '%0%' n'existe pas, utilisez un des suivants: &7%1%."
 schemevent-success: "L’événement '%0%' a été activé dans la région '%1%'."
 schemevent-noPermission: "Vous n'avez pas la permission de déclencher des événements schématiques."
+
 add-help: "/as add <rent|buy> [region] [world]"
 add-noPermission: "Vous n'avez pas la permission d'ajouter une région à AreaShop."
 add-success: "Ajoutée comme %0% : &7%1%."
@@ -265,10 +289,12 @@ add-failed: "Déjà enregistrée : &7%0%."
 add-specifyWorld: "Spécifiez le monde de la région lors de l'utilisation de la console."
 add-incorrectWorld: "Le monde '%0%' est introuvable, essayez de nouveau (attention à la casse)."
 add-noRegion: "La région '%0%' n'existe pas dans ce monde."
+
 del-noRegion: "Le région '%0%' n'est pas enregistrée à AreaShop."
 del-noPermission: "Vous n'avez pas la permission de supprimer des régions."
 del-success: "Régions supprimées : &7%0%."
 del-failed: "Pas de permission pour supprimer, ou pas enregistrée: &7%0%."
+
 addsign-help: "/as addsign [region] [profile]"
 addsign-noSign: "Vous ne regardez pas de panneau."
 addsign-noRegion: "La région '%0%' n'a pas été trouvée."
@@ -280,10 +306,12 @@ addsign-success: "Le panneau a été ajouté à %0%."
 addsign-successProfile: "Le panneau a été ajouté à %0% avec le profil %1%."
 addsign-alreadyRegistered: "Ce panneau a déjà été enregistré pour la région '%0%'."
 addsign-noPermission: "Vous n'avez pas la permission d'ajouter un panneau."
+
 delsign-noSign: "Vous ne regardez pas un panneau."
 delsign-noPermission: "Vous n'avez pas la permission de supprimer un panneau."
 delsign-noRegion: "Ce signe n'appartient pas à une région AreaShop."
 delsign-success: "Ce panneau a été supprimé de la région '%0%'."
+
 me-noPermission: "Vous n'avez pas la permission de voir quelle(s) région(s) vous possédez."
 me-notAPlayer: "Vous n'êtes pas un joueur. Vous ne pouvez donc pas avoir de régions."
 me-noRentRegions: "Vous ne louez aucune région."
@@ -295,6 +323,7 @@ me-buyLine: "&2&l►&r %region%"
 me-noFriendRegions: "Vous n'avez pas été ajouté en ami sur une région."
 me-friendRegions: "Vous avez été ajouté en ami dans les régions suivantes :"
 me-friendLine: "&2&l►&r %region% &7(propriétaire : %player%)"
+
 setowner-help: "/as setowner <joueur> [region], la région dans laquelle vous vous trouvez sera utilisée si vous ne spécifiez pas de région."
 setowner-noPermission: "Vous n'avez pas la permission de définir le propriétaire d'une région."
 setowner-noPermissionRent: "Vous n'avez pas la permission de définir le propriétaire de régions à louer."
@@ -304,6 +333,7 @@ setowner-noPlayer: "UUID du joueur introuvable : %0%."
 setowner-succesRent: "Propriétaire de la région '%region%' modifié avec succès. Elle appartient maintenant à %player% et est louée jusqu'au %until% (%timeleft% restant)."
 setowner-succesRentExtend: "Le propriétaire était déjà %player%, location prolongée de '%duration%', maintenant louée jusqu'au %until% (%timeleft% restant%)."
 setowner-succesBuy: "Propriétaire de la région '%region%' changé avec succès. Elle appartient maintenant à %player%."
+
 resell-help: "/as resell <prix> <région>, la région dans laquelle vous vous trouvez sera utilisée si vous ne spécifiez pas de région."
 resell-wrongPrice: "'%0%' n'est pas un prix valide."
 resell-notRegistered: "'%0%' n'est pas enregistrée dans AreaShop."
@@ -312,6 +342,7 @@ resell-notBought: "Vous ne pouvez pas revendre la région '%region%', elle n'est
 resell-success: "'%region%' a été mise en revente avec succès pour un prix de %resellprice%."
 resell-noPermission: "Vous n'avez pas la permission de mettre votre région en revente."
 resell-noPermissionOther: "Vous n'avez pas la permission de mettre des régions en revente."
+
 stopresell-help: "/as stropresell [région], la région où vous vous trouvez sera utilisée si vous ne spécifiez pas de région."
 stopresell-notRegistered: "'%0%' n'est pas enregistrée dans AreaShop."
 stopresell-noRegionFound: "Aucune région AreaShop n'a été trouvée à votre emplacement, essayez de la spécifier en argument."
@@ -319,6 +350,7 @@ stopresell-notResell: "Vous ne pouvez pas arrêter la revente de la région '%re
 stopresell-success: "'%region%' n'est plus en revente."
 stopresell-noPermission: "Vous n'avez pas la permission de retirer votre région de la vente."
 stopresell-noPermissionOther: "Vous n'avez pas la permission de retirer les régions de la vente."
+
 addfriend-help: "/as addfriend <joueur> [region], la région dans laquelle vous vous trouvez sera utilisée si vous ne spécifiez pas de région."
 addfriend-noPermissionOther: "Vous n'avez pas la permission d'ajouter des gens en amis dans une région qui n'est pas la vôtre."
 addfriend-noPermission: "Vous n'avez pas la permission d'ajouter en amis des gens à votre région."
@@ -327,6 +359,7 @@ addfriend-success: "%0% a été ajouté ajouté en ami à votre région '%1%'."
 addfriend-alreadyAdded: "%0% est déjà ami avec cette région."
 addfriend-self: "Ajouter le propriétaire de la région en ami n'aurait aucune utilité."
 addfriend-noOwner: "Vous ne pouvez pas ajouter d'amis à une région sans propriétaire."
+
 delfriend-help: "/as delfriend <joueur> [région], la région dans laquelle vous vous trouvez sera utilisée si vous ne spécifiez pas de région."
 delfriend-noPermissionOther: "Vous n'avez pas la permission de supprimer des amis à une région n'étant pas la vôtre."
 delfriend-noPermission: "Vous n'avez pas la permission de supprimer des amis de votre région."
@@ -334,6 +367,7 @@ delfriend-successOther: "%0% a été supprimé de la liste d'amis de la région 
 delfriend-success: "%0% a été supprimé des amis de votre région '%1%'."
 delfriend-notAdded: "%0% n'est pas dans les amis de cette région."
 delfriend-noOwner: "Vous ne pouvez pas supprimer les amis d'une région sans propriétaire."
+
 timeleft-years: "%0% années."
 timeleft-months: "%0% mois."
 timeleft-days: "%0% jours."
@@ -342,6 +376,7 @@ timeleft-minutes: "%0% minutes."
 timeleft-second: "%0% seconde."
 timeleft-seconds: "%0% secondes."
 timeleft-ended: "Expiré"
+
 greeting-forrent: "La région '%region%' peut être louée pour %price% pour une durée de %duration%."
 greeting-rented: "La région '%region%' est louée par %player% jusqu'au %until%."
 greeting-forsale: "La région '%region%' peut être achetée pour %price%."

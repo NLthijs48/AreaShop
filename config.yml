@@ -5,8 +5,7 @@
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ GENERAL: Options that influence the global state of the plugin                                                             │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-## Chatprefix used for all messages in the chat. Also check the 'greeting' lines in the 'flagProfiles' section, 
-## these also contain the prefix and you may want to change those to
+## Chatprefix used for all messages in the chat, also changes the greeting messages.
 chatPrefix: '&2[AreaShop]&r '
 ## The characters used for the prices of regions, will appear before the number, for the euro character use '%euro%'
 moneyCharacter: '$'
@@ -16,7 +15,7 @@ moneyCharacterAfter: ''
 fractionalNumbers: 2
 ## Set this to true if you want to hide '.0' for a number like '15.0' ('4.50' will still stay '4.50')
 hideEmptyFractionalPart: true
-## The .yml language file that should be used, provided by this plugin: EN, NL, FR, DE, PL
+## The language file that should be used, check the 'lang' folder for build-in languages (use the filename without .yml here)
 language: EN
 ## Enable Schematic saving and restoring in general
 enableSchematics: true
@@ -40,7 +39,7 @@ postCommandErrors: true
 ## Enables / disables debug messages in the console, could be useful to figure out where errors come from
 debug: false
 ## Version of the config, do not change!
-version: 2.1.2
+version: 2.1.4
 
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

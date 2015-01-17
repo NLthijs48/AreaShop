@@ -1,6 +1,6 @@
-# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Dutch (Nederlands), Version: V2.1.2, Percentage translated: 100%, author(s): NLThijs48                           ║
+# ║ Language: Dutch, Version: V2.1.4, Percentage translated: 100%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -9,6 +9,7 @@
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 total-maximum: "Je kunt niet meer dan %0% gebied(en) kopen en huren in totaal (je hebt er al %1% in groep '%2%')"
+
 cmd-notValid: "Dat commando is niet geldig , gebruik '/as help' voor informatie"
 cmd-onlyByPlayer: "Dit commando kan alleen door een speler uitgevoert worden"
 cmd-weOnlyByPlayer: "Gebruikmaken van een WorldEdit selectie is alleen mogelijk als speler, geef de naam van het gebied mee als extra argument"
@@ -19,6 +20,7 @@ cmd-notRegistered: "%0% is niet geregistreerd in AreaShop"
 cmd-noRegionsAtLocation: "Geen gebieden gevonden op je lokatie, geef het gebied mee als argument"
 cmd-moreRegionsAtLocation: "Meerdere gebieden gevonden op je lokatie, geef het gebied mee als argument"
 cmd-automaticRegionOnlyByPlayer: "Automatisch bepalen van het gebied is alleen mogelijk voor spelers, geef het gebied mee als argument"
+
 help-header: "Help pagina, commando's die jij kunt uitvoeren"
 help-alias: "Commando aliassen: /areashop, /as"
 help-help: "&6/as help &7-&r Laat deze help pagina zien"
@@ -59,6 +61,7 @@ help-addFriend: "&6/as addfriend &7-&r Voeg een vriend toe aan je gebied"
 help-addFriendAll: "&6/as addfriend &7-&r Voeg een vriend toe aan een gebied"
 help-delFriend: "&6/as delfriend &7-&r Verwijder een vriend van je gebied"
 help-delFriendAll: "&6/as delfriend &7-&r Verwijder een vriend van een gebied"
+
 rent-help: "/as rent <gebiednaam>"
 rent-noPermission: "Je hebt geen toestemming om een gebied te huren"
 rent-maximum: "Je kunt niet meer dan %0% gebied(en) huren (je hebt er al %1% in groep '%2%')"
@@ -75,6 +78,7 @@ rent-maxRentTime: "Je kunt dit huur gebied niet meer tijd van tevoren huren, de 
 rent-restrictedToWorld: "Je moet in de '%0%' wereld zijn om dit gebied te huren (je bent in '%1%')"
 rent-restrictedToRegion: "Je moet in '%0%' staan om hem te huren"
 rent-expireWarning: "Je gebied %region% heeft nog %timeleft% over, verleng het als je het wilt houden."
+
 buy-help: "/as buy <gebiednaam>"
 buy-noPermission: "Je hebt geen toestemming om een gebied te kopen"
 buy-notBuyable: "Dat gebied is niet beschikbaar om te kopen"
@@ -88,6 +92,7 @@ buy-yours: "Je hebt dit gebied al gekocht"
 buy-someoneElse: "Iemand anders heeft dit gebied al gekocht"
 buy-restrictedToWorld: "Je moet in de wereld '%0%' zijn om dit gebied te kopen (je ben in '%1%')"
 buy-restrictedToRegion: "Je moet in '%0%' staan om hem te kopen"
+
 unrent-help: "/as unrent <gebiednaam>, het gebied waarin je staat zal worden gebruikt als je deze niet aangeeft"
 unrent-noPermission: "Je hebt geen toestemming om te stoppen met huren"
 unrent-noPermissionOther: "Je hebt geen toestemming om iemand anders huur te stoppen"
@@ -96,6 +101,7 @@ unrent-notRented: "De huur kan niet gestopt worden want het gebied is niet gehuu
 unrent-unrented: "De huur van je gebied is gestopt"
 unrent-other: "De huur voor het gebied is gestopt voor speler %0%"
 unrent-expired: "De huur van je gebied %0% is gestopt"
+
 sell-help: "/as sell <gebiednaam>, het gebied waarin je staat zal worden gebruikt als je deze niet aangeeft"
 sell-notRegistered: "Het gebied kan niet verkocht worden want het staat niet geregistreerd om te kopen"
 sell-notBought: "Het gebied kan niet verkocht worden want het is niet gekocht"
@@ -103,14 +109,18 @@ sell-sold: "Het gebied is verkocht voor speler %0%"
 sell-soldYours: "Je gebied is verkocht"
 sell-noPermission: "Je hebt geen toestemming om een gebied te verkopen"
 sell-noPermissionOther: "Je hebt geen toestemming om een gebied van iemand anders te verkopen"
+
 rents-updated: "Alle borden en gebieden voor de verhuur zijn geupdate"
 rents-noPermission: "Je hebt geen toestemming om alle verhuur borden en gebieden te updaten"
 rents-notUpdated: "Niet alle borden zijn geupdate, een reload zou het op kunnen lossen"
+
 buys-updated: "Alle borden en gebieden voor de verkoop zijn geupdate"
 buys-noPermission: "Je hebt geen toestemming om alle verkoop borden en gebieden te updaten"
 buys-notUpdated: "Niet alle borden zijn geupdate, een reload zou het op kunnen lossen"
+
 reload-reloaded: "De config is succesvol opnieuw ingeladen"
 reload-noPermission: "Je hebt geen toestemming om de config opnieuw in te laden"
+
 info-help: "/as info <all|rented|forrent|sold|forsale|player|region>"
 info-noPermission: "Je hebt geen toestemming om informatie over gebieden te bekijken"
 info-all-rents: "Gebieden geregistreerd voor de verhuur: %0%"
@@ -168,24 +178,28 @@ info-regionRestoreProfile: "Herstel profiel: %0%"
 info-regionTPLocation: "Teleporteer locatie: &7Wereld=%0%, X=%1%, Y=%2%, Z=%3%, Helling=%4%, Draaiing=%5%"
 info-regionNoTP: "Geen teleporteer locatie ingesteld"
 info-regionNotExisting: "Gebeid %0% staat niet geregistreerd"
+
 setrestore-help: "/as setrestore <gebied> <true|false|general> [profiel]"
 setrestore-noPermission: "Je hebt geen toestemming om de herstel opties te veranderen"
 setrestore-notRegistered: "%0% is niet geregistreerd"
 setrestore-invalidSetting: "'%0%' is geen geldige staat, gebruik true, false of general"
 setrestore-success: "De herstel optie van %0% is succesvol gezet naar '%1%'"
 setrestore-successProfile: "Herstel instelling van %0% is succesvol gezet op '%1%' en het profiel naar '%2%'"
+
 setprice-noPermission: "Je hebt geen toestemming om de prijs van een gebied te veranderen"
 setprice-help: "/as setprice <prijs> [gebied], het gebied waarin je staat zal worden gebruikt als je deze niet aangeeft"
 setprice-notRegistered: "%0% is niet geregistreerd in AreaShop"
 setprice-wrongPrice: "'%0%' is geen geldige prijs"
 setprice-successRent: "Prijs van gebied %0% is veranderd naar %1% per %2%"
 setprice-successBuy: "De prijs van het gebied %0% is veranderd naar %1%"
+
 setduration-noPermission: "Je hebt geen toestemming om de duur van het huur gebied aan te passen"
 setduration-help: "/as setduration <aantal> <identificator> [gebied], het gebied waarin je staat zal worden gebruikt als je niets aangeeft"
 setduration-notRegistered: "%0% is niet geregistreerd als een huur gebied"
 setduration-wrongAmount: "'%0%' is geen geldig aantal, gebruik een geheel nummer"
 setduration-wrongFormat: "'%0%' is geen goed tijdsformaat, bekijk de documentatie op Bukkit"
 setduration-success: "Duur van het gebied %0% veranderd naar '%1%'"
+
 setup-noRegion: "Je hebt geen gebied aangegeven op de tweede regel"
 setup-wrongRegion: "Het aangegeven gebied bestaat niet"
 setup-alreadyRentSign: "Het aangegeven gebied heeft al een bord voor huren"
@@ -199,10 +213,12 @@ setup-buySuccess: "Kopen van gebied %0% is goed opgezet"
 setup-noPermissionRent: "Je hebt geen toestemming om huur gebieden op te zetten"
 setup-noPermissionBuy: "Je hebt geen toestemming om koop gebieden op te zetten"
 setup-couldNotDetect: "Meerdere gebieden gevonden met dezelfde prioriteit en/of parent/child relatie, geeft een specifieke aan op de tweede regel (2 van de gebieden die gevonden zijn: %0% en %1%)"
+
 destroy-noPermissionRent: "Je hebt geen toestemming om een bordje van dit huur gebied kapot te maken"
 destroy-noPermissionBuy: "Je hebt geen toestemming om een bordje van dit koop gebied kapot te maken"
 destroy-successRent: "Het huren van %0% is succesvol verwijderd"
 destroy-successBuy: "Het kopen van %0% is succesvol verwijderd"
+
 teleport-help: "/as tp <gebied> <aantal> <soort>"
 teleport-noRentOrBuy: "Gebied '%0%' is niet geregistreerd als koop of huur gebied"
 teleport-noPermission: "Je hebt geen toestemming om naar je gebied te teleporteren"
@@ -215,6 +231,7 @@ teleport-success: "Je bent naar %0% geteleporteerd"
 teleport-successSign: "Je bent geteleporteerd naar het bordje van %0%"
 teleport-noSafe: "Geen veilige plek gevonden in gebied %0%, verander het gebied of stel de teleporteer positie in"
 teleport-blocked: "Je kunt niet teleporteren omdat de positie buiten het gebied ligt en je geforceerd word erbinnen te teleporteren"
+
 setteleport-help: "/as settp [gebied] [reset], het gebied waar je in staat zal worden gebruikt als je deze niet aangeeft"
 setteleport-noPermission: "Je hebt geen toestemming om de teleporteer lokatie in te stellen"
 setteleport-noPermissionOther: "Je hebt geen toestemming om de teleporteer lokatie in te stellen voor een gebied dat niet van jou is"
@@ -222,6 +239,7 @@ setteleport-noRentOrBuy: "Gebied '%0%' is niet geregistreerd als koop of huur ge
 setteleport-success: "Teleporteer lokatie van %0% ingestelt"
 setteleport-notInside: "De lokatie moet zich binnen het gebied bevinden"
 setteleport-reset: "Teleporteer lokatie van %0% is gereset"
+
 find-help: "/as find <buy|rent> [maxprijs] [groep]"
 find-noPermission: "Je hebt geen toestemming om te zoeken naar gebieden en naar deze te teleporteren"
 find-success: "Een %0% gebied is gevonden: %1%, bij het zoeken met een maximale prijs gelijk aan je saldo: %2%%3%"
@@ -231,6 +249,7 @@ find-wrongGroup: "De aangegeven groep bestaat niet: %0%"
 find-noneFound: "Geen %0% gebied gevonden bij het zoeken met een maximale prijs gelijk aan je saldo: %1%%2%"
 find-noneFoundMax: "Geen %0% gebied gevonden bij het zoeken met een maximale prijs van %1%%2%"
 find-onlyInGroup: ", alleen gebieden gezocht in de groep: %0%"
+
 groupadd-help: "/as groupadd <groep> [gebied], als er geen gebied is aangegeven dan worden alle gebieden in je WorldEdit selectie gebruikt"
 groupadd-noPermission: "Je hebt geen toestemming om gebieden toe te voegen aan groepen"
 groupadd-noRegion: "Het aangegeven gebied is niet geregistreerd: %0%"
@@ -238,6 +257,7 @@ groupadd-success: "Gebied %0% is toegevoegd aan groep '%1%', deze group heeft nu
 groupadd-failed: "Gebied %0% is al toegevoegd aan groep '%1%'"
 groupadd-weSuccess: "Toegevoegd aan groep %0%: &7%1%"
 groupadd-weFailed: "Waren al toegevoegd aan groep %0%: &7%1%"
+
 groupdel-help: "/as groupdel <groep> [gebied], als er geen gebied is aangegeven worden alle gebieden in je WorldEdit selectie gebruikt"
 groupdel-noPermission: "Je hebt geen toestemming om gebieden van groepen te verwijderen"
 groupdel-noRegion: "Het aangegeven gebied staat niet geregistreerd: %0%"
@@ -245,19 +265,23 @@ groupdel-success: "Gebied %0% is verwijderd van groep '%1%', deze groep heeft nu
 groupdel-failed: "Gebied %0% is geen lid van groep '%1%'"
 groupdel-weSuccess: "Verwijderd van groep %0%: &7%1%"
 groupdel-weFailed: "Waren al niet in de groep %0%: &7%1%"
+
 grouplist-noPermission: "Je hebt geen toestemming om de geregistreerde groepen te bekijken"
 grouplist-noGroups: "Er zijn geen groepen aangemaakt"
 grouplist-success: "De volgende groepen zijn geregistreerd: &7%0%"
+
 groupinfo-help: "/as groupinfo <groep>"
 groupinfo-noPermission: "Je hebt geen toestemming voor het bekijken van informatie over een groep"
 groupinfo-noGroup: "Er is geen groep geregistreerd met de naam '%0%', gebruik /as grouplist om de lijst te bekijken"
 groupinfo-members: "De volgende gebieden zijn leden van de groep %0%: &7%1%"
 groupinfo-noMembers: "Groep %0% heeft geen leden"
+
 schemevent-help: "/as schemevent <gebied> <created|deleted|rented|unrented|bought|sold>"
 schemevent-noRegion: "Het aangegeven gebied is niet geregistreerd: %0%"
 schemevent-wrongEvent: "Het aangegeven event '%0%' bestaat niet, gebruik een van de volgende: &7%1%"
 schemevent-success: "Event '%0%' succesvol getriggerd voor gebied %1%"
 schemevent-noPermission: "Je hebt geen toestemming om events te triggeren"
+
 add-help: "/as add <rent|buy> [gebied] [wereld]"
 add-noPermission: "Je hebt geen toestemming om een gebied toe te voegen aan AreaShop"
 add-success: "Toegevoegd als %0%: &7%1%"
@@ -265,10 +289,12 @@ add-failed: "Al geregistreerd: &7%0%"
 add-specifyWorld: "Geef de wereld van het gebied aan als je het commando vanuit de console gebruikt"
 add-incorrectWorld: "Wereld '%0%' niet gevonden, probeer opnieuw (hoofdlettergevoelig)"
 add-noRegion: "Gebied '%0%' bestaat niet in deze wereld"
+
 del-noRegion: "Gebied '%0%' is niet geregistreerd in AreaShop"
 del-noPermission: "Je hebt geen toestemming om gebieden te verwijderen"
 del-success: "Verwijderde gebieden: &7%0%"
 del-failed: "Geen toestemming om te verwijderen of niet geregistreerd: &7%0%"
+
 addsign-help: "/as addsign [gebied] [profiel]"
 addsign-noSign: "Je kijkt niet naar een bord"
 addsign-noRegion: "Gebied '%0%' kan niet gevonden worden"
@@ -280,10 +306,12 @@ addsign-success: "Het bord is toegevoegd aan %0%"
 addsign-successProfile: "Het bord is toegevoegd aan %0% met profiel %1%"
 addsign-alreadyRegistered: "Dat bord is al geregistreerd voor gebied %0%"
 addsign-noPermission: "Je hebt geen toestemming om een bord toe te voegen"
+
 delsign-noSign: "Je kijkt niet naar een bord"
 delsign-noPermission: "Je hebt geen toestemming om een bord te verwijderen"
 delsign-noRegion: "Dat bord hoort niet bij een AreaShop gebied"
 delsign-success: "Het bord is verwijderd van gebied %0%"
+
 me-noPermission: "Je hebt geen toestemming om te zien welke gebieden je hebt"
 me-notAPlayer: "Je bent geen speler dus je kunt geen gebieden hebben"
 me-noRentRegions: "Je hebt geen huur gebieden gehuurt"
@@ -295,6 +323,7 @@ me-buyLine: "&2&l►&r %region%"
 me-noFriendRegions: "Je bent niet aan gebieden toegevoegd als vriend"
 me-friendRegions: "Je bent toegevoegd als vriend aan de volgende gebieden:"
 me-friendLine: "&2&l►&r %region% &7(eigenaar: %player%)"
+
 setowner-help: "/as setowner <speler> [gebied], het gebied waar je in staat zal worden gebruikt als je deze niet aangeeft"
 setowner-noPermission: "Je hebt geen toestemming om de eigenaar van een gebied in te stellen"
 setowner-noPermissionRent: "Je hebt geen toestemming om de eigenaar van huur gebieden in te stellen"
@@ -304,6 +333,7 @@ setowner-noPlayer: "De UUID van de aangegeven speler kon niet worden gevonden: %
 setowner-succesRent: "Eigenaar van %region% succesvol veranderd naar %player%, gehuurt tot %until% (%timeleft% over)"
 setowner-succesRentExtend: "Eigenaar was al %player%, huur verlengt met '%duration%', nu gehuurd tot %until% (%timeleft% over)"
 setowner-succesBuy: "Eigenaar van %region% succesvol veranderd naar %player%"
+
 resell-help: "/as resell <prijs> [gebied], het gebied waarin je staat zal worden gebruikt als je deze niet aangeeft"
 resell-wrongPrice: "'%0%' is geen geldige prijs"
 resell-notRegistered: "%0% is niet geregistreerd in AreaShop"
@@ -312,6 +342,7 @@ resell-notBought: "Je kunt %region% niet doorverkopen want dit gebied is nog nie
 resell-success: "%region% is succesvol in doorverkoop mode gezet voor %resellprice%"
 resell-noPermission: "Je hebt geen toestemming om je gebied in doorverkoop mode te zetten"
 resell-noPermissionOther: "Je hebt geen toestemming om gebieden in doorverkoop mode te zetten"
+
 stopresell-help: "/as stopresell [gebied], het gebied waarin je staat zal worden gebruikt als je deze niet aangeeft"
 stopresell-notRegistered: "%0% is niet geregistreerd in AreaShop"
 stopresell-noRegionFound: "Geen AreaShop gebied gevonden op je lokatie, geeft de naam van het gebied mee als argument"
@@ -319,6 +350,7 @@ stopresell-notResell: "Je kunt niet stoppen met doorverkopen van %region% want h
 stopresell-success: "%region% is succesvol terug gezet in verkocht mode"
 stopresell-noPermission: "Je hebt geen toestemming om je gebied terug te zetten in verkocht mode"
 stopresell-noPermissionOther: "Je hebt geen toestemming om een gebied terug te zetten in verkocht mode"
+
 addfriend-help: "/as addfriend <speler> [gebied], het gebied waar je in staat zal worden gebruikt als je deze niet aangeeft"
 addfriend-noPermissionOther: "Je hebt geen toestemming om vrienden toe te voegen aan gebieden die niet van jou zijn"
 addfriend-noPermission: "Je hebt geen toestemming om vrienden toe te voegen aan je gebied"
@@ -327,6 +359,7 @@ addfriend-success: "%0% is toegevoegd als vriend bij je gebied %1%"
 addfriend-alreadyAdded: "%0% is al toegevoegd als vriend voor dit gebied"
 addfriend-self: "Het toevoegen van de eigenaar van het gebied als vriend zou nutteloos zijn"
 addfriend-noOwner: "Je kunt geen vrienden toevoegen aan een gebied zonder eigenaar"
+
 delfriend-help: "/as delfriend <speler> [gebied], het gebied waar je in staat zal worden gebruikt als je deze niet aangeeft"
 delfriend-noPermissionOther: "Je hebt geen toestemming om vrienden te verwijderen van gebieden die niet van jou zijn"
 delfriend-noPermission: "Je hebt geen toestemming om vrienden te verwijderen van je gebied"
@@ -334,6 +367,7 @@ delfriend-successOther: "%0% is verwijderd als vriend van gebied %1%"
 delfriend-success: "%0% is verwijderd als vriend van je gebied %1%"
 delfriend-notAdded: "%0% is niet toegevoegd als vriend voor dit gebied"
 delfriend-noOwner: "Je kunt geen vrienden verwijderen van een gebied zonder eigenaar"
+
 timeleft-years: "%0% jaren"
 timeleft-months: "%0% maanden"
 timeleft-days: "%0% dagen"
@@ -342,6 +376,7 @@ timeleft-minutes: "%0% minuten"
 timeleft-second: "%0% seconde"
 timeleft-seconds: "%0% seconden"
 timeleft-ended: "Verlopen"
+
 greeting-forrent: "%region% kan worden gehuurd voor %price% per %duration%"
 greeting-rented: "%region% is gehuurd door %player% tot %until%"
 greeting-forsale: "%region% kan worden gekocht voor %price%"

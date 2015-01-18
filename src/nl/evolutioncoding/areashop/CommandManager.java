@@ -164,7 +164,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 			}
 			for(CommandAreaShop c : commands) {
 				if(c.canExecute(command, args)) {
-					result = c.getTabCompleteList(toCompleteNumber, start);
+					result = c.getTabCompleteList(toCompleteNumber, start, sender);
 				}
 			}
 		}

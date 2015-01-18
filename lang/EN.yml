@@ -363,6 +363,7 @@ addfriend-success: "%0% has been added as friend to your region %1%."
 addfriend-alreadyAdded: "%0% is already added as friend for this region."
 addfriend-self: "Adding the owner of the region as friend would be pointless."
 addfriend-noOwner: "You cannot add friends to a region without owner."
+addfriend-notVisited: "You cannot add %0% because he did not visit the server yet"
 
 delfriend-help: "/as delfriend <player> [region], the region you stand in will be used if not specified."
 delfriend-noPermissionOther: "You don't have permission to delete friends from regions that are not yours."

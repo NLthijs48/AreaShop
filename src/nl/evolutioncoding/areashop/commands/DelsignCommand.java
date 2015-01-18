@@ -69,7 +69,7 @@ public class DelsignCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public List<String> getTabCompleteList(int toComplete, String[] start) {
+	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		return new ArrayList<String>();
 	}
 

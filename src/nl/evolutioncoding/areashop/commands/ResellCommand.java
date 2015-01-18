@@ -104,7 +104,7 @@ public class ResellCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public List<String> getTabCompleteList(int toComplete, String[] start) {
+	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<String>();
 		if(toComplete == 3) {
 			for(BuyRegion region : plugin.getFileManager().getBuys()) {

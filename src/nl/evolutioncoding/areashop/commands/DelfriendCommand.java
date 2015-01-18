@@ -110,7 +110,7 @@ public class DelfriendCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public List<String> getTabCompleteList(int toComplete, String[] start) {
+	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<String>();
 		if(toComplete == 2) {
 			for(Player player : Bukkit.getOnlinePlayers()) {

@@ -38,7 +38,7 @@ public abstract class CommandAreaShop {
 	 * @param start The already given start of the command
 	 * @return A collection with all the possibilities for argument to complete
 	 */
-	public abstract List<String> getTabCompleteList(int toComplete, String[] start);
+	public abstract List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender);
 	
 	/**
 	 * Get the argument that comes after the base command that this command reacts to

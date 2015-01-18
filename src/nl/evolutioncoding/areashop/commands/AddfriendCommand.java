@@ -80,6 +80,10 @@ public class AddfriendCommand extends CommandAreaShop {
 				return;
 			}	
 			OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
+			if(!friend.hasPlayedBefore()) {
+				plugin.message(sender, "addfriend-notVisited", args[1]);
+				return;
+			}
 			if(region.getFriends().contains(friend.getUniqueId())) {
 				plugin.message(sender, "addfriend-alreadyAdded", friend.getName());
 				return;
@@ -97,6 +101,10 @@ public class AddfriendCommand extends CommandAreaShop {
 			if(sender.hasPermission("areashop.addfriend") && sender instanceof Player) {
 				if(region.isOwner((Player)sender)) {
 					OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
+					if(!friend.hasPlayedBefore()) {
+						plugin.message(sender, "addfriend-notVisited", args[1]);
+						return;
+					}
 					if(region.getFriends().contains(friend.getUniqueId())) {
 						plugin.message(sender, "addfriend-alreadyAdded", friend.getName());
 						return;
@@ -120,7 +128,7 @@ public class AddfriendCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public List<String> getTabCompleteList(int toComplete, String[] start) {
+	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<String>();
 		if(toComplete == 2) {
 			for(Player player : Bukkit.getOnlinePlayers()) {

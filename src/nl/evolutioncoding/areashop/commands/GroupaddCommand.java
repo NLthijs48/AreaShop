@@ -103,7 +103,7 @@ public class GroupaddCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public List<String> getTabCompleteList(int toComplete, String[] start) {
+	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<String>();
 		if(toComplete == 2) {
 			result = plugin.getFileManager().getGroupNames();

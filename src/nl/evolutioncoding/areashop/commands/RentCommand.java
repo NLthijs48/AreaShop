@@ -63,7 +63,7 @@ public class RentCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public List<String> getTabCompleteList(int toComplete, String[] start) {
+	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<String>();
 		if(toComplete == 2) {
 			for(RentRegion region : plugin.getFileManager().getRents()) {

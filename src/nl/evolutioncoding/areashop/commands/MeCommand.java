@@ -92,7 +92,7 @@ public class MeCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public List<String> getTabCompleteList(int toComplete, String[] start) {
+	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<String>();
 		// Nothing to complete
 		return result;

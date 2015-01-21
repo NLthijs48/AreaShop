@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
@@ -601,6 +603,22 @@ public class FileManager {
 	 */
 	public String getRegionFolder() {
 		return regionsPath;
+	}
+	
+	/**
+	 * Check if a region is on the adding blacklist
+	 * @param region The region name to check
+	 * @return true if the region may not be added, otherwise false
+	 */
+	public boolean isBlacklisted(String region) {
+		for(String line : plugin.getConfig().getStringList("blacklist")) {
+			Pattern pattern = Pattern.compile(line, Pattern.CASE_INSENSITIVE);
+			Matcher matcher = pattern.matcher(region);
+			if(matcher.matches()) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**

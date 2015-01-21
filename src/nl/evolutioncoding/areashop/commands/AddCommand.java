@@ -105,11 +105,14 @@ public class AddCommand extends CommandAreaShop {
 		}
 			
 		ArrayList<String> namesSuccess = new ArrayList<String>();
-		ArrayList<String> namesFailed = new ArrayList<String>();
+		ArrayList<String> namesAlready = new ArrayList<String>();
+		ArrayList<String> namesBlacklisted = new ArrayList<String>();
 		for(ProtectedRegion region : regions) {
 			GeneralRegion asRegion = plugin.getFileManager().getRegion(region.getId());
 			if(asRegion != null) {
-				namesFailed.add(region.getId());
+				namesAlready.add(region.getId());
+			} else if(plugin.getFileManager().isBlacklisted(region.getId())) {
+				namesBlacklisted.add(region.getId());
 			} else {
 				namesSuccess.add(region.getId());
 				if(isRent) {
@@ -138,12 +141,15 @@ public class AddCommand extends CommandAreaShop {
 				}
 			}
 		}
-		if(namesSuccess.size() != 0) {
+		if(!namesSuccess.isEmpty()) {
 			plugin.message(sender, "add-success", args[1], Utils.createCommaSeparatedList(namesSuccess));
 		}
-		if(namesFailed.size() != 0) {
-			plugin.message(sender, "add-failed", Utils.createCommaSeparatedList(namesFailed));
-		}	
+		if(!namesAlready.isEmpty()) {
+			plugin.message(sender, "add-failed", Utils.createCommaSeparatedList(namesAlready));
+		}
+		if(!namesBlacklisted.isEmpty()) {
+			plugin.message(sender, "add-blacklisted", Utils.createCommaSeparatedList(namesBlacklisted));
+		}
 	}
 	
 	@Override

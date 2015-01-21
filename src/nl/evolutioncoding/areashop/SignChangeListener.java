@@ -97,6 +97,9 @@ public final class SignChangeListener implements Listener {
 			} else if(regionManager.getRegion(secondLine) == null) {
 				plugin.message(player, "setup-wrongRegion");
 				return;
+			} else if(plugin.getFileManager().isBlacklisted(secondLine)) {
+				plugin.message(player, "setup-blacklisted", secondLine);
+				return;
 			} else if(plugin.getFileManager().getRent(secondLine) != null) {
 				plugin.message(player, "setup-alreadyRentSign");
 				return;
@@ -194,6 +197,9 @@ public final class SignChangeListener implements Listener {
 				return;
 			} else if(regionManager.getRegion(secondLine) == null) {
 				plugin.message(player, "setup-wrongRegion");
+				return;
+			} else if(plugin.getFileManager().isBlacklisted(secondLine)) {
+				plugin.message(player, "setup-blacklisted", secondLine);
 				return;
 			} else if(plugin.getFileManager().getBuy(secondLine) != null) {
 				plugin.message(player, "setup-alreadyBuySign");

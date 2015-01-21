@@ -27,6 +27,11 @@ signTags:
   buy: '[buy]'
   ## Tag for adding a sign to an existing region
   add: '[as]'
+## Blacklist of region names that cannot be added to AreaShop for renting or buying. Regular expressions can be used, search
+## for 'java regex pattern' to find documentation about how to use it. The case-insensitive option is enabled because 
+## WorldGuard will return the correct region no matter what the casing is.
+blacklist:
+  - '__global__'
 ## Enable sending stats to http://mcstats.org/ (Metrics plugin)
 sendStats: true
 ## If enabled it will check for updates when loading the plugin, it will never download files, it will only notify about it

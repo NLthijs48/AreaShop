@@ -25,6 +25,9 @@ general:
   teleportIntoRegion: true
   ## Same as above, but then for when you teleport to the sign of a region instead of the region itself
   teleportToSignIntoRegion: false
+  ## Set where the '/as find' command should teleport the player to, set to true for the first sign of the region and set to
+  ## false to teleport to the location set by '/as settp' or the default location (if not set).
+  findTeleportToSign: true
   ## Restricts the /as buy and /as rent commands to the world of the region 
   ## Usefull if you have diffrent economies for different worlds
   restrictedToWorld: false

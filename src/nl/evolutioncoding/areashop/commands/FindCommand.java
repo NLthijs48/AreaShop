@@ -97,7 +97,7 @@ public class FindCommand extends CommandAreaShop {
 				} else {
 					plugin.message(player, "find-success", "buy", region.getName(), balance, onlyInGroup);
 				}
-				region.teleportPlayer(player, true, false);		
+				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {
 				BigDecimal bigDecimal = new BigDecimal(balance);
 			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
@@ -138,7 +138,7 @@ public class FindCommand extends CommandAreaShop {
 				} else {
 					plugin.message(player, "find-success", "rent", region.getName(), balance, onlyInGroup);
 				}
-				region.teleportPlayer(player, true, false);		
+				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {
 				BigDecimal bigDecimal = new BigDecimal(balance);
 			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);

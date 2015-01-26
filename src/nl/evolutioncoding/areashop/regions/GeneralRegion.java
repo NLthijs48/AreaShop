@@ -1284,9 +1284,9 @@ public abstract class GeneralRegion {
 				startLocation = signs.get(0).subtract(0.0, 1.0, 0.0);
 				startLocation.setPitch(player.getLocation().getPitch());
 				startLocation.setYaw(player.getLocation().getYaw());
-			}
-			
-		} else if(this.hasTeleportLocation()) {
+			}		
+		} 
+		if(startLocation == null && this.hasTeleportLocation()) {
 			startLocation = getTeleportLocation();
 		}
 		// Set default startLocation if not set

@@ -10,6 +10,7 @@ import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
+import nl.evolutioncoding.areashop.regions.RegionGroup;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 
 import org.bukkit.Bukkit;
@@ -362,6 +363,51 @@ public class InfoCommand extends CommandAreaShop {
 				} else {
 					plugin.message(sender, "info-regionHelp");
 				}
+			}
+				
+			/* List of regions without a group */
+			else if(args[1].equalsIgnoreCase("nogroup")) {
+				String message = "";
+				/* Message for rents */
+				List<String> rents = plugin.getFileManager().getRentNames();
+				// Remove regions that have a group
+				for(RegionGroup group : plugin.getFileManager().getGroups()) {
+					rents.removeAll(group.getMembers());
+				}
+				// Create the list message
+				Iterator<String> itRent = rents.iterator();
+				if(itRent.hasNext()) {
+					message = itRent.next();
+					while(itRent.hasNext()) {
+						message += ", " + itRent.next();
+					}
+				}
+				if(message.equals("")) {
+					plugin.message(sender, "info-nogroupNoRents");
+				} else {
+					plugin.message(sender, "info-nogroupRents", message);
+				}
+				
+				/* Message for buys */
+				message = "";
+				// Remove regions that have a group
+				List<String> buys = plugin.getFileManager().getBuyNames();
+				for(RegionGroup group : plugin.getFileManager().getGroups()) {
+					buys.removeAll(group.getMembers());
+				}
+				// Create the list message
+				Iterator<String> itBuy = buys.iterator();
+				if(itBuy.hasNext()) {
+					message = itBuy.next();
+					while(itBuy.hasNext()) {
+						message += ", " + itBuy.next();
+					}
+				}
+				if(message.equals("")) {
+					plugin.message(sender, "info-nogroupNoBuys");
+				} else {
+					plugin.message(sender, "info-nogroupBuys", message);
+				}
 			} else {
 				plugin.message(sender, "info-help");
 			}
@@ -394,7 +440,7 @@ public class InfoCommand extends CommandAreaShop {
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<String>();
 		if(toComplete == 2) {
-			result.addAll(Arrays.asList("all", "rented", "forrent", "sold", "forsale", "player", "region"));
+			result.addAll(Arrays.asList("all", "rented", "forrent", "sold", "forsale", "player", "region", "nogroup"));
 		} else if(toComplete == 3) {
 			if(start[2].equalsIgnoreCase("player")) {
 				for(Player player : Bukkit.getOnlinePlayers()) {

@@ -14,10 +14,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import nl.evolutioncoding.areashop.AreaShop;
-import nl.evolutioncoding.areashop.FileManager;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
+import nl.evolutioncoding.areashop.managers.FileManager;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -2090,22 +2091,32 @@ public abstract class GeneralRegion {
 			
 			boolean result = false;
 			String error = null;
+			String stacktrace = null;
 			try {
 				result = plugin.getServer().dispatchCommand(sender, command);
 			} catch(CommandException e) {
 				result = false;
-				error = e.getMessage();				
+				error = e.getMessage();
+				stacktrace = ExceptionUtils.getStackTrace(e);
 			}
-			if(error == null) {
-				AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", result=" + result);
-			} else {
-				AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", result=" + result + ", error=" + error);
-			}
+			boolean printed = false;
 			if(!result && postCommandErrors) {
+				printed = true;
 				if(error != null) {
-					plugin.getLogger().warning("Command execution failed, command=" + command + ", error=" + error);
+					plugin.getLogger().warning("Command execution failed, command=" + command + ", error=" + error + ", stacktrace:");
+					plugin.getLogger().warning(stacktrace);
+					plugin.getLogger().warning("--- End of stacktrace ---");
 				} else {
 					plugin.getLogger().warning("Command execution failed, command=" + command);
+				}
+			}
+			if(!printed) {
+				if(error == null) {
+					AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", result=" + result);
+				} else {
+					AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", result=" + result + ", error=" + error + ", stacktrace:");
+					AreaShop.debug(stacktrace);
+					AreaShop.debug("--- End of stacktrace ---");
 				}
 			}
 		}

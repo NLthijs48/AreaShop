@@ -1,8 +1,7 @@
-package nl.evolutioncoding.areashop;
+package nl.evolutioncoding.areashop.listeners;
 
-import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
-import nl.evolutioncoding.areashop.regions.RentRegion;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -46,24 +45,13 @@ public final class SignBreakListener implements Listener {
 			if(region == null) {
 				return;
 			}
-			if(region.isRentRegion()) {
-				/* Remove the rent if the player has permission */
-				if(event.getPlayer().hasPermission("areashop.destroyrent")) {
-					plugin.getFileManager().removeRent((RentRegion)region, true);
-					plugin.message(event.getPlayer(), "destroy-successRent", region.getName());
-				} else { /* Cancel the breaking of the sign */
-					event.setCancelled(true);
-					plugin.message(event.getPlayer(), "destroy-noPermissionRent");
-				}
-			} else if(region.isBuyRegion()) {
-				/* Remove the buy if the player has permission */
-				if(event.getPlayer().hasPermission("areashop.destroybuy")) {
-					plugin.getFileManager().removeBuy((BuyRegion)region, true);
-					plugin.message(event.getPlayer(), "destroy-successBuy", region.getName());
-				} else { /* Cancel the breaking of the sign */
-					event.setCancelled(true);
-					plugin.message(event.getPlayer(), "destroy-noPermissionBuy");
-				}
+			/* Remove the rent if the player has permission */
+			if(event.getPlayer().hasPermission("areashop.delsign")) {
+				region.removeSign(block.getLocation());
+				plugin.message(event.getPlayer(), "delsign-success", region.getName());
+			} else { /* Cancel the breaking of the sign */
+				event.setCancelled(true);
+				plugin.message(event.getPlayer(), "delsign-noPermission");
 			}
 		}
 	}

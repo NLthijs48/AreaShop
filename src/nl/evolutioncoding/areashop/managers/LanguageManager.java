@@ -1,4 +1,4 @@
-package nl.evolutioncoding.areashop;
+package nl.evolutioncoding.areashop.managers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
 import org.bukkit.configuration.file.YamlConfiguration;

@@ -208,3 +208,6 @@ permissions:
   areashop.notifyupdate:
     description: Will notify this player when an update is available
     default: op
+  areashop.linksigns:
+    description: Allows you to enter sign linking mode
+    default: op

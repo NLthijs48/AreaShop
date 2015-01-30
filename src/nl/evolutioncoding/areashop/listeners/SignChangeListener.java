@@ -1,7 +1,8 @@
-package nl.evolutioncoding.areashop;
+package nl.evolutioncoding.areashop.listeners;
 
 import java.util.List;
 
+import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
@@ -278,10 +279,10 @@ public final class SignChangeListener implements Listener {
 			Sign sign = (Sign)event.getBlock().getState().getData();
 			if(thirdLine == null || thirdLine.length() == 0) {
 				region.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
-				plugin.message(player, "addsign-success", region.getName());
+				plugin.message(player, "addsign-success", region);
 			} else {
 				region.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
-				plugin.message(player, "addsign-successProfile", region.getName(), thirdLine);
+				plugin.message(player, "addsign-successProfile", region, thirdLine);
 			}
 			region.saveRequired();
 			

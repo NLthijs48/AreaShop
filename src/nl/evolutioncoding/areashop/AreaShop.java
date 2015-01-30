@@ -9,6 +9,14 @@ import java.util.logging.Logger;
 import net.milkbowl.vault.economy.Economy;
 import nl.evolutioncoding.areashop.Updater.UpdateResult;
 import nl.evolutioncoding.areashop.Updater.UpdateType;
+import nl.evolutioncoding.areashop.listeners.PlayerLoginListener;
+import nl.evolutioncoding.areashop.listeners.SignBreakListener;
+import nl.evolutioncoding.areashop.listeners.SignChangeListener;
+import nl.evolutioncoding.areashop.listeners.SignClickListener;
+import nl.evolutioncoding.areashop.managers.CommandManager;
+import nl.evolutioncoding.areashop.managers.FileManager;
+import nl.evolutioncoding.areashop.managers.LanguageManager;
+import nl.evolutioncoding.areashop.managers.SignLinkerManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -38,6 +46,7 @@ public final class AreaShop extends JavaPlugin {
 	private FileManager fileManager = null;
 	private LanguageManager languageManager = null;
 	private CommandManager commandManager = null;
+	private SignLinkerManager signLinkerManager = null;
 	private boolean debug = false;
 	private String chatprefix = null;
 	private Updater updater = null;
@@ -152,6 +161,9 @@ public final class AreaShop extends JavaPlugin {
 	        
 		    // Startup the CommandManager (registers itself for the command)
 	        commandManager = new CommandManager(this);
+	        
+	        // Create a signLinkerManager
+	        signLinkerManager = new SignLinkerManager(this);
 			
 	        // Enable Metrics if config allows it
 			if(this.getConfig().getBoolean("sendStats")) {
@@ -228,6 +240,10 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public CommandManager getCommandManager() {
 		return commandManager;
+	}
+	
+	public SignLinkerManager getSignlinkerManager() {
+		return signLinkerManager;
 	}
 	
 	/**

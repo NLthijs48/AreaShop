@@ -1,4 +1,4 @@
-package nl.evolutioncoding.areashop;
+package nl.evolutioncoding.areashop.managers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;

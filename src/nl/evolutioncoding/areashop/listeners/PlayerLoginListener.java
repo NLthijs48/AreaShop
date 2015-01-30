@@ -1,5 +1,6 @@
-package nl.evolutioncoding.areashop;
+package nl.evolutioncoding.areashop.listeners;
 
+import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 
 import org.bukkit.entity.Player;

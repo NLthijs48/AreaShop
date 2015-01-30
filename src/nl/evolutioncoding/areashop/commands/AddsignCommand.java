@@ -101,9 +101,9 @@ public class AddsignCommand extends CommandAreaShop {
 		
 		region.addSign(block.getLocation(), block.getType(), sign.getFacing(), profile);
 		if(profile == null) {
-			plugin.message(sender, "addsign-success", region.getName());
+			plugin.message(sender, "addsign-success", region);
 		} else {
-			plugin.message(sender, "addsign-successProfile", region.getName(), profile);
+			plugin.message(sender, "addsign-successProfile", region, profile);
 		}
 		region.updateSigns();
 		region.saveRequired();

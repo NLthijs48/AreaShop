@@ -1,5 +1,6 @@
-package nl.evolutioncoding.areashop;
+package nl.evolutioncoding.areashop.listeners;
 
+import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.ClickType;
 
@@ -31,7 +32,7 @@ public class SignClickListener implements Listener {
 	public void onSignClick(PlayerInteractEvent event) {
 		Block block = event.getClickedBlock();
 		/* Check for clicking a sign and rightclicking */
-		if(		   (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) 
+		if((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) 
 				&& (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN)) {
 			/* Check if the rent sign is really the same as a saved rent */
 			GeneralRegion result = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
@@ -40,6 +41,9 @@ public class SignClickListener implements Listener {
 			}
 			String signName = result.getSignName(block.getLocation());
 			Player player = event.getPlayer();
+			if(plugin.getSignlinkerManager().isInSignLinkMode(player)) {
+				return;
+			}
 			// Get the clicktype
 			ClickType clickType = null;
 			if(player.isSneaking() && event.getAction() == Action.LEFT_CLICK_BLOCK) {

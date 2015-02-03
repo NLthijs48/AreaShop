@@ -33,7 +33,7 @@ public class TeleportCommand extends CommandAreaShop {
 
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
-		if(!sender.hasPermission("areashop.teleport") && !sender.hasPermission("areashop.teleportall") && !sender.hasPermission("areashop.teleportsign") && !sender.hasPermission("areashop.teleportsignall")) {
+		if(!sender.hasPermission("areashop.teleport") && !sender.hasPermission("areashop.teleportall") && !sender.hasPermission("areashop.teleportsign") && !sender.hasPermission("areashop.teleportsignall") && !sender.hasPermission("areashop.teleportfriend") && !sender.hasPermission("teleportfriendsign")) {
 			plugin.message(sender, "teleport-noPermission");
 			return;
 		}

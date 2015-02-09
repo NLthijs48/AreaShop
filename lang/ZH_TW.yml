@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Chinese (Taiwan), Version: V2.1.4, Percentage translated: 99%                                                    ║
+# ║ Language: Chinese (Taiwan), Version: V2.1.4, Percentage translated: 91%                                                    ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -103,8 +103,6 @@ unrent-other: "玩家%0%土地已經被取消出租"
 unrent-expired: "你所租賃的%0%已經過期"
 
 sell-help: "/as sell [regionname],若你不指定土地名稱,則預設為你所站立的土地"
-sell-notRegistered: "該土地不能被購買,因為它並非註冊出售的土地"
-sell-notBought: "該土地不能被購買,因為它並非他人財產"
 sell-sold: "該土地已被出售,玩家 %0%"
 sell-soldYours: "你的土地已經被購買"
 sell-noPermission: "你並沒有出售土地的權限"
@@ -121,7 +119,6 @@ buys-notUpdated: "並非所有告示牌皆被更新,請使用reload來排除問�
 reload-reloaded: "你的config設定已經成功重載"
 reload-noPermission: "你沒有權限重載config設定"
 
-info-help: "/as info <all|rented|forrent|sold|forsale|player|region>"
 info-noPermission: "你沒有權限查詢該土地資訊"
 info-all-rents: "已註冊為出租土地:&7%0%"
 info-all-noRents: "沒有任何註冊的出租土地"
@@ -202,8 +199,6 @@ setduration-success: "土地租期由 %0% 修改至 '%1%'"
 
 setup-noRegion: "你並未特定土地名稱在第二行"
 setup-wrongRegion: "你所指定的土地名稱並不存在"
-setup-alreadyRentSign: "你所特定的土地名稱已經有出租告示牌了"
-setup-alreadyBuySign: "你所特定的土地名稱已經有出售告示牌了"
 setup-noDuration: "你並未指定該土地出租期間, 請打在告示牌第三行"
 setup-wrongDuration: "你所指定的土地出租期間不是適當的時間格式, 例子: 1 day是一天"
 setup-noPrice: "你第四行並未指定該土地的價格"
@@ -302,8 +297,6 @@ addsign-noRegions: "該告示牌的位置並未有任何土地存在"
 addsign-couldNotDetect: "超過一個以上的區域在告示牌的位置, 為避免重複請指定一個土地 (2個的區域被發現: %0% and %1%)"
 addsign-couldNotDetectSign: "超過一個以上的區域在告示牌的位置, 為避免重複請在第二行指定一個土地 (2個的區域被發現: %0% and %1%)"
 addsign-wrongProfile: "指定資料並不存在, 請使用以下之一 (查詢你的config檔案): &7%0%"
-addsign-success: "告示牌已經被增加至 %0%"
-addsign-successProfile: "告示牌已經被增加至 %0% 根據檔案 %1%"
 addsign-alreadyRegistered: "該告示牌已經被註冊在土地 %0%"
 addsign-noPermission: "你沒有權限新增告示牌"
 

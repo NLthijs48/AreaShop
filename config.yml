@@ -319,6 +319,10 @@ signs:
   delay: 60
   ## Number of regions to update signs for per tick (there are 20 ticks in a second)
   regionsPerTick: 1
+## Number of regions per tick to check when a player joins to see if his name changed for regions he owned (updates the regions when changed)
+nameupdate:
+  ## Number of regions to update signs for per tick (there are 20 ticks in a second)
+  regionsPerTick: 5
 
 
 

@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: French, Version: V2.1.4, Percentage translated: 100%                                                             ║
+# ║ Language: French, Version: V2.1.4, Percentage translated: 95%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -103,8 +103,6 @@ unrent-other: "La région du joueur %0% a été dé-louée."
 unrent-expired: "Votre location de '%0%' a expiré."
 
 sell-help: "/as sell [regionname], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
-sell-notRegistered: "La région ne peut pas être vendue car elle n'est pas enregistrée comme achetée."
-sell-notBought: "La région ne peut pas être vendue car elle n'est pas la propriété de quelqu'un."
 sell-sold: "Cette région a été vendue au joueur %0%."
 sell-soldYours: "Votre région a été vendue."
 sell-noPermission: "Vous n'avez pas la permission de vendre une région."
@@ -121,12 +119,16 @@ buys-notUpdated: "Tous les panneaux n'ont pas été mis à jour. Recharger le se
 reload-reloaded: "La configuration a bien été rechargée."
 reload-noPermission: "Vous n'avez pas la permission de recharger la configuration."
 
-info-help: "/as info <all|rented|forrent|sold|forsale|player|region>"
+info-help: "/as info <all|rented|forrent|sold|forsale|player|region|nogroup>."
 info-noPermission: "Vous n'avez pas la permission d'avoir des informations à propos des régions."
 info-all-rents: "Régions enregistrées en location : &7%0%"
 info-all-noRents: "Il n'y a pas de régions enregistrées en location."
 info-all-buys: "Régions enregistrées en vente : &7%0%"
 info-all-noBuys: "Il n'y a pas de régions enregistrées en achat."
+info-nogroupRents: "Régions louables sans groupe : &7%0%."
+info-nogroupBuys: "Régions achetables sans groupe : &7%0%."
+info-nogroupNoRents: "Il n'y a pas de régions à louer car vous n'appartenez pas à un groupe."
+info-nogroupNoBuys: "Il n'y a aucune région à acheter puisque vous ne faites pas partie d'un groupe."
 info-rented: "Régions louées : &7%0%"
 info-noRented: "Aucune région louée."
 info-unrented: "Régions non louées : &7%0%"
@@ -204,8 +206,8 @@ setduration-success: "Temps de location de la région '%0%' changé à '%1%'."
 
 setup-noRegion: "Vous n'avez pas spécifié de région à la seconde ligne."
 setup-wrongRegion: "La région que vous avez spécifiée n'existe pas."
-setup-alreadyRentSign: "La région que vous avez spécifiée possède déjà un panneau de location."
-setup-alreadyBuySign: "La région que vous avez spécifiée possède déjà un panneau de vente."
+setup-alreadyRentSign: "La région que vous avez spécifiée a déjà été ajoutée à AreaShop en tant qu'une région louable, ajoutez un panneau avec [as] sur le première ligne ou tapez '/as addsign'."
+setup-alreadyBuySign: "La région que vous avez spécifiée a déjà été ajoutée à AreaShop en tant qu'une région achetable, ajoutez un panneau avec [as] sur le première ligne ou tapez '/as addsign'."
 setup-noDuration: "A la troisième ligne, vous n'avez pas spécifié la durée de location de la région."
 setup-wrongDuration: "Le temps spécifié n'est pas au bon format. Exemple : 1 day."
 setup-noPrice: "A la quatrième ligne, vous n'avez pas spécifié le prix."
@@ -215,6 +217,7 @@ setup-buySuccess: "L'achat de la région '%0%' est correctement configuré."
 setup-noPermissionRent: "Vous n'avez pas la permission de mettre en place la location de régions."
 setup-noPermissionBuy: "Vous n'avez pas la permission de mettre en place l'achat de régions."
 setup-couldNotDetect: "Multiples régions trouvées avec la même priorité et/ou étant de même nature : parent ou enfant. Spécifiez-en une sur la deuxième ligne. (2 des régions trouvées:  %0% et %1%)."
+setup-blacklisted: "%0% est sur la blacklist et ne peut pas être ajouté à AreaShop."
 
 destroy-noPermissionRent: "Vous n'avez pas la permission de détruire le panneau de location d'une région."
 destroy-noPermissionBuy: "Vous n'avez pas la permission de détruire le panneau de vente d'une région."
@@ -288,6 +291,7 @@ add-help: "/as add <rent|buy> [region] [world]"
 add-noPermission: "Vous n'avez pas la permission d'ajouter une région à AreaShop."
 add-success: "Ajoutée comme %0% : &7%1%."
 add-failed: "Déjà enregistrée : &7%0%."
+add-blacklisted: "Sur la blacklist : &7%0%."
 add-specifyWorld: "Spécifiez le monde de la région lors de l'utilisation de la console."
 add-incorrectWorld: "Le monde '%0%' est introuvable, essayez de nouveau (attention à la casse)."
 add-noRegion: "La région '%0%' n'existe pas dans ce monde."
@@ -304,8 +308,6 @@ addsign-noRegions: "Aucune région trouvée autour du panneau."
 addsign-couldNotDetect: "Plusieurs régions ont été trouvées à proximité du panneau. Spécifiez la région en argument supplémentaire (2 des régions trouvées: %0% et %1%)."
 addsign-couldNotDetectSign: "Plusieurs régions ont été trouvées à proximité du panneau. Spécifiez la région à la deuxième ligne (2 des régions trouvées: %0% et %1%)."
 addsign-wrongProfile: "Le profil spécifié n'existe pas. Utilisez un des suivants (vérifier la configuration): &7%0%."
-addsign-success: "Le panneau a été ajouté à %0%."
-addsign-successProfile: "Le panneau a été ajouté à %0% avec le profil %1%."
 addsign-alreadyRegistered: "Ce panneau a déjà été enregistré pour la région '%0%'."
 addsign-noPermission: "Vous n'avez pas la permission d'ajouter un panneau."
 
@@ -361,6 +363,7 @@ addfriend-success: "%0% a été ajouté ajouté en ami à votre région '%1%'."
 addfriend-alreadyAdded: "%0% est déjà ami avec cette région."
 addfriend-self: "Ajouter le propriétaire de la région en ami n'aurait aucune utilité."
 addfriend-noOwner: "Vous ne pouvez pas ajouter d'amis à une région sans propriétaire."
+addfriend-notVisited: "Vous ne pouvez pas ajouter %0% car il n'est jamais venu sur le serveur."
 
 delfriend-help: "/as delfriend <joueur> [région], la région dans laquelle vous vous trouvez sera utilisée si vous ne spécifiez pas de région."
 delfriend-noPermissionOther: "Vous n'avez pas la permission de supprimer des amis à une région n'étant pas la vôtre."

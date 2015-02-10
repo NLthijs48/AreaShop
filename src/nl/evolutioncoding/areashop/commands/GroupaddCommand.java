@@ -76,14 +76,14 @@ public class GroupaddCommand extends CommandAreaShop {
 					namesFailed.add(region.getName());
 				}
 			}
-			// Update all regions, this does it in a task, updating them without lag
-			plugin.getFileManager().updateRegions(toUpdate);
 			if(namesSuccess.size() != 0) {
 				plugin.message(player, "groupadd-weSuccess", group.getName(), Utils.createCommaSeparatedList(namesSuccess));
 			}
 			if(namesFailed.size() != 0) {
 				plugin.message(player, "groupadd-weFailed", group.getName(), Utils.createCommaSeparatedList(namesFailed));
 			}
+			// Update all regions, this does it in a task, updating them without lag
+			plugin.getFileManager().updateRegions(toUpdate, player);
 			group.saveRequired();
 		} else {
 			GeneralRegion region = plugin.getFileManager().getRegion(args[2]);

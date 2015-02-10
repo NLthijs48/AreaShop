@@ -360,6 +360,17 @@ public final class AreaShop extends JavaPlugin {
 				}
 	        }.runTaskTimer(this, expireWarning, expireWarning);	     
         }
+        
+        // Update all regions on startup
+        if(getConfig().getBoolean("updateRegionsOnStartup")) {
+	        new BukkitRunnable() {
+				@Override
+				public void run() {
+					finalPlugin.getFileManager().updateAllRegions();
+					AreaShop.debug("Updating all regions at startup...");
+				}
+	        }.runTaskLater(this, 20L);	     
+        }
 	}
 	
 	/**
@@ -506,15 +517,26 @@ public final class AreaShop extends JavaPlugin {
 	}
 	
 	/**
-	 * Reload all files of the plugin
+	 * Reload all files of the plugin and update all regions
+	 * confirmationReceiver The CommandSender that should receive confirmation messages, null for nobody
 	 */
-	public void reload() {
+	public void reload(CommandSender confirmationReceiver) {
 		fileManager.saveRequiredFilesAtOnce();
 		chatprefix = this.getConfig().getString("chatPrefix");
 		debug = this.getConfig().getBoolean("debug");
 		fileManager.loadFiles();
-		languageManager = new LanguageManager(this);
+		languageManager.startup();
 		fileManager.checkRents();
+		if(confirmationReceiver != null) {
+			this.message(confirmationReceiver, "reload-reloaded");
+		}
+		fileManager.updateAllRegions(confirmationReceiver);
+	}
+	/**
+	 * Reload all files of the plugin and update all regions
+	 */
+	public void reload() {
+		reload(null);
 	}
 	
 	/**

@@ -36,8 +36,6 @@ import nl.evolutioncoding.areashop.commands.SetteleportCommand;
 import nl.evolutioncoding.areashop.commands.StopresellCommand;
 import nl.evolutioncoding.areashop.commands.TeleportCommand;
 import nl.evolutioncoding.areashop.commands.UnrentCommand;
-import nl.evolutioncoding.areashop.commands.UpdatebuysCommand;
-import nl.evolutioncoding.areashop.commands.UpdaterentsCommand;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -71,8 +69,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new FindCommand(plugin));
 		commands.add(new ResellCommand(plugin));
 		commands.add(new StopresellCommand(plugin));
-		commands.add(new UpdaterentsCommand(plugin));
-		commands.add(new UpdatebuysCommand(plugin));
 		commands.add(new SetrestoreCommand(plugin));
 		commands.add(new SetpriceCommand(plugin));
 		commands.add(new SetownerCommand(plugin));
@@ -140,7 +136,12 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		if(!executed && args.length == 0) {
 			this.showHelp(sender);
 		} else if(!executed && args.length > 0) {
-			plugin.message(sender, "cmd-notValid");
+			// Indicate that the '/as updaterents' and '/as updatebuys' commands are removed
+			if("updaterents".equalsIgnoreCase(args[0]) || "updatebuys".equalsIgnoreCase(args[0])) {
+				plugin.message(sender, "reload-updateCommandChanged");
+			} else {
+				plugin.message(sender, "cmd-notValid");
+			}
 		}
 		return true;
 	}

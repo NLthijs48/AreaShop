@@ -485,12 +485,16 @@ public class FileManager {
 	 * Update regions in a task to minimize lag
 	 * @param regions Regions to update
 	 */
-	public void updateRegions(final List<GeneralRegion> regions) {
+	public void updateRegions(final List<GeneralRegion> regions, final CommandSender confirmationReceiver) {
+		final int regionsPerTick = plugin.getConfig().getInt("update.regionsPerTick");
+		if(confirmationReceiver != null) {
+			plugin.message(confirmationReceiver, "reload-updateStart", regions.size(), regionsPerTick*20);
+		}
 		new BukkitRunnable() {
 			private int current = 0;
 			@Override
 			public void run() {
-				for(int i=0; i<plugin.getConfig().getInt("update.regionsPerTick"); i++) {
+				for(int i=0; i<regionsPerTick; i++) {
 					if(current < regions.size()) {
 						regions.get(current).updateSigns();
 						regions.get(current).updateRegionFlags();
@@ -498,11 +502,27 @@ public class FileManager {
 					} 
 				}
 				if(current >= regions.size()) {
+					if(confirmationReceiver != null) {
+						plugin.message(confirmationReceiver, "reload-updateComplete");
+					}
 					this.cancel();
 				}
 			}
 		}.runTaskTimer(plugin, 1, 1);
 	}
+	public void updateRegions(List<GeneralRegion> regions) {
+		updateRegions(regions, null);
+	}
+	/**
+	 * Update all regions, happens in a task to minimize lag
+	 */
+	public void updateAllRegions() {
+		updateRegions(getRegions(), null);
+	}
+	public void updateAllRegions(CommandSender confirmationReceiver) {
+		updateRegions(getRegions(), confirmationReceiver);
+	}
+
 	
 	/**
 	 * Save the group file to disk

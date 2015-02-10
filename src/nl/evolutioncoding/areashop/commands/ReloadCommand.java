@@ -30,8 +30,8 @@ public class ReloadCommand extends CommandAreaShop {
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
 		if(sender.hasPermission("areashop.reload")) {
-			plugin.reload();	
-			plugin.message(sender, "reload-reloaded");
+			// Reload the configuration files and update all region flags/signs
+			plugin.reload(sender);
 		} else {
 			plugin.message(sender, "reload-noPermission");
 		}

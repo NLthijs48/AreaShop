@@ -23,8 +23,6 @@ permissions:
       areashop.buy: true
       areashop.unrent: true
       areashop.info: true
-      areashop.updaterents: true
-      areashop.updatebuys: true
       areashop.reload: true
       areashop.setrestore: true
       areashop.setprice: true
@@ -88,14 +86,8 @@ permissions:
   areashop.info:
     description: Allows you check the status of regions and players
     default: true
-  areashop.updaterents:
-    description: Allows you to update all rent signs and regions
-    default: op
-  areashop.updatebuys:
-    description: Allows you to update all buy signs and regions
-    default: op
   areashop.reload:
-    description: Allows you to reload the config
+    description: Allows you to reload the config and update all region flags and signs
     default: op
   areashop.setrestore:
     description: Allows you to change the restore settings

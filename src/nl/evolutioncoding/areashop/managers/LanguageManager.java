@@ -30,11 +30,14 @@ public class LanguageManager {
 	 */
 	public LanguageManager(AreaShop plugin) {
 		this.plugin = plugin;
-		
-		/* Save default language files if not present */
+		startup();
+	}
+	
+	/**
+	 * Save the default language files and open the current and backup language file
+	 */
+	public void startup() {
 		this.saveDefaults();
-
-		/* Open current language file */
 		this.loadLanguage();
 	}
 	

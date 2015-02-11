@@ -1003,7 +1003,10 @@ public abstract class GeneralRegion {
 			String flagName = it.next();
 			String value = flags.getString(flagName);
 			value = applyAllReplacements(value);
-    		value = translateBukkitToWorldGuardColors(value);
+			// In the config normal Bukkit color codes are used, those only need to be translated on 5.X WorldGuard versions
+			if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {
+				value = translateBukkitToWorldGuardColors(value);
+			}
 			if(flagName.equalsIgnoreCase("members")) {
 				// Split the string and parse all values
 				String[] names = value.split(", ");

@@ -1,6 +1,6 @@
 name: AreaShop
 main: nl.evolutioncoding.areashop.AreaShop
-version: 2.1.4
+version: 2.1.5
 depend: [Vault, WorldGuard, WorldEdit]
 softdepend: [Multiverse-Core]
 author: NLThijs48

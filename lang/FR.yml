@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: French, Version: V2.1.4, Percentage translated: 95%                                                              ║
+# ║ Language: French, Version: V2.1.5, Percentage translated: 93%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -31,9 +31,6 @@ help-unrent: "&6/as unrent &7-&r Dé-louer une région."
 help-unrentOwn: "&6/as unrent &7-&r Dé-louer votre propre région."
 help-sell: "&6/as sell &7-&r Vendre une région."
 help-sellOwn: "&6/as sell &7-&r Vendre votre propre région."
-help-updaterents: "&6/as updaterents &7-&r Mettre à jour toutes les pancartes et les régions louées."
-help-updatebuys: "&6/as updatebuys &7-&r Mettre à jour toutes les pancartes et les régions achetées."
-help-reload: "&6/as reload &7-&r Recharge les configurations et langages."
 help-setrestore: "&6/as setrestore &7-&r Activer ou désactiver la restauration et choisir le profil."
 help-setprice: "&6/as setprice &7-&r Changer le prix d'une région."
 help-setduration: "&6/as setduration &7-&r Changer le temps de location d'une région."
@@ -107,17 +104,6 @@ sell-sold: "Cette région a été vendue au joueur %0%."
 sell-soldYours: "Votre région a été vendue."
 sell-noPermission: "Vous n'avez pas la permission de vendre une région."
 sell-noPermissionOther: "Vous n'avez pas la permission de vendre une autre région."
-
-rents-updated: "Tout les panneaux et régions en location ont été mis à jour."
-rents-noPermission: "Vous n'avez pas la permission de mettre à jour les panneaux et régions en location."
-rents-notUpdated: "Tout les panneaux n'ont pas été mis à jour. Recharger le serveur peut corriger le problème."
-
-buys-updated: "Tous les panneaux et régions en vente ont été mis à jour."
-buys-noPermission: "Vous n'avez pas la permission de mettre à jour les panneaux et régions en vente."
-buys-notUpdated: "Tous les panneaux n'ont pas été mis à jour. Recharger le serveur peut corriger le problème."
-
-reload-reloaded: "La configuration a bien été rechargée."
-reload-noPermission: "Vous n'avez pas la permission de recharger la configuration."
 
 info-help: "/as info <all|rented|forrent|sold|forsale|player|region|nogroup>."
 info-noPermission: "Vous n'avez pas la permission d'avoir des informations à propos des régions."

@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Dutch, Version: V2.1.4, Percentage translated: 100%                                                              ║
+# ║ Language: Dutch, Version: V2.1.5, Percentage translated: 100%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -31,9 +31,7 @@ help-unrent: "&6/as unrent &7-&r Stop de huur van een gebied."
 help-unrentOwn: "&6/as unrent &7-&r Stop de huur van een eigen gebied."
 help-sell: "&6/as sell &7-&r Verkoop een gebied."
 help-sellOwn: "&6/as sell &7-&r Verkoop een eigen gebied."
-help-updaterents: "&6/as updaterents &7-&r Update alle huur borden en gebieden."
-help-updatebuys: "&6/as updatebuys &7-&r Update alle koop borden en gebieden."
-help-reload: "&6/as reload &7-&r Herlaad de config en de taalbestanden."
+help-reload: "&6/as reload &7-&r Herlaad bestanden en update gebieden."
 help-setrestore: "&6/as setrestore &7-&r Schakel herstellen in/uit en kies het profiel."
 help-setprice: "&6/as setprice &7-&r Verander de prijs van een gebied."
 help-setduration: "&6/as setduration &7-&r Verander de huurtijd van een region."
@@ -111,16 +109,11 @@ sell-soldYours: "Je gebied is verkocht."
 sell-noPermission: "Je hebt geen toestemming om een gebied te verkopen."
 sell-noPermissionOther: "Je hebt geen toestemming om een gebied van iemand anders te verkopen."
 
-rents-updated: "Alle borden en gebieden voor de verhuur zijn geupdate."
-rents-noPermission: "Je hebt geen toestemming om alle verhuur borden en gebieden te updaten."
-rents-notUpdated: "Niet alle borden zijn geupdate, een reload zou het op kunnen lossen."
-
-buys-updated: "Alle borden en gebieden voor de verkoop zijn geupdate."
-buys-noPermission: "Je hebt geen toestemming om alle verkoop borden en gebieden te updaten."
-buys-notUpdated: "Niet alle borden zijn geupdate, een reload zou het op kunnen lossen."
-
-reload-reloaded: "De config is succesvol opnieuw ingeladen."
-reload-noPermission: "Je hebt geen toestemming om de config opnieuw in te laden."
+reload-reloaded: "Alle bestanden zijn succesvol herladen."
+reload-updateStart: "&7%0% gebieden aan het updaten met %1% per seconde."
+reload-updateComplete: "&7Updaten van gebieden compleet."
+reload-noPermission: "Je hebt geen toestemming om configuratiebestanden te herladen."
+reload-updateCommandChanged: "'/as updaterents' en '/as updatebuys' zijn verwijderd, '/as reload' updated nu ook de gebieden, gebruik dus dat commando."
 
 info-help: "/as info <all|rented|forrent|sold|forsale|player|region|nogroup>."
 info-noPermission: "Je hebt geen toestemming om informatie over gebieden te bekijken."

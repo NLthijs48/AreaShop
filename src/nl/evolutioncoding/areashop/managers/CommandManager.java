@@ -21,7 +21,6 @@ import nl.evolutioncoding.areashop.commands.GroupinfoCommand;
 import nl.evolutioncoding.areashop.commands.GrouplistCommand;
 import nl.evolutioncoding.areashop.commands.HelpCommand;
 import nl.evolutioncoding.areashop.commands.InfoCommand;
-import nl.evolutioncoding.areashop.commands.LinksignsCommand;
 import nl.evolutioncoding.areashop.commands.MeCommand;
 import nl.evolutioncoding.areashop.commands.ReloadCommand;
 import nl.evolutioncoding.areashop.commands.RentCommand;
@@ -83,7 +82,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new DelCommand(plugin));
 		commands.add(new AddsignCommand(plugin));
 		commands.add(new DelsignCommand(plugin));
-		commands.add(new LinksignsCommand(plugin));
+		//commands.add(new LinksignsCommand(plugin));
 		
 		/* Register commands in bukkit */
 		plugin.getCommand("AreaShop").setExecutor(this);	

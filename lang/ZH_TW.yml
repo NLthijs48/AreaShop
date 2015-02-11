@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Chinese (Taiwan), Version: V2.1.4, Percentage translated: 91%                                                    ║
+# ║ Language: Chinese (Taiwan), Version: V2.1.5, Percentage translated: 90%                                                    ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -31,9 +31,6 @@ help-unrent: "&6/as unrent &7-&r 取消該土地租賃"
 help-unrentOwn: "&6/as unrent &7-&r 取消你的土地租賃"
 help-sell: "&6/as sell &7-&r 出售該土地"
 help-sellOwn: "&6/as sell &7-&r 出售你的土地"
-help-updaterents: "&6/as updaterents &7-&r 更新所有出租告示牌及土地"
-help-updatebuys: "&6/as updatebuys &7-&r 更新所有出售土地告示牌及土地"
-help-reload: "&6/as reload &7-&r 重載你的config及languages設定"
 help-setrestore: "&6/as setrestore &7-&r 設定恢復開/關,並選擇文件"
 help-setprice: "&6/as setprice &7-&r 修改土地的價錢"
 help-setduration: "&6/as setduration &7-&r 修改該出租土地的租期"
@@ -107,17 +104,6 @@ sell-sold: "該土地已被出售,玩家 %0%"
 sell-soldYours: "你的土地已經被購買"
 sell-noPermission: "你並沒有出售土地的權限"
 sell-noPermissionOther: "你並沒有出售其他土地的權限"
-
-rents-updated: "所有出租告示牌及土地已經更新"
-rents-noPermission: "你沒有權限更新所有出租告示牌及土地"
-rents-notUpdated: "並非所有告示牌皆被更新,請使用reload來排除問題"
-
-buys-updated: "所有出售土地告示牌及土地已經更新"
-buys-noPermission: "你沒有權限更新所有出售土地告示牌及土地"
-buys-notUpdated: "並非所有告示牌皆被更新,請使用reload來排除問題"
-
-reload-reloaded: "你的config設定已經成功重載"
-reload-noPermission: "你沒有權限重載config設定"
 
 info-noPermission: "你沒有權限查詢該土地資訊"
 info-all-rents: "已註冊為出租土地:&7%0%"

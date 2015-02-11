@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: German, Version: V2.1.4, Percentage translated: 95%                                                              ║
+# ║ Language: German, Version: V2.1.5, Percentage translated: 93%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -31,9 +31,6 @@ help-unrent: "&6/as unrent &7-&r Kündige den Mietvertrag einer Region."
 help-unrentOwn: "&6/as unrent &7-&r Kündige den Mietvertrag deiner Region."
 help-sell: "&6/as sell &7-&r Verkaufe eine Region."
 help-sellOwn: "&6/as sell &7-&r Verkaufe deine Region."
-help-updaterents: "&6/as updaterents &7-&r Aktualisiere alle Mietschilder und -regionen."
-help-updatebuys: "&6/as updatebuys &7-&r Aktualisiere alle Verkaufsschilder und Regionen."
-help-reload: "&6/as reload &7-&r Lädt die Konfigurations- und Sprachdateien neu."
 help-setrestore: "&6/as setrestore &7-&r Setze Wiederherstellung an/aus und wähle Profil."
 help-setprice: "&6/as setprice &7-&r Ändere den Preis einer Region."
 help-setduration: "&6/as setduration &7-&r Ändere die Mietdauer einer Region."
@@ -107,17 +104,6 @@ sell-sold: "Diese Region wurde verkauft an %0%."
 sell-soldYours: "Region erfolgreich verkauft."
 sell-noPermission: "Du bist nicht berechtigt, diese Region zu verkaufen."
 sell-noPermissionOther: "Du bist nicht berechtigt, eine Region zu verkaufen."
-
-rents-updated: "Alle Verkaufs- und Mietschilder aktualisiert."
-rents-noPermission: "Du bist nicht berechtigt, alle Verkaufs- und Mietschilder zu aktualisieren."
-rents-notUpdated: "Es sind nicht alle Schilder aktualisiert worden, Wiederholen kann das Problem beheben."
-
-buys-updated: "Alle Schilder der kaufbaren Regionen aktualisiert."
-buys-noPermission: "Du bist nicht berechtigt, alle Verkaufsschilder und Regionen zu aktualisieren."
-buys-notUpdated: "Es sind nicht alle Schilder aktualisiert worden, Wiederholen kann das Problem beheben."
-
-reload-reloaded: "Konfiguration erfolgreich neu geladen."
-reload-noPermission: "Du bist nicht berechtigt, die Konfiguration neu zu laden."
 
 info-help: "/as info <all|rented|forrent|sold|forsale|player|region|nogroup>."
 info-noPermission: "Du hast keine Berechtigung, Informationen über Regionen zu erhalten."

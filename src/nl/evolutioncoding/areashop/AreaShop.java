@@ -131,7 +131,7 @@ public final class AreaShop extends JavaPlugin {
 	    /* Check if Vault is present */
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
         if (economyProvider == null) {
-        	this.getLogger().severe("Vault plugin is not present or has not loaded correctly");
+        	this.getLogger().severe("Vault plugin is not present, has not loaded correctly or you do not have a working Economy plugin supported by Vault");
         	error = true;
         } else {
             economy = economyProvider.getProvider();

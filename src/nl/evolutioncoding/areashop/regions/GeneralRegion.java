@@ -1,6 +1,10 @@
 package nl.evolutioncoding.areashop.regions;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,13 +37,20 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.data.DataException;
-import com.sk89q.worldedit.schematic.SchematicFormat;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.world.registry.WorldData;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -48,6 +59,7 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.util.io.Closer;
 
 public abstract class GeneralRegion {
 	protected YamlConfiguration config;
@@ -799,37 +811,55 @@ public abstract class GeneralRegion {
 	 * @return
 	 */
 	public boolean saveRegionBlocks(String fileName) {
-		boolean result = true;
-		EditSession editSession = new EditSession(new BukkitWorld(getWorld()), plugin.getConfig().getInt("maximumBlocks"));
+		// Check if the region is correct
 		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist in WorldGuard, save failed");
 			return false;
 		}
-		
-		// Get the origin and size of the region
-		Vector origin = new Vector(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
-		Vector size = (new Vector(region.getMaximumPoint().getBlockX(), region.getMaximumPoint().getBlockY(), region.getMaximumPoint().getBlockZ()).subtract(origin)).add(new Vector(1,1,1));
-		
+		// Find the correct world wrapper in WorldEdit, seems weird there is no getWorld(String name) method
+		com.sk89q.worldedit.world.World world = null;
+		for(com.sk89q.worldedit.world.World possibleWorld : plugin.getWorldEdit().getServerInterface().getWorlds()) {
+			if(possibleWorld.getName().equalsIgnoreCase(getWorldName())) {
+				world = possibleWorld;
+			}
+		}		
+		if(world == null) {
+			plugin.getLogger().warning("Did not save region " + getName() + ", world not found: " + getWorldName());
+			return false;
+		}
 		// The path to save the schematic
 		File saveFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
-		
-		// Save the schematic
-		editSession.enableQueue();
-		CuboidClipboard clipboard = new CuboidClipboard(size, origin);
-		clipboard.copy(editSession);
-		try {
-			SchematicFormat.MCEDIT.save(clipboard, saveFile);
-		} catch (IOException | DataException e) {
-			result = false;
-		}
-		editSession.flushQueue();
-		if(result) {
-			AreaShop.debug("Saved schematic for " + getName());
-		} else {
-			AreaShop.debug("Not saved " + getName());
-		}
-		return result;
+		// Create a clipboard
+		CuboidRegion selection = new CuboidRegion(world, region.getMinimumPoint(), region.getMaximumPoint());
+		BlockArrayClipboard clipboard = new BlockArrayClipboard(selection);
+        clipboard.setOrigin(region.getMinimumPoint());
+        Closer closer = Closer.create();
+        try {
+            // Create parent directories
+            File parent = saveFile.getParentFile();
+            if (parent != null && !parent.exists()) {
+                if (!parent.mkdirs()) {
+                	plugin.getLogger().warning("Did not save region " + getName() + ", schematic directory could not be created: " + saveFile);
+                    return false;
+                }
+            }
+            FileOutputStream fos = closer.register(new FileOutputStream(saveFile));
+            BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
+            ClipboardWriter writer = closer.register(ClipboardFormat.SCHEMATIC.getWriter(bos));
+            writer.write(clipboard, world.getWorldData());
+		} catch (IOException e) {
+			plugin.getLogger().warning("An error occured while restoring schematic of " + getName() + ", enable debug to see the complete stacktrace");
+			AreaShop.debug(ExceptionUtils.getStackTrace(e));
+			return false;
+		} finally {
+            try {
+                closer.close();
+            } catch (IOException ignored) {
+            }
+        }
+		AreaShop.debug("Saved schematic for " + getName());
+		return true;
 	}
 	
 	/**
@@ -840,8 +870,19 @@ public abstract class GeneralRegion {
 	 * @return
 	 */
 	public boolean restoreRegionBlocks(String fileName) {
-		boolean result = true;
-		EditSession editSession = plugin.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(new BukkitWorld(getWorld()), plugin.getConfig().getInt("maximumBlocks"));
+		com.sk89q.worldedit.world.World world = null;
+		// Find the correct world wrapper in WorldEdit, seems weird there is no getWorld(String name) method
+		for(com.sk89q.worldedit.world.World possibleWorld : plugin.getWorldEdit().getServerInterface().getWorlds()) {
+			if(possibleWorld.getName().equalsIgnoreCase(getWorldName())) {
+				world = possibleWorld;
+			}
+		}
+		if(world == null) {
+			plugin.getLogger().info("Did not restore region " + getName() + ", world not found: " + getWorldName());
+			return false;
+		}
+		EditSession editSession = plugin.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(world, plugin.getConfig().getInt("maximumBlocks"));
+		editSession.enableQueue();
 		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist in WorldGuard, restore failed");
@@ -857,57 +898,41 @@ public abstract class GeneralRegion {
 			plugin.getLogger().info("Did not restore region " + getName() + ", file does not exist: " + restoreFile);
 			return false;
 		}
-//		// NEW
-//		Closer closer = Closer.create();
-//        try {
-//            FileInputStream fis = closer.register(new FileInputStream(restoreFile));
-//            BufferedInputStream bis = closer.register(new BufferedInputStream(fis));
-//            ClipboardReader reader = ClipboardFormat.SCHEMATIC.getReader(bis);
-//            
-//            WorldData worldData = localSession.getWorld().getWorldData();
-//            Clipboard clipboard = reader.read(editSession.getWorld().getWorldData());
-//            localSession.setBlockChangeLimit(plugin.getConfig().getInt("maximumBlocks"));
-//            editSession.setClipboard(new ClipboardHolder(clipboard, worldData));
-//
-//            log.info(player.getName() + " loaded " + filePath);
-//            player.print(filename + " loaded. Paste it with //paste");
-//            
-//        } catch (IOException e) {
-//            player.printError("Schematic could not read or it does not exist: " + e.getMessage());
-//            log.log(Level.WARNING, "Failed to load a saved clipboard", e);
-//        } finally {
-//            try {
-//                closer.close();
-//            } catch (IOException ignored) {
-//            }
-//        }		
-		
-		editSession.enableQueue();
-		try {
-			CuboidClipboard clipBoard = SchematicFormat.MCEDIT.load(restoreFile);
-			if(clipBoard.getHeight() != getHeight()
-					|| clipBoard.getWidth() != getWidth()
-					|| clipBoard.getLength() != getDepth()) {
-				plugin.getLogger().warning("Size of the region " + getName() + " is not the same as the schematic to restore!");
-				AreaShop.debug("schematic|region, x:" + clipBoard.getWidth() + "|" + getWidth() + ", y:" + clipBoard.getHeight() + "|" + getHeight() + ", z:" + clipBoard.getLength() + "|" + getDepth());
-			}
-			clipBoard.place(editSession, origin, false);
-		} catch(MaxChangedBlocksException e) {
-			plugin.getLogger().warning("Exeeded the block limit while restoring schematic of " + getName());
-			result = false;
-		} catch(IOException | DataException e) {
-			AreaShop.debug(e.getMessage());
-			result = false;
-		}
+
+		// Read the schematic and paste it into the world
+		Closer closer = Closer.create();
+        try {
+            FileInputStream fis = closer.register(new FileInputStream(restoreFile));
+            BufferedInputStream bis = closer.register(new BufferedInputStream(fis));
+            ClipboardReader reader = ClipboardFormat.SCHEMATIC.getReader(bis);
+            
+            WorldData worldData = world.getWorldData();
+            LocalSession session = new LocalSession(plugin.getWorldEdit().getLocalConfiguration());
+            Clipboard clipboard = reader.read(worldData);
+            ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard, worldData);
+            session.setBlockChangeLimit(plugin.getConfig().getInt("maximumBlocks"));
+            session.setClipboard(clipboardHolder);
+            Operation operation = clipboardHolder
+                    .createPaste(editSession, editSession.getWorld().getWorldData())
+                    .to(origin)
+                    .build();
+            Operations.completeLegacy(operation);
+        } catch (MaxChangedBlocksException e) {
+        	plugin.getLogger().warning("Exeeded the block limit while restoring schematic of " + getName());
+			return false;
+		} catch (IOException e) {
+			plugin.getLogger().warning("An error occured while restoring schematic of " + getName() + ", enable debug to see the complete stacktrace");
+			AreaShop.debug(ExceptionUtils.getStackTrace(e));
+			return false;
+		} finally {
+            try {
+                closer.close();
+            } catch (IOException ignored) {
+            }
+        }
 		editSession.flushQueue();
-		
-		//we.flushBlockBag(localPlayer, editSession);
-		if(result) {
-			AreaShop.debug("Restored schematic for " + getName());
-		} else {
-			AreaShop.debug("Not restored " + getName());
-		}
-		return result;
+		AreaShop.debug("Restored schematic for " + getName());
+		return true;
 	}
 	
 	/**

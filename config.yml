@@ -111,8 +111,8 @@ limitGroups:
 ## %moneybackpercent% The percentage of the price the player will get back when unrenting (only the number  between 0-100)
 ## %maxextends%     The maximum number of extends a player can do on the region
 ## %extendsleft%    The number of extends that are left (maxextends - timesextended)
-## %maxrenttime%    The maximum time you can rent a region in advance (human readble)
-## %inactivetime%   The maximum time a player may be inactive before unrent/sell (human readble)
+## %maxrenttime%    The maximum time you can rent a region in advance (human readable)
+## %inactivetime%   The maximum time a player may be inactive before unrent/sell (human readable)
 
 ## Below are profiles for the signs, you can assign profiles to regions 
 ## by setting 'general.signProfile' in default.yml, groups or individual regions
@@ -305,7 +305,7 @@ expireWarning:
   delay: 5
   ## Number of regions to update per tick (there are 20 ticks in a second)
   regionsPerTick: 1
-## Timings for updating signs and region flags (/as updaterents or /as updatebuys)
+## Timings for updating signs and region flags ('/as reload' or after '/as groupadd' or '/as groupdel')
 update:
   ## Number of regions to update per tick (there are 20 ticks in a second)
   regionsPerTick: 2

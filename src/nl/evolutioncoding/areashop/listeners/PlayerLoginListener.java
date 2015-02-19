@@ -40,35 +40,33 @@ public final class PlayerLoginListener implements Listener {
 			return;
 		}
 		final Player player = event.getPlayer();
-		// Notify for rents that almost run out
-		for(RentRegion region : plugin.getFileManager().getRents()) {
-			if(region.isRenter(player)) {
-				String warningSetting = region.getStringSetting("rent.warningOnLoginTime");
-				if(warningSetting == null || warningSetting.isEmpty()) {
-					continue;
+		// Schedule task to check for notifications, prevents a lag spike at login
+        new BukkitRunnable() {
+			@Override
+			public void run() {
+				if(!player.isOnline()) {
+					return;
 				}
-				long warningTime = region.durationStringToLong(warningSetting);
-				if(region.getTimeLeft() < warningTime) {
-					// Send the warning message later to let it appear after general MOTD messages
-					final RentRegion finalRegion = region;
-			        new BukkitRunnable() {
-						@Override
-						public void run() {
-							AreaShop.getInstance().message(player, "rent-expireWarning", finalRegion);
+				// Notify for rents that almost run out
+				for(RentRegion region : plugin.getFileManager().getRents()) {
+					if(region.isRenter(player)) {
+						String warningSetting = region.getStringSetting("rent.warningOnLoginTime");
+						if(warningSetting == null || warningSetting.isEmpty()) {
+							continue;
 						}
-			        }.runTaskLater(plugin, 2);			        
-				}				
-			}
-		}
-		// Notify admins for plugin updates
-		if(plugin.updateAvailable() && player.hasPermission("areashop.notifyupdate")) {
-	        new BukkitRunnable() {
-				@Override
-				public void run() {
-					AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());
+						long warningTime = region.durationStringToLong(warningSetting);
+						if(region.getTimeLeft() < warningTime) {
+							// Send the warning message later to let it appear after general MOTD messages
+							AreaShop.getInstance().message(player, "rent-expireWarning", region);		        
+						}				
+					}
 				}
-	        }.runTaskLater(plugin, 20);			
-		}
+				// Notify admins for plugin updates
+				if(plugin.updateAvailable() && player.hasPermission("areashop.notifyupdate")) {
+					AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());	
+				}
+			}
+        }.runTaskLater(plugin, 25);	
 		// Check if the player has regions that use an old name of him and update them
 		final List<GeneralRegion> regions = new ArrayList<GeneralRegion>(plugin.getFileManager().getRegions());
 		new BukkitRunnable() {

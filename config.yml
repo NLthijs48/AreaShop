@@ -304,7 +304,7 @@ expireWarning:
   ## The time between checking if expiration warning need to be sent
   delay: 5
   ## Number of regions to update per tick (there are 20 ticks in a second)
-  regionsPerTick: 1
+  regionsPerTick: 3
 ## Timings for updating signs and region flags ('/as reload' or after '/as groupadd' or '/as groupdel')
 update:
   ## Number of regions to update per tick (there are 20 ticks in a second)
@@ -321,12 +321,15 @@ signs:
   ## Time between updates of all signs (seconds)
   delay: 60
   ## Number of regions to update signs for per tick (there are 20 ticks in a second)
-  regionsPerTick: 1
+  regionsPerTick: 3
 ## Number of regions per tick to check when a player joins to see if his name changed for regions he owned (updates the regions when changed)
 nameupdate:
   ## Number of regions to update signs for per tick (there are 20 ticks in a second)
   regionsPerTick: 5
-
+## Timings for adding regions to AreaShop ('/as stack')
+adding:
+  ## Number of regions to add per tick (there are 20 ticks in a second)
+  regionsPerTick: 2
 
 
 

@@ -156,11 +156,11 @@ public abstract class GeneralRegion {
 		this.plugin = plugin;
 		this.config = config;
 		
-		if(getWorld() == null 
-				|| plugin.getWorldGuard().getRegionManager(getWorld()) == null 
-				|| plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName()) == null) {
-			
-			throw new RegionCreateException("Region of " + getName() + " does not exist anymore");
+		if(getWorld() == null) {
+			throw new RegionCreateException("World '"+ getWorldName() +"' of region '" + getName() + "' does not exist anymore, removed region from AreaShop");
+		} else if(plugin.getWorldGuard().getRegionManager(getWorld()) == null 
+				|| plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName()) == null) {			
+			throw new RegionCreateException("WorldGuard region '" + getName() + "' does not exist anymore, removed region from AreaShop");
 		}
 	}
 	
@@ -307,11 +307,7 @@ public abstract class GeneralRegion {
 	 * @return The name of the world of the region
 	 */
 	public String getWorldName() {
-		String world = getStringSetting("general.world");
-		if(world == null) {
-			return null;
-		}
-		return world;
+		return getStringSetting("general.world");
 	}
 	
 	/**
@@ -890,6 +886,7 @@ public abstract class GeneralRegion {
 		}
 		// Get the origin and size of the region
 		Vector origin = new Vector(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
+		AreaShop.debug("origin of restoreoperation: " + origin);
 		
 		// The path to save the schematic
 		File restoreFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
@@ -909,6 +906,7 @@ public abstract class GeneralRegion {
             WorldData worldData = world.getWorldData();
             LocalSession session = new LocalSession(plugin.getWorldEdit().getLocalConfiguration());
             Clipboard clipboard = reader.read(worldData);
+            clipboard.setOrigin(clipboard.getMinimumPoint());
             ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard, worldData);
             session.setBlockChangeLimit(plugin.getConfig().getInt("maximumBlocks"));
             session.setClipboard(clipboardHolder);

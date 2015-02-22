@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -76,6 +77,16 @@ public class Utils {
 			}
 		}		
 		return result;
+	}
+	
+	public static final BlockFace[] facings = { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };
+    /**
+	* Get the facing direction based on the yaw
+	* @param yaw The horizontal angle that for example the player is looking
+	* @return The Block Face of the angle
+	*/
+	public static BlockFace yawToFacing(float yaw) {
+		return facings[Math.round(yaw / 45f) & 0x7];
 	}
 	
 }

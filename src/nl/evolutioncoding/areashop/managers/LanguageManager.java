@@ -63,6 +63,10 @@ public class LanguageManager {
 			OutputStream output = null;
 			try {
 				input = plugin.getResource(AreaShop.languageFolder + "/" + languages[i] + ".yml");
+				if(input == null) {
+					plugin.getLogger().warning("Could not save default language to the '" + AreaShop.languageFolder + "' folder: " + languages[i] + ".yml");
+					continue;
+				}
 				output = new FileOutputStream(langFile);
 		 
 				int read = 0;

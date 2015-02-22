@@ -243,7 +243,8 @@ public class FileManager {
 	
 	/**
 	 * Remove a rent from the list
-	 * @param regionName
+	 * @param rent The region to remove
+	 * @param giveMoneyBack use true to give money back to the player if someone is currently renting this region, otherwise false
 	 */
 	public boolean removeRent(RentRegion rent, boolean giveMoneyBack) {
 		boolean result = false;
@@ -903,6 +904,7 @@ public class FileManager {
 	 * @return true
 	 */
 	public boolean loadRegionFiles() {
+		regions.clear();
 		File file = new File(regionsPath);
 		if(!file.exists()) {
 			file.mkdirs();

@@ -50,6 +50,7 @@ permissions:
       areashop.addfriendall: true
       areashop.delfriendall: true
       areashop.notifyupdate: true
+      areashop.stack: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -202,4 +203,7 @@ permissions:
     default: op
   areashop.linksigns:
     description: Allows you to enter sign linking mode
+    default: op
+  areashop.stack:
+    description: Allows you to create regions and add them to AreaShop like the WorldEdit //stack command
     default: op

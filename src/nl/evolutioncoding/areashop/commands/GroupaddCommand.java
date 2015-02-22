@@ -47,7 +47,6 @@ public class GroupaddCommand extends CommandAreaShop {
 		if(group == null) {
 			group = new RegionGroup(plugin, args[1]);
 			plugin.getFileManager().addGroup(group);
-			group.saveRequired();
 		}
 		if(args.length == 2) {
 			if(!(sender instanceof Player)) {

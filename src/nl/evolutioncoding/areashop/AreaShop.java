@@ -558,9 +558,14 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public String toName(UUID uuid) {
 		if(uuid == null) {
-			return null;
+			return "";
 		} else {
-			return Bukkit.getOfflinePlayer(uuid).getName();			
+			String name = Bukkit.getOfflinePlayer(uuid).getName();
+			if(name != null) {
+				return name;
+			} else {
+				return uuid.toString();
+			}
 		}
 	}
 	

@@ -1009,6 +1009,7 @@ public class FileManager {
 						if(messageReceiver != null) {
 							plugin.message(messageReceiver, "reload-loadComplete");
 						}
+						plugin.getFileManager().checkRents();
 						this.cancel();
 					}
 				}

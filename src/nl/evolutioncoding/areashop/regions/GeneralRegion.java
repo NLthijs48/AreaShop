@@ -45,6 +45,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -825,12 +826,20 @@ public abstract class GeneralRegion {
 			plugin.getLogger().warning("Did not save region " + getName() + ", world not found: " + getWorldName());
 			return false;
 		}
+		EditSession editSession = plugin.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(world, plugin.getConfig().getInt("maximumBlocks"));
 		// The path to save the schematic
 		File saveFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
 		// Create a clipboard
 		CuboidRegion selection = new CuboidRegion(world, region.getMinimumPoint(), region.getMaximumPoint());
 		BlockArrayClipboard clipboard = new BlockArrayClipboard(selection);
         clipboard.setOrigin(region.getMinimumPoint());
+        ForwardExtentCopy copy = new ForwardExtentCopy(editSession, new CuboidRegion(world, region.getMinimumPoint(), region.getMaximumPoint()), clipboard, region.getMinimumPoint());
+        try {
+			Operations.completeLegacy(copy);
+		} catch (MaxChangedBlocksException e1) {
+        	plugin.getLogger().warning("Exeeded the block limit while saving schematic of " + getName());
+			return false;
+		}
         Closer closer = Closer.create();
         try {
             // Create parent directories

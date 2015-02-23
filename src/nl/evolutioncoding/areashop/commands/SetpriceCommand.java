@@ -88,7 +88,7 @@ public class SetpriceCommand extends CommandAreaShop {
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<String>();
-		if(toComplete == 2) {
+		if(toComplete == 3) {
 			result = plugin.getFileManager().getRegionNames();		
 		}
 		return result;

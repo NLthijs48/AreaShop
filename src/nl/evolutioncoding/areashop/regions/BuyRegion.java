@@ -157,16 +157,16 @@ public class BuyRegion extends GeneralRegion {
 	 * @param price The price this region should be put up for sale
 	 */
 	public void enableReselling(double price) {
-		config.set("buy.resellMode", true);
-		config.set("buy.resellPrice", price);
+		setSetting("buy.resellMode", true);
+		setSetting("buy.resellPrice", price);
 	}
 	
 	/**
 	 * Stop this region from being in resell mode
 	 */
 	public void disableReselling() {
-		config.set("buy.resellMode", null);
-		config.set("buy.resellPrice", null);
+		setSetting("buy.resellMode", null);
+		setSetting("buy.resellPrice", null);
 	}
 	
 	/**

@@ -126,9 +126,9 @@ public class RentRegion extends GeneralRegion {
 	 */
 	public void setTimesExtended(int times) {
 		if(times < 0) {
-			config.set("rent.timesExtended", null);
+			setSetting("rent.timesExtended", null);
 		} else {
-			config.set("rent.timesExtended", times);
+			setSetting("rent.timesExtended", times);
 		}
 	}
 	

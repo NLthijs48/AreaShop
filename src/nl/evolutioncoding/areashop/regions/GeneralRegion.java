@@ -161,7 +161,7 @@ public abstract class GeneralRegion {
 		this.plugin = plugin;
 		
 		config = new YamlConfiguration();
-		config.set("general.name", name);
+		setSetting("general.name", name);
 		setSetting("general.world", world.getName());
 		setSetting("general.type", getType().getValue().toLowerCase());
 	}
@@ -506,7 +506,7 @@ public abstract class GeneralRegion {
 		Set<String> friends = new HashSet<String>(config.getStringList("general.friends"));
 		friends.add(player.toString());
 		List<String> list = new ArrayList<String>(friends);
-		config.set("general.friends", list);
+		setSetting("general.friends", list);
 	}
 	
 	/**
@@ -518,9 +518,9 @@ public abstract class GeneralRegion {
 		friends.remove(player.toString());
 		List<String> list = new ArrayList<String>(friends);
 		if(list.isEmpty()) {
-			config.set("general.friends", null);
+			setSetting("general.friends", null);
 		} else {
-			config.set("general.friends", list);
+			setSetting("general.friends", list);
 		}
 	}
 	
@@ -562,7 +562,7 @@ public abstract class GeneralRegion {
 	 * Remove all friends that are added to this region
 	 */
 	public void clearFriends() {
-		config.set("general.friends", null);
+		setSetting("general.friends", null);
 	}
 	
 	/**
@@ -584,11 +584,11 @@ public abstract class GeneralRegion {
 			i++;
 		}
 		String signPath = "general.signs." + i + ".";
-		config.set(signPath + "location", Utils.locationToConfig(location));
-		config.set(signPath + "facing", facing.name());
-		config.set(signPath + "signType", signType.name());
+		setSetting(signPath + "location", Utils.locationToConfig(location));
+		setSetting(signPath + "facing", facing.name());
+		setSetting(signPath + "signType", signType.name());
 		if(profile != null && profile.length() != 0) {
-			config.set(signPath + "profile", profile);
+			setSetting(signPath + "profile", profile);
 		}
 	}
 	
@@ -615,7 +615,7 @@ public abstract class GeneralRegion {
 	 * @param name Name of the sign to be removed
 	 */
 	public void removeSign(String name) {
-		config.set("general.signs." + name, null);
+		setSetting("general.signs." + name, null);
 	}
 	public void removeSign(Location location) {
 		if(location == null) {
@@ -762,11 +762,11 @@ public abstract class GeneralRegion {
 				}
 				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 				if(!config.isString("general.signs." + sign + ".signType")) {
-					config.set("general.signs." + sign + ".signType", signState.getType().toString());
+					setSetting("general.signs." + sign + ".signType", signState.getType().toString());
 					this.saveRequired();
 				}
 				if(!config.isString("general.signs." + sign + ".facing")) {
-					config.set("general.signs." + sign + ".facing", signData.getFacing().toString());
+					setSetting("general.signs." + sign + ".facing", signData.getFacing().toString());
 					this.saveRequired();
 				}
 				// Apply replacements and color and then set it on the sign
@@ -1782,6 +1782,7 @@ public abstract class GeneralRegion {
 	
 	public void setSetting(String path, Object value) {
 		config.set(path, value);
+		this.saveRequired();
 	}
 	
 

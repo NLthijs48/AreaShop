@@ -99,7 +99,10 @@ public class SetownerCommand extends CommandAreaShop {
 				calendar.setTimeInMillis(rent.getRentedUntil() + rent.getDuration());
 				rent.setRentedUntil(calendar.getTimeInMillis());
 				rent.setRenter(uuid);
+				rent.saveRequired();
 				plugin.message(sender, "setowner-succesRentExtend", region);
+				rent.updateRegionFlags();
+				rent.updateSigns();
 			} else {
 				// change
 				Calendar calendar = Calendar.getInstance();
@@ -110,7 +113,10 @@ public class SetownerCommand extends CommandAreaShop {
 				calendar.setTimeInMillis(current + rent.getDuration());
 				rent.setRentedUntil(calendar.getTimeInMillis());
 				rent.setRenter(uuid);
+				rent.saveRequired();
 				plugin.message(sender, "setowner-succesRent", region);
+				rent.updateRegionFlags();
+				rent.updateSigns();
 			}
 			rent.updateRegionFlags();
 			rent.updateSigns();
@@ -118,6 +124,7 @@ public class SetownerCommand extends CommandAreaShop {
 		if(region.isBuyRegion()) {
 			BuyRegion buy = (BuyRegion)region;
 			buy.setBuyer(uuid);
+			buy.saveRequired();
 			plugin.message(sender, "setowner-succesBuy", region);
 			buy.updateRegionFlags();
 			buy.updateSigns();

@@ -915,105 +915,93 @@ public class FileManager {
 		} else if(file.isDirectory()) {
 			final File[] regionFiles = file.listFiles();
 			new BukkitRunnable() {
-				private int current = 0;
 				private List<GeneralRegion> noWorld = new ArrayList<GeneralRegion>();
 				private List<GeneralRegion> noRegion = new ArrayList<GeneralRegion>();
-				private boolean first = true;
 				
 				@Override
 				public void run() {
-					if(first) {
-						AreaShop.debug("Loading region files...");
-						if(messageReceiver != null) {
-							plugin.message(messageReceiver, "reload-loadStart", regionFiles.length, plugin.getConfig().getInt("loading.regionsPerTick")*20);
-						}
-						first = false;
+					AreaShop.debug("Loading region files...");
+					if(messageReceiver != null) {
+						plugin.message(messageReceiver, "reload-loadStart", regionFiles.length, plugin.getConfig().getInt("loading.regionsPerTick")*20);
 					}
-					for(int i=0; i<plugin.getConfig().getInt("loading.regionsPerTick"); i++) {
-						if(current < regionFiles.length) {
-							File file = regionFiles[current];
-							if(file.exists() && file.isFile()) {
-								// Load the region file from disk in UTF8 mode
-								InputStreamReader reader = null;
-								YamlConfiguration config = null;
-								try {
-									reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
-								} catch (FileNotFoundException e) {}
-								if(reader != null) {
-									config = YamlConfiguration.loadConfiguration(reader);
+					for(File file : regionFiles) {
+						if(file.exists() && file.isFile()) {
+							// Load the region file from disk in UTF8 mode
+							InputStreamReader reader = null;
+							YamlConfiguration config = null;
+							try {
+								reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
+							} catch (FileNotFoundException e) {}
+							if(reader != null) {
+								config = YamlConfiguration.loadConfiguration(reader);
+							}
+							try {
+								reader.close();
+							} catch (IOException e) {}
+							GeneralRegion region = null;
+							// Construct the correct type of region
+							if(RegionType.RENT.getValue().equals(config.getString("general.type"))) {
+								RentRegion rent = new RentRegion(plugin, config);
+								addRent(rent);
+								region = rent;
+							} else if(RegionType.BUY.getValue().equals(config.getString("general.type"))) {
+								BuyRegion buy = new BuyRegion(plugin, config);
+								addBuy(buy);
+								region = buy;
+							}
+							// Add broken regions to a list
+							if(region != null) {
+								if(region.getWorld() == null) {
+									noWorld.add(region);
 								}
-								try {
-									reader.close();
-								} catch (IOException e) {}
-								GeneralRegion region = null;
-								// Construct the correct type of region
-								if(RegionType.RENT.getValue().equals(config.getString("general.type"))) {
-									RentRegion rent = new RentRegion(plugin, config);
-									addRent(rent);
-									region = rent;
-								} else if(RegionType.BUY.getValue().equals(config.getString("general.type"))) {
-									BuyRegion buy = new BuyRegion(plugin, config);
-									addBuy(buy);
-									region = buy;
-								}
-								// Add broken regions to a list
-								if(region != null) {
-									if(region.getWorld() == null) {
-										noWorld.add(region);
-									}
-									if(region.getRegion() == null) {
-										noRegion.add(region);
-									}
-								}
-								// Update regions if necessary
-								if(updateRegions) {
-									region.updateRegionFlags();
-									region.updateSigns();
+								if(region.getRegion() == null) {
+									noRegion.add(region);
 								}
 							}
-							current++;
-						}
+							// Update regions if necessary
+							if(updateRegions) {
+								region.updateRegionFlags();
+								region.updateSigns();
+							}
+						}						
 					}
-					if(current >= regionFiles.length) {
-						// All files are loaded, print possible problems to the console
-						if(!noRegion.isEmpty()) {
-							List<String> noRegionNames = new ArrayList<String>();
-							for(GeneralRegion region : noRegion) {
-								noRegionNames.add(region.getName());
-							}
-							plugin.getLogger().warning("AreaShop regions that are missing their WorldGuard region: " + Utils.createCommaSeparatedList(noRegionNames));
-							plugin.getLogger().warning("Remove these regions from AreaShop with '/as del' or recreate their regions in WorldGuard.");
+					// All files are loaded, print possible problems to the console
+					if(!noRegion.isEmpty()) {
+						List<String> noRegionNames = new ArrayList<String>();
+						for(GeneralRegion region : noRegion) {
+							noRegionNames.add(region.getName());
 						}
-						boolean noWorldRegions = !noWorld.isEmpty();
-						while(!noWorld.isEmpty()) {
-							List<GeneralRegion> toDisplay = new ArrayList<GeneralRegion>();
-							String missingWorld = noWorld.get(0).getWorldName();
-							toDisplay.add(noWorld.get(0));
-							for(int i=1; i<noWorld.size(); i++) {
-								if(noWorld.get(i).getWorldName().equalsIgnoreCase(missingWorld)) {
-									toDisplay.add(noWorld.get(i));
-								}
-							}
-							List<String> noWorldNames = new ArrayList<String>();
-							for(GeneralRegion region : noRegion) {
-								noWorldNames.add(region.getName());
-							}
-							plugin.getLogger().warning("World " + missingWorld + " is not loaded, the following AreaShop regions are not functional now: " + Utils.createCommaSeparatedList(noWorldNames));
-							noWorld.removeAll(toDisplay);
-						}
-						if(noWorldRegions) {
-							plugin.getLogger().warning("Remove these regions from AreaShop with '/as del' or load the world(s) on the server again.");
-						}
-						AreaShop.debug("Done with loading region files");
-						plugin.setReady(true);
-						if(messageReceiver != null) {
-							plugin.message(messageReceiver, "reload-loadComplete");
-						}
-						plugin.getFileManager().checkRents();
-						this.cancel();
+						plugin.getLogger().warning("AreaShop regions that are missing their WorldGuard region: " + Utils.createCommaSeparatedList(noRegionNames));
+						plugin.getLogger().warning("Remove these regions from AreaShop with '/as del' or recreate their regions in WorldGuard.");
 					}
+					boolean noWorldRegions = !noWorld.isEmpty();
+					while(!noWorld.isEmpty()) {
+						List<GeneralRegion> toDisplay = new ArrayList<GeneralRegion>();
+						String missingWorld = noWorld.get(0).getWorldName();
+						toDisplay.add(noWorld.get(0));
+						for(int i=1; i<noWorld.size(); i++) {
+							if(noWorld.get(i).getWorldName().equalsIgnoreCase(missingWorld)) {
+								toDisplay.add(noWorld.get(i));
+							}
+						}
+						List<String> noWorldNames = new ArrayList<String>();
+						for(GeneralRegion region : noRegion) {
+							noWorldNames.add(region.getName());
+						}
+						plugin.getLogger().warning("World " + missingWorld + " is not loaded, the following AreaShop regions are not functional now: " + Utils.createCommaSeparatedList(noWorldNames));
+						noWorld.removeAll(toDisplay);
+					}
+					if(noWorldRegions) {
+						plugin.getLogger().warning("Remove these regions from AreaShop with '/as del' or load the world(s) on the server again.");
+					}
+					AreaShop.debug("Done with loading region files");
+					plugin.setReady(true);
+					if(messageReceiver != null) {
+						plugin.message(messageReceiver, "reload-loadComplete");
+					}
+					plugin.getFileManager().checkRents();					
 				}
-			}.runTaskTimer(plugin, 1, 1);
+			}.runTask(plugin);
 		}
 		// Warnings will be printed in console, no other things can go wrong
 		return true;

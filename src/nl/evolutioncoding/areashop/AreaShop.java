@@ -172,18 +172,33 @@ public final class AreaShop extends JavaPlugin {
 			
 			// Dont initialize the updatechecker if disabled in the config
 			if(this.getConfig().getBoolean("checkForUpdates")) {
-				try {
-					updater = new Updater(this, 76518, null, UpdateType.NO_DOWNLOAD, false);
-					AreaShop.debug("Result=" + updater.getResult().toString() + ", Latest=" + updater.getLatestName() + ", Type=" + updater.getLatestType());
-					updateAvailable = updater.getResult() == UpdateResult.UPDATE_AVAILABLE;
-					if(updateAvailable) {
-						this.getLogger().info("Update from AreaShop V" + this.getDescription().getVersion() + " to " + updater.getLatestName() + " available, get the latest version at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/");
+		        new BukkitRunnable() {
+					@Override
+					public void run() {
+						try {
+							updater = new Updater(AreaShop.getInstance(), 76518, null, UpdateType.NO_DOWNLOAD, false);
+							AreaShop.debug("Result=" + updater.getResult().toString() + ", Latest=" + updater.getLatestName() + ", Type=" + updater.getLatestType());
+							updateAvailable = updater.getResult() == UpdateResult.UPDATE_AVAILABLE;
+							if(updateAvailable) {
+								AreaShop.getInstance().getLogger().info("Update from AreaShop V" + AreaShop.getInstance().getDescription().getVersion() + " to " + updater.getLatestName() + " available, get the latest version at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/");
+								new BukkitRunnable() {
+									@Override
+									public void run() {
+										for(Player player : Bukkit.getOnlinePlayers()) {
+											if(player.hasPermission("areashop.notifyupdate")) {
+												AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());	
+											}
+										}
+									}								
+								}.runTask(AreaShop.getInstance());
+							}
+						} catch(Exception e) {
+							AreaShop.debug("Something went wrong with the Updater:");
+							AreaShop.debug(e.getMessage());
+							updateAvailable = false;
+						}
 					}
-				} catch(Exception e) {
-					AreaShop.debug("Something went wrong with the Updater:");
-					AreaShop.debug(e.getMessage());
-					updateAvailable = false;
-				}
+		        }.runTaskAsynchronously(this);
 			}
 		}
 	}

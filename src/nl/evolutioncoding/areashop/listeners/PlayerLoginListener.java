@@ -40,6 +40,10 @@ public final class PlayerLoginListener implements Listener {
 			return;
 		}
 		final Player player = event.getPlayer();
+		// Notify admins for plugin updates
+		if(plugin.updateAvailable() && player.hasPermission("areashop.notifyupdate")) {
+			AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());	
+		}
 		// Schedule task to check for notifications, prevents a lag spike at login
         new BukkitRunnable() {
 			@Override
@@ -65,10 +69,6 @@ public final class PlayerLoginListener implements Listener {
 							AreaShop.getInstance().message(player, "rent-expireWarning", region);		        
 						}				
 					}
-				}
-				// Notify admins for plugin updates
-				if(plugin.updateAvailable() && player.hasPermission("areashop.notifyupdate")) {
-					AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());	
 				}
 				this.cancel();
 			}

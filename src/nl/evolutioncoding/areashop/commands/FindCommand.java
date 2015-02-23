@@ -49,7 +49,10 @@ public class FindCommand extends CommandAreaShop {
 			return;
 		}
 		Player player = (Player)sender;
-		double balance = plugin.getEconomy().getBalance(player);
+		double balance = 0.0;
+		if(plugin.getEconomy() != null) {
+			plugin.getEconomy().getBalance(player);
+		}
 		double maxPrice = 0;
 		boolean maxPriceSet = false;
 		RegionGroup group = null;

@@ -236,6 +236,10 @@ public class BuyRegion extends GeneralRegion {
 	public boolean buy(Player player) {
 		/* Check if the player has permission */
 		if(player.hasPermission("areashop.buy")) {
+			if(plugin.getEconomy() == null) {
+				plugin.message(player, "general-noEconomy");
+				return false;
+			}
 			if(getWorld() == null) {
 				plugin.message(player, "general-noWorld", getWorldName());
 				return false;

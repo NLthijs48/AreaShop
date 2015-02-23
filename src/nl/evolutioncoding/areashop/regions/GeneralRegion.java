@@ -896,7 +896,6 @@ public abstract class GeneralRegion {
 		}
 		// Get the origin and size of the region
 		Vector origin = new Vector(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
-		AreaShop.debug("origin of restoreoperation: " + origin);
 		
 		// The path to save the schematic
 		File restoreFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);

@@ -421,6 +421,10 @@ public class RentRegion extends GeneralRegion {
 	public boolean rent(Player player) {		
 		/* Check if the player has permission */
 		if(player.hasPermission("areashop.rent")) {
+			if(plugin.getEconomy() == null) {
+				plugin.message(player, "general-noEconomy");
+				return false;
+			}
 			if(getWorld() == null) {
 				plugin.message(player, "general-noWorld", getWorldName());
 				return false;

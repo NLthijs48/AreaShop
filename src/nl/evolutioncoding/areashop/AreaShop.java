@@ -42,7 +42,6 @@ public final class AreaShop extends JavaPlugin {
 	
 	private WorldGuardPlugin worldGuard = null;
 	private WorldEditPlugin worldEdit = null;
-	private Economy economy = null;
 	private FileManager fileManager = null;
 	private LanguageManager languageManager = null;
 	private CommandManager commandManager = null;
@@ -130,13 +129,10 @@ public final class AreaShop extends JavaPlugin {
 	    }
 
 	    /* Check if Vault is present */
-        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider == null) {
-        	this.getLogger().severe("Vault plugin is not present, has not loaded correctly or you do not have a working Economy plugin supported by Vault");
+	    if(getServer().getPluginManager().getPlugin("Vault") == null) {
+	    	this.getLogger().severe("Vault plugin is not present or has not loaded correctly");
         	error = true;
-        } else {
-            economy = economyProvider.getProvider();
-        }        
+	    }
         
 		/* Load all data from files and check versions */
 	    fileManager = new FileManager(this);
@@ -213,7 +209,6 @@ public final class AreaShop extends JavaPlugin {
 		/* set variables to null to prevent memory leaks */
 		worldGuard = null;
 		worldEdit = null;
-		economy = null;
 		fileManager = null;
 		languageManager = null;
 		commandManager = null;
@@ -296,7 +291,12 @@ public final class AreaShop extends JavaPlugin {
 	 * @return Economy
 	 */
 	public Economy getEconomy() {
-	    return economy;
+		RegisteredServiceProvider<Economy> economy = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economy == null || economy.getProvider() == null) {
+        	this.getLogger().severe("There is no economy provider to support Vault, make sure you installed an economy plugin");
+        	return null;
+        }		
+	    return economy.getProvider();
 	}	
 	
 	/**

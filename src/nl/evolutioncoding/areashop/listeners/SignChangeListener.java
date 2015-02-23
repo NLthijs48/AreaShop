@@ -46,6 +46,10 @@ public final class SignChangeListener implements Listener {
 			return;
 		}
 		Player player = event.getPlayer();
+		if(!plugin.isReady()) {
+			plugin.message(player, "general-notReady");
+			return;
+		}
 		
 		// Check if the sign is meant for this plugin
 		if(event.getLine(0).contains(plugin.getConfig().getString("signTags.rent"))) {

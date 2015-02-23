@@ -9,6 +9,9 @@
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 total-maximum: "You can't rent and buy more than %0% region(s) in total (you already have %1% in group '%2%')."
+general-notReady: "AreaShop has not fully loaded yet, please wait."
+general-noWorld: "You cannot do that, the world of this region is currently unavailable (world '%0%')."
+general-noRegion: "You cannot do that, the WorldGuard region is currently unavailable (region '%0%')."
 
 cmd-notValid: "That command is not valid, use '/as help' for info."
 cmd-onlyByPlayer: "This command can only be run by a player."
@@ -110,9 +113,11 @@ sell-soldYours: "Your region has been sold."
 sell-noPermission: "You don't have permission to sell a region."
 sell-noPermissionOther: "You don't have permission to sell another region."
 
-reload-reloaded: "All files have been reloaded successfully."
+reload-reloading: "Started reloading files and updating regions."
 reload-updateStart: "&7Updating %0% regions at %1% per second."
 reload-updateComplete: "&7Updating regions complete."
+reload-loadStart: "&7Loading and updating %0% regions at %1% per second."
+reload-loadComplete: "&7Loading and updating regions complete."
 reload-noPermission: "You don't have permission to reload the config files."
 reload-updateCommandChanged: "'/as updaterents' and '/as updatebuys' have been removed, '/as reload' will also update the regions now so use that command instead."
 

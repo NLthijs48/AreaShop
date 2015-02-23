@@ -293,6 +293,10 @@ saving:
   delay: 10
   ## How many regions per tick will be saved
   regionsPerTick: 1
+## Timings for loading region files from disk
+loading:
+  ## How many regions per tick will be loaded
+  regionsPerTick: 5
 ## Timings for rent expiration checking
 expiration:
   ## Time between checking if rent regions have been expired (seconds)

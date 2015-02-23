@@ -93,7 +93,7 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(player, "setteleport-reset", region.getName());
 			return;
 		}
-		if(!wgRegion.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()) && !player.hasPermission("areashop.setteleportoutsideregion")) {
+		if(!player.hasPermission("areashop.setteleportoutsideregion") && (wgRegion == null || !wgRegion.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
 			plugin.message(player, "setteleport-notInside", region.getName());
 			return;
 		}

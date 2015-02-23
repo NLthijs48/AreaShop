@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
-import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 import nl.evolutioncoding.areashop.managers.FileManager;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -152,19 +151,12 @@ public abstract class GeneralRegion {
 		}
 	} 
 	
-	public GeneralRegion(AreaShop plugin, YamlConfiguration config) throws RegionCreateException {
+	public GeneralRegion(AreaShop plugin, YamlConfiguration config) {
 		this.plugin = plugin;
 		this.config = config;
-		
-		if(getWorld() == null) {
-			throw new RegionCreateException("World '"+ getWorldName() +"' of region '" + getName() + "' does not exist anymore, removed region from AreaShop");
-		} else if(plugin.getWorldGuard().getRegionManager(getWorld()) == null 
-				|| plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName()) == null) {			
-			throw new RegionCreateException("WorldGuard region '" + getName() + "' does not exist anymore, removed region from AreaShop");
-		}
 	}
 	
-	public GeneralRegion(AreaShop plugin, String name, World world) {
+	protected GeneralRegion(AreaShop plugin, String name, World world) {
 		this.plugin = plugin;
 		
 		config = new YamlConfiguration();
@@ -355,6 +347,9 @@ public abstract class GeneralRegion {
 	 * @return The width of the region (x-axis)
 	 */
 	public int getWidth() {
+		if(getRegion() == null) {
+			return 0;
+		}
 		return getRegion().getMaximumPoint().getBlockX() - getRegion().getMinimumPoint().getBlockX() +1;
 	}
 	/**
@@ -362,6 +357,9 @@ public abstract class GeneralRegion {
 	 * @return The depth of the region (z-axis)
 	 */
 	public int getDepth() {
+		if(getRegion() == null) {
+			return 0;
+		}
 		return getRegion().getMaximumPoint().getBlockZ() - getRegion().getMinimumPoint().getBlockZ() +1;
 	}
 	/**
@@ -369,6 +367,9 @@ public abstract class GeneralRegion {
 	 * @return The height of the region (y-axis)
 	 */
 	public int getHeight() {
+		if(getRegion() == null) {
+			return 0;
+		}
 		return getRegion().getMaximumPoint().getBlockY() - getRegion().getMinimumPoint().getBlockY() +1;
 	}
 	
@@ -808,7 +809,7 @@ public abstract class GeneralRegion {
 	 */
 	public boolean saveRegionBlocks(String fileName) {
 		// Check if the region is correct
-		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
+		ProtectedRegion region = getRegion();
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist in WorldGuard, save failed");
 			return false;
@@ -879,7 +880,7 @@ public abstract class GeneralRegion {
 		}
 		EditSession editSession = plugin.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(world, plugin.getConfig().getInt("maximumBlocks"));
 		editSession.enableQueue();
-		ProtectedRegion region = plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
+		ProtectedRegion region = getRegion();
 		if(region == null) {
 			AreaShop.debug("Region '" + getName() + "' does not exist in WorldGuard, restore failed");
 			return false;
@@ -1105,6 +1106,9 @@ public abstract class GeneralRegion {
 					result = false;
 				}
 			} else if(flagName.equalsIgnoreCase("parent")) {
+				if(getWorld() == null || worldGuard.getRegionManager(getWorld()) == null) {
+					continue;
+				}
 				ProtectedRegion parentRegion = worldGuard.getRegionManager(getWorld()).getRegion(value);
 				if(parentRegion != null) {
 					try {
@@ -1269,6 +1273,14 @@ public abstract class GeneralRegion {
 		boolean friend = getFriends().contains(player.getUniqueId());
 		Location startLocation = null;
 		ProtectedRegion region = getRegion();
+		if(getWorld() == null) {
+			plugin.message(player, "general-noWorld", getWorldName());
+			return false;
+		}
+		if(getRegion() == null) {
+			plugin.message(player, "general-noRegion", getName());
+			return false;
+		}	
 		if(isRentRegion()) {
 			owner = player.getUniqueId().equals(((RentRegion)this).getRenter());
 		} else {
@@ -1318,22 +1330,18 @@ public abstract class GeneralRegion {
 		}
 		// Set default startLocation if not set
 		if(startLocation == null) {
-			if(region != null) {
-				// Set to block in the middle, y configured in the config
-				Vector middle = Vector.getMidpoint(region.getMaximumPoint(), region.getMinimumPoint());
-				String configSetting = getStringSetting("general.teleportLocationY");
-				AreaShop.debug("teleportLocationY = " + configSetting);
-				if("bottom".equalsIgnoreCase(configSetting)) {
-					middle = middle.setY(region.getMinimumPoint().getBlockY());
-				} else if("top".equalsIgnoreCase(configSetting)) {
-					middle = middle.setY(region.getMaximumPoint().getBlockY());
-				} else {
-					middle = middle.setY(middle.getBlockY());
-				}
-				startLocation = new Location(getWorld(), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
+			// Set to block in the middle, y configured in the config
+			Vector middle = Vector.getMidpoint(region.getMaximumPoint(), region.getMinimumPoint());
+			String configSetting = getStringSetting("general.teleportLocationY");
+			AreaShop.debug("teleportLocationY = " + configSetting);
+			if("bottom".equalsIgnoreCase(configSetting)) {
+				middle = middle.setY(region.getMinimumPoint().getBlockY());
+			} else if("top".equalsIgnoreCase(configSetting)) {
+				middle = middle.setY(region.getMaximumPoint().getBlockY());
 			} else {
-				return false;
+				middle = middle.setY(middle.getBlockY());
 			}
+			startLocation = new Location(getWorld(), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
 		}
 		boolean insideRegion;
 		if(toSign) {

@@ -27,7 +27,7 @@ public class RentRegion extends GeneralRegion {
 	 * @param settings All settings of this region
 	 * @throws RegionCreateException 
 	 */
-	public RentRegion(AreaShop plugin, YamlConfiguration config) throws RegionCreateException {
+	public RentRegion(AreaShop plugin, YamlConfiguration config) {
 		super(plugin, config);
 	}
 	
@@ -420,7 +420,15 @@ public class RentRegion extends GeneralRegion {
 	 */
 	public boolean rent(Player player) {		
 		/* Check if the player has permission */
-		if(player.hasPermission("areashop.rent")) {	
+		if(player.hasPermission("areashop.rent")) {
+			if(getWorld() == null) {
+				plugin.message(player, "general-noWorld", getWorldName());
+				return false;
+			}
+			if(getRegion() == null) {
+				plugin.message(player, "general-noRegion", getName());
+				return false;
+			}			
 			boolean extend = false;
 			if(getRenter() != null && player.getUniqueId().equals(getRenter())) {
 				extend = true;

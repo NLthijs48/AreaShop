@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import nl.evolutioncoding.areashop.AreaShop;
-import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -16,7 +15,7 @@ import org.bukkit.entity.Player;
 
 public class BuyRegion extends GeneralRegion {
 
-	public BuyRegion(AreaShop plugin, YamlConfiguration config) throws RegionCreateException {
+	public BuyRegion(AreaShop plugin, YamlConfiguration config) {
 		super(plugin, config);
 	}
 	
@@ -236,7 +235,15 @@ public class BuyRegion extends GeneralRegion {
 	 */
 	public boolean buy(Player player) {
 		/* Check if the player has permission */
-		if(player.hasPermission("areashop.buy")) {	
+		if(player.hasPermission("areashop.buy")) {
+			if(getWorld() == null) {
+				plugin.message(player, "general-noWorld", getWorldName());
+				return false;
+			}
+			if(getRegion() == null) {
+				plugin.message(player, "general-noRegion", getName());
+				return false;
+			}			
 			if(!isSold() || (isInResellingMode() && !isBuyer(player))) {
 				boolean isResell = isInResellingMode();
 				// Check if the players needs to be in the world or region for buying

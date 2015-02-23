@@ -44,7 +44,12 @@ public final class PlayerLoginListener implements Listener {
         new BukkitRunnable() {
 			@Override
 			public void run() {
+				// Delay until all regions are loaded
+				if(!plugin.isReady()) {
+					return;
+				}	
 				if(!player.isOnline()) {
+					this.cancel();
 					return;
 				}
 				// Notify for rents that almost run out
@@ -65,8 +70,9 @@ public final class PlayerLoginListener implements Listener {
 				if(plugin.updateAvailable() && player.hasPermission("areashop.notifyupdate")) {
 					AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());	
 				}
+				this.cancel();
 			}
-        }.runTaskLater(plugin, 25);	
+        }.runTaskTimer(plugin, 25, 25);	
 		// Check if the player has regions that use an old name of him and update them
 		final List<GeneralRegion> regions = new ArrayList<GeneralRegion>(plugin.getFileManager().getRegions());
 		new BukkitRunnable() {
@@ -74,6 +80,11 @@ public final class PlayerLoginListener implements Listener {
 			
 			@Override
 			public void run() {
+				// Delay until all regions are loaded
+				if(!plugin.isReady()) {
+					return;
+				}
+				// Check all regions
 				for(int i=0; i<plugin.getConfig().getInt("nameupdate.regionsPerTick"); i++) {
 					if(current < regions.size()) {
 						GeneralRegion region = regions.get(current);

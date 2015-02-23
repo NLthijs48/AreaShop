@@ -128,6 +128,10 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
+		if(!plugin.isReady()) {
+			plugin.message(sender, "general-notReady");
+			return true;
+		}
 		boolean executed = false;		
 		for(int i=0; i<commands.size() && !executed; i++) {
 			if(commands.get(i).canExecute(command, args)) {

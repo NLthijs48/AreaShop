@@ -51,6 +51,7 @@ public final class AreaShop extends JavaPlugin {
 	private String chatprefix = null;
 	private Updater updater = null;
 	private boolean updateAvailable = false;
+	private boolean ready = false;
 	
 	/* Folders and file names */
 	public static final String languageFolder = "lang";
@@ -139,11 +140,7 @@ public final class AreaShop extends JavaPlugin {
         
 		/* Load all data from files and check versions */
 	    fileManager = new FileManager(this);
-	    error = error & !fileManager.loadFiles();
-		
-	    // Set the debug and chatprefix variables
-		debug = this.getConfig().getBoolean("debug");
-	    chatprefix = this.getConfig().getString("chatPrefix");
+	    error = error & !fileManager.loadFiles(null);
         
 	    /* Create a LanguageMananager */
 	    languageManager = new LanguageManager(this);
@@ -207,7 +204,40 @@ public final class AreaShop extends JavaPlugin {
 		commandManager = null;
 		chatprefix = null;
 		debug = false;
+		ready = false;
 		updater = null;
+	}	
+	
+	/**
+	 * Indicates if the plugin is ready to be used
+	 * @return true if the plugin is ready, false otherwise
+	 */
+	public boolean isReady() {
+		return ready;
+	}
+	
+	/**
+	 * Set if the plugin is ready to be used or not (not to be used from another plugin!)
+	 * @param ready Indicate if the plugin is ready to be used
+	 */
+	public void setReady(boolean ready) {
+		this.ready = ready;
+	}
+	
+	/**
+	 * Set if the plugin should output debug messages (loaded from config normally)
+	 * @param debug Indicates if the plugin should output debug messages or not
+	 */
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+	
+	/**
+	 * Set the chatprefix to use in the chat (loaded from config normally)
+	 * @param chatprefix The string to use in front of chat messages (supports formatting codes like &1)
+	 */
+	public void setChatprefix(String chatprefix) {
+		this.chatprefix = chatprefix;
 	}
  
 	/**
@@ -311,8 +341,12 @@ public final class AreaShop extends JavaPlugin {
 	        new BukkitRunnable() {
 				@Override
 				public void run() {
-					finalPlugin.getFileManager().checkRents();
-					AreaShop.debug("Checking rent expirations...");
+					if(isReady()) {
+						finalPlugin.getFileManager().checkRents();
+						AreaShop.debug("Checking rent expirations...");
+					} else {
+						AreaShop.debug("Skipped checking rent expirations, plugin not ready");
+					}
 				}
 	        }.runTaskTimer(this, expirationCheck, expirationCheck);
         }
@@ -322,8 +356,12 @@ public final class AreaShop extends JavaPlugin {
 	        new BukkitRunnable() {
 				@Override
 				public void run() {
-					finalPlugin.getFileManager().checkForInactiveRegions();
-					AreaShop.debug("Checking for regions with players that are inactive too long...");
+					if(isReady()) {
+						finalPlugin.getFileManager().checkForInactiveRegions();
+						AreaShop.debug("Checking for regions with players that are inactive too long...");
+					} else {
+						AreaShop.debug("Skipped checking for regions of inactive players, plugin not ready");
+					}
 				}
 	        }.runTaskTimer(this, inactiveCheck, inactiveCheck);	     
         }	        
@@ -333,8 +371,12 @@ public final class AreaShop extends JavaPlugin {
 	        new BukkitRunnable() {
 				@Override
 				public void run() {
-					finalPlugin.getFileManager().performPeriodicSignUpdate();
-					AreaShop.debug("Performing periodic sign update...");
+					if(isReady()) {
+						finalPlugin.getFileManager().performPeriodicSignUpdate();
+						AreaShop.debug("Performing periodic sign update...");
+					} else {
+						AreaShop.debug("Skipped performing periodic sign update, plugin not ready");
+					}
 				}
 	        }.runTaskTimer(this, periodicUpdate, periodicUpdate);	     
         }
@@ -344,8 +386,12 @@ public final class AreaShop extends JavaPlugin {
 	        new BukkitRunnable() {
 				@Override
 				public void run() {
-					finalPlugin.getFileManager().saveRequiredFiles();
-					AreaShop.debug("Saving required files...");
+					if(isReady()) {
+						finalPlugin.getFileManager().saveRequiredFiles();
+						AreaShop.debug("Saving required files...");
+					} else {
+						AreaShop.debug("Skipped saving required files, plugin not ready");
+					}
 				}
 	        }.runTaskTimer(this, saveFiles, saveFiles);	     
         }
@@ -355,21 +401,14 @@ public final class AreaShop extends JavaPlugin {
 	        new BukkitRunnable() {
 				@Override
 				public void run() {
-					finalPlugin.getFileManager().sendRentExpireWarnings();
-					AreaShop.debug("Sending rent expire warnings...");
+					if(isReady()) {
+						finalPlugin.getFileManager().sendRentExpireWarnings();
+						AreaShop.debug("Sending rent expire warnings...");
+					} else {
+						AreaShop.debug("Skipped sending rent expire warnings, plugin not ready");
+					}
 				}
 	        }.runTaskTimer(this, expireWarning, expireWarning);	     
-        }
-        
-        // Update all regions on startup
-        if(getConfig().getBoolean("updateRegionsOnStartup")) {
-	        new BukkitRunnable() {
-				@Override
-				public void run() {
-					finalPlugin.getFileManager().updateAllRegions();
-					AreaShop.debug("Updating all regions at startup...");
-				}
-	        }.runTaskLater(this, 20L);	     
         }
 	}
 	
@@ -520,17 +559,15 @@ public final class AreaShop extends JavaPlugin {
 	 * Reload all files of the plugin and update all regions
 	 * confirmationReceiver The CommandSender that should receive confirmation messages, null for nobody
 	 */
-	public void reload(CommandSender confirmationReceiver) {
+	public void reload(final CommandSender confirmationReceiver) {
+		message(confirmationReceiver, "reload-reloading");
+		setReady(false);
 		fileManager.saveRequiredFilesAtOnce();
 		chatprefix = this.getConfig().getString("chatPrefix");
 		debug = this.getConfig().getBoolean("debug");
-		fileManager.loadFiles();
+		fileManager.loadFiles(confirmationReceiver);
 		languageManager.startup();
-		fileManager.checkRents();
-		if(confirmationReceiver != null) {
-			this.message(confirmationReceiver, "reload-reloaded");
-		}
-		fileManager.updateAllRegions(confirmationReceiver);
+		fileManager.checkRents();		
 	}
 	/**
 	 * Reload all files of the plugin and update all regions

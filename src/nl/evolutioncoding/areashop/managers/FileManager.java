@@ -734,7 +734,7 @@ public class FileManager {
 	 * Load all files from disk
 	 * @return true
 	 */
-	public boolean loadFiles(CommandSender messageReceiver) {
+	public boolean loadFiles() {
 		boolean result = false;		
 		// Load config.yml + add defaults from .jar
 		result = result & loadConfigFile();
@@ -743,7 +743,7 @@ public class FileManager {
 		// Convert old formats to the latest
 		convertFiles();
 		// Load region files (regions folder)
-		result = result & loadRegionFiles(getConfig().getBoolean("updateRegionsOnStartup"), messageReceiver);
+		result = result & loadRegionFiles();
 		// Load groups.yml
 		result = result & loadGroupsFile();
 
@@ -907,64 +907,54 @@ public class FileManager {
 	 * Load all region files
 	 * @return true
 	 */
-	public boolean loadRegionFiles(final boolean updateRegions, final CommandSender messageReceiver) {
+	public boolean loadRegionFiles() {
 		regions.clear();
 		File file = new File(regionsPath);
 		if(!file.exists()) {
 			file.mkdirs();
 		} else if(file.isDirectory()) {
-			final File[] regionFiles = file.listFiles();
-			new BukkitRunnable() {
-				private List<GeneralRegion> noWorld = new ArrayList<GeneralRegion>();
-				private List<GeneralRegion> noRegion = new ArrayList<GeneralRegion>();
-				
+			File[] regionFiles = file.listFiles();
+			for(File regionFile : regionFiles) {
+				if(regionFile.exists() && regionFile.isFile()) {
+					// Load the region file from disk in UTF8 mode
+					InputStreamReader reader = null;
+					YamlConfiguration config = null;
+					try {
+						reader = new InputStreamReader(new FileInputStream(regionFile), Charsets.UTF_8);
+					} catch (FileNotFoundException e) {}
+					if(reader != null) {
+						config = YamlConfiguration.loadConfiguration(reader);
+					}
+					try {
+						reader.close();
+					} catch (IOException e) {}
+					// Construct the correct type of region
+					if(RegionType.RENT.getValue().equals(config.getString("general.type"))) {
+						RentRegion rent = new RentRegion(plugin, config);
+						addRent(rent);
+					} else if(RegionType.BUY.getValue().equals(config.getString("general.type"))) {
+						BuyRegion buy = new BuyRegion(plugin, config);
+						addBuy(buy);
+					}
+				}						
+			}
+			plugin.setReady(true);			
+			new BukkitRunnable() {				
 				@Override
 				public void run() {
-					AreaShop.debug("Loading region files...");
-					if(messageReceiver != null) {
-						plugin.message(messageReceiver, "reload-loadStart", regionFiles.length, plugin.getConfig().getInt("loading.regionsPerTick")*20);
-					}
-					for(File file : regionFiles) {
-						if(file.exists() && file.isFile()) {
-							// Load the region file from disk in UTF8 mode
-							InputStreamReader reader = null;
-							YamlConfiguration config = null;
-							try {
-								reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
-							} catch (FileNotFoundException e) {}
-							if(reader != null) {
-								config = YamlConfiguration.loadConfiguration(reader);
+					List<GeneralRegion> noWorld = new ArrayList<GeneralRegion>();
+					List<GeneralRegion> noRegion = new ArrayList<GeneralRegion>();
+					for(GeneralRegion region : AreaShop.getInstance().getFileManager().getRegions()) {
+						// Add broken regions to a list
+						if(region != null) {
+							if(region.getWorld() == null) {
+								noWorld.add(region);
 							}
-							try {
-								reader.close();
-							} catch (IOException e) {}
-							GeneralRegion region = null;
-							// Construct the correct type of region
-							if(RegionType.RENT.getValue().equals(config.getString("general.type"))) {
-								RentRegion rent = new RentRegion(plugin, config);
-								addRent(rent);
-								region = rent;
-							} else if(RegionType.BUY.getValue().equals(config.getString("general.type"))) {
-								BuyRegion buy = new BuyRegion(plugin, config);
-								addBuy(buy);
-								region = buy;
+							if(region.getRegion() == null) {
+								noRegion.add(region);
 							}
-							// Add broken regions to a list
-							if(region != null) {
-								if(region.getWorld() == null) {
-									noWorld.add(region);
-								}
-								if(region.getRegion() == null) {
-									noRegion.add(region);
-								}
-							}
-							// Update regions if necessary
-							if(updateRegions) {
-								region.updateRegionFlags();
-								region.updateSigns();
-							}
-						}						
-					}
+						}
+					}					
 					// All files are loaded, print possible problems to the console
 					if(!noRegion.isEmpty()) {
 						List<String> noRegionNames = new ArrayList<String>();
@@ -994,12 +984,6 @@ public class FileManager {
 					if(noWorldRegions) {
 						plugin.getLogger().warning("Remove these regions from AreaShop with '/as del' or load the world(s) on the server again.");
 					}
-					AreaShop.debug("Done with loading region files");
-					plugin.setReady(true);
-					if(messageReceiver != null) {
-						plugin.message(messageReceiver, "reload-loadComplete");
-					}
-					plugin.getFileManager().checkRents();					
 				}
 			}.runTask(plugin);
 		}

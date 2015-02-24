@@ -136,7 +136,7 @@ public final class AreaShop extends JavaPlugin {
         
 		/* Load all data from files and check versions */
 	    fileManager = new FileManager(this);
-	    error = error & !fileManager.loadFiles(null);
+	    error = error & !fileManager.loadFiles();
         
 	    /* Create a LanguageMananager */
 	    languageManager = new LanguageManager(this);
@@ -363,7 +363,7 @@ public final class AreaShop extends JavaPlugin {
 						AreaShop.debug("Skipped checking rent expirations, plugin not ready");
 					}
 				}
-	        }.runTaskTimer(this, expirationCheck, expirationCheck);
+	        }.runTaskTimer(this, 1, expirationCheck);
         }
 	    // Inactive unrenting/selling timer
         int inactiveCheck = this.getConfig().getInt("inactive.delay")*60*20;
@@ -424,6 +424,16 @@ public final class AreaShop extends JavaPlugin {
 					}
 				}
 	        }.runTaskTimer(this, expireWarning, expireWarning);	     
+        }
+        // Update all regions on startup
+        if(getConfig().getBoolean("updateRegionsOnStartup")) {
+	        new BukkitRunnable() {
+				@Override
+				public void run() {
+					finalPlugin.getFileManager().updateAllRegions();
+					AreaShop.debug("Updating all regions at startup...");
+				}
+	        }.runTaskLater(this, 20L);	     
         }
 	}
 	
@@ -575,14 +585,15 @@ public final class AreaShop extends JavaPlugin {
 	 * confirmationReceiver The CommandSender that should receive confirmation messages, null for nobody
 	 */
 	public void reload(final CommandSender confirmationReceiver) {
-		message(confirmationReceiver, "reload-reloading");
 		setReady(false);
 		fileManager.saveRequiredFilesAtOnce();
 		chatprefix = this.getConfig().getString("chatPrefix");
 		debug = this.getConfig().getBoolean("debug");
-		fileManager.loadFiles(confirmationReceiver);
+		fileManager.loadFiles();
 		languageManager.startup();
-		fileManager.checkRents();		
+		message(confirmationReceiver, "reload-reloading");
+		fileManager.checkRents();
+		fileManager.updateAllRegions(confirmationReceiver);
 	}
 	/**
 	 * Reload all files of the plugin and update all regions

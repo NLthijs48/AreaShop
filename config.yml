@@ -293,10 +293,6 @@ saving:
   delay: 10
   ## How many regions per tick will be saved
   regionsPerTick: 1
-## Timings for loading region files from disk
-loading:
-  ## How many regions per tick will be loaded
-  regionsPerTick: 5
 ## Timings for rent expiration checking
 expiration:
   ## Time between checking if rent regions have been expired (seconds)
@@ -312,7 +308,7 @@ expireWarning:
 ## Timings for updating signs and region flags ('/as reload' or after '/as groupadd' or '/as groupdel')
 update:
   ## Number of regions to update per tick (there are 20 ticks in a second)
-  regionsPerTick: 2
+  regionsPerTick: 5
 ## Time between checking if any regions need to be unrented because the player was not online for the specified time period (minutes)
 ## -1 means never, 1440 is one day, 43200 is one month, 525600 is one year
 inactive:

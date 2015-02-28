@@ -30,6 +30,9 @@ signTags:
 ## Blacklist of region names that cannot be added to AreaShop for renting or buying. Regular expressions can be used, search
 ## for 'java regex pattern' to find documentation about how to use it. The case-insensitive option is enabled because 
 ## WorldGuard will return the correct region no matter what the casing is.
+## Example: Blocking all regions that have a name like 'house_1', 'house_2', etc. would be done with 'house_\d+'
+## The '\d' represents the numerical digits 0-9, the + symbol represents 1 or more times repeated.
+## This means it would also block 'house_123' and 'house_000456'. It will not block 'ahouse_1' or 'house_'.
 blacklist:
   - '__global__'
 ## Enable sending stats to http://mcstats.org/ (Metrics plugin)

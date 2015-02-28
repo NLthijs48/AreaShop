@@ -40,6 +40,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -48,6 +49,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.internal.LocalWorldAdapter;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.registry.WorldData;
@@ -817,11 +819,9 @@ public abstract class GeneralRegion {
 		}
 		// Find the correct world wrapper in WorldEdit, seems weird there is no getWorld(String name) method
 		com.sk89q.worldedit.world.World world = null;
-		for(com.sk89q.worldedit.world.World possibleWorld : plugin.getWorldEdit().getServerInterface().getWorlds()) {
-			if(possibleWorld.getName().equalsIgnoreCase(getWorldName())) {
-				world = possibleWorld;
-			}
-		}		
+		if(getWorld() != null) {
+			world = LocalWorldAdapter.adapt(new BukkitWorld(getWorld()));	
+		}
 		if(world == null) {
 			plugin.getLogger().warning("Did not save region " + getName() + ", world not found: " + getWorldName());
 			return false;
@@ -875,13 +875,10 @@ public abstract class GeneralRegion {
 	 * @param fileName The name of the file to save to (extension and folder will be added)
 	 * @return
 	 */
-	public boolean restoreRegionBlocks(String fileName) {
+	public boolean restoreRegionBlocks(String fileName) {		
 		com.sk89q.worldedit.world.World world = null;
-		// Find the correct world wrapper in WorldEdit, seems weird there is no getWorld(String name) method
-		for(com.sk89q.worldedit.world.World possibleWorld : plugin.getWorldEdit().getServerInterface().getWorlds()) {
-			if(possibleWorld.getName().equalsIgnoreCase(getWorldName())) {
-				world = possibleWorld;
-			}
+		if(getWorld() != null) {
+			world = LocalWorldAdapter.adapt(new BukkitWorld(getWorld()));	
 		}
 		if(world == null) {
 			plugin.getLogger().info("Did not restore region " + getName() + ", world not found: " + getWorldName());
@@ -1017,7 +1014,7 @@ public abstract class GeneralRegion {
 	protected boolean setRegionFlags(ConfigurationSection flags) {
 		boolean result = true;		
 		if(flags == null) {
-			AreaShop.debug("Flags section is null");
+			AreaShop.debug("Flags section is null for region " + getName());
 			return false;
 		}
 		Set<String> flagNames = flags.getKeys(false);
@@ -1070,7 +1067,7 @@ public abstract class GeneralRegion {
 					}
 				}
 				region.setMembers(members);
-				AreaShop.debug("  Flag " + flagName + " set: " + members.toUserFriendlyString());
+				//AreaShop.debug("  Flag " + flagName + " set: " + members.toUserFriendlyString());
 			} else if(flagName.equalsIgnoreCase("owners")) {
 				// Split the string and parse all values
 				String[] names = value.split(", ");
@@ -1103,12 +1100,12 @@ public abstract class GeneralRegion {
 					}
 				}
 				region.setOwners(owners);
-				AreaShop.debug("  Flag " + flagName + " set: " + owners.toUserFriendlyString());
+				//AreaShop.debug("  Flag " + flagName + " set: " + owners.toUserFriendlyString());
 			} else if(flagName.equalsIgnoreCase("priority")) {
 				try {
 					int priority = Integer.parseInt(value);
 					region.setPriority(priority);				
-					AreaShop.debug("  Flag " + flagName + " set: " + value);
+					//AreaShop.debug("  Flag " + flagName + " set: " + value);
 				} catch(NumberFormatException e) {
 					plugin.getLogger().warning("The value of flag " + flagName + " is not a number");
 					result = false;
@@ -1121,7 +1118,7 @@ public abstract class GeneralRegion {
 				if(parentRegion != null) {
 					try {
 						region.setParent(parentRegion);
-						AreaShop.debug("  Flag " + flagName + " set: " + value);
+						//AreaShop.debug("  Flag " + flagName + " set: " + value);
 					} catch (CircularInheritanceException e) {
 						plugin.getLogger().warning("The parent set in the config is not correct (circular inheritance)");
 					}
@@ -1144,7 +1141,7 @@ public abstract class GeneralRegion {
 		            if (groupFlag != null) {
 		                region.setFlag(groupFlag, null);
 		            }
-	                AreaShop.debug("  Flag " + flagName + " reset (+ possible group of flag)");
+	                //AreaShop.debug("  Flag " + flagName + " reset (+ possible group of flag)");
 		        	continue;
 		        } else {
 		        	if(groupFlag == null) {
@@ -1171,7 +1168,7 @@ public abstract class GeneralRegion {
 		        	if (flagSetting != null) {
 			            try {
 			                setFlag(region, foundFlag, flagSetting);
-			                AreaShop.debug("  Flag " + flagName + " set: " + flagSetting);
+			                //AreaShop.debug("  Flag " + flagName + " set: " + flagSetting);
 			            } catch (InvalidFlagFormat e) {
 			            	plugin.getLogger().warning("Found wrong value for flag " + flagName);
 			            }
@@ -1179,10 +1176,10 @@ public abstract class GeneralRegion {
 		        	if(groupValue != null) {
 		        		if(groupValue == groupFlag.getDefault()) {
 		        			region.setFlag(groupFlag, null);
-		        			AreaShop.debug("    Group of flag " + flagName + " set to default: " + groupValue);
+		        			//AreaShop.debug("    Group of flag " + flagName + " set to default: " + groupValue);
 		        		} else {
 		        			region.setFlag(groupFlag, groupValue);
-		        			AreaShop.debug("    Group of flag " + flagName + " set: " + groupValue);
+		        			//AreaShop.debug("    Group of flag " + flagName + " set: " + groupValue);
 		        		}
 		        	}
 		        }

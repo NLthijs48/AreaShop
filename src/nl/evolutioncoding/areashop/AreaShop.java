@@ -609,7 +609,7 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public String toName(String uuid) {
 		if(uuid == null) {
-			return null;
+			return "";
 		} else {
 			return this.toName(UUID.fromString(uuid));			
 		}

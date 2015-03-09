@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -65,7 +68,12 @@ public class UnrentCommand extends CommandAreaShop {
 		if(!rent.isRented()) {
 			plugin.message(sender, "unrent-notRented");
 			return;
-		}		
+		} 
+		List<GeneralRegion> activechilds = Utils.getActiveRegions(Utils.getParentChilds(rent));
+		if(!activechilds.isEmpty()){
+		    plugin.message(sender, "require-childsFail", rent.getName(), StringUtils.join(Utils.getRegionsNames(activechilds),", "));
+		    return;
+		}
 		if(sender.hasPermission("areashop.unrent")) {
 			plugin.message(sender, "unrent-other", rent.getPlayerName());
 			rent.unRent(true);

@@ -66,6 +66,8 @@ help-delFriend: "&6/as delfriend &7-&r Delete a friend from your region."
 help-delFriendAll: "&6/as delfriend &7-&r Delete a friend from a region."
 help-linksigns: "&6/as linksigns &7-&r Use bulk sign linking mode."
 help-stack: "&6/as stack &7-&r Create multiple regions and add them."
+help-require: "&6/as require <add|clear|list> &7-&r Manage requirements for regions."
+help-setperm: "&6/as setperm &7-&r Set permission of a region. No argument to remove it"
 
 rent-help: "/as rent [regionname], the region you stand in will be used if not specified."
 rent-noPermission: "You don't have permission to rent a region."
@@ -418,3 +420,20 @@ greeting-bought: "%region% is bought by %player%."
 greeting-resale: "%region% can be bought for %resaleprice% from %player%."
 
 update-playerNotify: "&2Update from AreaShop V%0% to %1% available, get the latest version at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/."
+ 
+require-noPermission: "You don't have permission to manage requirements for regions."
+require-help: "&6/as require <add|clear|list> [region] , the region you stand in will be used if not specified."
+require-notRegistered: "The specified region is not registered: %0%."
+require-existsInList: "The specified region is in the requirements list for this shop allready" # %0% region , %1% region to add
+require-List: "The region %0% requirements: %1%" # %0% region , %1% list requirements
+require-successAdd: "The region %1% has been added to region %0% requirements" # %0% region, %1% region added, %2% list requirements
+require-successClear: "The region %0% has been cleared" # %0% region
+require-failClick: "To get %0% you need first to own: %1%" # %0% region , %1% list requirements
+require-failParentTime: "Please extend %1% with at least %2% more." # %0% current region , %1% parent region, %2% time differance, %3% expire date
+require-childsFail: "This region has active childrens, please unrent them first:&6 %1%" # %0% region , %1% list active childrens
+
+require-failPerm: "You dont have the permission to aquire this shop. &c %1%" # %0% region , %1% permission
+setperm-noPermission: "You don't have permission to manage permissions for regions."
+setperm-notRegistered: "The specified region is not registered: %0%."
+setperm-successSet: "Permission for region %0% set to %1%" # %0% region , %1% permission
+

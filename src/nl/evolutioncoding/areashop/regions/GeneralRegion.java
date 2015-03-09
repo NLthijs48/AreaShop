@@ -173,7 +173,25 @@ public abstract class GeneralRegion {
 	 * Get the region type of the region
 	 * @return The RegionType of this region
 	 */
-	public abstract RegionType getType();	
+	public abstract RegionType getType();
+	
+	//TODO required shops
+	/**
+	 *  Get requirements if any
+	 * @return list of required shops
+	 */
+	public List<String> getRequireShops(){
+	   return this.getStringListSettingOrEmptie("general.requireShops");
+    }	
+	public void addRequireShops(String shop){
+	    List<String> shops = getRequireShops();
+	    shops.add(shop);
+	    setSetting("general.requireShops",shops);    
+	}	
+	public void clearRequireShops(){
+        setSetting("general.requireShops",null);    
+    }
+
 
 	/**
 	 * Update the region flags according the region data
@@ -1035,7 +1053,9 @@ public abstract class GeneralRegion {
 			// In the config normal Bukkit color codes are used, those only need to be translated on 5.X WorldGuard versions
 			if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {
 				value = translateBukkitToWorldGuardColors(value);
-			}
+			} else if(plugin.getWorldGuard().getDescription().getVersion().startsWith("6.")) {
+                value = translateBukkitToWorldGuardColors6(value);
+            }
 			if(flagName.equalsIgnoreCase("members")) {
 				// Split the string and parse all values
 				String[] names = value.split(", ");
@@ -1191,6 +1211,38 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
+     * Translate the color codes you put in greeting/farwell messages to the weird color codes of WorldGuard 6
+     * @param message The message where the color codes should be translated (this message has bukkit color codes)
+     * @return The string with the WorldGuard 6 color codes
+     */
+	private String translateBukkitToWorldGuardColors6(String message) {
+	    String result = message;
+        result = result.replace("&r", "`r");//RED
+        result = result.replace("&4", "`R");//DARK_RED
+        result = result.replace("&e", "`y");//YELLOW
+        result = result.replace("&6", "`Y");//GOLD
+        result = result.replace("&a", "`g");//GREEN
+        result = result.replace("&2", "`G");//DARK_GREEN
+        result = result.replace("&b", "`c");//AQUA
+        result = result.replace("&3", "`C");//DARK_AQUA
+        result = result.replace("&9", "`b");//BLUE
+        result = result.replace("&1", "`B");//DARK_BLUE
+        result = result.replace("&d", "`p");//LIGHT_PURPLE
+        result = result.replace("&5", "`P");//DARK_PURPLE
+        result = result.replace("&0", "`0");//BLACK
+        result = result.replace("&8", "`1");//DARK_GRAY
+        result = result.replace("&7", "`2");//GRAY
+        result = result.replace("&f", "`w");//WHITE
+        result = result.replace("&k", "`k");//MAGIC        
+        result = result.replace("&l", "`l");//BOLD
+        result = result.replace("&m", "`m");//STRIKETHROUGH
+        result = result.replace("&n", "`n");//UNDERLINE
+        result = result.replace("&o", "`o");//ITALIC
+        result = result.replace("&x", "`x");//RESET
+        return result;
+    }
+
+    /**
 	 * Translate the color codes you put in greeting/farwell messages to the weird color codes of WorldGuard
 	 * @param message The message where the color codes should be translated (this message has bukkit color codes)
 	 * @return The string with the WorldGuard color codes
@@ -1776,6 +1828,13 @@ public abstract class GeneralRegion {
 		return this.getFileManager().getDefaultSettings().getStringList(path);
 	}
 	
+	public List<String> getStringListSettingOrEmptie(String path) {
+        if(config.isSet(path)) {
+            return config.getStringList(path);
+        }
+        return new ArrayList<String>();
+    }
+	
 	public void setSetting(String path, Object value) {
 		config.set(path, value);
 		this.saveRequired();
@@ -2216,6 +2275,13 @@ public abstract class GeneralRegion {
 		
 		return !playerCommands.isEmpty() || !consoleCommands.isEmpty();
 	}
+
+	public void setPermission(String perm){
+	    setSetting("general.permission",perm);
+	}
+    public String getPermission() {
+        return config.getString("general.permission", null);
+    }
 }
 
 

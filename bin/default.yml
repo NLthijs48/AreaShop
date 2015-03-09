@@ -1,0 +1,86 @@
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ default.yml file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop ║
+# ║ All settings below are default settings and can be overridden by group settings or individual region settings              ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ GENERAL: Options for all regions                                                                                           │
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘  
+general:
+  ## Set this to true to enable saving/restoring for regions as specified in the profile below, which is specified in the config
+  enableRestore: false
+  ## The schematic profile as specified in the config
+  schematicProfile: 'default'
+  ## The event commands profile as specified in the config
+  eventCommandProfile: 'default'
+  ## The profile for the format of the sign as specified in the config
+  signProfile: 'default'
+  ## The profile for the WorldGuard flags as specified in the config
+  flagProfile: 'default'
+  ## The y location within the region to start searching for safe teleport spots (x and z will be in the middle of the region)
+  ## Possible values: bottom, middle, top
+  teleportLocationY: bottom
+  ## If true the teleportation algorithm only allows telportation to inside the region, otherwise it will expand algorithm
+  ## a cube from the starting point to check for safe spots (then it could end outside the region)
+  ## If you set a teleport location outside of the region with /as settp then setting this to true breaks that teleport (players cannot use it)
+  teleportIntoRegion: true
+  ## Same as above, but then for when you teleport to the sign of a region instead of the region itself
+  teleportToSignIntoRegion: false
+  ## Set where the '/as find' command should teleport the player to, set to true for the first sign of the region and set to
+  ## false to teleport to the location set by '/as settp' or the default location (if not set).
+  findTeleportToSign: true
+  ## Restricts the /as buy and /as rent commands to the world of the region 
+  ## Usefull if you have diffrent economies for different worlds
+  restrictedToWorld: false
+  ## Restricts the /as buy and /as rent commands to the region itself (player needs to be inside)
+  restrictedToRegion: false
+
+
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ RENT: Options for rent regions                                                                                             │
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+rent:
+  ## The default price of a renting region
+  price: 1000
+  ## The default duration of a renting region, you can find all time indicators in config.yml below the RENTING header
+  duration: '1 day'
+  ## The percentage of the renting price you get back if you unrent the region (price of time left will be multiplied by this/100)
+  moneyBack: 100
+  ## Maximum number of extends a player can do (-1 for infinite, 0 for no extending)
+  maxExtends: -1
+  ## The Maximum time they can have the region rented in advance (minutes, -1 for infinite)
+  ## If you set this lower then the rent duration then players will not be able to rent the region 
+  ## (because it always exceeds the maxRentTime in that case) 
+  maxRentTime: -1
+  ## Automatically unrent the region after the specified number of minutes between the last login time of the renter and the current time
+  ## -1 means never, 1440 is one day, 43200 is one month, 525600 is one year
+  inactiveTimeUntilUnrent: -1
+  ## If a region of a player has less then this time left when he joins the server he will get a warning
+  ## You can find all time indicators in config.yml below the RENTING header, change to '' to disable
+  warningOnLoginTime: '1 day'
+  ## The profile for the expiration warnings as specified in the config
+  expirationWarningProfile: 'default'
+
+
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUY: Options for buy regions                                                                                               │
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+buy:
+  ## The default price of a buying region
+  price: 1000
+  ## The percentage of the buying price you get back if you sell the region
+  moneyBack: 100
+  ## Automatically sell the region after the specified number of minutes between the last login time of the buyer and the current time
+  ## -1 mean never, 1440 is one day, 43200 is one month, 525600 is one year
+  inactiveTimeUntilSell: -1
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

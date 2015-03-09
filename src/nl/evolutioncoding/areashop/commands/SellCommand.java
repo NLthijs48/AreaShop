@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -66,6 +69,13 @@ public class SellCommand extends CommandAreaShop {
 			plugin.message(sender, "sell-notBought");
 			return;
 		}
+		//check if it has childrens
+		List<GeneralRegion> activechilds = Utils.getActiveRegions(Utils.getParentChilds(buy));
+        if(!activechilds.isEmpty()){
+            plugin.message(sender, "require-childsFail", buy.getName(), StringUtils.join(Utils.getRegionsNames(activechilds),", "));
+            return;
+        }
+        
 		if(sender.hasPermission("areashop.sell")) {
 			plugin.message(sender, "sell-sold", buy.getPlayerName());
 			buy.sell(true);

@@ -1,6 +1,7 @@
 package nl.evolutioncoding.areashop.listeners;
 
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.ClickType;
 
@@ -55,6 +56,14 @@ public class SignClickListener implements Listener {
 			} else if(!player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				clickType = ClickType.RIGHTCLICK;
 			}
+			
+			//check if requirements
+			boolean cancel = Utils.checkRequirements(result, player.getUniqueId(), player);
+			if(!cancel){
+                event.setCancelled(true);
+                return;
+            }
+			
 			// Run the commands
 			boolean runned = result.runSignCommands(signName, player, clickType);
 			// Only cancel event if at least one command has been executed

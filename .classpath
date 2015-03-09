@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="D:/development/Cauldron 171 clean/cauldron-1.7.10-1.1236.05.212-server.jar"/>
+	<classpathentry kind="lib" path="D:/development/Cauldron 171 clean/plugins/worldguard-6.0.0-SNAPSHOT-shaded.jar"/>
+	<classpathentry kind="lib" path="D:/development/Cauldron 171 clean/plugins/Vault-1.4.1.jar"/>
+	<classpathentry kind="lib" path="D:/development/Cauldron 171 clean/plugins/worldedit-bukkit-6.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

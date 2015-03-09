@@ -23,8 +23,10 @@ import nl.evolutioncoding.areashop.commands.HelpCommand;
 import nl.evolutioncoding.areashop.commands.InfoCommand;
 import nl.evolutioncoding.areashop.commands.LinksignsCommand;
 import nl.evolutioncoding.areashop.commands.MeCommand;
+import nl.evolutioncoding.areashop.commands.PermCommand;
 import nl.evolutioncoding.areashop.commands.ReloadCommand;
 import nl.evolutioncoding.areashop.commands.RentCommand;
+import nl.evolutioncoding.areashop.commands.RequireCommand;
 import nl.evolutioncoding.areashop.commands.ResellCommand;
 import nl.evolutioncoding.areashop.commands.SchematiceventCommand;
 import nl.evolutioncoding.areashop.commands.SellCommand;
@@ -86,6 +88,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new DelsignCommand(plugin));
 		commands.add(new LinksignsCommand(plugin));
 		commands.add(new StackCommand(plugin));
+		commands.add(new RequireCommand(plugin));
+		commands.add(new PermCommand(plugin));
 		
 		/* Register commands in bukkit */
 		plugin.getCommand("AreaShop").setExecutor(this);	

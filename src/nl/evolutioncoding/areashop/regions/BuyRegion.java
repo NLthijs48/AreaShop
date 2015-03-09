@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -275,6 +276,16 @@ public class BuyRegion extends GeneralRegion {
 					// Should not be reached, but is safe like this
 					return false;
 				}
+				//check area extra permissions
+                boolean perms = Utils.checkAreaPermissions(this, player.getUniqueId(), player);
+                        if(!perms){
+                            return false;
+                        }
+				//check requirements
+                boolean check = Utils.checkRequirements(this, player.getUniqueId(), player);
+                if(!check){
+                    return false;
+                }
 				
 				/* Check if the player has enough money */
 				if((!isResell && plugin.getEconomy().has(player, getWorldName(), getPrice())) || (isResell && plugin.getEconomy().has(player, getWorldName(), getResellPrice()))) {

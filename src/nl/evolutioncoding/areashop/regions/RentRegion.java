@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.exceptions.RegionCreateException;
 
 import org.bukkit.Bukkit;
@@ -473,6 +474,16 @@ public class RentRegion extends GeneralRegion {
 						plugin.message(player, "rent-maxExtends", getMaxExtends());
 						return false;
 					}
+				}
+				//check area extra permissions
+				boolean perms = Utils.checkAreaPermissions(this, player.getUniqueId(), player);
+				        if(!perms){
+		                    return false;
+		                }
+				//check requirements
+				boolean check = Utils.checkRequirements(this, player.getUniqueId(), player);
+				if(!check){
+				    return false;
 				}
 				
 				// Check if there is enough time left before hitting maxRentTime

@@ -29,6 +29,7 @@ import nl.evolutioncoding.areashop.commands.ResellCommand;
 import nl.evolutioncoding.areashop.commands.SchematiceventCommand;
 import nl.evolutioncoding.areashop.commands.SellCommand;
 import nl.evolutioncoding.areashop.commands.SetdurationCommand;
+import nl.evolutioncoding.areashop.commands.SetlandlordCommand;
 import nl.evolutioncoding.areashop.commands.SetownerCommand;
 import nl.evolutioncoding.areashop.commands.SetpriceCommand;
 import nl.evolutioncoding.areashop.commands.SetrestoreCommand;
@@ -86,6 +87,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new DelsignCommand(plugin));
 		commands.add(new LinksignsCommand(plugin));
 		commands.add(new StackCommand(plugin));
+		commands.add(new SetlandlordCommand(plugin));
 		
 		/* Register commands in bukkit */
 		plugin.getCommand("AreaShop").setExecutor(this);	

@@ -332,6 +332,61 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
+	 * Get the player that is currently the owner of this region (either bought or rented it)
+	 * @return The UUID of the owner of this region
+	 */
+	public UUID getOwner() {
+		if(isRentRegion()) {
+			return ((RentRegion)this).getRenter();
+		} else {
+			return ((BuyRegion)this).getBuyer();
+		}
+	}
+	
+	/**
+	 * Get the landlord of this region (the player that receives any revenue from this region)
+	 * @return The UUID of the landlord of this region
+	 */
+	public UUID getLandlord() {
+		String landlord = getStringSetting("general.landlord");
+		if(landlord != null) {
+			try {
+				return UUID.fromString(landlord);
+			} catch(IllegalArgumentException e) {}
+		}
+		return null;
+	}
+	
+	/**
+	 * Get the name of the landlord
+	 * @return The name of the landlord, if unavailable by UUID it will return the old cached name, if that is unavailable it will return <UNKNOWN>
+	 */
+	public String getLandlordName() {
+		String result = plugin.toName(getLandlord());
+		if(result == null || result.isEmpty()) {
+			result = config.getString("general.landlordName");
+			if(result == null || result.isEmpty()) {
+				result = "<UNKNOWN>";
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Set the landlord of this region (the player that receives all revenue of this region)
+	 * @param landlord The UUID of the player that should be set as landlord
+	 */
+	public void setLandlord(UUID landlord) {
+		if(landlord == null) {
+			setSetting("general.landlord", null);
+			setSetting("general.landlordName", null);
+		} else {
+			setSetting("general.landlord", landlord.toString());
+			setSetting("general.landlordName", plugin.toName(landlord));
+		}
+	}
+	
+	/**
 	 * Get the WorldGuard region associated with this AreaShop region
 	 * @return The ProtectedRegion of WorldGuard or null if the region does not exist anymore
 	 */
@@ -417,6 +472,8 @@ public abstract class GeneralRegion {
 		result.put(AreaShop.tagHeight, getHeight());
 		result.put(AreaShop.tagFriends, Utils.createCommaSeparatedList(getFriendNames()));
 		result.put(AreaShop.tagFriendsUUID, Utils.createCommaSeparatedList(getFriends()));
+		result.put(AreaShop.tagLandlord, getLandlordName());
+		result.put(AreaShop.tagLandlordUUID, getLandlord());
 		
 		// TODO: add more? coordinates?
 		

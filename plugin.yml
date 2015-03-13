@@ -51,6 +51,7 @@ permissions:
       areashop.delfriendall: true
       areashop.notifyupdate: true
       areashop.stack: true
+      areashop.setlandlord: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -206,4 +207,7 @@ permissions:
     default: op
   areashop.stack:
     description: Allows you to create regions and add them to AreaShop like the WorldEdit //stack command
+    default: op
+  areashop.setlandlord:
+    description: Allows you to set the landlord of a region, the landlord receives all revenue
     default: op

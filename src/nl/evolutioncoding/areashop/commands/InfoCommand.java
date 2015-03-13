@@ -251,6 +251,9 @@ public class InfoCommand extends CommandAreaShop {
 						} else {
 							plugin.messageNoPrefix(sender, "info-regionCanBeRented", rent);
 						}
+						if(rent.getLandlord() != null) {
+							plugin.messageNoPrefix(sender, "info-regionLandlord", rent);
+						}
 						if(rent.getMaxExtends() != -1) {
 							if(rent.getMaxExtends() == 0) {
 								plugin.messageNoPrefix(sender, "info-regionNoExtending", rent);
@@ -318,6 +321,9 @@ public class InfoCommand extends CommandAreaShop {
 							}
 						} else {
 							plugin.messageNoPrefix(sender, "info-regionCanBeBought", buy);
+						}
+						if(buy.getLandlord() != null) {
+							plugin.messageNoPrefix(sender, "info-regionLandlord", buy);
 						}
 						if(buy.getInactiveTimeUntilSell() != -1) {
 							plugin.messageNoPrefix(sender, "info-regionInactiveSell", buy);			

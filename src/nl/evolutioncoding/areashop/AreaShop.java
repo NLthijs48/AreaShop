@@ -21,6 +21,7 @@ import nl.evolutioncoding.areashop.managers.SignLinkerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -93,6 +94,8 @@ public final class AreaShop extends JavaPlugin {
 	public static final String tagExtendsLeft = "%extendsleft%";
 	public static final String tagMaxRentTime = "%maxrenttime%";
 	public static final String tagMaxInactiveTime = "%inactivetime%";
+	public static final String tagLandlord = "%landlord%";
+	public static final String tagLandlordUUID = "%landlorduuid%";
 	
 	public static AreaShop getInstance() {
 		return AreaShop.instance;
@@ -336,7 +339,11 @@ public final class AreaShop extends JavaPlugin {
 	 */
 	public void registerDynamicPermissions() {
 		// Register limit groups of amount of regions a player can have
-		for(String group : getConfig().getConfigurationSection("limitGroups").getKeys(false)) {
+		ConfigurationSection section = getConfig().getConfigurationSection("limitGroups");
+		if(section == null) {
+			return;
+		}
+		for(String group : section.getKeys(false)) {
 			if(!"default".equals(group)) {
 				Permission perm = new Permission("areashop.limits." + group);
 				Bukkit.getPluginManager().addPermission(perm);

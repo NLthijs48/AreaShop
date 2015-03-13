@@ -171,10 +171,17 @@ public class RentRegion extends GeneralRegion {
 	
 	/**
 	 * Get the name of the player renting this region
-	 * @return Name of the player renting this region
+	 * @return Name of the player renting this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return <UNKNOWN>
 	 */
 	public String getPlayerName() {
-		return plugin.toName(getRenter());
+		String result = plugin.toName(getRenter());
+		if(result == null || result.isEmpty()) {
+			result = config.getString("rent.renterName");
+			if(result == null || result.isEmpty()) {
+				result = "<UNKNOWN>";
+			}
+		}
+		return result;
 	}
 	
 	/**
@@ -497,6 +504,16 @@ public class RentRegion extends GeneralRegion {
 						plugin.message(player, "rent-payError");
 						return false;
 					}
+					// Optionally give money to the landlord
+					if(getLandlord() != null) {
+						OfflinePlayer landlord = Bukkit.getOfflinePlayer(getLandlord());
+						if(landlord != null) {
+							r = plugin.getEconomy().depositPlayer(landlord, getWorldName(), getPrice());
+							if(!r.transactionSuccess()) {
+								plugin.getLogger().warning("Something went wrong with paying '" + landlord.getName() + "' " + getFormattedPrice() + " for his rent of region " + getName() + " to " + player.getName());
+							}
+						}
+					}					
 					if(!extend) {
 						// Run commands
 						runEventCommands(RegionEvent.RENTED, true);

@@ -33,7 +33,10 @@ general:
   restrictedToWorld: false
   ## Restricts the /as buy and /as rent commands to the region itself (player needs to be inside)
   restrictedToRegion: false
-
+  ## The UUID of the landlord, this player will receive all money from rents/buys (but not reselling with '/as resell')
+  ## If you use this value be sure that you set 'moneyBack' to 0, because money will not be substracted from the account
+  ## of the landlord and the player would get money 'out of thin air'.
+  landlord: ""
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ RENT: Options for rent regions                                                                                             │

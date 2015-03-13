@@ -78,7 +78,7 @@ public class BuyRegion extends GeneralRegion {
 	 * Set the buyer of this region
 	 * @param buyer The UUID of the player that should be set as buyer
 	 */
-	public void setBuyer(UUID buyer) {
+	public void setLandlord(UUID buyer) {
 		if(buyer == null) {
 			setSetting("buy.buyer", null);
 			setSetting("buy.buyerName", null);
@@ -90,10 +90,17 @@ public class BuyRegion extends GeneralRegion {
 	
 	/**
 	 * Get the name of the player that owns this region
-	 * @return The name of the player that owns this region
+	 * @return The name of the player that owns this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return <UNKNOWN>
 	 */
 	public String getPlayerName() {
-		return plugin.toName(getBuyer());
+		String result = plugin.toName(getBuyer());
+		if(result == null || result.isEmpty()) {
+			result = config.getString("buy.buyerName");
+			if(result == null || result.isEmpty()) {
+				result = "<UNKNOWN>";
+			}
+		}
+		return result;
 	}
 	
 	/**
@@ -292,7 +299,7 @@ public class BuyRegion extends GeneralRegion {
 						if(oldOwnerPlayer != null) {
 							r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
 							if(!r.transactionSuccess()) {
-								plugin.getLogger().warning("Something went wrong with paying '" + oldOwnerPlayer.getName() + "' for his resell of region " + getName());
+								plugin.getLogger().warning("Something went wrong with paying '" + oldOwnerPlayer.getName() + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + player.getName());
 							}
 						}
 						// Resell is done, disable that now
@@ -300,7 +307,7 @@ public class BuyRegion extends GeneralRegion {
 						// Run commands
 						this.runEventCommands(RegionEvent.RESELL, true);
 						// Set the owner
-						setBuyer(player.getUniqueId());
+						setLandlord(player.getUniqueId());
 		
 						// Update everything
 						handleSchematicEvent(RegionEvent.RESELL);
@@ -325,12 +332,22 @@ public class BuyRegion extends GeneralRegion {
 							plugin.message(player, "buy-payError");
 							return false;
 						}
+						// Optionally give money to the landlord
+						if(getLandlord() != null) {
+							OfflinePlayer landlord = Bukkit.getOfflinePlayer(getLandlord());
+							if(landlord != null) {
+								r = plugin.getEconomy().depositPlayer(landlord, getWorldName(), getPrice());
+								if(!r.transactionSuccess()) {
+									plugin.getLogger().warning("Something went wrong with paying '" + landlord.getName() + "' " + getFormattedPrice() + " for his sell of region " + getName() + " to " + player.getName());
+								}
+							}
+						}
 						AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + getFormattedPrice());
 						
 						// Run commands
 						this.runEventCommands(RegionEvent.BOUGHT, true);
 						// Set the owner
-						setBuyer(player.getUniqueId());
+						setLandlord(player.getUniqueId());
 		
 						// Update everything
 						handleSchematicEvent(RegionEvent.BOUGHT);
@@ -404,7 +421,7 @@ public class BuyRegion extends GeneralRegion {
 		
 		/* Remove friends and the owner */
 		clearFriends();
-		setBuyer(null);		
+		setLandlord(null);		
 		
 		updateSigns();
 		

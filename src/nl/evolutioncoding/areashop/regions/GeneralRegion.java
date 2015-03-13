@@ -2097,11 +2097,6 @@ public abstract class GeneralRegion {
 	 * @param type The type of event
 	 */
 	public void handleSchematicEvent(RegionEvent type) {
-		// Check for the general killswitch
-		// TODO remove
-		if(!plugin.getConfig().getBoolean("enableSchematics")) {
-			return;
-		}
 		// Check the individual>group>default setting
 		if(!isRestoreEnabled()) {
 			return;

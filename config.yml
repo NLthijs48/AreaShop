@@ -17,8 +17,6 @@ fractionalNumbers: 2
 hideEmptyFractionalPart: true
 ## The language file that should be used, check the 'lang' folder for build-in languages (use the filename without .yml here)
 language: EN
-## Enable Schematic saving and restoring in general
-enableSchematics: true
 ## The tags you need to write on the sign to trigger the plugin
 signTags:
   ## Tag for adding a rent region

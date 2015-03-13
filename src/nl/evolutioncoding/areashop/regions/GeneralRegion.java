@@ -1292,11 +1292,28 @@ public abstract class GeneralRegion {
 			owner = player.getUniqueId().equals(((BuyRegion)this).getBuyer());
 		}
 		
+		List<Location> signs = getSignLocations();
+		boolean signAvailable = !signs.isEmpty();
+		if(toSign) {
+			if(signAvailable) {
+				// Use the location 1 below the sign to prevent weird spawing above the sign
+				startLocation = signs.get(0).subtract(0.0, 1.0, 0.0);
+				startLocation.setPitch(player.getLocation().getPitch());
+				startLocation.setYaw(player.getLocation().getYaw());
+			} else {
+				// No sign available
+				plugin.message(player, "teleport-changedToNoSign");
+				toSign = false;
+			}
+		} 
+		
 		if(checkPermissions) {
 			// Teleport to sign instead if they dont have permission for teleporting to region
-			if(!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
+			if(signAvailable && 
+					  (!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
 					|| !toSign && !owner && !friend && !player.hasPermission("areashop.teleportall") && player.hasPermission("areashop.teleportsignall")
-					|| !toSign && !owner && friend && !player.hasPermission("areashop.teleportfriend") && player.hasPermission("areashop.teleportfriendsign")) {
+					|| !toSign && !owner && friend && !player.hasPermission("areashop.teleportfriend") && player.hasPermission("areashop.teleportfriendsign"))) {
+				plugin.message(player, "teleport-changedToSign");
 				toSign = true;
 			}
 			// Check permissions
@@ -1321,15 +1338,7 @@ public abstract class GeneralRegion {
 			}
 		}
 		
-		if(toSign) {
-			List<Location> signs = getSignLocations();
-			if(!signs.isEmpty()) {
-				// Use the location 1 below the sign to prevent weird spawing above the sign
-				startLocation = signs.get(0).subtract(0.0, 1.0, 0.0);
-				startLocation.setPitch(player.getLocation().getPitch());
-				startLocation.setYaw(player.getLocation().getYaw());
-			}		
-		} 
+
 		if(startLocation == null && this.hasTeleportLocation()) {
 			startLocation = getTeleportLocation();
 		}
@@ -2089,6 +2098,7 @@ public abstract class GeneralRegion {
 	 */
 	public void handleSchematicEvent(RegionEvent type) {
 		// Check for the general killswitch
+		// TODO remove
 		if(!plugin.getConfig().getBoolean("enableSchematics")) {
 			return;
 		}

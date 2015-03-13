@@ -240,6 +240,8 @@ teleport-success: "You teleported to %0%."
 teleport-successSign: "You teleported to the sign of %0%."
 teleport-noSafe: "No safe position found in region %0%, no spots in region left or maximum tries exceeded (%1%/%2%)."
 teleport-blocked: "You can't teleport because the position is outside the region, and you are forced to teleport inside."
+teleport-changedToSign: "You only have permission to teleport to the sign and not inside the region, teleporting to sign."
+teleport-changedToNoSign: "No sign available to teleport to, trying to teleport inside the region instead."
 
 setteleport-help: "/as settp [region] [reset], the region you stand in will be used if not specified."
 setteleport-noPermission: "You don't have permission to set the teleport location."

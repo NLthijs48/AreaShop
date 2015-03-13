@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -668,7 +669,7 @@ public class Updater {
                 this.plugin.getLogger().severe("If you have not recently modified your configuration and this is the first time you are seeing this message, the site may be experiencing temporary downtime.");
                 this.result = UpdateResult.FAIL_DBO;
             }
-            this.plugin.getLogger().log(Level.SEVERE, null, e);
+            AreaShop.debug(ExceptionUtils.getStackTrace(e));
             return false;
         }
     }

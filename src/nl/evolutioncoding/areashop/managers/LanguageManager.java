@@ -21,7 +21,7 @@ import com.google.common.base.Charsets;
 
 public class LanguageManager {
 	private AreaShop plugin = null;
-	private String languages[] = {"EN", "ZH_TW", "NL", "FR", "DE"};
+	private String languages[] = {"EN", "ZH_TW", "NL", "FI", "FR", "DE", "PL"};
 	private HashMap<String, String> currentLanguage, defaultLanguage;
 	
 	/**

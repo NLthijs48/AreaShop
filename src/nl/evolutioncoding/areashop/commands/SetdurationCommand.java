@@ -31,7 +31,7 @@ public class SetdurationCommand extends CommandAreaShop {
 
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
-		if(!sender.hasPermission("areashop.setduration")) {
+		if(!sender.hasPermission("areashop.setduration") && (!sender.hasPermission("areashop.setduration.landlord") && sender instanceof Player)) {
 			plugin.message(sender, "setduration-noPermission");
 			return;
 		}
@@ -39,8 +39,12 @@ public class SetdurationCommand extends CommandAreaShop {
 			plugin.message(sender, "setduration-help");
 			return;
 		}
+		int regionArgument = 3;
+		if(args.length >= 2 && ("default".equalsIgnoreCase(args[1]) || "reset".equalsIgnoreCase(args[1]))) {
+			regionArgument = 2;
+		}
 		RentRegion rent = null;
-		if(args.length <= 3) {
+		if(args.length <= regionArgument) {
 			if (sender instanceof Player) {
 				// get the region by location
 				List<RentRegion> regions = plugin.getFileManager().getApplicableRentRegions(((Player) sender).getLocation());
@@ -58,10 +62,22 @@ public class SetdurationCommand extends CommandAreaShop {
 				return;
 			}		
 		} else {
-			rent = plugin.getFileManager().getRent(args[3]);
+			rent = plugin.getFileManager().getRent(args[regionArgument]);
 		}
 		if(rent == null) {
-			plugin.message(sender, "setduration-notRegistered", args[3]);
+			plugin.message(sender, "setduration-notRegistered", args[regionArgument]);
+			return;
+		}
+		if(!sender.hasPermission("areashop.setduration") && !rent.isLandlord(((Player)sender).getUniqueId())) {
+			plugin.message(sender, "setduration-noLandlord", rent);
+			return;
+		}	
+		if("default".equalsIgnoreCase(args[1]) || "reset".equalsIgnoreCase(args[1])) {
+			plugin.message(sender, "setduration-successRemoved", rent);
+			rent.setDuration(null);
+			rent.updateRegionFlags();
+			rent.updateSigns();
+			rent.saveRequired();
 			return;
 		}
 		try {

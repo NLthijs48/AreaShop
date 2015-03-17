@@ -3,10 +3,12 @@ package nl.evolutioncoding.areashop.listeners;
 import java.util.List;
 
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.managers.FileManager.AddResult;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
-import nl.evolutioncoding.areashop.regions.RentRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionEvent;
+import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionType;
+import nl.evolutioncoding.areashop.regions.RentRegion;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -53,7 +55,7 @@ public final class SignChangeListener implements Listener {
 		
 		// Check if the sign is meant for this plugin
 		if(event.getLine(0).contains(plugin.getConfig().getString("signTags.rent"))) {
-			if(!player.hasPermission("areashop.createrent")) {
+			if(!player.hasPermission("areashop.createrent") && !player.hasPermission("areashop.createrent.member") && !player.hasPermission("areashop.createrent.owner")) {
 				plugin.message(player, "setup-noPermissionRent");				
 				return;
 			}
@@ -92,6 +94,8 @@ public final class SignChangeListener implements Listener {
 					}
 				}
 			}
+			
+			
 		
 			boolean priceSet = fourthLine != null && fourthLine.length() != 0;
 			boolean durationSet = thirdLine != null && thirdLine.length() != 0;
@@ -99,15 +103,23 @@ public final class SignChangeListener implements Listener {
 			if(secondLine == null || secondLine.length() == 0) {
 				plugin.message(player, "setup-noRegion");
 				return;
-			} else if(regionManager.getRegion(secondLine) == null) {
+			}
+			ProtectedRegion region = regionManager.getRegion(secondLine);
+			if(region == null) {
 				plugin.message(player, "setup-wrongRegion");
 				return;
-			} else if(plugin.getFileManager().isBlacklisted(secondLine)) {
+			} 
+			
+			AddResult addResult = plugin.getFileManager().checkRegionAdd(player, regionManager.getRegion(secondLine), RegionType.RENT);			
+			if(addResult == AddResult.BLACKLISTED) {
 				plugin.message(player, "setup-blacklisted", secondLine);
 				return;
-			} else if(plugin.getFileManager().getRent(secondLine) != null) {
+			} else if(addResult == AddResult.ALREADYADDED) {
 				plugin.message(player, "setup-alreadyRentSign");
 				return;
+			} else if(addResult == AddResult.NOPERMISSION) {
+				plugin.message(player, "setup-noPermission", secondLine);
+				return;			
 			} else if(thirdLine != null && thirdLine.length() != 0 && !plugin.checkTimeFormat(thirdLine)) {
 				plugin.message(player, "setup-wrongDuration");
 				return;
@@ -125,6 +137,15 @@ public final class SignChangeListener implements Listener {
 				
 				// Add rent to the FileManager
 				final RentRegion rent = new RentRegion(plugin, secondLine, event.getPlayer().getWorld());
+				boolean isMember = player != null && region.getMembers().contains(player.getUniqueId());
+				boolean isOwner = player != null && region.getOwners().contains(player.getUniqueId());
+				boolean landlord = (!player.hasPermission("areashop.createrent")
+						&& ((player.hasPermission("areashop.createrent.owner") && isOwner)
+						|| (player.hasPermission("areashop.createrent.member") && isMember)));					
+
+				if(landlord) {
+					rent.setLandlord(player.getUniqueId());
+				}
 				if(priceSet) {
 					rent.setPrice(price);
 				}
@@ -156,7 +177,7 @@ public final class SignChangeListener implements Listener {
 			}
 		} else if (event.getLine(0).contains(plugin.getConfig().getString("signTags.buy"))) {
 			// Check for permission
-			if(!player.hasPermission("areashop.createbuy")) {
+			if(!player.hasPermission("areashop.createbuy") && !player.hasPermission("areashop.createbuy.member") && !player.hasPermission("areashop.createbuy.owner")) {
 				plugin.message(player, "setup-noPermissionBuy");				
 				return;
 			}
@@ -200,15 +221,22 @@ public final class SignChangeListener implements Listener {
 			if(secondLine == null || secondLine.length() == 0) {
 				plugin.message(player, "setup-noRegion");
 				return;
-			} else if(regionManager.getRegion(secondLine) == null) {
+			}
+			ProtectedRegion region = regionManager.getRegion(secondLine);
+			if(region == null) {
 				plugin.message(player, "setup-wrongRegion");
 				return;
-			} else if(plugin.getFileManager().isBlacklisted(secondLine)) {
+			}
+			AddResult addResult = plugin.getFileManager().checkRegionAdd(player, region, RegionType.BUY);			
+			if(addResult == AddResult.BLACKLISTED) {
 				plugin.message(player, "setup-blacklisted", secondLine);
 				return;
-			} else if(plugin.getFileManager().getBuy(secondLine) != null) {
-				plugin.message(player, "setup-alreadyBuySign");
+			} else if(addResult == AddResult.ALREADYADDED) {
+				plugin.message(player, "setup-alreadyRentSign");
 				return;
+			} else if(addResult == AddResult.NOPERMISSION) {
+				plugin.message(player, "setup-noPermission", secondLine);
+				return;			
 			} else {
 				double price = 0.0;
 				if(priceSet) {
@@ -223,6 +251,15 @@ public final class SignChangeListener implements Listener {
 				
 				// Add buy to the FileManager
 				final BuyRegion buy = new BuyRegion(plugin, secondLine, event.getPlayer().getWorld());
+				boolean isMember = player != null && region.getMembers().contains(player.getUniqueId());
+				boolean isOwner = player != null && region.getOwners().contains(player.getUniqueId());
+				boolean landlord = (!player.hasPermission("areashop.createbuy")
+						&& ((player.hasPermission("areashop.createbuy.owner") && isOwner)
+						|| (player.hasPermission("areashop.createbuy.member") && isMember)));					
+
+				if(landlord) {
+					buy.setLandlord(player.getUniqueId());
+				}
 				if(priceSet) {
 					buy.setPrice(price);
 				}

@@ -33,7 +33,7 @@ public class SetpriceCommand extends CommandAreaShop {
 
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
-		if(!sender.hasPermission("areashop.setprice")) {
+		if(!sender.hasPermission("areashop.setprice") && (!sender.hasPermission("areashop.setprice.landlord") && sender instanceof Player)) {
 			plugin.message(sender, "setprice-noPermission");
 			return;
 		}		
@@ -66,6 +66,22 @@ public class SetpriceCommand extends CommandAreaShop {
 			plugin.message(sender, "setprice-notRegistered", args[2]);
 			return;
 		}
+		if(!sender.hasPermission("areashop.setprice") && !region.isLandlord(((Player)sender).getUniqueId())) {
+			plugin.message(sender, "setprice-noLandlord", region);
+			return;
+		}
+		if("default".equalsIgnoreCase(args[1]) || "reset".equalsIgnoreCase(args[1])) {
+			if(region.isRentRegion()) {
+				((RentRegion)region).removePrice();
+			} else if(region.isBuyRegion()) {
+				((BuyRegion)region).removePrice();
+			}
+			plugin.message(sender, "setprice-successRemoved", region);
+			region.updateSigns();
+			region.updateRegionFlags();
+			region.saveRequired();
+			return;
+		}		
 		double price = 0.0;
 		try {
 			price = Double.parseDouble(args[1]);
@@ -75,10 +91,10 @@ public class SetpriceCommand extends CommandAreaShop {
 		}	
 		if(region.isRentRegion()) {
 			((RentRegion)region).setPrice(price);
-			plugin.message(sender, "setprice-successRent", region.getName(), ((RentRegion)region).getFormattedPrice(), ((RentRegion)region).getDurationString());
+			plugin.message(sender, "setprice-successRent", region);
 		} else if(region.isBuyRegion()) {
 			((BuyRegion)region).setPrice(price);
-			plugin.message(sender, "setprice-successBuy", region.getName(), ((BuyRegion)region).getFormattedPrice());
+			plugin.message(sender, "setprice-successBuy", region);
 		}
 		region.updateSigns();
 		region.updateRegionFlags();

@@ -137,6 +137,7 @@ public class RentRegion extends GeneralRegion {
 		// Fill the replacements map with things specific to a RentRegion
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		result.put(AreaShop.tagPrice, getFormattedPrice());
+		result.put(AreaShop.tagRawPrice, getPrice());
 		result.put(AreaShop.tagDuration, getDurationString());
 		result.put(AreaShop.tagPlayerName, getPlayerName());
 		result.put(AreaShop.tagPlayerUUID, getRenter());
@@ -148,6 +149,7 @@ public class RentRegion extends GeneralRegion {
 		result.put(AreaShop.tagRentedUntilShort, dateString);
 		result.put(AreaShop.tagTimeLeft, getTimeLeftString());
 		result.put(AreaShop.tagMoneyBackAmount, getFormattedMoneyBackAmount());
+		result.put(AreaShop.tagRawMoneyBackAmount, getMoneyBackAmount());
 		double moneyBackPercent = getMoneyBackPercentage();
 		if((moneyBackPercent%1.0) == 0.0) {
 			result.put(AreaShop.tagMoneyBackPercentage, (int)moneyBackPercent);
@@ -317,6 +319,13 @@ public class RentRegion extends GeneralRegion {
 	 */
 	public void setPrice(double price) {
 		setSetting("rent.price", price);
+	}
+	
+	/**
+	 * Remove the price so that the price will be taken from a group or the default.yml file
+	 */
+	public void removePrice() {
+		setSetting("rent.price", null);
 	}
 	
 	/**

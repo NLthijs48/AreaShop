@@ -34,7 +34,7 @@ public class SetlandlordCommand extends CommandAreaShop {
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
 		if(!sender.hasPermission("areashop.setlandlord")) {
-			plugin.message(sender, "setteleport-noPermission");
+			plugin.message(sender, "setlandlord-noPermission");
 			return;
 		}		
 		if(args.length < 2) {

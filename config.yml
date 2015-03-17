@@ -97,6 +97,7 @@ limitGroups:
 ## %friends%        The names of friends added to this region separated by ', '
 ## %friendsuuid%    The UUID's of friends added to this region separated by ', '
 ## %price%          The price of the region formatted with the configured characters before and after the number
+## %rawprice%       The price without formatting, like '10.0' or '7.77'
 ## %duration%       The duration of a rent region, for example '1 d', '4 minutes' or '2 years'
 ## %world%          The name of the world that the region is in
 ## %type%           The type of the region, 'rent' or 'buy'
@@ -108,7 +109,9 @@ limitGroups:
 ## %timeleft%       The time left on the rent (uses the unit of time that fits best, minutes used from 121 seconds till 120 minutes)
 ## %clicker%        The name of the player that clicked the sign (only to be used in the signProfiles section)
 ## %resellprice%    The price of a region when it is in resell mode
+## %rawresellprice% The resellprice without formatting, like '10.0' or '7.77'
 ## %moneyback%      The amount of money the player will get back when unrenting/selling the region (formatted with currency characters)
+## %rawmoneyback%   The moneyback without formatting, like '10.0' or '7.77'
 ## %moneybackpercent% The percentage of the price the player will get back when unrenting (only the number  between 0-100)
 ## %maxextends%     The maximum number of extends a player can do on the region
 ## %extendsleft%    The number of extends that are left (maxextends - timesextended)

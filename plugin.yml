@@ -52,6 +52,13 @@ permissions:
       areashop.notifyupdate: true
       areashop.stack: true
       areashop.setlandlord: true
+  areashop.landlord.*:
+    description: Give access to all landlord features
+    children:
+      areashop.createrent.owner: true
+      areashop.createbuy.owner: true
+      areashop.setprice.landlord: true
+      areashop.setduration.landlord: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -74,11 +81,23 @@ permissions:
     description: Allows you to sell your own region
     default: true
   areashop.createrent:
-    description: Allows you to set up signs for renting regions
+    description: Allows you to add rent regions to AreaShop
     default: op
+  areashop.createrent.member:
+    description: Allows you to add rent regions to AreaShop for which you are registered as member
+    default: false
+  areashop.createrent.owner:
+    description: Allows you to add rent regions to AreaShop for which you are registered as owner
+    default: false
   areashop.createbuy:
-    description: Allows you to set up signs for buying regions
+    description: Allows you to add buy regions to AreaShop
     default: op
+  areashop.createbuy.member:
+    description: Allows you to add buy regions to AreaShop for which you are registered as member
+    default: false
+  areashop.createbuy.owner:
+    description: Allows you to add buy regions to AreaShop for which you are registered as owner
+    default: false
   areashop.destroyrent:
     description: Allows you to break signs used for renting regions
     default: op
@@ -97,9 +116,15 @@ permissions:
   areashop.setprice:
     description: Allows you to change the price
     default: op
+  areashop.setprice.landlord:
+    description: Allows you to change the price of a region that you are landlord of
+    default: false
   areashop.setduration:
     description: Allows you to change the duration of a rent
     default: op
+  areashop.setduration.landlord:
+    description: Allows you to change the duration of a region that you are landlord of
+    default: false
   areashop.teleport:
     description: Teleport to your region
     default: true

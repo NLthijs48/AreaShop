@@ -77,6 +77,7 @@ public final class AreaShop extends JavaPlugin {
 	public static final String tagRegionName = "%region%";
 	public static final String tagRegionType = "%type%";
 	public static final String tagPrice = "%price%";
+	public static final String tagRawPrice = "%rawprice%";
 	public static final String tagDuration = "%duration%";
 	public static final String tagRentedUntil = "%until%";
 	public static final String tagRentedUntilShort = "%untilshort%";
@@ -86,10 +87,12 @@ public final class AreaShop extends JavaPlugin {
 	public static final String tagTimeLeft = "%timeleft%";
 	public static final String tagClicker = "%clicker%";
 	public static final String tagResellPrice = "%resellprice%";
+	public static final String tagRawResellPrice = "%rawresellprice%";
 	public static final String tagFriends = "%friends%";
 	public static final String tagFriendsUUID = "%friendsuuid%";
 	public static final String tagMoneyBackPercentage = "%moneybackpercent%";
 	public static final String tagMoneyBackAmount = "%moneyback%";
+	public static final String tagRawMoneyBackAmount = "%rawmoneyback%";
 	public static final String tagMaxExtends = "%maxextends%";
 	public static final String tagExtendsLeft = "%extendsleft%";
 	public static final String tagMaxRentTime = "%maxrenttime%";

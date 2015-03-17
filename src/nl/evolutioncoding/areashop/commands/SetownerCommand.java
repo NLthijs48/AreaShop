@@ -123,7 +123,7 @@ public class SetownerCommand extends CommandAreaShop {
 		}
 		if(region.isBuyRegion()) {
 			BuyRegion buy = (BuyRegion)region;
-			buy.setLandlord(uuid);
+			buy.setBuyer(uuid);
 			buy.saveRequired();
 			plugin.message(sender, "setowner-succesBuy", region);
 			buy.updateRegionFlags();

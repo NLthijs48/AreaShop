@@ -78,7 +78,7 @@ public class BuyRegion extends GeneralRegion {
 	 * Set the buyer of this region
 	 * @param buyer The UUID of the player that should be set as buyer
 	 */
-	public void setLandlord(UUID buyer) {
+	public void setBuyer(UUID buyer) {
 		if(buyer == null) {
 			setSetting("buy.buyer", null);
 			setSetting("buy.buyerName", null);
@@ -160,6 +160,13 @@ public class BuyRegion extends GeneralRegion {
 	}
 	
 	/**
+	 * Remove the price so that the price will be taken from a group or the default.yml file
+	 */
+	public void removePrice() {
+		setSetting("buy.price", null);
+	}
+	
+	/**
 	 * Set the region into resell mode with the given price
 	 * @param price The price this region should be put up for sale
 	 */
@@ -205,10 +212,13 @@ public class BuyRegion extends GeneralRegion {
 		// Fill the replacements map with things specific to a BuyRegion
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		result.put(AreaShop.tagPrice, getFormattedPrice());
+		result.put(AreaShop.tagRawPrice, getPrice());
 		result.put(AreaShop.tagPlayerName, getPlayerName());
 		result.put(AreaShop.tagPlayerUUID, getBuyer());
 		result.put(AreaShop.tagResellPrice, getFormattedResellPrice());
+		result.put(AreaShop.tagRawResellPrice, getResellPrice());
 		result.put(AreaShop.tagMoneyBackAmount, getFormattedMoneyBackAmount());
+		result.put(AreaShop.tagRawMoneyBackAmount, getMoneyBackAmount());
 		double moneyBackPercent = getMoneyBackPercentage();
 		if((moneyBackPercent%1.0) == 0.0) {
 			result.put(AreaShop.tagMoneyBackPercentage, (int)moneyBackPercent);
@@ -307,7 +317,7 @@ public class BuyRegion extends GeneralRegion {
 						// Run commands
 						this.runEventCommands(RegionEvent.RESELL, true);
 						// Set the owner
-						setLandlord(player.getUniqueId());
+						setBuyer(player.getUniqueId());
 		
 						// Update everything
 						handleSchematicEvent(RegionEvent.RESELL);
@@ -347,7 +357,7 @@ public class BuyRegion extends GeneralRegion {
 						// Run commands
 						this.runEventCommands(RegionEvent.BOUGHT, true);
 						// Set the owner
-						setLandlord(player.getUniqueId());
+						setBuyer(player.getUniqueId());
 		
 						// Update everything
 						handleSchematicEvent(RegionEvent.BOUGHT);
@@ -421,7 +431,7 @@ public class BuyRegion extends GeneralRegion {
 		
 		/* Remove friends and the owner */
 		clearFriends();
-		setLandlord(null);		
+		setBuyer(null);		
 		
 		updateSigns();
 		

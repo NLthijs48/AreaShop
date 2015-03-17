@@ -36,6 +36,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.base.Charsets;
@@ -68,6 +69,22 @@ public class FileManager {
 	private HashMap<String,Integer> versions = null;
 	private String versionPath = null;
 	private String schemFolder = null;
+	
+	/* Enum for region types */
+	public enum AddResult {		
+		BLACKLISTED("blacklisted"),
+		NOPERMISSION("nopermission"),
+		ALREADYADDED("alreadyadded"),
+		SUCCESS("success");
+		
+		private final String value;
+		private AddResult(String value) {
+			this.value = value;
+		}
+		public String getValue() {
+			return value;
+		}
+	} 
 	
 	/**
 	 * Constructor, initialize variabeles
@@ -230,6 +247,10 @@ public class FileManager {
 		regions.put(buy.getName().toLowerCase(), buy);
 	}
 	
+	/**
+	 * Add a RegionGroup
+	 * @param group The RegionGroup to add
+	 */
 	public void addGroup(RegionGroup group) {
 		groups.put(group.getName().toLowerCase(), group);
 		String lowGroup = group.getName().toLowerCase();
@@ -238,6 +259,44 @@ public class FileManager {
 			result = groupsConfig.createSection(lowGroup);
 			groupsConfig.set(lowGroup + ".name", group.getName());
 			groupsConfig.set(lowGroup + ".priority", 0);
+		}
+	}
+	
+	/**
+	 * Check if a player can add a certain region as rent or buy region
+	 * @param sender The player/console that wants to add a region
+	 * @param region The WorldGuard region to add
+	 * @param type The type the region should have in AreaShop
+	 * @return The result if a player would want to add this region
+	 */
+	public AddResult checkRegionAdd(CommandSender sender, ProtectedRegion region, RegionType type) {
+		Player player = null;
+		if(sender instanceof Player) {
+			player = (Player)sender;
+		}
+		// Determine if the player is an owner or member of the region
+		boolean isMember = player != null && region.getMembers().contains(player.getUniqueId());
+		boolean isOwner = player != null && region.getOwners().contains(player.getUniqueId());		
+		AreaShop.debug("checkRegionAdd: isOwner=" + isOwner + ", isMember=" + isMember);
+		String typeString = null;
+		if(type == RegionType.RENT) {
+			typeString = "rent";
+		} else {
+			typeString = "buy";
+		}
+		AreaShop.debug("  permissions: .create=" + sender.hasPermission("areashop.create" + typeString) + ", .create.owner=" + sender.hasPermission("areashop.create" + typeString + ".owner") + ", .create.member=" + sender.hasPermission("areashop.create" + typeString + ".member"));
+		if(!(sender.hasPermission("areashop.create" + typeString)
+				|| (sender.hasPermission("areashop.create" + typeString + ".owner") && isOwner)
+				|| (sender.hasPermission("areashop.create" + typeString + ".member") && isMember))) {
+			return AddResult.NOPERMISSION;
+		}
+		GeneralRegion asRegion = plugin.getFileManager().getRegion(region.getId());
+		if(asRegion != null) {
+			return AddResult.ALREADYADDED;
+		} else if(plugin.getFileManager().isBlacklisted(region.getId())) {
+			return AddResult.BLACKLISTED;
+		} else {
+			return AddResult.SUCCESS;
 		}
 	}
 	

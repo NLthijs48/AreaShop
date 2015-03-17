@@ -387,6 +387,15 @@ public abstract class GeneralRegion {
 	}
 	
 	/**
+	 * Check if the specified player is the landlord of this region
+	 * @param landlord The UUID of the players to check for landlord
+	 * @return true if the player is the landlord, otherwise false
+	 */
+	public boolean isLandlord(UUID landlord) {
+		return landlord !=null && getLandlord() != null && getLandlord().equals(landlord);
+	}
+	
+	/**
 	 * Get the WorldGuard region associated with this AreaShop region
 	 * @return The ProtectedRegion of WorldGuard or null if the region does not exist anymore
 	 */

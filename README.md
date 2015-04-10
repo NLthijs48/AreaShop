@@ -62,3 +62,7 @@ The following packages and classes can be found inside the AreaShop plugin:
 - **BuyRegion.java**: Class for buy regions, inherits everything from GeneralRegion. Adds a price to the region and adds an owner. Has methods to buy/sell the region.
 - **RentRegion.java**: Class for rental regions, inherits everything from GeneralRegion. Adds a price, duration and owner to the region. Has methods to rent/unrent the region (for extending simply rent again).
 - **RegionGroup.java**: A regiongroup which can be used to apply certain settings to with the config system. Has a list of regions that belong to it. Has methods to get settings, but these are normally not used (getting settings in a region already takes it from the region, a group or from default.yml).
+
+#### TODO
+- Guide for saving custom data for the AreaShop regions
+- Starting guide, which methods to use to get regions etc.

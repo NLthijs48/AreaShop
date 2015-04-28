@@ -66,3 +66,4 @@ The following packages and classes can be found inside the AreaShop plugin:
 #### TODO
 - Guide for saving custom data for the AreaShop regions
 - Starting guide, which methods to use to get regions etc.
+- -

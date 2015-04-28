@@ -810,11 +810,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 				if(!config.isString("general.signs." + sign + ".signType")) {
 					setSetting("general.signs." + sign + ".signType", signState.getType().toString());
-					this.saveRequired();
 				}
 				if(!config.isString("general.signs." + sign + ".facing")) {
 					setSetting("general.signs." + sign + ".facing", signData.getFacing().toString());
-					this.saveRequired();
 				}
 				// Apply replacements and color and then set it on the sign
 				for(int i=0; i<signLines.length; i++) {
@@ -1168,7 +1166,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 		} else {
 			setSetting("general.teleportLocation", Utils.locationToConfig(location, true));
 		}
-		this.saveRequired();
 	}
 	
 	

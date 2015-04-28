@@ -60,7 +60,6 @@ public class SetrestoreCommand extends CommandAreaShop {
 		} else {
 			plugin.message(sender, "setrestore-success", region.getName(), valueString);
 		}
-		region.saveRequired();
 	}
 	
 	@Override

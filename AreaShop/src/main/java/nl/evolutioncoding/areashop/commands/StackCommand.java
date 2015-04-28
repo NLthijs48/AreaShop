@@ -170,7 +170,6 @@ public class StackCommand extends CommandAreaShop {
 							rent.handleSchematicEvent(RegionEvent.CREATED);
 							rent.updateRegionFlags();
 							rent.runEventCommands(RegionEvent.CREATED, false);
-							rent.saveRequired();
 						} else {
 							BuyRegion buy = new BuyRegion(plugin, region.getId(), selection.getWorld());
 							if(finalGroup != null) {
@@ -181,7 +180,6 @@ public class StackCommand extends CommandAreaShop {
 							buy.handleSchematicEvent(RegionEvent.CREATED);
 							buy.updateRegionFlags();						
 							buy.runEventCommands(RegionEvent.CREATED, false);
-							buy.saveRequired();
 						}						
 						current++;
 					} 

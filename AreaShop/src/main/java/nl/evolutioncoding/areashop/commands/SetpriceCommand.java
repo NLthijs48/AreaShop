@@ -80,7 +80,6 @@ public class SetpriceCommand extends CommandAreaShop {
 			plugin.message(sender, "setprice-successRemoved", region);
 			region.updateSigns();
 			region.updateRegionFlags();
-			region.saveRequired();
 			return;
 		}		
 		double price = 0.0;
@@ -100,7 +99,6 @@ public class SetpriceCommand extends CommandAreaShop {
 		}
 		region.updateSigns();
 		region.updateRegionFlags();
-		region.saveRequired();
 	}
 	
 	@Override

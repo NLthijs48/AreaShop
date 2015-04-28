@@ -563,8 +563,6 @@ public class RentRegion extends GeneralRegion {
 						plugin.message(player, "rent-rented", getName(), dateFull.format(calendar.getTime()));
 						plugin.message(player, "rent-extend");
 					}
-
-					this.saveRequired();
 					if(!extend) {
 						// Run commands
 						this.runEventCommands(RegionEvent.RENTED, false);
@@ -629,8 +627,6 @@ public class RentRegion extends GeneralRegion {
 		setTimesExtended(-1);
 		
 		updateSigns();
-		
-		this.saveRequired();
 		// Run commands
 		this.runEventCommands(RegionEvent.UNRENTED, false);
 	}

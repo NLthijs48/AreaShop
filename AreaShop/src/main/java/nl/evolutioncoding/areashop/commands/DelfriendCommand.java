@@ -84,7 +84,6 @@ public class DelfriendCommand extends CommandAreaShop {
 				return;
 			}
 			region.deleteFriend(friend.getUniqueId());
-			region.saveRequired();
 			region.updateRegionFlags();
 			region.updateSigns();
 			plugin.message(sender, "delfriend-successOther", friend.getName(), region.getName());
@@ -97,7 +96,6 @@ public class DelfriendCommand extends CommandAreaShop {
 						return;
 					}
 					region.deleteFriend(friend.getUniqueId());
-					region.saveRequired();
 					region.updateRegionFlags();
 					region.updateSigns();
 					plugin.message(sender, "delfriend-success", friend.getName(), region.getName());

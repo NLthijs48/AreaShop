@@ -189,7 +189,6 @@ public class SignLinkerManager implements Listener {
 					plugin.message(linker, "addsign-successProfile", region, profile);
 				}
 				region.updateSigns();
-				region.saveRequired();
 				reset();
 				
 				plugin.message(linker, "linksigns-next");

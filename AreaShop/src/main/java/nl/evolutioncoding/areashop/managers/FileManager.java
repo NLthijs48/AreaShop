@@ -228,6 +228,7 @@ public class FileManager {
 			return;
 		}
 		regions.put(rent.getName().toLowerCase(), rent);
+		rent.saveRequired();
 	}
 	
 	/**
@@ -241,6 +242,7 @@ public class FileManager {
 			return;
 		}
 		regions.put(buy.getName().toLowerCase(), buy);
+		buy.saveRequired();
 	}
 	
 	/**

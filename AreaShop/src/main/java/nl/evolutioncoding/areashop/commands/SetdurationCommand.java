@@ -78,7 +78,6 @@ public class SetdurationCommand extends CommandAreaShop {
 			rent.setDuration(null);
 			rent.updateRegionFlags();
 			rent.updateSigns();
-			rent.saveRequired();
 			return;
 		}
 		try {
@@ -94,7 +93,6 @@ public class SetdurationCommand extends CommandAreaShop {
 		rent.setDuration(args[1]+" "+args[2]);
 		rent.updateRegionFlags();
 		rent.updateSigns();
-		rent.saveRequired();
 		plugin.message(sender, "setduration-success", rent.getName(), rent.getDurationString());
 	}
 	

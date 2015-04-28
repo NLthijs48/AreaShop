@@ -163,7 +163,6 @@ public class AddCommand extends CommandAreaShop {
 								rent.updateRegionFlags();
 								// Run commands
 								rent.runEventCommands(RegionEvent.CREATED, false);
-								rent.saveRequired();
 							} else {
 								BuyRegion buy = new BuyRegion(plugin, region.getId(), finalWorld);
 								// Set landlord
@@ -179,7 +178,6 @@ public class AddCommand extends CommandAreaShop {
 								buy.updateRegionFlags();						
 								// Run commands
 								buy.runEventCommands(RegionEvent.CREATED, false);
-								buy.saveRequired();
 							}
 						}
 						current++;

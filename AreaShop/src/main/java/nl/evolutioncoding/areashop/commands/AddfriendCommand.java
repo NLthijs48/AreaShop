@@ -94,7 +94,6 @@ public class AddfriendCommand extends CommandAreaShop {
 				return;
 			}
 			region.addFriend(friend.getUniqueId());
-			region.saveRequired();
 			region.updateRegionFlags();
 			region.updateSigns();
 			plugin.message(sender, "addfriend-successOther", friend.getName(), region.getName());
@@ -115,7 +114,6 @@ public class AddfriendCommand extends CommandAreaShop {
 						return;
 					}
 					region.addFriend(friend.getUniqueId());
-					region.saveRequired();
 					region.updateRegionFlags();
 					region.updateSigns();
 					plugin.message(sender, "addfriend-success", friend.getName(), region.getName());

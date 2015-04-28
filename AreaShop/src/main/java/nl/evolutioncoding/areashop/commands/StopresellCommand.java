@@ -74,14 +74,12 @@ public class StopresellCommand extends CommandAreaShop {
 		}
 		if(sender.hasPermission("areashop.stopresellall")) {
 			buy.disableReselling();
-			buy.saveRequired();
 			plugin.message(sender, "stopresell-success", buy);
 			buy.updateSigns();
 			buy.updateRegionFlags();
 		} else if(sender.hasPermission("areashop.stopresell") && sender instanceof Player) {
 			if(buy.isOwner((Player)sender)) {
 				buy.disableReselling();
-				buy.saveRequired();
 				plugin.message(sender, "stopresell-success", buy);
 				buy.updateSigns();
 				buy.updateRegionFlags();

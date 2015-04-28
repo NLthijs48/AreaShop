@@ -331,8 +331,6 @@ public class BuyRegion extends GeneralRegion {
 							plugin.message(player, "buy-successSeller", getName(), getPlayerName(), resellPrice);
 						}						
 						AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + getFormattedPrice() + " from " + oldOwnerPlayer.getName());
-		
-						this.saveRequired();
 						// Run commands
 						this.runEventCommands(RegionEvent.RESELL, false);
 					} else {
@@ -366,7 +364,6 @@ public class BuyRegion extends GeneralRegion {
 
 						// Send message to the player
 						plugin.message(player, "buy-succes", getName());
-						this.saveRequired();
 						// Run commands
 						this.runEventCommands(RegionEvent.BOUGHT, false);
 					}				
@@ -434,8 +431,6 @@ public class BuyRegion extends GeneralRegion {
 		setBuyer(null);		
 		
 		updateSigns();
-		
-		this.saveRequired();
 		// Run commands
 		this.runEventCommands(RegionEvent.SOLD, false);
 	}

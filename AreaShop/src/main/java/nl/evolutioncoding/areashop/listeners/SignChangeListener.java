@@ -173,7 +173,6 @@ public final class SignChangeListener implements Listener {
 				plugin.message(player, "setup-rentSuccess", rent.getName());
 				// Run commands
 				rent.runEventCommands(RegionEvent.CREATED, false);
-				rent.saveRequired();
 			}
 		} else if (event.getLine(0).contains(plugin.getConfig().getString("signTags.buy"))) {
 			// Check for permission
@@ -284,7 +283,6 @@ public final class SignChangeListener implements Listener {
 				
 				// Run commands
 				buy.runEventCommands(RegionEvent.CREATED, false);
-				buy.saveRequired();
 			}
 		} else if(event.getLine(0).contains(plugin.getConfig().getString("signTags.add"))) {
 			// Check for permission
@@ -325,7 +323,6 @@ public final class SignChangeListener implements Listener {
 				region.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
 				plugin.message(player, "addsign-successProfile", region, thirdLine);
 			}
-			region.saveRequired();
 			
 			// Update the sign later because this event will do it first
 			final GeneralRegion regionUpdate = region;

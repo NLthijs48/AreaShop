@@ -92,14 +92,12 @@ public final class PlayerLoginListener implements Listener {
 							if(region.isBuyRegion()) {
 								if(!player.getName().equals(region.getStringSetting("buy.buyerName"))) {
 									region.setSetting("buy.buyerName", player.getName());
-									region.saveRequired();
 									region.updateRegionFlags();
 									region.updateSigns();
 								}
 							} else if(region.isRentRegion()) {
 								if(!player.getName().equals(region.getStringSetting("rent.renterName"))) {
 									region.setSetting("rent.renterName", player.getName());
-									region.saveRequired();
 									region.updateRegionFlags();
 									region.updateSigns();
 								}

@@ -65,7 +65,6 @@ public class DelsignCommand extends CommandAreaShop {
 		plugin.message(sender, "delsign-success", region.getName());
 		region.removeSign(block.getLocation());
 		region.updateSigns();
-		region.saveRequired();
 	}
 	
 	@Override

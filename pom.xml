@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>nl.evolutioncoding</groupId>
+  <artifactId>areashop-parent</artifactId>
+  <!-- Artifact ID doesn't matter for anything but the final product
+       At least, it doesn't matter externally to this setup -->
+  <packaging>pom</packaging>
+  <!-- Packaging? POM -->
+  <version>parent</version>
+  <!-- I keep my versions of the internal projects static, so I don't have to rename them all the time. -->
+  <name>AreaShop Parent</name>
+  <url>http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <modules>
+    <module>WorldGuard 5</module>
+    <module>WorldGuard 6</module>
+    <module>WorldGuardInterface</module>
+    <module>WorldEdit 5</module>
+    <module>WorldEdit 6</module>
+    <module>WorldEditInterface</module>
+    <module>AreaShop</module>
+  </modules>
+
+  <!-- Define the repo here since multiple modules will be using it -->
+  <repositories>
+    <repository>
+      <id>bukkit-repo</id>
+      <url>http://repo.bukkit.org/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>sk89q-repo-wg</id>
+      <url>http://maven.sk89q.com/artifactory/repo/</url>
+    </repository>
+  </repositories>
+
+</project>

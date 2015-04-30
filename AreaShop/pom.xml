@@ -131,7 +131,7 @@
         <version>3.3</version>
         <configuration>
           <source>1.7</source>
-          <targer>1.7</targer>
+          <target>1.7</target>
         </configuration>
       </plugin>
       <!-- Copy resulting file to local server, change to your own path -->

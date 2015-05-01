@@ -3,12 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.evolutioncoding</groupId>
   <artifactId>areashop-parent</artifactId>
-  <!-- Artifact ID doesn't matter for anything but the final product
-       At least, it doesn't matter externally to this setup -->
   <packaging>pom</packaging>
-  <!-- Packaging? POM -->
   <version>parent</version>
-  <!-- I keep my versions of the internal projects static, so I don't have to rename them all the time. -->
   <name>AreaShop Parent</name>
   <url>http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/</url>
   <properties>
@@ -18,14 +14,12 @@
   <modules>
     <module>WorldGuard 5</module>
     <module>WorldGuard 6</module>
-    <module>WorldGuardInterface</module>
+    <module>Interfaces</module>
     <module>WorldEdit 5</module>
     <module>WorldEdit 6</module>
-    <module>WorldEditInterface</module>
     <module>AreaShop</module>
   </modules>
 
-  <!-- Define the repo here since multiple modules will be using it -->
   <repositories>
     <repository>
       <id>bukkit-repo</id>

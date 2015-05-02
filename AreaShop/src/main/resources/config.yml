@@ -7,14 +7,6 @@
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ## Chatprefix used for all messages in the chat, also changes the greeting messages.
 chatPrefix: '&2[AreaShop]&r '
-## The characters used for the prices of regions, will appear before the number, for the euro character use '%euro%'
-moneyCharacter: '$'
-## The characters used after a currency number, '%euro%' will become the euro character
-moneyCharacterAfter: ''
-## How many numbers behind the dot should be shown (2 will make numbers like '8.55', '9.01')
-fractionalNumbers: 2
-## Set this to true if you want to hide '.0' for a number like '15.0' ('4.50' will still stay '4.50')
-hideEmptyFractionalPart: true
 ## The language file that should be used, check the 'lang' folder for build-in languages (use the filename without .yml here)
 language: EN
 ## The tags you need to write on the sign to trigger the plugin
@@ -33,7 +25,8 @@ signTags:
 ## This means it would also block 'house_123' and 'house_000456'. It will not block 'ahouse_1' or 'house_'.
 blacklist:
   - '__global__'
-## Enable sending stats to http://mcstats.org/ (Metrics plugin)
+## Enable sending stats to http://mcstats.org/ (Metrics plugin).
+## This information will give me an indication about how much the plugin is used and encourages me to continue development.
 sendStats: true
 ## If enabled it will check for updates when loading the plugin, it will never download files, it will only notify about it
 ## A message will be printed in the console when an update is available and OPs will be notified when joining the server
@@ -49,6 +42,24 @@ updateRegionsOnStartup: true
 debug: false
 ## Version of the config, do not change!
 version: ${project.version}
+
+
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ NUMBERS: Options to change the output of prices                                                                            │
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+## The characters displayed before a price, special characters like € can be used
+moneyCharacter: '$'
+## The characters displayed after a price, special characters like € can be used
+moneyCharacterAfter: ''
+## How many numbers behind the dot should be shown (2 will make numbers like '8.55', '9.01')
+fractionalNumbers: 2
+## Set this to true if you want to hide '.0' for a number like '15.0' ('4.50' will still stay '4.50')
+hideEmptyFractionalPart: true
+## Use metric suffixes if the price is above this number (use 1.00M instead of 1000000.00 etc.), use -1 for disable
+## Indications are used as defined on: http://en.wikipedia.org/wiki/Metric_prefix, implemented from 'k' to 'Y'
+metricSuffixesAbove: 1000000.0
+## The character(s) to use as decimal mark
+decimalMark: '.'
 
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

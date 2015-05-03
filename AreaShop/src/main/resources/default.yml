@@ -50,13 +50,13 @@ rent:
   moneyBack: 100
   ## Maximum number of extends a player can do (-1 for infinite, 0 for no extending)
   maxExtends: -1
-  ## The Maximum time they can have the region rented in advance (minutes, -1 for infinite)
+  ## The Maximum time they can have the region rented in advance (use times like '1 day' etc, or 'unlimited' for no limit)
   ## If you set this lower then the rent duration then players will not be able to rent the region 
-  ## (because it always exceeds the maxRentTime in that case) 
-  maxRentTime: -1
+  ## (because it always exceeds the maxRentTime in that case)
+  maxRentTime: 'unlimited'
   ## Automatically unrent the region after the specified number of minutes between the last login time of the renter and the current time
-  ## -1 means never, 1440 is one day, 43200 is one month, 525600 is one year
-  inactiveTimeUntilUnrent: -1
+  ## Use times like '1 day' etc, or 'disabled' for never
+  inactiveTimeUntilUnrent: 'disabled'
   ## If a region of a player has less then this time left when he joins the server he will get a warning
   ## You can find all time indicators in config.yml below the RENTING header, change to '' to disable
   warningOnLoginTime: '1 day'

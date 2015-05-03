@@ -78,6 +78,11 @@ public class Utils {
 		return result;
 	}
 	
+	/**
+	 * Create a comma-separated list
+	 * @param input Collection of object which should be concatenated with comma's in between
+	 * @return Innput object concatenated with comma's in between
+	 */
 	public static String createCommaSeparatedList(Collection<? extends Object> input) {
 		String result = "";
 		boolean first = true;
@@ -92,6 +97,15 @@ public class Utils {
 			}
 		}		
 		return result;
+	}
+	
+	/**
+	 * Convert milliseconds to ticks
+	 * @param milliseconds Milliseconds to convert
+	 * @return milliseconds divided by 50 (20 ticks per second)
+	 */
+	public static long millisToTicks(long milliseconds) {
+		return milliseconds/50;
 	}
 	
 	public static final BlockFace[] facings = { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };

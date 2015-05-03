@@ -63,7 +63,7 @@ public final class PlayerLoginListener implements Listener {
 						if(warningSetting == null || warningSetting.isEmpty()) {
 							continue;
 						}
-						long warningTime = region.durationStringToLong(warningSetting);
+						long warningTime = plugin.durationStringToLong(warningSetting);
 						if(region.getTimeLeft() < warningTime) {
 							// Send the warning message later to let it appear after general MOTD messages
 							AreaShop.getInstance().message(player, "rent-expireWarning", region);		        

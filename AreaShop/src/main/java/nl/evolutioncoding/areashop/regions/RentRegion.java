@@ -1,7 +1,6 @@
 package nl.evolutioncoding.areashop.regions;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -227,46 +226,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The duration in milliseconds of 1 rent period
 	 */
 	public long getDuration() {		
-		return durationStringToLong(getDurationString());
-	}
-	
-	/**
-	 * Methode to tranlate a duration string to a millisecond value
-	 * @param duration The duration string
-	 * @return The duration in milliseconds translated from the durationstring, or if it is invalid then 0
-	 */
-	public long durationStringToLong(String duration) {
-		if(duration == null) {
-			return 0;
-		}
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(0);
-
-		ArrayList<String> minutes = new ArrayList<String>(plugin.getConfig().getStringList("minutes"));
-		ArrayList<String> hours = new ArrayList<String>(plugin.getConfig().getStringList("hours"));
-		ArrayList<String> days = new ArrayList<String>(plugin.getConfig().getStringList("days"));
-		ArrayList<String> months = new ArrayList<String>(plugin.getConfig().getStringList("months"));
-		ArrayList<String> years = new ArrayList<String>(plugin.getConfig().getStringList("years"));
-		
-		String durationString = duration.substring(duration.indexOf(' ')+1, duration.length());
-		int durationInt = 0;
-		try {
-			durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));
-		} catch(NumberFormatException exception) {}
-		
-		if(minutes.contains(durationString)) {
-			calendar.add(Calendar.MINUTE, durationInt);
-		} else if(hours.contains(durationString)) {
-			calendar.add(Calendar.HOUR, durationInt);
-		} else if(days.contains(durationString)) {
-			calendar.add(Calendar.DAY_OF_MONTH, durationInt);
-		} else if(months.contains(durationString)) {
-			calendar.add(Calendar.MONTH, durationInt);
-		} else if(years.contains(durationString)) {
-			calendar.add(Calendar.YEAR, durationInt);
-		}
-		
-		return calendar.getTimeInMillis();
+		return plugin.durationStringToLong(getDurationString());
 	}
 	
 	/**
@@ -302,7 +262,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The number of minutes until the region is unrented while player is offline
 	 */
 	public long getInactiveTimeUntilUnrent() {
-		return getLongSetting("rent.inactiveTimeUntilUnrent");
+		return plugin.getDurationFromMinutesOrString("rent.inactiveTimeUntilUnrent");
 	}
 	
 	/**
@@ -371,7 +331,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The maximum rent time in minutes
 	 */
 	public long getMaxRentTime() {
-		return this.getLongSetting("rent.maxRentTime");
+		return plugin.getDurationFromMinutesOrString("rent.maxRentTime")/1000;
 	}
 	
 	/**
@@ -411,7 +371,7 @@ public class RentRegion extends GeneralRegion {
 				return;
 			}
 			for(String timeBefore : section.getKeys(false)) {
-				long timeBeforeParsed = this.durationStringToLong(timeBefore);
+				long timeBeforeParsed = plugin.durationStringToLong(timeBefore);
 				if(timeBeforeParsed <= 0) {
 					return;
 				}

@@ -3,6 +3,7 @@ package nl.evolutioncoding.areashop;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -426,7 +427,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public void setupTasks() {
         // Rent expiration timer
-        int expirationCheck = this.getConfig().getInt("expiration.delay")*20;
+        long expirationCheck = Utils.millisToTicks(getDurationFromSecondsOrString("expiration.delay"));
         final AreaShop finalPlugin = this;
         if(expirationCheck > 0) {
 	        new BukkitRunnable() {
@@ -442,7 +443,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	        }.runTaskTimer(this, 1, expirationCheck);
         }
 	    // Inactive unrenting/selling timer
-        int inactiveCheck = this.getConfig().getInt("inactive.delay")*60*20;
+        long inactiveCheck = Utils.millisToTicks(getDurationFromMinutesOrString("inactive.delay"));
         if(inactiveCheck > 0) {
 	        new BukkitRunnable() {
 				@Override
@@ -457,7 +458,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	        }.runTaskTimer(this, inactiveCheck, inactiveCheck);	     
         }	        
 	    // Periodic updating of signs for timeleft tags
-        int periodicUpdate = this.getConfig().getInt("signs.delay")*20;
+        long periodicUpdate = Utils.millisToTicks(getDurationFromSecondsOrString("signs.delay"));
         if(periodicUpdate > 0) {
 	        new BukkitRunnable() {
 				@Override
@@ -472,7 +473,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	        }.runTaskTimer(this, periodicUpdate, periodicUpdate);	     
         }
         // Saving regions and group settings
-        int saveFiles = this.getConfig().getInt("saving.delay")*20*60;
+        long saveFiles = Utils.millisToTicks(getDurationFromMinutesOrString("saving.delay"));
         if(saveFiles > 0) {
 	        new BukkitRunnable() {
 				@Override
@@ -487,7 +488,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	        }.runTaskTimer(this, saveFiles, saveFiles);	     
         }
         // Sending warnings about rent regions to online players
-        int expireWarning = this.getConfig().getInt("expireWarning.delay")*20*60;
+       long expireWarning = Utils.millisToTicks(getDurationFromMinutesOrString("expireWarning.delay"));
         if(expireWarning > 0) {
 	        new BukkitRunnable() {
 				@Override
@@ -609,7 +610,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				after = "k" + after;
 			}
 			BigDecimal bigDecimal = new BigDecimal(amount);
-			bigDecimal.setScale(getConfig().getInt("fractionalNumbers"), RoundingMode.HALF_UP);
 			if(bigDecimal.toString().contains(".")) {
 				int frontLength = bigDecimal.toString().substring(0, bigDecimal.toString().indexOf('.')).length();
 			    bigDecimal = bigDecimal.setScale(getConfig().getInt("fractionalNumbers") + (3-frontLength), RoundingMode.HALF_UP);
@@ -617,7 +617,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		    result = bigDecimal.toString();
 		} else {
 			BigDecimal bigDecimal = new BigDecimal(amount);
-			bigDecimal.setScale(getConfig().getInt("fractionalNumbers"), RoundingMode.HALF_UP);
+			bigDecimal = bigDecimal.setScale(getConfig().getInt("fractionalNumbers"), RoundingMode.HALF_UP);
+			amount = bigDecimal.doubleValue();
 		    result = bigDecimal.toString();
 			if(getConfig().getBoolean("hideEmptyFractionalPart") && (amount%1.0) == 0.0 && result.contains(".")) {
 				result = result.substring(0, result.indexOf('.'));
@@ -685,6 +686,76 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 	
 	/**
+	 * Methode to tranlate a duration string to a millisecond value
+	 * @param duration The duration string
+	 * @return The duration in milliseconds translated from the durationstring, or if it is invalid then 0
+	 */
+	public long durationStringToLong(String duration) {
+		if(duration == null) {
+			return 0;
+		} else if(duration.equalsIgnoreCase("disabled") || duration.equalsIgnoreCase("unlimited")) {
+			return -1;
+		}
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(0);
+
+		ArrayList<String> seconds = new ArrayList<String>(this.getConfig().getStringList("seconds"));
+		ArrayList<String> minutes = new ArrayList<String>(this.getConfig().getStringList("minutes"));
+		ArrayList<String> hours = new ArrayList<String>(this.getConfig().getStringList("hours"));
+		ArrayList<String> days = new ArrayList<String>(this.getConfig().getStringList("days"));
+		ArrayList<String> months = new ArrayList<String>(this.getConfig().getStringList("months"));
+		ArrayList<String> years = new ArrayList<String>(this.getConfig().getStringList("years"));
+		
+		String durationString = duration.substring(duration.indexOf(' ')+1, duration.length());
+		int durationInt = 0;
+		try {
+			durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));
+		} catch(NumberFormatException exception) {}
+		
+		if(seconds.contains(durationString)) {
+			calendar.add(Calendar.SECOND, durationInt);
+		} else if(minutes.contains(durationString)) {
+			calendar.add(Calendar.MINUTE, durationInt);
+		} else if(hours.contains(durationString)) {
+			calendar.add(Calendar.HOUR, durationInt);
+		} else if(days.contains(durationString)) {
+			calendar.add(Calendar.DAY_OF_MONTH, durationInt);
+		} else if(months.contains(durationString)) {
+			calendar.add(Calendar.MONTH, durationInt);
+		} else if(years.contains(durationString)) {
+			calendar.add(Calendar.YEAR, durationInt);
+		}		
+		return calendar.getTimeInMillis();
+	}
+	
+	/**
+	 * Get setting from config that could be only a number indicating seconds
+	 * or a string indicating a duration string
+	 * @param path Path of the setting to read
+	 * @return milliseconds that the setting indicates
+	 */
+	public long getDurationFromSecondsOrString(String path) {
+		if(getConfig().isLong(path)) {
+			return getConfig().getLong(path)*1000;
+		} else {
+			return durationStringToLong(getConfig().getString(path));
+		}
+	}
+	/**
+	 * Get setting from config that could be only a number indicating minutes
+	 * or a string indicating a duration string
+	 * @param path Path of the setting to read
+	 * @return milliseconds that the setting indicates
+	 */
+	public long getDurationFromMinutesOrString(String path) {
+		if(getConfig().isLong(path)) {
+			return getConfig().getLong(path)*60*1000;
+		} else {
+			return durationStringToLong(getConfig().getString(path));
+		}
+	}
+	
+	/**
 	 * Sends an debug message to the console
 	 * @param message The message that should be printed to the console
 	 */
@@ -692,7 +763,10 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		if(AreaShop.getInstance().debug) {
 			AreaShop.getInstance().getLogger().info("Debug: " + message);
 		}
-	}	
+	}
+	/**
+	 * Non-static debug to use as implementation of the interface
+	 */
 	public void debugI(String message) {
 		AreaShop.debug(message);
 	}

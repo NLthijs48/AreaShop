@@ -71,8 +71,9 @@ timeFormatSign: 'dd-MM HH:mm'
 ## Timeformat used in the chat, default is like '30 june 2014 14:52', US format: 'MMMMMMMMMMMMMMMMM dd yyyy KK:mm a'
 ## Search for 'java SimpleDateFormat' for more options and documentation
 timeFormatChat: 'dd MMMMMMMMMMMMMMMMM yyyy HH:mm'
-## Time indicators, used for specifing rent duration on the signs
-## Be careful with deleting words, will break signs using those, adding is no problem
+## Time indicators, used for specifing time periods (for example rent duration)
+## Be careful with deleting words, will break settings using those, adding is no problem
+seconds: [s, sec, secs, second, seconds]
 minutes: [m, min, mins, minute, minutes, minuten, minuut]
 hours: [h, hour, hours, uur, uren]
 days: [d, day, days, dag, dagen]
@@ -295,55 +296,57 @@ expirationWarningProfiles:
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ LIMITS AND TIMINGS: Options for limits and the frequencies for certain functions (be very carefull with these!)            │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-## Setting the 'delay' setting to 0 or lower will prevent the taks from runnning, if you don't use a certain feature you 
-## could switch the task off this way.
-
 ## Maximum number of blocks to save to or restore from a .schemetic
 maximumBlocks: 1000000
 ## Maximum number of locations the teleport function should check to find a safe spot
 maximumTries: 50000
+
+## Setting the 'delay' setting to 0 or lower will prevent the taks from runnning, if you don't use a certain feature you 
+## could switch the task off this way.
+## The 'delay' settings are specified using a number followed by one of the identifiers as defined above in the config
+## The 'regionsPerTick' settings are to configure how fast something goes, lower value is less lag, but slower updates
+##   There are 20 ticks in 1 second, so if you set 'regionPerTick' to 5, then 5*20=100 regions per second will be updated
 ## Timings for saving files that need saving
 saving:
   ## Time between saving files that need to be saved (not all files will be saved by default)
-  delay: 10
+  delay: '10 minutes'
   ## How many regions per tick will be saved
   regionsPerTick: 1
 ## Timings for rent expiration checking
 expiration:
-  ## Time between checking if rent regions have been expired (seconds)
-  delay: 59
-  ## Number of rent regions to check per tick (there are 20 ticks in a second)
+  ## Time between checking if rent regions have been expired
+  delay: '59 seconds'
+  ## Number of rent regions to check per tick
   regionsPerTick: 5
 ## Timings for expiration warning to online players
 expireWarning:
   ## The time between checking if expiration warning need to be sent
-  delay: 5
-  ## Number of regions to update per tick (there are 20 ticks in a second)
+  delay: '5 minutes'
+  ## Number of regions to update per tick
   regionsPerTick: 3
 ## Timings for updating signs and region flags ('/as reload' or after '/as groupadd' or '/as groupdel')
 update:
-  ## Number of regions to update per tick (there are 20 ticks in a second)
+  ## Number of regions to update per tick
   regionsPerTick: 5
-## Time between checking if any regions need to be unrented because the player was not online for the specified time period (minutes)
-## -1 means never, 1440 is one day, 43200 is one month, 525600 is one year
+## Time between checking if any regions need to be unrented because the player was not online for the specified time period
 inactive:
-  ## Time between checking if a regions needs to be unrented/sold because of inactivity by the player (minutes)
-  delay: 15
-  ## Number of rent regions to check per tick (there are 20 ticks in a second)
+  ## Time between checking if a regions needs to be unrented/sold because of inactivity by the player
+  delay: '15 minutes'
+  ## Number of rent regions to check per tick
   regionsPerTick: 5
 ## Timings for the periodic updating of signs (for timeleft tags etc)
 signs:
-  ## Time between updates of all signs (seconds)
-  delay: 60
-  ## Number of regions to update signs for per tick (there are 20 ticks in a second)
+  ## Time between updates of all signs
+  delay: '60 seconds'
+  ## Number of regions to update signs for per tick
   regionsPerTick: 3
 ## Number of regions per tick to check when a player joins to see if his name changed for regions he owned (updates the regions when changed)
 nameupdate:
-  ## Number of regions to update signs for per tick (there are 20 ticks in a second)
+  ## Number of regions to update signs for per tick
   regionsPerTick: 5
 ## Timings for adding regions to AreaShop ('/as stack')
 adding:
-  ## Number of regions to add per tick (there are 20 ticks in a second)
+  ## Number of regions to add per tick
   regionsPerTick: 2
 
 

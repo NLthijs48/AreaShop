@@ -4,7 +4,8 @@ Check the documentation at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent
 
 Every time I make a change to the code that is somewhat finished and possibly tested I will push the code to GitHub, this way you can follow the commit log to see the progress.
 
-# Compiling yourself
+# Compiling yourself OLD
+This information below is only usefull for old AreaShop versions, and not for the current version at the master branch. The current version is a Maven project and can be build like that (information below will be updated later).
 Below is some information about how to compile AreaShop, as a normal user you would not need this. You can simply download a stable and tested release here from the [releases page](https://github.com/NLthijs48/AreaShop/releases), the [BukkitDev](http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/) platform or the [Spigot](http://www.spigotmc.org/resources/areashop.2991/) resources section. If you however want to compile a development build yourself (code will be pushed to GitHub after adding something, but an official release is only made after some longer time).
 
 #### Cloning the repository

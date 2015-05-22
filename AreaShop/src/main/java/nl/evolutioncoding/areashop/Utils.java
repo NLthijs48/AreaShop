@@ -63,7 +63,8 @@ public class Utils {
 				|| !config.isString("world")
 				|| !config.isDouble("x")
 				|| !config.isDouble("y")
-				|| !config.isDouble("z")) {
+				|| !config.isDouble("z")
+				|| Bukkit.getWorld(config.getString("world")) == null) {
 			return null;
 		}
 		Location result = new Location(

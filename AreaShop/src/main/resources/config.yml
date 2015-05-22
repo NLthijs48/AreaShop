@@ -294,7 +294,7 @@ expirationWarningProfiles:
      
   
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-# │ LIMITS AND TIMINGS: Options for limits and the frequencies for certain functions (be very carefull with these!)            │
+# │ LIMITS AND TIMINGS: Options for limits and the frequencies for certain functions (be very careful with these!)             │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ## Maximum number of blocks to save to or restore from a .schemetic
 maximumBlocks: 1000000

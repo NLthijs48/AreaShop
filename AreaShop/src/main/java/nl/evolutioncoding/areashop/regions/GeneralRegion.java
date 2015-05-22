@@ -754,77 +754,77 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 				// TODO: Remove the sign if the location is wrong?
 				AreaShop.debug("  location null");
 				result = false;
-				continue;
-			}
-			// Get the profile set in the config
-			String profile = config.getString("general.signs." + sign + ".profile");
-			if(profile == null || profile.length() == 0) {
-				profile = getStringSetting("general.signProfile");
-			}
-			// Get the prefix
-			String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".";			
-			// Get the lines
-			String[] signLines = new String[4];
-			signLines[0] = plugin.getConfig().getString(prefix + "line1");
-			signLines[1] = plugin.getConfig().getString(prefix + "line2");
-			signLines[2] = plugin.getConfig().getString(prefix + "line3");
-			signLines[3] = plugin.getConfig().getString(prefix + "line4");
-			// Check if the sign should be present
-			Block block = location.getBlock();
-			if(!plugin.getConfig().isSet(prefix) 
-					|| (	   (signLines[0] == null || signLines[0].length() == 0) 
-							&& (signLines[1] == null || signLines[1].length() == 0) 
-							&& (signLines[2] == null || signLines[2].length() == 0) 
-							&& (signLines[3] == null || signLines[3].length() == 0) )) {
-				block.setType(Material.AIR);
-			} else {				
-				Sign signState = null;
-				if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
-					Material signType = null;
-					try {
-						signType = Material.valueOf(config.getString("general.signs." + sign + ".signType"));
-					} catch(NullPointerException | IllegalArgumentException e) {
-						signType = null;
+			} else {
+				// Get the profile set in the config
+				String profile = config.getString("general.signs." + sign + ".profile");
+				if(profile == null || profile.length() == 0) {
+					profile = getStringSetting("general.signProfile");
+				}
+				// Get the prefix
+				String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".";			
+				// Get the lines
+				String[] signLines = new String[4];
+				signLines[0] = plugin.getConfig().getString(prefix + "line1");
+				signLines[1] = plugin.getConfig().getString(prefix + "line2");
+				signLines[2] = plugin.getConfig().getString(prefix + "line3");
+				signLines[3] = plugin.getConfig().getString(prefix + "line4");
+				// Check if the sign should be present
+				Block block = location.getBlock();
+				if(!plugin.getConfig().isSet(prefix) 
+						|| (	   (signLines[0] == null || signLines[0].length() == 0) 
+								&& (signLines[1] == null || signLines[1].length() == 0) 
+								&& (signLines[2] == null || signLines[2].length() == 0) 
+								&& (signLines[3] == null || signLines[3].length() == 0) )) {
+					block.setType(Material.AIR);
+				} else {				
+					Sign signState = null;
+					if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
+						Material signType = null;
+						try {
+							signType = Material.valueOf(config.getString("general.signs." + sign + ".signType"));
+						} catch(NullPointerException | IllegalArgumentException e) {
+							signType = null;
+						}
+						if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
+							AreaShop.debug("  setting sign failed");
+							continue;
+						}
+						block.setType(signType);
+						signState = (Sign)block.getState();
+						org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
+						BlockFace signFace;
+						try {
+							signFace = BlockFace.valueOf(config.getString("general.signs." + sign + ".facing"));
+						} catch(NullPointerException | IllegalArgumentException e) {
+							signFace = null;
+						}
+						if(signFace != null) {
+							signData.setFacingDirection(signFace);
+							signState.setData(signData);
+						}
 					}
-					if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
-						AreaShop.debug("  setting sign failed");
-						continue;
+					if(signState == null) {
+						signState = (Sign)block.getState();
 					}
-					block.setType(signType);
-					signState = (Sign)block.getState();
 					org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
-					BlockFace signFace;
-					try {
-						signFace = BlockFace.valueOf(config.getString("general.signs." + sign + ".facing"));
-					} catch(NullPointerException | IllegalArgumentException e) {
-						signFace = null;
+					if(!config.isString("general.signs." + sign + ".signType")) {
+						setSetting("general.signs." + sign + ".signType", signState.getType().toString());
 					}
-					if(signFace != null) {
-						signData.setFacingDirection(signFace);
-						signState.setData(signData);
+					if(!config.isString("general.signs." + sign + ".facing")) {
+						setSetting("general.signs." + sign + ".facing", signData.getFacing().toString());
 					}
+					// Apply replacements and color and then set it on the sign
+					for(int i=0; i<signLines.length; i++) {
+						if(signLines[i] == null) {
+							signState.setLine(i, "");
+							continue;
+						}					
+						signLines[i] = applyAllReplacements(signLines[i]);					
+						signLines[i] = plugin.fixColors(signLines[i]);	
+						signState.setLine(i, signLines[i]);
+					}
+					signState.update();
 				}
-				if(signState == null) {
-					signState = (Sign)block.getState();
-				}
-				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
-				if(!config.isString("general.signs." + sign + ".signType")) {
-					setSetting("general.signs." + sign + ".signType", signState.getType().toString());
-				}
-				if(!config.isString("general.signs." + sign + ".facing")) {
-					setSetting("general.signs." + sign + ".facing", signData.getFacing().toString());
-				}
-				// Apply replacements and color and then set it on the sign
-				for(int i=0; i<signLines.length; i++) {
-					if(signLines[i] == null) {
-						signState.setLine(i, "");
-						continue;
-					}					
-					signLines[i] = applyAllReplacements(signLines[i]);					
-					signLines[i] = plugin.fixColors(signLines[i]);	
-					signState.setLine(i, signLines[i]);
-				}
-				signState.update();
 			}		
 		}
 		return result;

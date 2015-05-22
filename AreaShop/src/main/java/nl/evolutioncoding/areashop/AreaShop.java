@@ -691,7 +691,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * @return The duration in milliseconds translated from the durationstring, or if it is invalid then 0
 	 */
 	public long durationStringToLong(String duration) {
-		if(duration == null) {
+		if(duration == null || duration.indexOf(' ') == -1) {
 			return 0;
 		} else if(duration.equalsIgnoreCase("disabled") || duration.equalsIgnoreCase("unlimited")) {
 			return -1;
@@ -735,7 +735,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * @return milliseconds that the setting indicates
 	 */
 	public long getDurationFromSecondsOrString(String path) {
-		if(getConfig().isLong(path)) {
+		if(getConfig().isLong(path) || getConfig().isInt(path)) {
 			return getConfig().getLong(path)*1000;
 		} else {
 			return durationStringToLong(getConfig().getString(path));
@@ -748,7 +748,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * @return milliseconds that the setting indicates
 	 */
 	public long getDurationFromMinutesOrString(String path) {
-		if(getConfig().isLong(path)) {
+		if(getConfig().isLong(path) || getConfig().isInt(path)) {
 			return getConfig().getLong(path)*60*1000;
 		} else {
 			return durationStringToLong(getConfig().getString(path));

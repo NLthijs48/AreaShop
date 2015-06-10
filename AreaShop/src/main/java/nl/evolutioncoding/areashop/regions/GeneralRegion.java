@@ -842,8 +842,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	 * Change the restore profile
 	 * @param profile default or the name of the profile as set in the config
 	 */
-	public void setRestoreProfile(String profile) {
-		setSetting("general.restoreProfile", profile);
+	public void setSchematicProfile(String profile) {
+		setSetting("general.schematicProfile", profile);
 	}
 	
 	/**
@@ -1125,6 +1125,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	 * Indicate this region needs to be saved, saving will happen by a repeating task
 	 */
 	public void saveRequired() {
+		AreaShop.debug("saveRequired()");
 		saveRequired = true;
 	}
 	
@@ -1276,14 +1277,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 		
 		// Check locations starting from startLocation and then a cube that increases
 		// radius around that (until no block in the region is found at all cube sides)
-		Location saveLocation = startLocation;
+		Location safeLocation = startLocation;
 		int radius = 1;
 		boolean blocksInRegion = region.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
 		if(!blocksInRegion && insideRegion) {
 			plugin.message(player, "teleport-blocked", getName());
 			return false;
 		}
-		boolean done = isSave(saveLocation) && ((blocksInRegion && insideRegion) || (!insideRegion));
+		boolean done = isSafe(safeLocation) && ((blocksInRegion && insideRegion) || (!insideRegion));
 		boolean north=false, east=false, south=false, west=false, top=false, bottom=false;
 		boolean track;
 		while(((blocksInRegion && insideRegion) || (!insideRegion)) && !done) {
@@ -1292,13 +1293,13 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 			track = false;
 			for(int x=-radius+1; x<=radius && !done && !north; x++) {
 				for(int y=-radius+1; y<radius && !done; y++) {
-					saveLocation = startLocation.clone().add(x, y, -radius);
-					if(saveLocation.getBlockY()>256 || saveLocation.getBlockY()<0) {
+					safeLocation = startLocation.clone().add(x, y, -radius);
+					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
 						continue;
 					}
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
@@ -1310,13 +1311,13 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 			track = false;
 			for(int z=-radius+1; z<=radius && !done && !east; z++) {
 				for(int y=-radius+1; y<radius && !done; y++) {
-					saveLocation = startLocation.clone().add(radius, y, z);
-					if(saveLocation.getBlockY()>256 || saveLocation.getBlockY()<0) {
+					safeLocation = startLocation.clone().add(radius, y, z);
+					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
 						continue;
 					}
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
@@ -1328,13 +1329,13 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 			track = false;
 			for(int x=radius-1; x>=-radius && !done && !south; x--) {
 				for(int y=-radius+1; y<radius && !done; y++) {
-					saveLocation = startLocation.clone().add(x, y, radius);
-					if(saveLocation.getBlockY()>256 || saveLocation.getBlockY()<0) {
+					safeLocation = startLocation.clone().add(x, y, radius);
+					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
 						continue;
 					}
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
@@ -1346,13 +1347,13 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 			track = false;
 			for(int z=radius-1; z>=-radius && !done && !west; z--) {
 				for(int y=-radius+1; y<radius && !done; y++) {
-					saveLocation = startLocation.clone().add(-radius, y, z);
-					if(saveLocation.getBlockY()>256 || saveLocation.getBlockY()<0) {
+					safeLocation = startLocation.clone().add(-radius, y, z);
+					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
 						continue;
 					}
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
@@ -1367,10 +1368,10 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 				top = true;
 			}
 			if(!done && !top) {
-				saveLocation = startLocation.clone().add(0, radius, 0);
-				if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+				safeLocation = startLocation.clone().add(0, radius, 0);
+				if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 					checked++;
-					done = isSave(saveLocation) || checked > maxTries;
+					done = isSafe(safeLocation) || checked > maxTries;
 					blocksInRegion = true;
 					track = true;
 				}
@@ -1378,40 +1379,40 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 			for(int r=1; r<=radius && !done && !top; r++) {
 				// North
 				for(int x=-r+1; x<=r && !done; x++) {
-					saveLocation = startLocation.clone().add(x, radius, -r);
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					safeLocation = startLocation.clone().add(x, radius, -r);
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
 				}
 				// East
 				for(int z=-r+1; z<=r && !done; z++) {
-					saveLocation = startLocation.clone().add(r, radius, z);
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					safeLocation = startLocation.clone().add(r, radius, z);
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
 				}
 				// South side
 				for(int x=r-1; x>=-r && !done; x--) {
-					saveLocation = startLocation.clone().add(x, radius, r);
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					safeLocation = startLocation.clone().add(x, radius, r);
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
 				}
 				// West side
 				for(int z=r-1; z>=-r && !done; z--) {
-					saveLocation = startLocation.clone().add(-r, radius, z);
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					safeLocation = startLocation.clone().add(-r, radius, z);
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
@@ -1426,10 +1427,10 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 				bottom = true;
 			}
 			if(!done && !bottom) {
-				saveLocation = startLocation.clone().add(0, -radius, 0);
-				if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+				safeLocation = startLocation.clone().add(0, -radius, 0);
+				if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 					checked++;
-					done = isSave(saveLocation) || checked > maxTries;
+					done = isSafe(safeLocation) || checked > maxTries;
 					blocksInRegion = true;
 					track = true;
 				}
@@ -1437,40 +1438,40 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 			for(int r=1; r<=radius && !done && !bottom; r++) {
 				// North
 				for(int x=-r+1; x<=r && !done; x++) {
-					saveLocation = startLocation.clone().add(x, -radius, -r);
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					safeLocation = startLocation.clone().add(x, -radius, -r);
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
 				}
 				// East
 				for(int z=-r+1; z<=r && !done; z++) {
-					saveLocation = startLocation.clone().add(r, -radius, z);
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					safeLocation = startLocation.clone().add(r, -radius, z);
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
 				}
 				// South side
 				for(int x=r-1; x>=-r && !done; x--) {
-					saveLocation = startLocation.clone().add(x, -radius, r);
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					safeLocation = startLocation.clone().add(x, -radius, r);
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
 				}
 				// West side
 				for(int z=r-1; z>=-r && !done; z--) {
-					saveLocation = startLocation.clone().add(-r, -radius, z);
-					if((insideRegion && region.contains(saveLocation.getBlockX(), saveLocation.getBlockY(), saveLocation.getBlockZ())) || !insideRegion) {
+					safeLocation = startLocation.clone().add(-r, -radius, z);
+					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
 						checked++;
-						done = isSave(saveLocation) || checked > maxTries;
+						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
 						track = true;
 					}
@@ -1481,14 +1482,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 			// Increase cube radius
 			radius++;
 		}
-		if(done && isSave(saveLocation)) {
+		if(done && isSafe(safeLocation)) {
 			if(toSign) {
 				plugin.message(player, "teleport-successSign", getName());
 			} else {
 				plugin.message(player, "teleport-success", getName());
 			}			
-			player.teleport(saveLocation);
-			AreaShop.debug("Found location: " + saveLocation.toString() + " Tries: " + (checked-1));
+			player.teleport(safeLocation);
+			AreaShop.debug("Found location: " + safeLocation.toString() + " Tries: " + (checked-1));
 			return true;
 		} else {
 			plugin.message(player, "teleport-noSafe", getName(), checked-1, maxTries);
@@ -1508,7 +1509,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	 * @param location The location to check
 	 * @return true if it is safe, otherwise false
 	 */
-	protected boolean isSave(Location location) {
+	protected boolean isSafe(Location location) {
 		Block feet = location.getBlock();
 		Block head = feet.getRelative(BlockFace.UP);
 		Block below = feet.getRelative(BlockFace.DOWN);

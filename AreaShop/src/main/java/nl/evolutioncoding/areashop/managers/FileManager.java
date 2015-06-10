@@ -222,12 +222,15 @@ public class FileManager {
 	 * @param regionName Name of the region that can be rented
 	 * @param rent Map containing all the info for a rent
 	 */
-	public void addRent(RentRegion rent) {
+	public void addRentNoSave(RentRegion rent) {
 		if(rent == null) {
 			AreaShop.debug("Tried adding a null rent!");
 			return;
 		}
 		regions.put(rent.getName().toLowerCase(), rent);
+	}
+	public void addRent(RentRegion rent) {
+		addRentNoSave(rent);
 		rent.saveRequired();
 	}
 	
@@ -236,12 +239,15 @@ public class FileManager {
 	 * @param regionName Name of the region that can be buyed
 	 * @param buy Map containing all the info for a buy
 	 */
-	public void addBuy(BuyRegion buy) {
+	public void addBuyNoSave(BuyRegion buy) {
 		if(buy == null) {
 			AreaShop.debug("Tried adding a null buy!");
 			return;
 		}
 		regions.put(buy.getName().toLowerCase(), buy);
+	}
+	public void addBuy(BuyRegion buy) {
+		addBuyNoSave(buy);
 		buy.saveRequired();
 	}
 	
@@ -992,10 +998,10 @@ public class FileManager {
 					// Construct the correct type of region
 					if(RegionType.RENT.getValue().equals(config.getString("general.type"))) {
 						RentRegion rent = new RentRegion(plugin, config);
-						addRent(rent);
+						addRentNoSave(rent);
 					} else if(RegionType.BUY.getValue().equals(config.getString("general.type"))) {
 						BuyRegion buy = new BuyRegion(plugin, config);
-						addBuy(buy);
+						addBuyNoSave(buy);
 					}
 				}						
 			}

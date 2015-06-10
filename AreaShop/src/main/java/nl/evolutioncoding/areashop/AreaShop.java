@@ -581,47 +581,54 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		String after = this.getConfig().getString("moneyCharacterAfter");
 		after = after.replace(currencyEuro, "\u20ac");
 	    String result;
-		// Add metric 
-		double metricAbove = getConfig().getDouble("metricSuffixesAbove");
-		if(metricAbove != -1 && amount >= metricAbove) {
-			if(amount >= 1000000000000000000000000.0) {
-				amount = amount/1000000000000000000000000.0;
-				after = "Y" + after;
-			} else if(amount >= 1000000000000000000000.0) {
-				amount = amount/1000000000000000000000.0;
-				after = "Z" + after;
-			} else if(amount >= 1000000000000000000.0) {
-				amount = amount/1000000000000000000.0;
-				after = "E" + after;
-			} else if(amount >= 1000000000000000.0) {
-				amount = amount/1000000000000000.0;
-				after = "P" + after;
-			} else if(amount >= 1000000000000.0) {
-				amount = amount/1000000000000.0;
-				after = "T" + after;
-			} else if(amount >= 1000000000.0) {
-				amount = amount/1000000000.0;
-				after = "G" + after;
-			} else if(amount >= 1000000.0) {
-				amount = amount/1000000.0;
-				after = "M" + after;
-			} else if(amount >= 1000.0) {
-				amount = amount/1000.0;
-				after = "k" + after;
-			}
-			BigDecimal bigDecimal = new BigDecimal(amount);
-			if(bigDecimal.toString().contains(".")) {
-				int frontLength = bigDecimal.toString().substring(0, bigDecimal.toString().indexOf('.')).length();
-			    bigDecimal = bigDecimal.setScale(getConfig().getInt("fractionalNumbers") + (3-frontLength), RoundingMode.HALF_UP);
-			}
-		    result = bigDecimal.toString();
-		} else {
-			BigDecimal bigDecimal = new BigDecimal(amount);
-			bigDecimal = bigDecimal.setScale(getConfig().getInt("fractionalNumbers"), RoundingMode.HALF_UP);
-			amount = bigDecimal.doubleValue();
-		    result = bigDecimal.toString();
-			if(getConfig().getBoolean("hideEmptyFractionalPart") && (amount%1.0) == 0.0 && result.contains(".")) {
-				result = result.substring(0, result.indexOf('.'));
+	    // Check for infinite and NaN
+	    if(Double.isInfinite(amount)) {
+			result = "\u221E"; // Infinite symbol
+		} else if(Double.isNaN(amount)) {
+			result = "NaN";
+		} else {	    
+			// Add metric 
+			double metricAbove = getConfig().getDouble("metricSuffixesAbove");
+			if(metricAbove != -1 && amount >= metricAbove) {
+				if(amount >= 1000000000000000000000000.0) {
+					amount = amount/1000000000000000000000000.0;
+					after = "Y" + after;
+				} else if(amount >= 1000000000000000000000.0) {
+					amount = amount/1000000000000000000000.0;
+					after = "Z" + after;
+				} else if(amount >= 1000000000000000000.0) {
+					amount = amount/1000000000000000000.0;
+					after = "E" + after;
+				} else if(amount >= 1000000000000000.0) {
+					amount = amount/1000000000000000.0;
+					after = "P" + after;
+				} else if(amount >= 1000000000000.0) {
+					amount = amount/1000000000000.0;
+					after = "T" + after;
+				} else if(amount >= 1000000000.0) {
+					amount = amount/1000000000.0;
+					after = "G" + after;
+				} else if(amount >= 1000000.0) {
+					amount = amount/1000000.0;
+					after = "M" + after;
+				} else if(amount >= 1000.0) {
+					amount = amount/1000.0;
+					after = "k" + after;
+				}
+				BigDecimal bigDecimal = new BigDecimal(amount);
+				if(bigDecimal.toString().contains(".")) {
+					int frontLength = bigDecimal.toString().substring(0, bigDecimal.toString().indexOf('.')).length();
+				    bigDecimal = bigDecimal.setScale(getConfig().getInt("fractionalNumbers") + (3-frontLength), RoundingMode.HALF_UP);
+				}
+			    result = bigDecimal.toString();
+			} else {
+				BigDecimal bigDecimal = new BigDecimal(amount);
+				bigDecimal = bigDecimal.setScale(getConfig().getInt("fractionalNumbers"), RoundingMode.HALF_UP);
+				amount = bigDecimal.doubleValue();
+			    result = bigDecimal.toString();
+				if(getConfig().getBoolean("hideEmptyFractionalPart") && (amount%1.0) == 0.0 && result.contains(".")) {
+					result = result.substring(0, result.indexOf('.'));
+				}
 			}
 		}
 		result = result.replace(".", getConfig().getString("decimalMark"));

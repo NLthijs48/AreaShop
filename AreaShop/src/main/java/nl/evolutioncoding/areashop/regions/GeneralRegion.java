@@ -1125,7 +1125,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	 * Indicate this region needs to be saved, saving will happen by a repeating task
 	 */
 	public void saveRequired() {
-		AreaShop.debug("saveRequired()");
 		saveRequired = true;
 	}
 	

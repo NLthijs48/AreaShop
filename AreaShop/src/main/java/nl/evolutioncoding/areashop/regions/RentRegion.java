@@ -461,8 +461,7 @@ public class RentRegion extends GeneralRegion {
 				if((timeRented + getDuration()) > (maxRentTime) 
 						&& !player.hasPermission("areashop.renttimebypass")
 						&& maxRentTime != -1) {
-					int timeRentedMinutes = (int)(timeRented/1000.0/60.0 +1);
-					plugin.message(player, "rent-maxRentTime", this.millisToHumanFormat(maxRentTime), this.millisToHumanFormat(timeRentedMinutes));
+					plugin.message(player, "rent-maxRentTime", this.millisToHumanFormat(maxRentTime), this.millisToHumanFormat(timeRented));
 					return false;
 				}
 

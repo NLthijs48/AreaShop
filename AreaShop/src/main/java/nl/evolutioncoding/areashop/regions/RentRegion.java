@@ -157,7 +157,7 @@ public class RentRegion extends GeneralRegion {
 		}
 		result.put(AreaShop.tagMaxExtends, this.getMaxExtends());
 		result.put(AreaShop.tagExtendsLeft, getMaxExtends() - getTimesExtended());
-		result.put(AreaShop.tagMaxRentTime, this.millisToHumanFormat(getMaxRentTime()*60*1000));
+		result.put(AreaShop.tagMaxRentTime, this.millisToHumanFormat(getMaxRentTime()));
 		result.put(AreaShop.tagMaxInactiveTime, this.getFormattedInactiveTimeUntilUnrent());
 		return result;
 	}
@@ -259,10 +259,10 @@ public class RentRegion extends GeneralRegion {
 	
 	/**
 	 * Minutes until automatic unrent when player is offline
-	 * @return The number of minutes until the region is unrented while player is offline
+	 * @return The number of milliseconds until the region is unrented while player is offline
 	 */
 	public long getInactiveTimeUntilUnrent() {
-		return plugin.getDurationFromMinutesOrString("rent.inactiveTimeUntilUnrent");
+		return plugin.getDurationFromMinutesOrStringInput(getStringSetting("rent.inactiveTimeUntilUnrent"));
 	}
 	
 	/**
@@ -270,7 +270,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return String indicating the inactive time until unrent
 	 */
 	public String getFormattedInactiveTimeUntilUnrent() {
-		return this.millisToHumanFormat(getInactiveTimeUntilUnrent()*60*1000);
+		return this.millisToHumanFormat(getInactiveTimeUntilUnrent());
 	}
 	
 	/**
@@ -327,11 +327,11 @@ public class RentRegion extends GeneralRegion {
 	}
 	
 	/**
-	 * Get the maximum time the player can rent the region in advance (minutes)
-	 * @return The maximum rent time in minutes
+	 * Get the maximum time the player can rent the region in advance (milliseconds)
+	 * @return The maximum rent time in milliseconds
 	 */
 	public long getMaxRentTime() {
-		return plugin.getDurationFromMinutesOrString("rent.maxRentTime")/1000;
+		return plugin.getDurationFromMinutesOrStringInput(getStringSetting("rent.maxRentTime"));
 	}
 	
 	/**
@@ -458,11 +458,11 @@ public class RentRegion extends GeneralRegion {
 				if(isRented()) {
 					timeRented = getRentedUntil() - timeNow;
 				}
-				if((timeRented + getDuration()) > (maxRentTime*60*1000) 
+				if((timeRented + getDuration()) > (maxRentTime) 
 						&& !player.hasPermission("areashop.renttimebypass")
 						&& maxRentTime != -1) {
 					int timeRentedMinutes = (int)(timeRented/1000.0/60.0 +1);
-					plugin.message(player, "rent-maxRentTime", maxRentTime, timeRentedMinutes);
+					plugin.message(player, "rent-maxRentTime", this.millisToHumanFormat(maxRentTime), this.millisToHumanFormat(timeRentedMinutes));
 					return false;
 				}
 
@@ -602,7 +602,7 @@ public class RentRegion extends GeneralRegion {
 			return false;
 		}
 		//AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + player.getLastPlayed() + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
-		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting * 60 * 1000)) {
+		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting)) {
 			plugin.getLogger().info("Region " + getName() + " unrented because of inactivity for player " + getPlayerName());
 			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + player.getLastPlayed() + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
 			this.unRent(true);

@@ -743,7 +743,11 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public long getDurationFromSecondsOrString(String path) {
 		if(getConfig().isLong(path) || getConfig().isInt(path)) {
-			return getConfig().getLong(path)*1000;
+			long setting = getConfig().getLong(path);
+			if(setting != -1) {
+				setting = setting*1000;
+			}
+			return setting;
 		} else {
 			return durationStringToLong(getConfig().getString(path));
 		}
@@ -756,9 +760,49 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public long getDurationFromMinutesOrString(String path) {
 		if(getConfig().isLong(path) || getConfig().isInt(path)) {
-			return getConfig().getLong(path)*60*1000;
+			long setting = getConfig().getLong(path);
+			if(setting != -1) {
+				setting = setting*60*1000;
+			}
+			return setting;
 		} else {
 			return durationStringToLong(getConfig().getString(path));
+		}
+	}
+	
+	/**
+	 * Parse a time setting that could be minutes or a duration string
+	 * @param input The string to parse
+	 * @return milliseconds that the string indicates
+	 */
+	public long getDurationFromMinutesOrStringInput(String input) {
+		long number;
+		try {
+			number = Long.parseLong(input);
+			if(number != -1) {
+				number = number*60*1000;
+			}
+			return number;
+		} catch(NumberFormatException e) {
+			return durationStringToLong(input);			
+		}
+	}
+	
+	/**
+	 * Parse a time setting that could be seconds or a duration string
+	 * @param input The string to parse
+	 * @return seconds that the string indicates
+	 */
+	public long getDurationFromSecondsOrStringInput(String input) {
+		long number;
+		try {
+			number = Long.parseLong(input);
+			if(number != -1) {
+				number = number*1000;
+			}
+			return number;
+		} catch(NumberFormatException e) {
+			return durationStringToLong(input);			
 		}
 	}
 	

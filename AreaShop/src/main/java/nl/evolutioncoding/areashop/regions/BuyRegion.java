@@ -231,10 +231,10 @@ public class BuyRegion extends GeneralRegion {
 	
 	/**
 	 * Minutes until automatic unrent when player is offline
-	 * @return The number of minutes until the region is unrented while player is offline
+	 * @return The number of milliseconds until the region is unrented while player is offline
 	 */
 	public long getInactiveTimeUntilSell() {
-		return getLongSetting("buy.inactiveTimeUntilSell");
+		return plugin.getDurationFromMinutesOrStringInput(getStringSetting("buy.inactiveTimeUntilSell"));
 	}
 	
 	/**
@@ -242,7 +242,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return String indicating the inactive time until unrent
 	 */
 	public String getFormattedInactiveTimeUntilSell() {
-		return this.millisToHumanFormat(getInactiveTimeUntilSell()*60*1000);
+		return this.millisToHumanFormat(getInactiveTimeUntilSell());
 	}
 	
 	/**
@@ -446,7 +446,7 @@ public class BuyRegion extends GeneralRegion {
 			return false;
 		}
 		//AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + player.getLastPlayed() + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
-		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting * 60 * 1000)) {
+		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting)) {
 			plugin.getLogger().info("Region " + getName() + " sold because of inactivity for player " + getPlayerName());
 			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + player.getLastPlayed() + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
 			this.sell(true);

@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: English, Version: V2.1.5, Percentage translated: 100% (source), author: NLThijs48                                ║
+# ║ Language: English, Version: V2.2.0, Percentage translated: 100% (source), author: NLThijs48                                ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -80,7 +80,7 @@ rent-lowMoneyRent: "You don't have enough money to rent this region (you have %0
 rent-someoneElse: "Someone else already rented this region."
 rent-notRentable: "That region is not available for renting."
 rent-maxExtends: "You cannot extend this rent anymore (the maximum is %0% times), however after the rent is over you can rent this region again."
-rent-maxRentTime: "You cannot rent this region more time in advance, the maximum time is %0% minutes and you have currently rented it for %1% minutes."
+rent-maxRentTime: "You cannot rent this region more time in advance, the maximum time is %0% and you have currently rented it for %1%."
 rent-restrictedToWorld: "You need to be in the '%0%' world to rent this region (you are in '%1%')."
 rent-restrictedToRegion: "You need to be inside '%0%' to rent it."
 rent-expireWarning: "Your region %region% has %timeleft% left, be sure to extend it if you want to keep it."

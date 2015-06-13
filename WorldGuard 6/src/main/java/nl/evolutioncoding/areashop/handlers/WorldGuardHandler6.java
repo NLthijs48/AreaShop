@@ -98,5 +98,15 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 		}
 		return result;
 	}
+
+	@Override
+	public boolean containsMember(ProtectedRegion region, UUID player) {
+		return region.getMembers().contains(player);
+	}
+
+	@Override
+	public boolean containsOwner(ProtectedRegion region, UUID player) {
+		return region.getOwners().contains(player);
+	}
 	
 }

@@ -104,5 +104,33 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 		}
 		return result;
 	}
+
+	@Override
+	public boolean containsMember(ProtectedRegion region, UUID player) {
+		if(player == null) {
+			return false;
+		} else {
+			String name = Bukkit.getOfflinePlayer(player).getName();
+			if(name != null) {
+				return region.getMembers().contains(name);
+			} else {
+				return false;
+			}
+		}
+	}
+
+	@Override
+	public boolean containsOwner(ProtectedRegion region, UUID player) {
+		if(player == null) {
+			return false;
+		} else {
+			String name = Bukkit.getOfflinePlayer(player).getName();
+			if(name != null) {
+				return region.getOwners().contains(name);
+			} else {
+				return false;
+			}
+		}
+	}
 	
 }

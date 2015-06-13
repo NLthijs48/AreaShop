@@ -101,7 +101,7 @@ public class AddfriendCommand extends CommandAreaShop {
 			if(sender.hasPermission("areashop.addfriend") && sender instanceof Player) {
 				if(region.isOwner((Player)sender)) {
 					OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
-					if(!friend.hasPlayedBefore()) {
+					if(friend.getLastPlayed() == 0) {
 						plugin.message(sender, "addfriend-notVisited", args[1]);
 						return;
 					}

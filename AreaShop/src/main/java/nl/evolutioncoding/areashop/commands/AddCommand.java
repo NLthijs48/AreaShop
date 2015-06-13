@@ -127,8 +127,8 @@ public class AddCommand extends CommandAreaShop {
 					if(current < finalRegions.size()) {
 						ProtectedRegion region = finalRegions.get(current);
 						// Determine if the player is an owner or member of the region
-						boolean isMember = finalPlayer != null && region.getMembers().contains(finalPlayer.getUniqueId());
-						boolean isOwner = finalPlayer != null && region.getOwners().contains(finalPlayer.getUniqueId());						
+						boolean isMember = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
+						boolean isOwner = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());						
 						String type = null;
 						if(isRent) {
 							type = "rent";				

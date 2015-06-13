@@ -279,8 +279,8 @@ public class FileManager {
 			player = (Player)sender;
 		}
 		// Determine if the player is an owner or member of the region
-		boolean isMember = player != null && region.getMembers().contains(player.getUniqueId());
-		boolean isOwner = player != null && region.getOwners().contains(player.getUniqueId());		
+		boolean isMember = player != null && plugin.getWorldGuardHandler().containsMember(region, player.getUniqueId());
+		boolean isOwner = player != null && plugin.getWorldGuardHandler().containsOwner(region, player.getUniqueId());		
 		AreaShop.debug("checkRegionAdd: isOwner=" + isOwner + ", isMember=" + isMember);
 		String typeString = null;
 		if(type == RegionType.RENT) {

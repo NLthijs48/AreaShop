@@ -1815,7 +1815,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 		while(!groups.isEmpty()) {
 			String group = groups.get(0);
 			if(player.hasPermission("areashop.limits." + group) && this.matchesLimitGroup(group)) {
-				AreaShop.debug("  has group: " + group);
+				AreaShop.debug(player.getName() + " has limitGroup: " + group);
 				int totalLimit = plugin.getConfig().getInt("limitGroups." + group + ".total");
 				int rentsLimit = plugin.getConfig().getInt("limitGroups." + group + ".rents");
 				int totalCurrent = hasRegionsInLimitGroup(player, group, totalRegions);

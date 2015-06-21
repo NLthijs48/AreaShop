@@ -698,10 +698,12 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * @return The duration in milliseconds translated from the durationstring, or if it is invalid then 0
 	 */
 	public long durationStringToLong(String duration) {
-		if(duration == null || duration.indexOf(' ') == -1) {
+		if(duration == null) {
 			return 0;
 		} else if(duration.equalsIgnoreCase("disabled") || duration.equalsIgnoreCase("unlimited")) {
 			return -1;
+		} else if(duration.indexOf(' ') == -1) {
+			return 0;
 		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(0);

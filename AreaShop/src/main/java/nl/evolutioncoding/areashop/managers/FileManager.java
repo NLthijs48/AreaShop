@@ -979,6 +979,7 @@ public class FileManager {
 		File file = new File(regionsPath);
 		if(!file.exists()) {
 			file.mkdirs();
+			plugin.setReady(true);
 		} else if(file.isDirectory()) {
 			File[] regionFiles = file.listFiles();
 			for(File regionFile : regionFiles) {

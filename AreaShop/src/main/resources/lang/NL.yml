@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Dutch, Version: V2.1.5, Percentage translated: 94%                                                               ║
+# ║ Language: Dutch, Version: V2.2.0, Percentage translated: 100%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -208,10 +208,18 @@ setup-alreadyBuySign: "Het aangegeven gebied is al toegevoegd als koop gebied aa
 setup-noDuration: "Je hebt geen tijdsduur voor het huren aangegeven, zet dit op de derde regel."
 setup-wrongDuration: "De aangegeven tijdsduur is niet in het correcte formaat, voorbeeld: 1 dag."
 setup-noPrice: "Je hebt geen prijs aangegeven op de vierde regel."
+setup-wrongPrice: "Je hebt de prijs niet goed aangegeven, gebruik alleen nummers."
 setup-rentSuccess: "Huren van gebied %0% is goed opgezet."
 setup-buySuccess: "Kopen van gebied %0% is goed opgezet."
+setup-noPermissionRent: "Je hebt geen toestemming om huur gebieden op te zetten."
+setup-noPermissionBuy: "Je hebt geen toestemming om koop gebieden op te zetten."
 setup-couldNotDetect: "Meerdere gebieden gevonden met dezelfde prioriteit en/of parent/child relatie, geeft een specifieke aan op de tweede regel (2 van de gebieden die gevonden zijn: %0% en %1%)."
 setup-blacklisted: "%0% staat op de blacklist en kan niet toegevoegd worden aan AreaShop."
+
+destroy-noPermissionRent: "Je hebt geen toestemming om huur gebieden te verwijderen."
+destroy-noPermissionBuy: "Je hebt geen toestemming om koop gebieden te verwijderen."
+destroy-successRent: "%0% succesvol verwijderd als huur gebied."
+destroy-successBuy: "%0% succesvol verwijderd als koop gebied."
 
 teleport-help: "/as tp <gebied> <aantal> <soort>."
 teleport-noRentOrBuy: "Het aangegeven gebied is niet geregistreerd: %0%."
@@ -219,9 +227,12 @@ teleport-noPermission: "Je hebt geen toestemming om naar je gebied te teleporter
 teleport-noPermissionOther: "Je hebt geen toestemming om te teleporteren naar een gebied dat niet van jou is."
 teleport-noPermissionSign: "Je hebt geen toestemming om naar het bordje van je gebied te teleporteren."
 teleport-noPermissionOtherSign: "Je hebt geen toestemming om naar bordjes te teleporteren van gebieden die niet van jou zijn."
+teleport-noPermissionFriend: "Je hebt geen toestemming om te teleporteren naar gebieden waar je als vriend bent toegevoegd."
+teleport-noPermissionFriendSign: "Je hebt geen toestemming om te teleporteren naar het bord van gebieden waar je als vriend bent toegevoegd."
 teleport-success: "Je bent naar %0% geteleporteerd."
 teleport-successSign: "Je bent geteleporteerd naar het bordje van %0%."
 teleport-noSafe: "Geen veilige plek gevonden in gebied %0%, verander het gebied of stel de teleporteer positie in."
+teleport-blocked: "Je kunt niet teleporteren omdat de positie buiten het gebied ligt en je geforceerd word erbinnen te teleporteren."
 
 setteleport-help: "/as settp [gebied] [reset], het gebied waar je in staat zal worden gebruikt als je deze niet aangeeft."
 setteleport-noPermission: "Je hebt geen toestemming om de teleporteer lokatie in te stellen."
@@ -312,6 +323,8 @@ me-rentRegions: "Je hebt de volgende gebieden gehuurt:"
 me-buyRegions: "Je hebt de volgende gebieden gekocht:"
 me-rentLine: "&2&l►&r %region% tot %until% &7(%timeleft% over)."
 me-buyLine: "&2&l►&r %region%."
+me-noFriendRegions: "Je bent niet aan gebieden toegevoegd als vriend."
+me-friendRegions: "Je bent toegevoegd als vriend bij de volgende gebieden:"
 me-friendLine: "&2&l►&r %region% &7(eigenaar: %player%)."
 
 setowner-help: "/as setowner <speler> [gebied], het gebied waar je in staat zal worden gebruikt als je deze niet aangeeft."
@@ -370,6 +383,17 @@ linksigns-first: "Je bent in bord-koppel modus gegaan."
 linksigns-next: "&7Linksklik om een bord te selecteren, rechtsklik om een gebied te selecteren, gebruik '/as linksigns' om te stoppen."
 linksigns-noPermission: "Je hebt geen toestemming om massa bord-koppel modus te gebruiken."
 linksigns-stopped: "Je bent gestopt met bord-koppel modus."
+
+stack-help: "/as stack <aantal> <gat> <naam> <rent|buy> [groep].\n&7  <aantal> Het aantal gebieden dat word aangemaakt.\n  <gat> Blokken afstand tussen de gebieden.\n  <naam> Naam van de gebieden (komt een nummer achter).\n  <rent|buy> Maak ze huur of koop gebieden.\n  [groep] Voeg de gebieden toe aan een groep.\n  De gebieden zullen worden gemaakt in de richting waarnaar je kijkt."
+stack-accepted: "Begonnen met %0% %1% gebieden maken met %2% blokken ruimte ertussen, namen beginnen met %3% en hebben een nummer erachter.%4%"
+stack-addToGroup: " Gemaakte gebieden zullen worden toegevoegd aan de groep '%0%'."
+stack-noPermission: "Je hebt geen toestemming om in grote aantallen gebieden toe te voegen aan AreaShop."
+stack-wrongAmount: "'%0%' is geen goed aantal gebieden."
+stack-wrongGap: "'%0%' is geen correct getal voor het aantal blokken ruimte tussen gebieden."
+stack-noSelection: "Je hebt geen selectie die aangeeft waar het eerste gebied word gemaakt."
+stack-addStart: "&7%0% gebieden aan het toevoegen met %1% per seconde."
+stack-addComplete: "&7Toevoegen van gebieden voltooid."
+stack-unclearDirection: "Kijk precies in het noorden, oosten, zuiden of westen, op dit moment gedetecteert: %0%."
 
 timeleft-years: "%0% jaren"
 timeleft-months: "%0% maanden"

@@ -153,7 +153,7 @@ public class AddCommand extends CommandAreaShop {
 								RentRegion rent = new RentRegion(plugin, region.getId(), finalWorld);
 								// Set landlord
 								if(landlord) {
-									rent.setLandlord(finalPlayer.getUniqueId());
+									rent.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
 								}
 								// Run commands
 								rent.runEventCommands(RegionEvent.CREATED, true);						
@@ -167,7 +167,7 @@ public class AddCommand extends CommandAreaShop {
 								BuyRegion buy = new BuyRegion(plugin, region.getId(), finalWorld);
 								// Set landlord
 								if(landlord) {
-									buy.setLandlord(finalPlayer.getUniqueId());
+									buy.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
 								}
 								// Run commands
 								buy.runEventCommands(RegionEvent.CREATED, true);

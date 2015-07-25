@@ -79,8 +79,8 @@ hours: [h, hour, hours, uur, uren]
 days: [d, day, days, dag, dagen]
 months: [M,  month,  months, maanden, maand]
 years: [y, year, years, jaar, jaren]
-  
-  
+
+
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ PERMISSION GROUPS: Assigned by giving players certain permissions                                                          │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -97,7 +97,7 @@ limitGroups:
     rents: 1
     buys: 1
 
-    
+
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ PROFILES: Assigned in general (default.yml), for a group (groups.yml) or individually (<region>.yml)                       │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -291,8 +291,8 @@ expirationWarningProfiles:
     "5 minutes":
       warnPlayer: true
       commands:
-     
-  
+
+
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ LIMITS AND TIMINGS: Options for limits and the frequencies for certain functions (be very careful with these!)             │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -348,16 +348,3 @@ nameupdate:
 adding:
   ## Number of regions to add per tick
   regionsPerTick: 2
-
-
-
-
-
-
-
-
-
-
-
-
-

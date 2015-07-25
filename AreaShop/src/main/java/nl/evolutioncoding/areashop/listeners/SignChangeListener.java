@@ -144,7 +144,7 @@ public final class SignChangeListener implements Listener {
 						|| (player.hasPermission("areashop.createrent.member") && isMember)));					
 
 				if(landlord) {
-					rent.setLandlord(player.getUniqueId());
+					rent.setLandlord(player.getUniqueId(), player.getName());
 				}
 				if(priceSet) {
 					rent.setPrice(price);
@@ -257,7 +257,7 @@ public final class SignChangeListener implements Listener {
 						|| (player.hasPermission("areashop.createbuy.member") && isMember)));					
 
 				if(landlord) {
-					buy.setLandlord(player.getUniqueId());
+					buy.setLandlord(player.getUniqueId(), player.getName());
 				}
 				if(priceSet) {
 					buy.setPrice(price);

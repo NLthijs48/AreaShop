@@ -394,6 +394,7 @@ public class RentRegion extends GeneralRegion {
 	 * @param regionName The name of the region you want to rent
 	 * @return true if it succeeded and false if not
 	 */
+	@SuppressWarnings("deprecation")
 	public boolean rent(Player player) {		
 		/* Check if the player has permission */
 		if(player.hasPermission("areashop.rent")) {
@@ -476,7 +477,13 @@ public class RentRegion extends GeneralRegion {
 					if(getLandlord() != null) {
 						OfflinePlayer landlord = Bukkit.getOfflinePlayer(getLandlord());
 						if(landlord != null) {
-							r = plugin.getEconomy().depositPlayer(landlord, getWorldName(), getPrice());
+							// If the landlord has no player.dat file anymore, then getName() returns null,
+							// therefor we deposit the money by the old cached name instead
+							if(landlord.getName() == null) {
+								r = plugin.getEconomy().depositPlayer(getLandlordName(), getWorldName(), getPrice());
+							} else {
+								r = plugin.getEconomy().depositPlayer(landlord, getWorldName(), getPrice());
+							}
 							if(!r.transactionSuccess()) {
 								plugin.getLogger().warning("Something went wrong with paying '" + landlord.getName() + "' " + getFormattedPrice() + " for his rent of region " + getName() + " to " + player.getName());
 							}
@@ -551,6 +558,7 @@ public class RentRegion extends GeneralRegion {
 	 * Unrent a region, reset to unrented
 	 * @param regionName Region that should be unrented
 	 */
+	@SuppressWarnings("deprecation")
 	public void unRent(boolean giveMoneyBack) {
 		// Run commands
 		this.runEventCommands(RegionEvent.UNRENTED, true);
@@ -562,7 +570,11 @@ public class RentRegion extends GeneralRegion {
 				EconomyResponse r = null;
 				boolean error = false;
 				try {
-					r = plugin.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getRenter()), getWorldName(), moneyBack);
+					if(player.getName() == null) {
+						r = plugin.getEconomy().depositPlayer(getPlayerName(), getWorldName(), moneyBack);
+					} else {
+						r = plugin.getEconomy().depositPlayer(player, getWorldName(), moneyBack);
+					}
 				} catch(Exception e) {
 					error = true;
 				}

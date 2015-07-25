@@ -250,6 +250,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @param player The player that wants to buy the region
 	 * @return true if it succeeded and false if not
 	 */
+	@SuppressWarnings("deprecation")
 	public boolean buy(Player player) {
 		/* Check if the player has permission */
 		if(player.hasPermission("areashop.buy")) {
@@ -307,7 +308,11 @@ public class BuyRegion extends GeneralRegion {
 						}
 						OfflinePlayer oldOwnerPlayer = Bukkit.getOfflinePlayer(oldOwner);
 						if(oldOwnerPlayer != null) {
-							r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
+							if(oldOwnerPlayer.getName() == null) {
+								r = plugin.getEconomy().depositPlayer(getPlayerName(), getWorldName(), getResellPrice());
+							} else {
+								r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
+							}
 							if(!r.transactionSuccess()) {
 								plugin.getLogger().warning("Something went wrong with paying '" + oldOwnerPlayer.getName() + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + player.getName());
 							}
@@ -344,7 +349,11 @@ public class BuyRegion extends GeneralRegion {
 						if(getLandlord() != null) {
 							OfflinePlayer landlord = Bukkit.getOfflinePlayer(getLandlord());
 							if(landlord != null) {
-								r = plugin.getEconomy().depositPlayer(landlord, getWorldName(), getPrice());
+								if(landlord.getName() == null) {
+									r = plugin.getEconomy().depositPlayer(getLandlordName(), getWorldName(), getPrice());
+								} else {
+									r = plugin.getEconomy().depositPlayer(landlord, getWorldName(), getPrice());
+								}
 								if(!r.transactionSuccess()) {
 									plugin.getLogger().warning("Something went wrong with paying '" + landlord.getName() + "' " + getFormattedPrice() + " for his sell of region " + getName() + " to " + player.getName());
 								}
@@ -395,6 +404,7 @@ public class BuyRegion extends GeneralRegion {
 	 * Sell a buyed region, get part of the money back
 	 * @param regionName
 	 */
+	@SuppressWarnings("deprecation")
 	public void sell(boolean giveMoneyBack) {
 		// Run commands
 		this.runEventCommands(RegionEvent.SOLD, true);
@@ -409,7 +419,11 @@ public class BuyRegion extends GeneralRegion {
 				EconomyResponse response = null;
 				boolean error = false;
 				try {
-					response = plugin.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getBuyer()), getWorldName(), moneyBack);
+					if(player.getName() == null) {
+						response = plugin.getEconomy().depositPlayer(getPlayerName(), getWorldName(), moneyBack);
+					} else {
+						response = plugin.getEconomy().depositPlayer(player, getWorldName(), moneyBack);
+					}
 				} catch(Exception e) {
 					error = true;
 				}

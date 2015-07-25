@@ -72,7 +72,7 @@ public class SetlandlordCommand extends CommandAreaShop {
 			plugin.message(player, "setlandlord-noRegion", args[2]);
 			return;
 		}		
-		region.setLandlord(player.getUniqueId());
+		region.setLandlord(player.getUniqueId(), args[1]);
 		String playerName = player.getName();
 		if(playerName.isEmpty()) {
 			playerName = args[1];

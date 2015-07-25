@@ -355,13 +355,17 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	 * Set the landlord of this region (the player that receives all revenue of this region)
 	 * @param landlord The UUID of the player that should be set as landlord
 	 */
-	public void setLandlord(UUID landlord) {
+	public void setLandlord(UUID landlord, String name) {
 		if(landlord == null) {
 			setSetting("general.landlord", null);
 			setSetting("general.landlordName", null);
 		} else {
 			setSetting("general.landlord", landlord.toString());
-			setSetting("general.landlordName", plugin.toName(landlord));
+			String properName = plugin.toName(landlord);
+			if(properName != null) {
+				name = properName;
+			}
+			setSetting("general.landlordName", properName);
 		}
 	}
 	

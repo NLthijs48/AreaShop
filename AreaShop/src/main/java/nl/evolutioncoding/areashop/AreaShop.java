@@ -105,6 +105,16 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public static final String tagMaxInactiveTime = "%inactivetime%";
 	public static final String tagLandlord = "%landlord%";
 	public static final String tagLandlordUUID = "%landlorduuid%";
+	public static final String tagDateTime = "%datetime%";
+	public static final String tagDateTimeShort = "%datetimeshort%";
+	public static final String tagYear = "%year%";
+	public static final String tagMonth = "%month%";
+	public static final String tagDay = "%day%";
+	public static final String tagHour = "%hour%";
+	public static final String tagMinute = "%minute%";
+	public static final String tagSecond = "%second%";
+	public static final String tagMillisecond = "%millisecond%";
+	public static final String tagEpoch = "%epoch%";
 	
 	public static AreaShop getInstance() {
 		return AreaShop.instance;

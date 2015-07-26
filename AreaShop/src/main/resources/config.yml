@@ -129,6 +129,14 @@ limitGroups:
 ## %extendsleft%    The number of extends that are left (maxextends - timesextended)
 ## %maxrenttime%    The maximum time you can rent a region in advance (human readable)
 ## %inactivetime%   The maximum time a player may be inactive before unrent/sell (human readable)
+## %year%           The current year
+## %month%          The current month in the year
+## %day%            The current day in the month
+## %hour%           The current hour in the day (0-23)
+## %minute%         The current minute of the hour
+## %second%         The current second of the minute
+## %millisecond%    The current millisecond of the second
+## %epoch%          The number of milliseconds since January 1, 1970 (Unix Epoch)
 
 ## Below are profiles for the signs, you can assign profiles to regions 
 ## by setting 'general.signProfile' in default.yml, groups or individual regions

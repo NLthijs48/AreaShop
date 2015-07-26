@@ -2,8 +2,10 @@ package nl.evolutioncoding.areashop.regions;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -466,6 +468,23 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 		result.put(AreaShop.tagFriendsUUID, Utils.createCommaSeparatedList(getFriends()));
 		result.put(AreaShop.tagLandlord, getLandlordName());
 		result.put(AreaShop.tagLandlordUUID, getLandlord());
+		// Date/time stuff
+		Calendar calendar = Calendar.getInstance();
+		result.put(AreaShop.tagEpoch, calendar.getTimeInMillis());
+		result.put(AreaShop.tagMillisecond, calendar.get(Calendar.MILLISECOND));
+		result.put(AreaShop.tagSecond, calendar.get(Calendar.SECOND));
+		result.put(AreaShop.tagMinute, calendar.get(Calendar.MINUTE));
+		result.put(AreaShop.tagHour, calendar.get(Calendar.HOUR_OF_DAY));
+		result.put(AreaShop.tagDay, calendar.get(Calendar.DAY_OF_MONTH));
+		result.put(AreaShop.tagMonth, calendar.get(Calendar.MONTH));
+		result.put(AreaShop.tagYear, calendar.get(Calendar.YEAR));
+		// In specified format
+		SimpleDateFormat date = new SimpleDateFormat(plugin.getConfig().getString("timeFormatChat"));
+		String dateString = date.format(Calendar.getInstance().getTime());
+		result.put(AreaShop.tagDateTime, dateString);
+		date = new SimpleDateFormat(plugin.getConfig().getString("timeFormatSign"));
+		dateString = date.format(Calendar.getInstance().getTime());
+		result.put(AreaShop.tagDateTimeShort, dateString);
 		
 		// TODO: add more? coordinates?
 		

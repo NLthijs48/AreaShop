@@ -83,7 +83,6 @@ public class GroupaddCommand extends CommandAreaShop {
 			}
 			// Update all regions, this does it in a task, updating them without lag
 			plugin.getFileManager().updateRegions(toUpdate, player);
-			group.saveRequired();
 		} else {
 			GeneralRegion region = plugin.getFileManager().getRegion(args[2]);
 			if(region == null) {
@@ -97,7 +96,6 @@ public class GroupaddCommand extends CommandAreaShop {
 			} else {
 				plugin.message(sender, "groupadd-failed", region.getName(), group.getName());
 			}
-			group.saveRequired();
 		}
 	}
 	

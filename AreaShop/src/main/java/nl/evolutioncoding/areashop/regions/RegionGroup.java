@@ -57,6 +57,7 @@ public class RegionGroup {
 		} else {
 			members.add(region.getName());
 			setSetting("regions", members);
+			this.saveRequired();
 			return true;
 		}
 	}
@@ -74,6 +75,9 @@ public class RegionGroup {
 			plugin.getFileManager().removeGroup(this);
 		} else {
 			setSetting("regions", members);
+		}
+		if(result) {
+			this.saveRequired();
 		}
 		return result;
 	}

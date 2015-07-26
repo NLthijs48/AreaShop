@@ -140,10 +140,20 @@ public class StackCommand extends CommandAreaShop {
 				for(int i=0; i<regionsPerTick; i++) {
 					if(current < amount) {
 						// Create the region name
-						String regionName = namePrefix + counter;
+						String counterName = counter+"";
+						int minimumLength = plugin.getConfig().getInt("stackRegionNumberLength");
+						while(counterName.length() < minimumLength) {
+							counterName = "0"+counterName;
+						}
+						String regionName = namePrefix + counterName;
 						while(manager.getRegion(regionName) != null || AreaShop.getInstance().getFileManager().getRegion(regionName) != null) {
 							counter++;
-							regionName = namePrefix + counter;
+							counterName = counter+"";
+							minimumLength = plugin.getConfig().getInt("stackRegionNumberLength");
+							while(counterName.length() < minimumLength) {
+								counterName = "0"+counterName;
+							}
+							regionName = namePrefix + counterName;
 						}
 						// Add the region to WorldGuard (at startposition shifted by the number of this region times the blocks it should shift)
 						ProtectedCuboidRegion region = new ProtectedCuboidRegion(regionName, 

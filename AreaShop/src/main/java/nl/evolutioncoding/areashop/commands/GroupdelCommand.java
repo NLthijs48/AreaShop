@@ -47,7 +47,6 @@ public class GroupdelCommand extends CommandAreaShop {
 		if(group == null) {
 			group = new RegionGroup(plugin, args[1]);
 			plugin.getFileManager().addGroup(group);
-			group.saveRequired();
 		}
 		if(args.length == 2) {
 			if(!(sender instanceof Player)) {
@@ -69,7 +68,7 @@ public class GroupdelCommand extends CommandAreaShop {
 			ArrayList<String> namesFailed = new ArrayList<String>();
 			ArrayList<GeneralRegion> toUpdate = new ArrayList<GeneralRegion>();
 			for(GeneralRegion region : regions) {
-				if(group.addMember(region)) {
+				if(group.removeMember(region)) {
 					namesSuccess.add(region.getName());
 					toUpdate.add(region);
 				} else {
@@ -98,7 +97,6 @@ public class GroupdelCommand extends CommandAreaShop {
 			} else {
 				plugin.message(sender, "groupdel-failed", region.getName(), group.getName());
 			}
-			group.saveRequired();
 		}
 	}
 	

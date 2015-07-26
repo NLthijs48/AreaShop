@@ -264,6 +264,7 @@ public class FileManager {
 			groupsConfig.set(lowGroup + ".name", group.getName());
 			groupsConfig.set(lowGroup + ".priority", 0);
 		}
+		saveGroupsIsRequired();
 	}
 	
 	/**
@@ -331,7 +332,6 @@ public class FileManager {
 			for(RegionGroup group : groups) {
 				group.removeMember(rent);
 			}
-			saveGroupsIsRequired();
 			rent.resetRegionFlags();
 			regions.remove(rent.getLowerCaseName());
 			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + rent.getLowerCaseName() + ".yml");
@@ -396,7 +396,6 @@ public class FileManager {
 			for(RegionGroup group : getGroups()) {
 				group.removeMember(buy);
 			}
-			saveGroupsIsRequired();
 			
 			// Deleting the file
 			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + buy.getLowerCaseName() + ".yml");
@@ -592,7 +591,6 @@ public class FileManager {
 	 * Save the group file to disk
 	 */
 	public void saveGroupsIsRequired() {
-		AreaShop.debug("saveGroupsRequired() set");
 		saveGroupsRequired = true;
 	}
 	public boolean isSaveGroupsRequired() {

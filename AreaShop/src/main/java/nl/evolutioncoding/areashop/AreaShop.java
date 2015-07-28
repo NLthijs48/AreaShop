@@ -13,7 +13,7 @@ import nl.evolutioncoding.areashop.Updater.UpdateType;
 import nl.evolutioncoding.areashop.interfaces.AreaShopInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldEditInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldGuardInterface;
-import nl.evolutioncoding.areashop.listeners.PlayerLoginListener;
+import nl.evolutioncoding.areashop.listeners.PlayerLoginLogoutListener;
 import nl.evolutioncoding.areashop.listeners.SignBreakListener;
 import nl.evolutioncoding.areashop.listeners.SignChangeListener;
 import nl.evolutioncoding.areashop.listeners.SignClickListener;
@@ -74,7 +74,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	
 	/* Constants for handling file versions */
 	public static final String versionFiles = "files";
-	public static final int versionFilesCurrent = 2;
+	public static final int versionFilesCurrent = 3;
 	
 	/* Keys for replacing parts of flags, commands, strings */
 	public static final String tagPlayerName = "%player%";
@@ -211,7 +211,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			this.getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 			this.getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
 			this.getServer().getPluginManager().registerEvents(new SignClickListener(this), this);			
-			this.getServer().getPluginManager().registerEvents(new PlayerLoginListener(this), this);
+			this.getServer().getPluginManager().registerEvents(new PlayerLoginLogoutListener(this), this);
 			
 			setupTasks();
 	        

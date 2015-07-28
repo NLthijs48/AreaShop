@@ -607,15 +607,16 @@ public class RentRegion extends GeneralRegion {
 		if(isDeleted() || !isRented()) {
 			return false;
 		}
-		OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());
 		long inactiveSetting = getInactiveTimeUntilUnrent();
+		OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());
 		if(inactiveSetting <= 0 || player.isOp()) {
 			return false;
 		}
-		//AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + player.getLastPlayed() + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
-		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting)) {
+		long lastPlayed = getLastActiveTime();
+		AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
+		if(Calendar.getInstance().getTimeInMillis() > (lastPlayed + inactiveSetting)) {
 			plugin.getLogger().info("Region " + getName() + " unrented because of inactivity for player " + getPlayerName());
-			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + player.getLastPlayed() + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
+			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
 			this.unRent(true);
 			return true;
 		}

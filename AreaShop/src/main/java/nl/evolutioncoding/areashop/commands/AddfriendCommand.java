@@ -81,7 +81,7 @@ public class AddfriendCommand extends CommandAreaShop {
 				return;
 			}	
 			OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
-			if(friend.getLastPlayed() == 0) {
+			if(friend.getLastPlayed() == 0 && !plugin.getConfig().getBoolean("addFriendNotExistingPlayers")) {
 				plugin.message(sender, "addfriend-notVisited", args[1]);
 				return;
 			}
@@ -101,7 +101,7 @@ public class AddfriendCommand extends CommandAreaShop {
 			if(sender.hasPermission("areashop.addfriend") && sender instanceof Player) {
 				if(region.isOwner((Player)sender)) {
 					OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
-					if(friend.getLastPlayed() == 0) {
+					if(friend.getLastPlayed() == 0 && !plugin.getConfig().getBoolean("addFriendNotExistingPlayers")) {
 						plugin.message(sender, "addfriend-notVisited", args[1]);
 						return;
 					}

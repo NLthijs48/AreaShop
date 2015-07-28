@@ -11,22 +11,24 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Checks for placement of signs for this plugin
  * @author NLThijs48
  */
-public final class PlayerLoginListener implements Listener {
+public final class PlayerLoginLogoutListener implements Listener {
 	AreaShop plugin;
 	
 	/**
 	 * Constructor
 	 * @param plugin The AreaShop plugin
 	 */
-	public PlayerLoginListener(AreaShop plugin) {
+	public PlayerLoginLogoutListener(AreaShop plugin) {
 		this.plugin = plugin;
 	}
 	
@@ -111,6 +113,29 @@ public final class PlayerLoginListener implements Listener {
 				}
 			}
 		}.runTaskTimer(plugin, 22, 1); // Wait a bit before starting to prevent a lot of stress on the server when a player joins (a lot of plugins already do stuff then)
+	}
+	
+	// Active time updates
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerLogout(PlayerQuitEvent event) {
+		updateLastActive(event.getPlayer());
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerKick(PlayerKickEvent event) {
+		updateLastActive(event.getPlayer());
+	}
+	
+	/**
+	 * Update the last active time for all regions the player is owner off
+	 * @param player The player to update the active times for
+	 */
+	public void updateLastActive(Player player) {
+		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
+			if(region.isOwner(player)) {
+				region.updateLastActiveTime();
+			}
+		}
 	}
 }
 

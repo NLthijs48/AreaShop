@@ -455,15 +455,16 @@ public class BuyRegion extends GeneralRegion {
 		if(isDeleted() || !isSold()) {
 			return false;
 		}
-		OfflinePlayer player = Bukkit.getOfflinePlayer(getBuyer());
 		long inactiveSetting = getInactiveTimeUntilSell();
+		OfflinePlayer player = Bukkit.getOfflinePlayer(getBuyer());
 		if(inactiveSetting <= 0 || player.isOp()) {
 			return false;
 		}
-		//AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + player.getLastPlayed() + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
-		if(Calendar.getInstance().getTimeInMillis() > (player.getLastPlayed() + inactiveSetting)) {
-			plugin.getLogger().info("Region " + getName() + " sold because of inactivity for player " + getPlayerName());
-			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + player.getLastPlayed() + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
+		long lastPlayed = getLastActiveTime();
+		AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
+		if(Calendar.getInstance().getTimeInMillis() > (lastPlayed + inactiveSetting)) {
+			plugin.getLogger().info("Region " + getName() + " unrented because of inactivity for player " + getPlayerName());
+			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
 			this.sell(true);
 			return true;
 		}

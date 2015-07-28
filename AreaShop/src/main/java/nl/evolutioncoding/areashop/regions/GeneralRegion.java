@@ -272,11 +272,28 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Get the time that the player was last active
+	 * @return Current time if he is online, last online time if offline, -1 if the region has no owner
 	 */
 	public long getLastActiveTime() {
+		if(getOwner() == null) {
+			return -1;
+		}
+		Player player = Bukkit.getPlayer(getOwner());
+		// Check if he is online currently
+		if(player != null) {
+			return Calendar.getInstance().getTimeInMillis();
+		}
 		return getLongSetting("general.lastActive");
+	}
+	
+	/**
+	 * Set the last active time of the player to the current time
+	 */
+	public void updateLastActiveTime() {
+		if(getOwner() != null) {
+			setSetting("general.lastActive", Calendar.getInstance().getTimeInMillis());
+		}
 	}
 	
 	/**
@@ -364,19 +381,25 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	/**
 	 * Set the landlord of this region (the player that receives all revenue of this region)
 	 * @param landlord The UUID of the player that should be set as landlord
+	 * @param name The backup name of the player (for in case that the UUID cannot be resolved to a playername)
 	 */
 	public void setLandlord(UUID landlord, String name) {
-		if(landlord == null) {
-			setSetting("general.landlord", null);
-			setSetting("general.landlordName", null);
-		} else {
+		if(landlord != null) {
 			setSetting("general.landlord", landlord.toString());
-			String properName = plugin.toName(landlord);
-			if(properName != null) {
-				name = properName;
-			}
-			setSetting("general.landlordName", properName);
 		}
+		String properName = plugin.toName(landlord);
+		if(properName != null) {
+			name = properName;
+		}
+		setSetting("general.landlordName", properName);
+	}
+	
+	/**
+	 * Remove the landlord from this region
+	 */
+	public void removelandlord() {
+		setSetting("general.landlord", null);
+		setSetting("general.landlordName", null);
 	}
 	
 	/**

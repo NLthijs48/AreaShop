@@ -43,10 +43,7 @@ public class SetlandlordCommand extends CommandAreaShop {
 			return;
 		}
 		@SuppressWarnings("deprecation")
-		OfflinePlayer player = Bukkit.getOfflinePlayer(args[1]);
-		if(player == null || player.getLastPlayed() == 0) {
-			plugin.message(sender, "setlandlord-didNotPlayBefore", args[1]); // Using args[1] instead of playername because that could return nothing if not played before
-		}		
+		OfflinePlayer player = Bukkit.getOfflinePlayer(args[1]);	
 		GeneralRegion region = null;
 		if(args.length < 3) {
 			if (sender instanceof Player) {
@@ -69,14 +66,14 @@ public class SetlandlordCommand extends CommandAreaShop {
 			region = plugin.getFileManager().getRegion(args[2]);
 		}	
 		if(region == null) {
-			plugin.message(player, "setlandlord-noRegion", args[2]);
+			plugin.message(sender, "setlandlord-noRegion", args[2]);
 			return;
 		}		
-		region.setLandlord(player.getUniqueId(), args[1]);
 		String playerName = player.getName();
-		if(playerName.isEmpty()) {
+		if(playerName == null || playerName.isEmpty()) {
 			playerName = args[1];
 		}
+		region.setLandlord(player.getUniqueId(), playerName);
 		plugin.message(sender, "setlandlord-success", playerName, region.getName());
 	}
 	

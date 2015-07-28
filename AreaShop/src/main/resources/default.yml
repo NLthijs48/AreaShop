@@ -37,6 +37,8 @@ general:
   ## If you use this value be sure that you set 'moneyBack' to 0, because money will not be substracted from the account
   ## of the landlord and the player would get money 'out of thin air'.
   landlord: ""
+  ## Name of the landlord, if the landlord UUID setting is not provided then the name will be used instead
+  landlordName: ""
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ RENT: Options for rent regions.                                                                                            │

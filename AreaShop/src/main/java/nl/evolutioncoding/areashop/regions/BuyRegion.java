@@ -346,18 +346,19 @@ public class BuyRegion extends GeneralRegion {
 							return false;
 						}
 						// Optionally give money to the landlord
+						OfflinePlayer landlordPlayer = null;
 						if(getLandlord() != null) {
-							OfflinePlayer landlord = Bukkit.getOfflinePlayer(getLandlord());
-							if(landlord != null) {
-								if(landlord.getName() == null) {
-									r = plugin.getEconomy().depositPlayer(getLandlordName(), getWorldName(), getPrice());
-								} else {
-									r = plugin.getEconomy().depositPlayer(landlord, getWorldName(), getPrice());
-								}
-								if(!r.transactionSuccess()) {
-									plugin.getLogger().warning("Something went wrong with paying '" + landlord.getName() + "' " + getFormattedPrice() + " for his sell of region " + getName() + " to " + player.getName());
-								}
-							}
+							landlordPlayer = Bukkit.getOfflinePlayer(getLandlord());
+						}
+						String landlordName = getLandlordName();
+						r = null;
+						if(landlordPlayer != null) {
+							r = plugin.getEconomy().depositPlayer(landlordPlayer, getWorldName(), getPrice());
+						} else if(landlordName != null) {
+							r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), getPrice());
+						}
+						if(r != null && !r.transactionSuccess()) {
+							plugin.getLogger().warning("Something went wrong with paying '" + landlordName + "' " + getFormattedPrice() + " for his sell of region " + getName() + " to " + player.getName());
 						}
 						AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + getFormattedPrice());
 						

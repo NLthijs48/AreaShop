@@ -251,7 +251,7 @@ public class InfoCommand extends CommandAreaShop {
 						} else {
 							plugin.messageNoPrefix(sender, "info-regionCanBeRented", rent);
 						}
-						if(rent.getLandlord() != null) {
+						if(rent.getLandlordName() != null) {
 							plugin.messageNoPrefix(sender, "info-regionLandlord", rent);
 						}
 						if(rent.getMaxExtends() != -1) {

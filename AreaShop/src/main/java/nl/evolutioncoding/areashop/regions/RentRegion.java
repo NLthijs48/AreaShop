@@ -474,21 +474,21 @@ public class RentRegion extends GeneralRegion {
 						return false;
 					}
 					// Optionally give money to the landlord
+					OfflinePlayer landlordPlayer = null;
 					if(getLandlord() != null) {
-						OfflinePlayer landlord = Bukkit.getOfflinePlayer(getLandlord());
-						if(landlord != null) {
-							// If the landlord has no player.dat file anymore, then getName() returns null,
-							// therefor we deposit the money by the old cached name instead
-							if(landlord.getName() == null) {
-								r = plugin.getEconomy().depositPlayer(getLandlordName(), getWorldName(), getPrice());
-							} else {
-								r = plugin.getEconomy().depositPlayer(landlord, getWorldName(), getPrice());
-							}
-							if(!r.transactionSuccess()) {
-								plugin.getLogger().warning("Something went wrong with paying '" + landlord.getName() + "' " + getFormattedPrice() + " for his rent of region " + getName() + " to " + player.getName());
-							}
-						}
-					}					
+						landlordPlayer = Bukkit.getOfflinePlayer(getLandlord());
+					}
+					String landlordName = getLandlordName();
+					r = null;
+					if(landlordPlayer != null) {
+						r = plugin.getEconomy().depositPlayer(landlordPlayer, getWorldName(), getPrice());
+					} else if(landlordName != null) {
+						r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), getPrice());
+					}
+					if(r != null && !r.transactionSuccess()) {
+						plugin.getLogger().warning("Something went wrong with paying '" + landlordName + "' " + getFormattedPrice() + " for his rent of region " + getName() + " to " + player.getName());
+					}
+			
 					if(!extend) {
 						// Run commands
 						runEventCommands(RegionEvent.RENTED, true);

@@ -272,6 +272,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	}
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public long getLastActiveTime() {
+		return getLongSetting("general.lastActive");
+	}
+	
+	/**
 	 * Get the World of the region
 	 * @return The World where the region is located
 	 */

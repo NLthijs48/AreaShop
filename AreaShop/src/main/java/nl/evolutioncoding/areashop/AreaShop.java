@@ -865,7 +865,14 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		if(uuid == null) {
 			return "";
 		} else {
-			return this.toName(UUID.fromString(uuid));			
+			UUID parsed = null;
+			try {
+				parsed = UUID.fromString(uuid);
+			} catch(IllegalArgumentException e) {}
+			if(parsed == null) {
+				return "";
+			}
+			return this.toName(parsed);			
 		}
 	}
 	/**
@@ -880,9 +887,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			String name = Bukkit.getOfflinePlayer(uuid).getName();
 			if(name != null) {
 				return name;
-			} else {
-				return uuid.toString();
 			}
+			return "";
 		}
 	}
 	

@@ -44,7 +44,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The UUID of the owner of this region
 	 */
 	public UUID getBuyer() {
-		String buyer = getStringSetting("buy.buyer");
+		String buyer = config.getString("buy.buyer");
 		if(buyer != null) {
 			try {
 				return UUID.fromString(buyer);
@@ -95,7 +95,7 @@ public class BuyRegion extends GeneralRegion {
 	public String getPlayerName() {
 		String result = plugin.toName(getBuyer());
 		if(result == null || result.isEmpty()) {
-			result = config.getString("buy.buyerName");
+			result = getStringSetting("buy.buyerName");
 			if(result == null || result.isEmpty()) {
 				result = "<UNKNOWN>";
 			}
@@ -306,16 +306,16 @@ public class BuyRegion extends GeneralRegion {
 							plugin.message(player, "buy-payError");
 							return false;
 						}
+						r = null;
 						OfflinePlayer oldOwnerPlayer = Bukkit.getOfflinePlayer(oldOwner);
-						if(oldOwnerPlayer != null) {
-							if(oldOwnerPlayer.getName() == null) {
-								r = plugin.getEconomy().depositPlayer(getPlayerName(), getWorldName(), getResellPrice());
-							} else {
-								r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
-							}
-							if(!r.transactionSuccess()) {
-								plugin.getLogger().warning("Something went wrong with paying '" + oldOwnerPlayer.getName() + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + player.getName());
-							}
+						String oldOwnerName = getPlayerName();
+						if(oldOwnerPlayer != null && oldOwnerPlayer.getName() != null) {
+							r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
+						} else if (oldOwnerName != null) {
+							r = plugin.getEconomy().depositPlayer(oldOwnerName, getWorldName(), getResellPrice());
+						}
+						if(r == null || !r.transactionSuccess()) {
+							plugin.getLogger().warning("Something went wrong with paying '" + oldOwnerPlayer.getName() + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + player.getName());
 						}
 						// Resell is done, disable that now
 						disableReselling();
@@ -352,7 +352,7 @@ public class BuyRegion extends GeneralRegion {
 						}
 						String landlordName = getLandlordName();
 						r = null;
-						if(landlordPlayer != null) {
+						if(landlordPlayer != null && landlordPlayer.getName() != null) {
 							r = plugin.getEconomy().depositPlayer(landlordPlayer, getWorldName(), getPrice());
 						} else if(landlordName != null) {
 							r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), getPrice());
@@ -420,10 +420,10 @@ public class BuyRegion extends GeneralRegion {
 				EconomyResponse response = null;
 				boolean error = false;
 				try {
-					if(player.getName() == null) {
-						response = plugin.getEconomy().depositPlayer(getPlayerName(), getWorldName(), moneyBack);
-					} else {
+					if(player != null && player.getName() != null) {
 						response = plugin.getEconomy().depositPlayer(player, getWorldName(), moneyBack);
+					} else if(getPlayerName() != null) {
+						response = plugin.getEconomy().depositPlayer(getPlayerName(), getWorldName(), moneyBack);
 					}
 				} catch(Exception e) {
 					error = true;

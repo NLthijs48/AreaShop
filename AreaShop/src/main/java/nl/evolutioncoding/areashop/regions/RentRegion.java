@@ -59,7 +59,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The UUID of the renter
 	 */
 	public UUID getRenter() {
-		String renter = getStringSetting("rent.renter");
+		String renter = config.getString("rent.renter");
 		if(renter != null) {
 			try {
 				return UUID.fromString(renter);
@@ -480,12 +480,12 @@ public class RentRegion extends GeneralRegion {
 					}
 					String landlordName = getLandlordName();
 					r = null;
-					if(landlordPlayer != null) {
+					if(landlordPlayer != null && landlordPlayer.getName() != null) {
 						r = plugin.getEconomy().depositPlayer(landlordPlayer, getWorldName(), getPrice());
 					} else if(landlordName != null) {
 						r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), getPrice());
 					}
-					if(r != null && !r.transactionSuccess()) {
+					if(r == null || !r.transactionSuccess()) {
 						plugin.getLogger().warning("Something went wrong with paying '" + landlordName + "' " + getFormattedPrice() + " for his rent of region " + getName() + " to " + player.getName());
 					}
 			
@@ -570,15 +570,15 @@ public class RentRegion extends GeneralRegion {
 				EconomyResponse r = null;
 				boolean error = false;
 				try {
-					if(player.getName() == null) {
-						r = plugin.getEconomy().depositPlayer(getPlayerName(), getWorldName(), moneyBack);
-					} else {
+					if(player != null && player.getName() != null) {
 						r = plugin.getEconomy().depositPlayer(player, getWorldName(), moneyBack);
+					} else if(getPlayerName() != null) {
+						r = plugin.getEconomy().depositPlayer(getPlayerName(), getWorldName(), moneyBack);
 					}
 				} catch(Exception e) {
 					error = true;
 				}
-				if(error || r == null || !r.transactionSuccess()) {
+				if(error || r == null || !r.transactionSuccess() || error) {
 					plugin.getLogger().warning("Something went wrong with paying back to " + getPlayerName() + " money while unrenting region " + getName());
 				}
 			}

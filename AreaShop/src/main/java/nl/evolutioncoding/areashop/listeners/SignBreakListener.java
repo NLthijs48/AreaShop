@@ -45,7 +45,7 @@ public final class SignBreakListener implements Listener {
 			if(region == null) {
 				return;
 			}
-			/* Remove the rent if the player has permission */
+			/* Remove the sign of the rental region if the player has permission */
 			if(event.getPlayer().hasPermission("areashop.delsign")) {
 				region.removeSign(block.getLocation());
 				plugin.message(event.getPlayer(), "delsign-success", region.getName());

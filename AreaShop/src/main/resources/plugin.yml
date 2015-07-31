@@ -60,6 +60,8 @@ permissions:
       areashop.createbuy.owner: true
       areashop.setprice.landlord: true
       areashop.setduration.landlord: true
+      areashop.destroyrent.landlord: true
+      areashop.destroybuy.landlord: true
   areashop.help:
     description: Allows you to see the help pages
     default: true
@@ -100,11 +102,17 @@ permissions:
     description: Allows you to add buy regions to AreaShop for which you are registered as owner
     default: false
   areashop.destroyrent:
-    description: Allows you to break signs used for renting regions
+    description: Allows you remove rental regions from AreaShop
     default: op
+  areashop.destroyrent.landlord:
+    description: Allows you to remove rental regions from AreaShop when you are the landlord
+    default: false
   areashop.destroybuy:
-    description: Allows you to break signs used for renting regions
+    description: Allows you to remove buy regions from AreaShop
     default: op
+  areashop.destroybuy.landlord:
+    description: Allows you to remove buy regions from AreaShop when you are the landlord
+    default: false
   areashop.info:
     description: Allows you check the status of regions and players
     default: true

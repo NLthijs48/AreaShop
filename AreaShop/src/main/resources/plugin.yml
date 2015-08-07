@@ -136,25 +136,25 @@ permissions:
     default: false
   areashop.teleport:
     description: Teleport to your region
-    default: true
+    default: op
   areashop.teleportall:
     description: Teleport to all regions
     default: op
   areashop.teleportsign:
     description: Teleport to signs of regions you own
-    default: true
+    default: op
   areashop.teleportsignall:
     description: Teleport to signs of all regions
     default: op
   areashop.teleportfriend:
     description: Teleport to regions where you are added as friend
-    default: true
+    default: op
   areashop.teleportfriendsign:
     description: Teleport to the sign of regions where you are added as friend
-    default: true
+    default: op
   areashop.setteleport:
     description: Set the teleport spot for your region
-    default: true
+    default: op
   areashop.setteleportall:
     description: Set the teleport for other regions
     default: op
@@ -166,7 +166,7 @@ permissions:
     default: op
   areashop.find:
     description: Allows you to teleport to a free region (/as find)
-    default: true
+    default: op
   areashop.groupadd:
     description: Allows you to add regions to groups
     default: op

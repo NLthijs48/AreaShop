@@ -279,7 +279,7 @@ public class BuyRegion extends GeneralRegion {
 					return false;
 				}			
 				// Check region limits
-				LimitResult limitResult = this.limitsAllowBuying(player);
+				LimitResult limitResult = this.limitsAllow(RegionType.BUY, player);
 				AreaShop.debug("LimitResult: " + limitResult.toString());
 				if(!limitResult.actionAllowed()) {
 					if(limitResult.getLimitingFactor() == LimitType.TOTAL) {

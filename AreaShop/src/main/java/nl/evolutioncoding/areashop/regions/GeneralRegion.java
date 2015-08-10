@@ -124,7 +124,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	public enum LimitType {		
 		RENTS("rents"),
 		BUYS("buys"),
-		TOTAL("total");
+		TOTAL("total"),
+		EXTEND("extend");
 		
 		private final String value;
 		private LimitType(String value) {
@@ -1761,127 +1762,60 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 
 	
 	// LIMIT FUNCTIONS
-	
 	/**
-	 * Check if the player can buy this region, detailed info in the result object
+	 * Check if the player can buy/rent this region, detailed info in the result object
+	 * @param type The type of region to check
 	 * @param player The player to check it for
 	 * @return LimitResult containing if it is allowed, why and limiting factor
 	 */
-	public LimitResult limitsAllowBuying(Player player) {
-		if(player.hasPermission("areashop.limitbypass")) {
-			return new LimitResult(true, null, 0, 0, null);
-		}		
-		// Get current total regions
-		List<GeneralRegion> totalRegions = new ArrayList<GeneralRegion>();
-		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
-			if(region.isOwner(player)) {
-				totalRegions.add(region);
-			}
-		}
-		// Get currently bought regions
-		List<BuyRegion> buyRegions = new ArrayList<BuyRegion>();
-		for(GeneralRegion region : totalRegions) {
-			if(region.isBuyRegion()) {
-				buyRegions.add((BuyRegion)region);
-			}
-		}
-		// Check all limitgroups the player has
-		List<String> groups = new ArrayList<String>(plugin.getConfig().getConfigurationSection("limitGroups").getKeys(false));
-		while(!groups.isEmpty()) {
-			String group = groups.get(0);
-			if(player.hasPermission("areashop.limits." + group) && this.matchesLimitGroup(group)) {
-				int totalLimit = plugin.getConfig().getInt("limitGroups." + group + ".total");
-				int buysLimit = plugin.getConfig().getInt("limitGroups." + group + ".buys");
-				int totalCurrent = hasRegionsInLimitGroup(player, group, totalRegions);
-				int buysCurrent = hasBuyRegionsInLimitGroup(player, group, buyRegions);
-				if(totalLimit == -1) {
-					totalLimit = Integer.MAX_VALUE;
-				}
-				if(buysLimit == -1) {
-					buysLimit = Integer.MAX_VALUE;
-				}
-				String totalHighestGroup = group;
-				String buysHighestGroup = group;
-				groups.remove(group);
-				// Get the highest number from the groups of the same category
-				List<String> groupsCopy = new ArrayList<String>(groups);
-				for(String checkGroup : groupsCopy) {
-					if(player.hasPermission("areashop.limits." + checkGroup) && this.matchesLimitGroup(checkGroup)) {
-						if(limitGroupsOfSameCategory(group, checkGroup)) {
-							groups.remove(checkGroup);
-							int totalLimitOther = plugin.getConfig().getInt("limitGroups." + checkGroup + ".total");
-							int buyLimitOther = plugin.getConfig().getInt("limitGroups." + checkGroup + ".buys");
-							if(totalLimitOther > totalLimit) {
-								totalLimit = totalLimitOther; 
-								totalHighestGroup = checkGroup;
-							} else if(totalLimitOther == -1) {
-								totalLimit = Integer.MAX_VALUE;
-							}
-							if(buyLimitOther > buysLimit) {
-								buysLimit = buyLimitOther;
-								buysHighestGroup = checkGroup;
-							} else if(buyLimitOther == -1) {
-								buysLimit = Integer.MAX_VALUE;
-							}
-						}
-					} else {
-						groups.remove(checkGroup);
-					}
-				}
-				// Check if the limits stop the player from buying the region
-				if(totalCurrent >= totalLimit) {
-					return new LimitResult(false, LimitType.TOTAL, totalLimit, totalCurrent, totalHighestGroup);					
-				}
-				if(buysCurrent >= buysLimit) {
-					return new LimitResult(false, LimitType.BUYS, buysLimit, buysCurrent, buysHighestGroup);					
-				}				
-			}
-			groups.remove(group);
-		}		
-		return new LimitResult(true, null, 0, 0, null);
+	public LimitResult limitsAllow(RegionType type, Player player) {
+		return limitsAllow(type, player, false);
 	}
 	
 	/**
-	 * Check if the player can rent this region, detailed info in the result object
+	 * Check if the player can buy/rent this region, detailed info in the result object
+	 * @param type The type of region to check
 	 * @param player The player to check it for
+	 * @param extend Check for extending of rental regions
 	 * @return LimitResult containing if it is allowed, why and limiting factor
 	 */
-	public LimitResult limitsAllowRenting(Player player) {
+	public LimitResult limitsAllow(RegionType type, Player player, boolean extend) {
 		if(player.hasPermission("areashop.limitbypass")) {
 			return new LimitResult(true, null, 0, 0, null);
 		}
-		// Get current total regions
-		List<GeneralRegion> totalRegions = new ArrayList<GeneralRegion>();
-		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
-			if(region.isOwner(player)) {
-				totalRegions.add(region);
-			}
+		GeneralRegion exclude = null;
+		if(extend) {
+			exclude = this;
 		}
-		// Get currently bought regions
-		List<RentRegion> rentRegions = new ArrayList<RentRegion>();
-		for(GeneralRegion region : totalRegions) {
-			if(region.isRentRegion()) {
-				rentRegions.add((RentRegion)region);
-			}
+		String typePath = null;
+		if(type == RegionType.RENT) {
+			typePath = "rents";
+		} else {
+			typePath = "buys";
 		}
 		// Check all limitgroups the player has
 		List<String> groups = new ArrayList<String>(plugin.getConfig().getConfigurationSection("limitGroups").getKeys(false));
 		while(!groups.isEmpty()) {
 			String group = groups.get(0);
 			if(player.hasPermission("areashop.limits." + group) && this.matchesLimitGroup(group)) {
-				AreaShop.debug(player.getName() + " has limitGroup: " + group);
 				int totalLimit = plugin.getConfig().getInt("limitGroups." + group + ".total");
-				int rentsLimit = plugin.getConfig().getInt("limitGroups." + group + ".rents");
-				int totalCurrent = hasRegionsInLimitGroup(player, group, totalRegions);
-				int rentsCurrent = hasRentRegionsInLimitGroup(player, group, rentRegions);
+				int typeLimit = plugin.getConfig().getInt("limitGroups." + group + "."+typePath);
+				AreaShop.debug("typeLimitOther="+typeLimit+", typePath="+typePath);
+				int totalCurrent = hasRegionsInLimitGroup(player, group, plugin.getFileManager().getRegions(), exclude);
+				int typeCurrent = 0;
+				if(type == RegionType.RENT) {
+					typeCurrent = hasRegionsInLimitGroup(player, group, plugin.getFileManager().getRents(), exclude);
+				} else {
+					typeCurrent = hasRegionsInLimitGroup(player, group, plugin.getFileManager().getBuys(), exclude);
+				}
 				if(totalLimit == -1) {
 					totalLimit = Integer.MAX_VALUE;
 				}
-				if(rentsLimit == -1) {
-					rentsLimit = Integer.MAX_VALUE;
+				if(typeLimit == -1) {
+					typeLimit = Integer.MAX_VALUE;
 				}
 				String totalHighestGroup = group;
-				String rentsHighestGroup = group;
+				String typeHighestGroup = group;
 				groups.remove(group);
 				// Get the highest number from the groups of the same category
 				List<String> groupsCopy = new ArrayList<String>(groups);
@@ -1890,18 +1824,18 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 						if(limitGroupsOfSameCategory(group, checkGroup)) {
 							groups.remove(checkGroup);
 							int totalLimitOther = plugin.getConfig().getInt("limitGroups." + checkGroup + ".total");
-							int rentLimitOther = plugin.getConfig().getInt("limitGroups." + checkGroup + ".rents");
+							int typeLimitOther = plugin.getConfig().getInt("limitGroups." + checkGroup + "."+typePath);
 							if(totalLimitOther > totalLimit) {
 								totalLimit = totalLimitOther; 
 								totalHighestGroup = checkGroup;
 							} else if(totalLimitOther == -1) {
 								totalLimit = Integer.MAX_VALUE;
 							}
-							if(rentLimitOther > rentsLimit) {
-								rentsLimit = rentLimitOther;
-								rentsHighestGroup = checkGroup;
-							} else if(rentLimitOther == -1) {
-								rentsLimit = Integer.MAX_VALUE;
+							if(typeLimitOther > typeLimit) {
+								typeLimit = typeLimitOther;
+								typeHighestGroup = checkGroup;
+							} else if(typeLimitOther == -1) {
+								typeLimit = Integer.MAX_VALUE;
 							}
 						}
 					} else {
@@ -1909,12 +1843,22 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 					}
 				}
 				// Check if the limits stop the player from buying the region
+				if(typeCurrent >= typeLimit) {
+					LimitType limitType = null;
+					if(type == RegionType.RENT) {
+						if(extend) {
+							limitType = LimitType.EXTEND;
+						} else {
+							limitType = LimitType.RENTS;
+						}
+					} else {
+						limitType = LimitType.BUYS;
+					}
+					return new LimitResult(false, limitType, typeLimit, typeCurrent, typeHighestGroup);					
+				}
 				if(totalCurrent >= totalLimit) {
 					return new LimitResult(false, LimitType.TOTAL, totalLimit, totalCurrent, totalHighestGroup);					
-				}
-				if(rentsCurrent >= rentsLimit) {
-					return new LimitResult(false, LimitType.RENTS, rentsLimit, rentsCurrent, rentsHighestGroup);					
-				}				
+				}		
 			}
 			groups.remove(group);
 		}		
@@ -1980,57 +1924,17 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	}
 	
 	/**
-	 * Get the amount of buy regions a player has matching a certain limits group (config.yml > limitGroups)
-	 * @param player The player to check the amount for
-	 * @param limitGroup The group to check
-	 * @param buyRegions All the regions a player has bought
-	 * @return The number of regions that the player has bought matching the limit group (worlds and groups filters)
-	 */
-	public int hasBuyRegionsInLimitGroup(Player player, String limitGroup, List<BuyRegion> buyRegions) {
-		int result = 0;
-		for(BuyRegion region : buyRegions) {
-			if(region.isBuyer(player)) {
-				if(region.matchesLimitGroup(limitGroup)) {
-					result++;
-				}
-			}
-		}
-		return result;
-	}
-	
-	/**
-	 * Get the amount of rent regions a player has matching a certain limits group (config.yml > limitGroups)
-	 * @param player The player to check the amount for
-	 * @param limitGroup The group to check
-	 * @param rentRegions All the regions a player has bought
-	 * @return The number of regions that the player has rented matching the limit group (worlds and groups filters)
-	 */
-	public int hasRentRegionsInLimitGroup(Player player, String limitGroup, List<RentRegion> rentRegions) {
-		int result = 0;
-		for(RentRegion region : rentRegions) {
-			if(region.isRenter(player)) {
-				if(region.matchesLimitGroup(limitGroup)) {
-					result++;
-				}
-			}
-		}
-		return result;
-	}
-	
-	/**
 	 * Get the amount of regions a player has matching a certain limits group (config.yml > limitGroups)
 	 * @param player The player to check the amount for
 	 * @param limitGroup The group to check
 	 * @param buyRegions All the regions a player has bought or rented
 	 * @return The number of regions that the player has bought or rented matching the limit group (worlds and groups filters)
 	 */
-	public int hasRegionsInLimitGroup(Player player, String limitGroup, List<GeneralRegion> regions) {
+	public int hasRegionsInLimitGroup(Player player, String limitGroup, List<? extends GeneralRegion> regions, GeneralRegion exclude) {
 		int result = 0;
 		for(GeneralRegion region : regions) {
-			if(region.isOwner(player)) {
-				if(region.matchesLimitGroup(limitGroup)) {
-					result++;
-				}
+			if(region.isOwner(player) && region.matchesLimitGroup(limitGroup) && (exclude == null || !exclude.getName().equals(region.getName()))) {
+				result++;
 			}
 		}
 		return result;

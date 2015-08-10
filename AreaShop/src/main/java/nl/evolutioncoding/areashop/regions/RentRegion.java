@@ -426,9 +426,16 @@ public class RentRegion extends GeneralRegion {
 					plugin.message(player, "rent-restrictedToWorld", getWorldName(), player.getWorld().getName());
 					return false;
 				}				
-				// Check region limits if this is not extending				
-				if(!extend) {
-					LimitResult limitResult = this.limitsAllowRenting(player);
+				// Check region limits if this is not extending
+				AreaShop.debug("extend="+extend+", config thing="+config.getBoolean("allowRegionExtendsWhenAboveLimits"));
+				if(!(extend && config.getBoolean("allowRegionExtendsWhenAboveLimits"))) {
+					
+					LimitResult limitResult = null;
+					if(extend) {
+						limitResult = this.limitsAllow(RegionType.RENT, player, extend);
+					} else {
+						limitResult = this.limitsAllow(RegionType.RENT, player);
+					}
 					AreaShop.debug("LimitResult: " + limitResult.toString());
 					if(!limitResult.actionAllowed()) {
 						if(limitResult.getLimitingFactor() == LimitType.TOTAL) {
@@ -439,7 +446,10 @@ public class RentRegion extends GeneralRegion {
 							plugin.message(player, "rent-maximum", limitResult.getMaximum(), limitResult.getCurrent(), limitResult.getLimitingGroup());
 							return false;
 						}
-						// Should not be reached, but is safe like this
+						if(limitResult.getLimitingFactor() == LimitType.EXTEND) {
+							plugin.message(player, "rent-maximumExtend", limitResult.getMaximum(), limitResult.getCurrent()+1, limitResult.getLimitingGroup());
+							return false;
+						}
 						return false;
 					}
 				}

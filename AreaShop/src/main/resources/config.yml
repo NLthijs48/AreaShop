@@ -53,6 +53,9 @@ hours: [h, hour, hours, uur, uren]
 days: [d, day, days, dag, dagen]
 months: [M,  month,  months, maanden, maand]
 years: [y, year, years, jaar, jaren]
+## Allow or disallow extending rental region when the player is above his limits enforced by the 'limitGroups' below.
+## false will ensure a player will eventually lose his region when he has no access anymore (rankup with other limits for example)
+allowRegionExtendsWhenAboveLimits: false
 
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

@@ -139,7 +139,7 @@
 	    <artifactId>maven-antrun-plugin</artifactId>
 	    <configuration>
 	      <tasks>
-	        <copy file="./target/${project.build.finalName}.jar" tofile="C:\Games\Minecraft\Spigot 1.8.7\plugins\${project.build.finalName}.jar"/>
+	        <copy file="./target/${project.build.finalName}.jar" tofile="C:\Games\Minecraft\Spigot 1.8.8\plugins\${project.build.finalName}.jar"/>
 	      </tasks>
 	    </configuration>
 	    <executions>

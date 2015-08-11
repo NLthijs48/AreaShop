@@ -1,7 +1,9 @@
 package nl.evolutioncoding.areashop.regions;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import nl.evolutioncoding.areashop.AreaShop;
 
@@ -91,6 +93,18 @@ public class RegionGroup {
 			return new ArrayList<String>();
 		}
 		return getSettings().getStringList("regions");
+	}
+	
+	/**
+	 * Get all members of the group as GeneralRegions
+	 * @return A Set with all group members
+	 */
+	public Set<GeneralRegion> getMemberRegions() {
+		Set<GeneralRegion> result = new HashSet<GeneralRegion>();
+		for(String name : getMembers()) {
+			result.add(plugin.getFileManager().getRegion(name));
+		}
+		return result;
 	}
 	
 	/**

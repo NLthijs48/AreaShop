@@ -44,7 +44,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
-public abstract class GeneralRegion implements GeneralRegionInterface {
+public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion> {
 	protected YamlConfiguration config;
 	private static ArrayList<Material> canSpawnIn  = new ArrayList<Material>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
 	private static ArrayList<Material> cannotSpawnOn = new ArrayList<Material>(Arrays.asList(Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.CACTUS, Material.IRON_FENCE, Material.FENCE_GATE, Material.THIN_GLASS, Material.NETHER_FENCE, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE, Material.STAINED_GLASS_PANE));
@@ -157,6 +157,22 @@ public abstract class GeneralRegion implements GeneralRegionInterface {
 	 */
 	public abstract RegionType getType();	
 
+	// Sorting by name
+	@Override
+	public int compareTo(GeneralRegion o) {
+		return getName().compareTo(o.getName());
+	}
+	
+	@Override
+	public String toString() {
+		return getName();
+	}
+	
+	@Override
+	public boolean equals(Object region) {
+		return region instanceof GeneralRegion && ((GeneralRegion)region).getName().equals(getName());
+	}
+	
 	/**
 	 * Update the region flags according the region data
 	 */

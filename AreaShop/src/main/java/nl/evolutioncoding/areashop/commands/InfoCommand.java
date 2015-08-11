@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
@@ -13,6 +15,7 @@ import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -38,6 +41,31 @@ public class InfoCommand extends CommandAreaShop {
 		return null;
 	}
 	
+	/**
+	 * Filter group of regions, join their names and printout the correct message
+	 * @param sender The CommandSender to receive the message
+	 * @param regions The regions
+	 * @param filterGroup The group to filter to the regions with
+	 * @param keySomeFound The key of the message to display when some regions are found
+	 * @param keyNoneFound The key of the message to display when no regions are found
+	 */
+	public void displayMessage(CommandSender sender, Set<? extends GeneralRegion> regions, RegionGroup filterGroup, String keySomeFound, String keyNoneFound) {
+		if(filterGroup != null) {
+			Iterator<? extends GeneralRegion> it = regions.iterator();
+			while(it.hasNext()) {
+				GeneralRegion region = it.next();
+				if(!filterGroup.isMember(region)) {
+					it.remove();
+				}
+			}
+		}
+		if(regions.isEmpty()) {
+			plugin.message(sender, keyNoneFound);
+		} else {
+			plugin.message(sender, keySomeFound, StringUtils.join(regions.iterator(), ", "));
+		}
+	}
+	
 	@Override
 	public void execute(CommandSender sender, Command command, String[] args) {
 		if(!sender.hasPermission("areashop.info")) {
@@ -45,166 +73,89 @@ public class InfoCommand extends CommandAreaShop {
 			return;
 		}
 		if(args.length > 1 && args[1] != null) {
-			/* List of all regions */
-			if(args[1].equalsIgnoreCase("all")) {
-				String message = "";
-				/* Message for rents */
-				Iterator<RentRegion> itRent = plugin.getFileManager().getRents().iterator();
-				if(itRent.hasNext()) {
-					message = itRent.next().getName();
-					while(itRent.hasNext()) {
-						message += ", " + itRent.next().getName();
-					}
-				}
-				if(message.equals("")) {
-					plugin.message(sender, "info-all-noRents");
-				} else {
-					plugin.message(sender, "info-all-rents", message);
-				}
-				
-				/* Message for buys */
-				message = "";
-				Iterator<BuyRegion> itBuy = plugin.getFileManager().getBuys().iterator();
-				if(itBuy.hasNext()) {
-					message = itBuy.next().getName();
-					while(itBuy.hasNext()) {
-						message += ", " + itBuy.next().getName();
-					}
-				}
-				if(message.equals("")) {
-					plugin.message(sender, "info-all-noBuys");
-				} else {
-					plugin.message(sender, "info-all-buys", message);
+			// Get filter group (only used by some commands)
+			RegionGroup filterGroup = null;
+			if(args.length > 2 && args[2] != null) {
+				filterGroup = plugin.getFileManager().getGroup(args[2]);
+				if(filterGroup == null) {
+					plugin.message(sender, "info-noFiltergroup", args[2]);
+					return;
 				}
 			}
-			/* List of rented regions */
+			
+			// All regions
+			if(args[1].equalsIgnoreCase("all")) {
+				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>(plugin.getFileManager().getRents());
+				displayMessage(sender, regions, filterGroup, "info-all-rents", "info-all-noRents");
+
+				regions = new TreeSet<GeneralRegion>(plugin.getFileManager().getBuys());
+				displayMessage(sender, regions, filterGroup, "info-all-buys", "info-all-noBuys");
+			}
+			
+			// Rented regions
 			else if(args[1].equalsIgnoreCase("rented")) {
-				String message = "";
-				Iterator<RentRegion> it = plugin.getFileManager().getRents().iterator();
-				boolean first = true;
-				while(it.hasNext()) {
-					RentRegion next = it.next();
-					if(next.isRented()) {
-						if(!first) {
-							message += ", " + next.getName();
-						} else {
-							first = false;
-							message += next.getName();
-						}
+				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+				for(RentRegion region : plugin.getFileManager().getRents()) {
+					if(region.isRented()) {
+						regions.add(region);
 					}
 				}
-				if(message.equals("")) {
-					plugin.message(sender, "info-noRented");
-				} else {
-					plugin.message(sender, "info-rented", message);
-				}								
+				displayMessage(sender, regions, filterGroup, "info-rented", "info-noRented");							
 			} 
-			/* List of unrented regions */
+			// Forrent regions
 			else if(args[1].equalsIgnoreCase("forrent")) {
-				String message = "";
-				Iterator<RentRegion> it = plugin.getFileManager().getRents().iterator();
-				boolean first = true;
-				while(it.hasNext()) {
-					RentRegion next = it.next();
-					if(!next.isRented()) {
-						if(!first) {
-							message += ", " + next.getName();
-						} else {
-							first = false;
-							message = next.getName();
-						}
+				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+				for(RentRegion region : plugin.getFileManager().getRents()) {
+					if(!region.isRented()) {
+						regions.add(region);
 					}
 				}
-				if(message.equals("")) {
-					plugin.message(sender, "info-noUnrented");
-				} else {
-					plugin.message(sender, "info-unrented", message);
-				}							
-			} else if(args[1].equalsIgnoreCase("sold")) {
-				String message = "";
-				Iterator<BuyRegion> it = plugin.getFileManager().getBuys().iterator();
-				boolean first = true;
-				while(it.hasNext()) {
-					BuyRegion next = it.next();
-					if(next.isSold()) {
-						if(!first) {
-							message += ", ";
-						} else {
-							first = false;
-						}
-						message += next.getName();
+				displayMessage(sender, regions, filterGroup, "info-unrented", "info-noUnrented");	
+			} 
+			// Sold regions
+			else if(args[1].equalsIgnoreCase("sold")) {
+				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+				for(BuyRegion region : plugin.getFileManager().getBuys()) {
+					if(region.isSold()) {
+						regions.add(region);
 					}
 				}
-				if(message.equals("")) {
-					plugin.message(sender, "info-noSold");
-				} else {
-					plugin.message(sender, "info-sold", message);
-				}							
-			} else if(args[1].equalsIgnoreCase("forsale")) {
-				String message = "";
-				Iterator<BuyRegion> it = plugin.getFileManager().getBuys().iterator();
-				boolean first = true;
-				while(it.hasNext()) {
-					BuyRegion next =it.next();
-					if(!next.isSold()) {
-						if(!first) {
-							message += ", " + next.getName();
-						} else {
-							first = false;
-							message = next.getName();
-						}
+				displayMessage(sender, regions, filterGroup, "info-sold", "info-noSold");							
+			} 
+			// Forsale regions
+			else if(args[1].equalsIgnoreCase("forsale")) {
+				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+				for(BuyRegion region : plugin.getFileManager().getBuys()) {
+					if(!region.isSold()) {
+						regions.add(region);
 					}
 				}
-				if(message.equals("")) {
-					plugin.message(sender, "info-noForsale");
-				} else {
-					plugin.message(sender, "info-forsale", message);
-				}							
-			} else if(args[1].equalsIgnoreCase("player")) {
+				displayMessage(sender, regions, filterGroup, "info-forsale", "info-noForsale");								
+			} 
+			// Player regions
+			else if(args[1].equalsIgnoreCase("player")) {
 				if(args.length > 2 && args[2] != null) {
-					String message = "";
-					Iterator<RentRegion> itRent = plugin.getFileManager().getRents().iterator();
-					boolean first = true;
-					while(itRent.hasNext()) {
-						RentRegion next = itRent.next();
-						if(next.isRented() && next.getPlayerName().equalsIgnoreCase(args[2])) {
-							if(!first) {
-								message += ", " + next.getName();
-							} else {
-								first = false;
-								message = next.getName();
-							}
+					Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+					for(RentRegion region : plugin.getFileManager().getRents()) {
+						if(region.isRented() && region.getPlayerName().equalsIgnoreCase(args[2])) {
+							regions.add(region);
 						}
 					}
-					if(message.equals("")) {
-						plugin.message(sender, "info-playerNoRents", args[2]);
-					} else {
-						plugin.message(sender, "info-playerRents", args[2], message);
-					}		
+					displayMessage(sender, regions, null, "info-playerRents", "info-playerNoRents");	
 					
-					message = "";
-					Iterator<BuyRegion> itBuy = plugin.getFileManager().getBuys().iterator();
-					first = true;
-					while(itBuy.hasNext()) {
-						BuyRegion next = itBuy.next();
-						if(next.isSold() && next.getPlayerName().equalsIgnoreCase(args[2])) {
-							if(!first) {
-								message += ", ";
-							} else {
-								first = false;
-							}
-							message += next.getName();
+					regions = new TreeSet<GeneralRegion>();
+					for(BuyRegion region : plugin.getFileManager().getBuys()) {
+						if(region.isSold() && region.getPlayerName().equalsIgnoreCase(args[2])) {
+							regions.add(region);
 						}
 					}
-					if(message.equals("")) {
-						plugin.message(sender, "info-playerNoBuys", args[2]);
-					} else {
-						plugin.message(sender, "info-playerBuys", args[2], message);
-					}	
+					displayMessage(sender, regions, null, "info-playerBuys", "info-playerNoBuys");
 				} else {
 					plugin.message(sender, "info-playerHelp");
 				}
-			} else if(args[1].equalsIgnoreCase("region")) {
+			} 
+			// Region info
+			else if(args[1].equalsIgnoreCase("region")) {
 				if(args.length > 1) {
 					RentRegion rent = null;
 					BuyRegion buy = null;
@@ -373,42 +324,24 @@ public class InfoCommand extends CommandAreaShop {
 				
 			/* List of regions without a group */
 			else if(args[1].equalsIgnoreCase("nogroup")) {
-				String message = "";
-				/* Message for rents */
-				List<String> rents = plugin.getFileManager().getRentNames();
-				// Remove regions that have a group
+				// Rental regions
+				Set<String> rents = new TreeSet<String>(plugin.getFileManager().getRentNames());
 				for(RegionGroup group : plugin.getFileManager().getGroups()) {
 					rents.removeAll(group.getMembers());
 				}
-				// Create the list message
-				Iterator<String> itRent = rents.iterator();
-				if(itRent.hasNext()) {
-					message = itRent.next();
-					while(itRent.hasNext()) {
-						message += ", " + itRent.next();
-					}
-				}
+				String message = StringUtils.join(rents, ", ");
 				if(message.equals("")) {
 					plugin.message(sender, "info-nogroupNoRents");
 				} else {
 					plugin.message(sender, "info-nogroupRents", message);
 				}
 				
-				/* Message for buys */
-				message = "";
-				// Remove regions that have a group
-				List<String> buys = plugin.getFileManager().getBuyNames();
+				// Buy regions
+				Set<String> buys = new TreeSet<String>(plugin.getFileManager().getBuyNames());
 				for(RegionGroup group : plugin.getFileManager().getGroups()) {
 					buys.removeAll(group.getMembers());
 				}
-				// Create the list message
-				Iterator<String> itBuy = buys.iterator();
-				if(itBuy.hasNext()) {
-					message = itBuy.next();
-					while(itBuy.hasNext()) {
-						message += ", " + itBuy.next();
-					}
-				}
+				message = StringUtils.join(buys, ", ");
 				if(message.equals("")) {
 					plugin.message(sender, "info-nogroupNoBuys");
 				} else {

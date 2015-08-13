@@ -1266,25 +1266,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			owner = player.getUniqueId().equals(((BuyRegion)this).getBuyer());
 		}
 		
-		List<Location> signs = getSignLocations();
-		boolean signAvailable = !signs.isEmpty();
-		if(toSign) {
-			if(signAvailable) {
-				// Use the location 1 below the sign to prevent weird spawing above the sign
-				startLocation = signs.get(0).subtract(0.0, 1.0, 0.0);
-				startLocation.setPitch(player.getLocation().getPitch());
-				startLocation.setYaw(player.getLocation().getYaw());
-			} else {
-				// No sign available
-				plugin.message(player, "teleport-changedToNoSign");
-				toSign = false;
-			}
-		} 
-		
 		if(checkPermissions) {
 			// Teleport to sign instead if they dont have permission for teleporting to region
-			if(signAvailable && 
-					  (!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
+			if(		  (!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
 					|| !toSign && !owner && !friend && !player.hasPermission("areashop.teleportall") && player.hasPermission("areashop.teleportsignall")
 					|| !toSign && !owner && friend && !player.hasPermission("areashop.teleportfriend") && player.hasPermission("areashop.teleportfriendsign"))) {
 				plugin.message(player, "teleport-changedToSign");
@@ -1311,7 +1295,21 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				return false;
 			}
 		}
-		
+	
+		List<Location> signs = getSignLocations();
+		boolean signAvailable = !signs.isEmpty();
+		if(toSign) {
+			if(signAvailable) {
+				// Use the location 1 below the sign to prevent weird spawing above the sign
+				startLocation = signs.get(0).subtract(0.0, 1.0, 0.0);
+				startLocation.setPitch(player.getLocation().getPitch());
+				startLocation.setYaw(player.getLocation().getYaw());
+			} else {
+				// No sign available
+				plugin.message(player, "teleport-changedToNoSign");
+				toSign = false;
+			}
+		}		
 
 		if(startLocation == null && this.hasTeleportLocation()) {
 			startLocation = getTeleportLocation();

@@ -21,7 +21,7 @@ cmd-noRegionsAtLocation: "Keine Regionen an deiner Stelle gefunden, gib die Regi
 cmd-moreRegionsAtLocation: "Mehr als eine Region wurde an deiner Position gefunden, gib die Region als Argument an."
 cmd-automaticRegionOnlyByPlayer: "Automatische Auswahl einer Region ist nur für Spieler möglich, gibt die Region als Argument an."
 
-help-header: "Hilfeseite mit Befehlen, die du ausführen kannst."
+help-header: "Hilfeseite mit Befehlen, die du ausführen kannstre."
 help-alias: "Befehlsaliase: /areashop, /as."
 help-help: "&6/as help &7-&r Zeigt diese Hilfeseite."
 help-info: "&6/as info &7-&r Zeigt Informationen über die aktuellen Regionen."
@@ -66,7 +66,7 @@ rent-help: "/as rent [Region], Wenn kein Regionsname angegeben wird, wird die Re
 rent-noPermission: "Du bist nicht berechtigt, diese Region zu mieten."
 rent-maximum: "Du kannst nicht mehr als %0% Region(en) mieten (Du hast bereits %1% in Gruppe '%2%')."
 rent-payError: "Die Bezahlung hat nicht funktioniert. Bitte versuche es später noch einmal."
-rent-rented: "Du hast %0% von %1% gemietet."
+rent-rented: "Du hast %0% bis %1% gemietet."
 rent-extended: "Du hast die Miete verlängert von %0% bis %1%."
 rent-extend: "Du kannst die Miete verlängern, indem du mit rechts noch einmal auf das Schild klickst oder den Befehl /as rent nutzt."
 rent-lowMoneyExtend: "Du hast nicht genug Geld, um die Miete zu verlängern (Du hast %0%, benötigst aber %1%)."

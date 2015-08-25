@@ -111,7 +111,7 @@ sell-noPermission: "Du bist nicht berechtigt, diese Region zu verkaufen."
 sell-noPermissionOther: "Du bist nicht berechtigt, eine Region zu verkaufen."
 
 reload-reloaded: "Alle Dateien wurden erfolgreich neu geladen."
-reload-updateStart: "&Aktualisiere %0% Regionen mit %1% Regionen pro Sekunde."
+reload-updateStart: "&aAktualisiere %0% Regionen mit %1% Regionen pro Sekunde."
 reload-updateComplete: "&7Regionen erfolgreich aktualisiert."
 reload-noPermission: "Du hast keine Berechtigungen um die Konfigurationsdateien neu zu laden."
 reload-updateCommandChanged: "'/as updaterents' und '/as updatebuys' wurden entfernt, bitte benutze '/as reload' um die Regionen neu zu laden."

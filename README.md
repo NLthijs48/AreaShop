@@ -1,6 +1,6 @@
 ![AreaShop logo](https://cloud.githubusercontent.com/assets/6951068/9470147/eb5bffe6-4b4a-11e5-951d-b0886df00698.png)
 
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br/>
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br/>
 **Usage and configuration:**
 [►Download (releases)](https://github.com/NLthijs48/AreaShop/releases)&nbsp;&nbsp;
 [►Commands and Permissions](https://github.com/NLthijs48/AreaShop/wiki/Commands-and-Permissions)&nbsp;&nbsp;
@@ -10,7 +10,7 @@
 **Advanced features:**
 [►Save/restore region blocks](https://github.com/NLthijs48/AreaShop/wiki/Region-blocks-save-restore)&nbsp;&nbsp;
 [►Change the language](https://github.com/NLthijs48/AreaShop/wiki/Language-support)&nbsp;&nbsp;
-[►Limitgroups (setup how many regions players can rent/buy)](https://github.com/NLthijs48/AreaShop/wiki/Limitgroups-information-and-examples)<br/>
+[►Limitgroups](https://github.com/NLthijs48/AreaShop/wiki/Limitgroups-information-and-examples)<br/>
 **Troubleshooting:**
 [►Frequently Asked Questions](https://github.com/NLthijs48/AreaShop/wiki/Frequently-Asked-Questions)&nbsp;&nbsp;
 [►Common errors](https://github.com/NLthijs48/AreaShop/wiki/Common-errors)<br/>
@@ -18,7 +18,7 @@
 [►Changelog](https://github.com/NLthijs48/AreaShop/wiki/Changelog)&nbsp;&nbsp;
 [►Compiling](https://github.com/NLthijs48/AreaShop/wiki/Compiling-AreaShop)&nbsp;&nbsp;
 [►Modules, packages and classes overview](https://github.com/NLthijs48/AreaShop/wiki/Modules,-packages-and-classes-overview)<br/>
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
 This plugin is for giving players the option to rent or buy a region. It could be used to let them rent a jail in your Prison server or maybe a shop in the market of the Survival server. The player interacts with signs, making it easy to use. It also has a lot of commands to check the status of all regions, manage the renting and buying of a region and also features for admins. Also the plugin is capable of saving the region and restoring it later, this is very flexible and can be set general and per region, check the [config](https://github.com/NLthijs48/AreaShop/wiki/The-config-system) for more information.
 

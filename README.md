@@ -1,4 +1,4 @@
-![AreaShop logo](https://cloud.githubusercontent.com/assets/6951068/9451989/34a8e248-4ab2-11e5-9b77-18e9b39e54d8.png)<br/>
+![AreaShop logo](https://cloud.githubusercontent.com/assets/6951068/9471294/f016d8ee-4b4f-11e5-9bda-d61b1c423ebb.png)<br/>
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br/>
 **Usage and configuration:**
 [►Download (releases)](https://github.com/NLthijs48/AreaShop/releases)&nbsp;&nbsp;

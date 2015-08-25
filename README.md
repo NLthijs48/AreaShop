@@ -1,10 +1,9 @@
-![AreaShop logo](https://cloud.githubusercontent.com/assets/6951068/9470147/eb5bffe6-4b4a-11e5-951d-b0886df00698.png)
-
+![AreaShop logo](https://cloud.githubusercontent.com/assets/6951068/9451989/34a8e248-4ab2-11e5-9b77-18e9b39e54d8.png)<br/>
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br/>
 **Usage and configuration:**
 [►Download (releases)](https://github.com/NLthijs48/AreaShop/releases)&nbsp;&nbsp;
 [►Commands and Permissions](https://github.com/NLthijs48/AreaShop/wiki/Commands-and-Permissions)&nbsp;&nbsp;
-[►Basic regions setup](https://github.com/NLthijs48/AreaShop/wiki/Basic-regions-setup)&nbsp;&nbsp;
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[►Basic regions setup](https://github.com/NLthijs48/AreaShop/wiki/Basic-regions-setup)&nbsp;&nbsp;
 [►Advanced regions setup](https://github.com/NLthijs48/AreaShop/wiki/Advanced-regions-setup)&nbsp;&nbsp;
 [►Configuration files](https://github.com/NLthijs48/AreaShop/wiki/The-config-system)<br/>
 **Advanced features:**

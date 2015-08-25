@@ -1,5 +1,4 @@
 ![AreaShop logo](https://cloud.githubusercontent.com/assets/6951068/9471294/f016d8ee-4b4f-11e5-9bda-d61b1c423ebb.png)<br/>
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬<br/>
 **Usage and configuration:**
 [►Download (releases)](https://github.com/NLthijs48/AreaShop/releases)&nbsp;&nbsp;
 [►Commands and Permissions](https://github.com/NLthijs48/AreaShop/wiki/Commands-and-Permissions)&nbsp;&nbsp;
@@ -16,8 +15,9 @@
 **Development:**
 [►Changelog](https://github.com/NLthijs48/AreaShop/wiki/Changelog)&nbsp;&nbsp;
 [►Compiling](https://github.com/NLthijs48/AreaShop/wiki/Compiling-AreaShop)&nbsp;&nbsp;
-[►Modules, packages and classes overview](https://github.com/NLthijs48/AreaShop/wiki/Modules,-packages-and-classes-overview)<br/>
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+[►Modules, packages and classes overview](https://github.com/NLthijs48/AreaShop/wiki/Modules,-packages-and-classes-overview)
+
+***
 
 This plugin is for giving players the option to rent or buy a region. It could be used to let them rent a jail in your Prison server or maybe a shop in the market of the Survival server. The player interacts with signs, making it easy to use. It also has a lot of commands to check the status of all regions, manage the renting and buying of a region and also features for admins. Also the plugin is capable of saving the region and restoring it later, this is very flexible and can be set general and per region, check the [config](https://github.com/NLthijs48/AreaShop/wiki/The-config-system) for more information.
 

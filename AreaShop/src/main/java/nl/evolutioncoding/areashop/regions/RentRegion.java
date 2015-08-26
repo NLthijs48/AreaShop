@@ -427,7 +427,7 @@ public class RentRegion extends GeneralRegion {
 					return false;
 				}				
 				// Check region limits if this is not extending
-				AreaShop.debug("extend="+extend+", config thing="+config.getBoolean("allowRegionExtendsWhenAboveLimits"));
+				//AreaShop.debug("extend="+extend+", config thing="+config.getBoolean("allowRegionExtendsWhenAboveLimits"));
 				if(!(extend && config.getBoolean("allowRegionExtendsWhenAboveLimits"))) {
 					
 					LimitResult limitResult = null;

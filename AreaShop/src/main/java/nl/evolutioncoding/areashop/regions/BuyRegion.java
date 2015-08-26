@@ -258,6 +258,17 @@ public class BuyRegion extends GeneralRegion {
 				plugin.message(player, "general-noEconomy");
 				return false;
 			}
+			if(isInResellingMode()) {
+				if(!player.hasPermission("areashop.buyresell")) {
+					plugin.message(player, "buy-noPermissionResell");
+					return false;
+				}
+			} else {
+				if(!player.hasPermission("areashop.buynormal")) {
+					plugin.message(player, "buy-noPermissionNoResell");
+					return false;
+				}
+			}
 			if(getWorld() == null) {
 				plugin.message(player, "general-noWorld", getWorldName());
 				return false;

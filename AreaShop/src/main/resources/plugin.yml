@@ -22,6 +22,8 @@ permissions:
       areashop.destroybuy: true
       areashop.rent: true
       areashop.buy: true
+      areashop.buyresell: true
+      areashop.buynormal: true
       areashop.unrent: true
       areashop.info: true
       areashop.reload: true
@@ -70,6 +72,12 @@ permissions:
     default: true
   areashop.buy:
     description: Allows you to buy a region
+    default: true
+  areashop.buyresell:
+    description: Allows you to buy a region that is in resell mode
+    default: true
+  areashop.buynormal:
+    description: Allows you to buy a region that is not in resell mode
     default: true
   areashop.unrent:
     description: Allows you to unrent a specific region

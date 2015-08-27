@@ -42,11 +42,11 @@ You need to have WorldEdit, WorldGuard and Vault installed on your server, World
 
 ## Tutorial & Feature overview (V2.0.1 of AreaShop)
 **Made by [Koz4Christ](https://www.youtube.com/user/koz4christ)**
-[![Tutorial Video](https://cloud.githubusercontent.com/assets/6951068/9532702/83d674c2-4d0d-11e5-8f6a-c65cb97e8dee.png)](https://www.youtube.com/watch?v=328WrStVkzs)
+[![Tutorial Video](https://cloud.githubusercontent.com/assets/6951068/9532789/152c33f8-4d0e-11e5-8d1c-9e80c19ceab8.png)](https://www.youtube.com/watch?v=328WrStVkzs)
 
 ## Advanced Prison cell setup tutorial (V2.1.0 of AreaShop)
 **Made by [PerkulatorTime](https://www.youtube.com/user/PerkulatorTime)**
-[![Tutorial Video](https://cloud.githubusercontent.com/assets/6951068/9532703/851f6c08-4d0d-11e5-8d96-ce43476ae477.png)](https://www.youtube.com/watch?v=OQOsOG-EdNc)
+[![Tutorial Video](https://cloud.githubusercontent.com/assets/6951068/9532788/147526cc-4d0e-11e5-9672-1274faae280a.png)](https://www.youtube.com/watch?v=OQOsOG-EdNc)
 
 Old video for AreaShop v1.0: [Tutorial by VariationVault](https://www.youtube.com/watch?v=k2HMCxCCOYo)
 

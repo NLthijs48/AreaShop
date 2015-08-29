@@ -50,11 +50,11 @@ This plugin is for giving players the option to rent or buy a region. It could b
 
 You need to have WorldEdit, WorldGuard and Vault installed on your server, WorldGuard is used for creating and managing regions, WorldEdit for the saving and restoring the blocks in regions and Vault is used to let players pay for the regions.
 
-### Tutorial & Feature overview (V2.0.1 of AreaShop)
+### Tutorial & Feature overview (AreaShop V2.0.1)
 **Made by [Koz4Christ](https://www.youtube.com/user/koz4christ)**<br/>
 [![Tutorial Video](https://cloud.githubusercontent.com/assets/6951068/9532789/152c33f8-4d0e-11e5-8d1c-9e80c19ceab8.png)](https://www.youtube.com/watch?v=328WrStVkzs)
 
-### Advanced Prison cell setup tutorial (V2.1.0 of AreaShop)
+### Prison cell setup tutorial (AreaShop V2.1.0)
 **Made by [PerkulatorTime](https://www.youtube.com/user/PerkulatorTime)**<br/>
 [![Tutorial Video](https://cloud.githubusercontent.com/assets/6951068/9532788/147526cc-4d0e-11e5-9672-1274faae280a.png)](https://www.youtube.com/watch?v=OQOsOG-EdNc)
 

@@ -1,7 +1,5 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -51,7 +49,7 @@ public class FindCommand extends CommandAreaShop {
 		Player player = (Player)sender;
 		double balance = 0.0;
 		if(plugin.getEconomy() != null) {
-			plugin.getEconomy().getBalance(player);
+			balance = plugin.getEconomy().getBalance(player);
 		}
 		double maxPrice = 0;
 		boolean maxPriceSet = false;
@@ -65,7 +63,8 @@ public class FindCommand extends CommandAreaShop {
 				plugin.message(sender, "find-wrongMaxPrice", args[2]);
 				return;
 			}
-		}	
+		}
+		AreaShop.debug("maxPriceSet="+maxPriceSet+", balance="+balance);
 		// Parse optional group argument
 		if(args.length >= 4) {
 			group = plugin.getFileManager().getGroup(args[3]);
@@ -87,32 +86,25 @@ public class FindCommand extends CommandAreaShop {
 			if(!results.isEmpty()) {
 				// Draw a random one
 				BuyRegion region = results.get(new Random().nextInt(results.size()));
-				
-				BigDecimal bigDecimal = new BigDecimal(balance);
-			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-			    balance = bigDecimal.doubleValue();
 			    String onlyInGroup = "";
 				if(group != null) {
 					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
 				}
 				if(maxPriceSet) {
-					plugin.message(player, "find-successMax", "buy", region.getName(), maxPrice, onlyInGroup);
+					plugin.message(player, "find-successMax", "buy", region.getName(), plugin.formatCurrency(maxPrice), onlyInGroup);
 				} else {
-					plugin.message(player, "find-success", "buy", region.getName(), balance, onlyInGroup);
+					plugin.message(player, "find-success", "buy", region.getName(), plugin.formatCurrency(balance), onlyInGroup);
 				}
 				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {
-				BigDecimal bigDecimal = new BigDecimal(balance);
-			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-			    balance = bigDecimal.doubleValue();
 			    String onlyInGroup = "";
 				if(group != null) {
 					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
 				}
 				if(maxPriceSet) {
-					plugin.message(player, "find-noneFound", "buy", maxPrice, onlyInGroup);
+					plugin.message(player, "find-noneFoundMax", "buy", plugin.formatCurrency(maxPrice), onlyInGroup);
 				} else {
-					plugin.message(player, "find-noneFoundMax", "buy", balance, onlyInGroup);
+					plugin.message(player, "find-noneFound", "buy", plugin.formatCurrency(balance), onlyInGroup);
 				}
 			}
 		} else {
@@ -128,32 +120,25 @@ public class FindCommand extends CommandAreaShop {
 			if(!results.isEmpty()) {
 				// Draw a random one
 				RentRegion region = results.get(new Random().nextInt(results.size()));
-								
-				BigDecimal bigDecimal = new BigDecimal(balance);
-			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-			    balance = bigDecimal.doubleValue();
 			    String onlyInGroup = "";
 				if(group != null) {
 					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
 				}
 				if(maxPriceSet) {
-					plugin.message(player, "find-successMax", "rent", region.getName(), maxPrice, onlyInGroup);
+					plugin.message(player, "find-successMax", "rent", region.getName(), plugin.formatCurrency(maxPrice), onlyInGroup);
 				} else {
-					plugin.message(player, "find-success", "rent", region.getName(), balance, onlyInGroup);
+					plugin.message(player, "find-success", "rent", region.getName(), plugin.formatCurrency(balance), onlyInGroup);
 				}
 				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {
-				BigDecimal bigDecimal = new BigDecimal(balance);
-			    bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-			    balance = bigDecimal.doubleValue();
 			    String onlyInGroup = "";
 				if(group != null) {
 					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
 				}
 				if(maxPriceSet) {
-					plugin.message(player, "find-noneFound", "rent", maxPrice, onlyInGroup);
+					plugin.message(player, "find-noneFoundMax", "rent", plugin.formatCurrency(maxPrice), onlyInGroup);
 				} else {
-					plugin.message(player, "find-noneFoundMax", "rent", balance, onlyInGroup);
+					plugin.message(player, "find-noneFound", "rent", plugin.formatCurrency(balance), onlyInGroup);
 				}
 			}
 		}

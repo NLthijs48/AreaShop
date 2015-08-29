@@ -5,7 +5,7 @@ description: "Selling and renting WorldGuard regions to your players, highly con
 depend: [Vault, WorldGuard, WorldEdit]
 softdepend: [Multiverse-Core]
 author: NLThijs48
-website: http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/
+website: https://github.com/NLthijs48/AreaShop
 commands:
   AreaShop:
     description: 'For all commands use /as help.'

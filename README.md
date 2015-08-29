@@ -60,6 +60,14 @@ You need to have WorldEdit, WorldGuard and Vault installed on your server, World
 
 Old video for AreaShop v1.0: [Tutorial by VariationVault](https://www.youtube.com/watch?v=k2HMCxCCOYo)
 
+### Required dependencies
+* Java 7 or higher (latest recommended)
+* Bukkit/Spigot 1.7.9 or higher (modded servers often include Bukkit/Spigot support, so it should also work on that, but it is not specifically tested for it)
+* [WorldGuard](http://dev.bukkit.org/bukkit-plugins/worldguard/): 5.9 or higher (6.0+ recommended)
+* [WorldEdit](http://dev.bukkit.org/bukkit-plugins/worldedit/): 5.6.3 or higher (6.0+ recommended)
+* [Vault](http://dev.bukkit.org/bukkit-plugins/vault/): 1.4.1 or higher
+* An economy plugin supported by Vault (check the [Vault page](http://dev.bukkit.org/bukkit-plugins/vault/) for a list of these)
+
 ### Metrics
 This plugin utilizes Hidendra's plugin metrics system, which means that the following information is collected and sent to mcstats.org:
 

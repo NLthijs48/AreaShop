@@ -18,7 +18,7 @@
 [►Request feature](https://github.com/NLthijs48/AreaShop/issues/new?body=Describe%20the%20feature%20with%20as%20much%20detail%20as%20possible:%20command,%20permissions,%20messages%20in%20chat,%20etc.%20Also%20indicate%20for%20which%20situations%20you%20would%20use%20it%20and%20why%20it%20should%20be%20added.&labels=Feature)&nbsp;&nbsp;
 [►Planned features](https://github.com/NLthijs48/AreaShop/labels/Feature)&nbsp;&nbsp;
 [►Report bug](https://github.com/NLthijs48/AreaShop/issues/new?body=Indicate%20the%20steps%20you%20did%20while%20encountering%20the%20problem,%20the%20expected%20outcome,%20and%20the%20actual%20outcome.%20Provide%20links%20to%20your%20config.yml,%20default.yml%20and%20groups.yml%20files%20(use%20pastebin.com%20or%20similar).%20Also%20provide%20a%20full%20startup%20log%20of%20your%20server%20(this%20indicates%20the%20plugin%20versions%20used).&labels=Bug)&nbsp;&nbsp;
-[►Open bugs](https://github.com/NLthijs48/AreaShop/labels/Bug)&nbsp;&nbsp;
+[►Open bugs](https://github.com/NLthijs48/AreaShop/labels/Bug)<br/>
 **Development:**
 [►Changelog](https://github.com/NLthijs48/AreaShop/wiki/Changelog)&nbsp;&nbsp;
 [►Compiling](https://github.com/NLthijs48/AreaShop/wiki/Compiling-AreaShop)&nbsp;&nbsp;

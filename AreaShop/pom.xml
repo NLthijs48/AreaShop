@@ -90,7 +90,7 @@
       <artifactId>vault</artifactId>
       <version>1.4.1</version>
       <scope>system</scope>
-      <systemPath>${basedir}/../Dependencies/Vault.jar</systemPath>
+      <systemPath>${basedir}/../dependencies/Vault.jar</systemPath>
     </dependency>
   </dependencies>
 

@@ -3,6 +3,7 @@ package nl.evolutioncoding.areashop.commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -75,7 +76,8 @@ public class InfoCommand extends CommandAreaShop {
 		if(args.length > 1 && args[1] != null) {
 			// Get filter group (only used by some commands)
 			RegionGroup filterGroup = null;
-			if(args.length > 2 && args[2] != null) {
+			Set<String> groupFilters = new HashSet<String>(Arrays.asList("all", "rented", "forrent", "sold", "forsale"));
+			if(groupFilters.contains(args[0].toLowerCase())) {
 				filterGroup = plugin.getFileManager().getGroup(args[2]);
 				if(filterGroup == null) {
 					plugin.message(sender, "info-noFiltergroup", args[2]);

@@ -64,7 +64,6 @@ public class FindCommand extends CommandAreaShop {
 				return;
 			}
 		}
-		AreaShop.debug("maxPriceSet="+maxPriceSet+", balance="+balance);
 		// Parse optional group argument
 		if(args.length >= 4) {
 			group = plugin.getFileManager().getGroup(args[3]);

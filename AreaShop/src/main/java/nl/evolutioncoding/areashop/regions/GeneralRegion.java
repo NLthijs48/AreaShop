@@ -389,7 +389,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(result == null || result.isEmpty()) {
 			result = config.getString("general.landlordName");
 			if(result == null || result.isEmpty()) {
-				result = "<UNKNOWN>";
+				result = null;
 			}
 		}
 		return result;

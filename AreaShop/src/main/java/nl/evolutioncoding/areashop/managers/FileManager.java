@@ -803,21 +803,22 @@ public class FileManager {
 
 	/**
 	 * Load all files from disk
-	 * @return true
+	 * @return true if the files are loaded correctly, otherwise false
 	 */
 	public boolean loadFiles() {
-		boolean result = false;		
+		boolean result = true;		
 		// Load config.yml + add defaults from .jar
 		result = result & loadConfigFile();
 		// Load default.yml + add defaults from .jar
 		result = result & loadDefaultFile();
-		// Convert old formats to the latest
+		// Convert old formats to the latest (object saving to .yml saving)
 		preUpdateFiles();
 		// Load region files (regions folder)
-		result = result & loadRegionFiles();
+		loadRegionFiles();
+		// Convert old formats to the latest (changes in .yml saving format)
 		postUpdateFiles();
 		// Load groups.yml
-		result = result & loadGroupsFile();
+		loadGroupsFile();
 
 		return result;
 	}
@@ -827,6 +828,7 @@ public class FileManager {
 	 * @return true if it has been loaded successfully, otherwise false
 	 */
 	public boolean loadDefaultFile() {
+		boolean result = true;
 		File defaultFile = new File(defaultPath);
 		// Safe the file from the jar to disk if it does not exist
 		if(!defaultFile.exists()) {
@@ -857,29 +859,33 @@ public class FileManager {
 		InputStreamReader reader = null;
 		try {
 			reader = new InputStreamReader(new FileInputStream(defaultFile), Charsets.UTF_8);
-		} catch (FileNotFoundException e) {}
+		} catch (FileNotFoundException e) {
+			result = false;
+		}
 		if(reader != null) {
 			defaultConfig = YamlConfiguration.loadConfiguration(reader);
+			if(defaultConfig.getKeys(false).size() == 0) {
+				plugin.getLogger().warning("File 'default.yml' is empty, check for errors in the log.");
+				result = false;
+			}
+			try {
+				reader.close();
+			} catch (IOException e) {}
 		}
-		try {
-			reader.close();
-		} catch (IOException e) {}
-		if(defaultConfig == null) {
-			defaultConfig = new YamlConfiguration();
+		if(result) {
+			// Addding the defaults from the normal file that is inside the jar is disabled, not nice when removing lines for things you don't want
+			InputStream inputStream = plugin.getResource(AreaShop.defaultFile);
+			if(inputStream != null) {
+				reader = new InputStreamReader(inputStream, Charsets.UTF_8);
+			}
+			if(reader != null) {
+				defaultConfig.addDefaults(YamlConfiguration.loadConfiguration(reader));
+				try {
+					reader.close();
+				} catch (IOException e) {}
+			}
 		}
-		
-		// Addding the defaults from the normal file that is inside the jar is disabled, not nice when removing lines for things you don't want
-		InputStream inputStream = plugin.getResource(AreaShop.defaultFile);
-		if(inputStream != null) {
-			reader = new InputStreamReader(inputStream, Charsets.UTF_8);
-		}
-		if(reader != null) {
-			defaultConfig.addDefaults(YamlConfiguration.loadConfiguration(reader));
-		}
-		try {
-			reader.close();
-		} catch (IOException e) {}
-		return defaultConfig != null;
+		return result;
 	}
 	
 	/**
@@ -887,6 +893,7 @@ public class FileManager {
 	 * @return true if it has been loaded successfully, otherwise false
 	 */
 	public boolean loadConfigFile() {
+		boolean result = true;
 		File configFile = new File(configPath);
 		// Safe the file from the jar to disk if it does not exist
 		if(!configFile.exists()) {
@@ -909,7 +916,6 @@ public class FileManager {
 					input.close();
 					output.close();
 				} catch (IOException e1) {} catch (NullPointerException e2) {}
-				
 				plugin.getLogger().warning("Something went wrong saving the config file: " + configFile.getPath());
 			}
 		}
@@ -917,40 +923,42 @@ public class FileManager {
 		InputStreamReader reader = null;
 		try {
 			reader = new InputStreamReader(new FileInputStream(configFile), Charsets.UTF_8);
-		} catch (FileNotFoundException e) {}
+		} catch (FileNotFoundException e) {
+			result = false;
+		}
 		if(reader != null) {
 			config = YamlConfiguration.loadConfiguration(reader);
+			if(config.getKeys(false).size() == 0) {
+				plugin.getLogger().warning("File 'config.yml' is empty, check for errors in the log.");
+				result = false;
+			}
+			try {
+				reader.close();
+			} catch (IOException e) {}
 		}
-		try {
-			reader.close();
-		} catch (IOException e) {}
-		if(config == null) {
-			config = new YamlConfiguration();
-		}
-		// Add the values from the config.yml file inside of the .jar as defaults
-		InputStream inputStream = plugin.getResource(AreaShop.configFile);
-		if(inputStream != null) {
-			reader = new InputStreamReader(inputStream, Charsets.UTF_8);
-		}
-		if(reader != null) {
-			config.addDefaults(YamlConfiguration.loadConfiguration(reader));
-		}
-		try {
-			reader.close();
-		} catch (IOException e) {}
-		
-	    // Set the debug and chatprefix variables
-		plugin.setDebug(this.getConfig().getBoolean("debug"));
-	    plugin.setChatprefix(this.getConfig().getString("chatPrefix"));
-		
-		return config != null;
+		if(result) {
+			// Add the values from the config.yml file inside of the .jar as defaults
+			InputStream inputStream = plugin.getResource(AreaShop.configFile);
+			if(inputStream != null) {
+				reader = new InputStreamReader(inputStream, Charsets.UTF_8);
+			}
+			if(reader != null) {
+				config.addDefaults(YamlConfiguration.loadConfiguration(reader));
+				try {
+					reader.close();
+				} catch (IOException e) {}
+			}
+		    // Set the debug and chatprefix variables
+			plugin.setDebug(this.getConfig().getBoolean("debug"));
+		    plugin.setChatprefix(this.getConfig().getString("chatPrefix"));
+		}		
+		return result;
 	}
 	
 	/**
 	 * Load the groups.yml file from disk
-	 * @return
 	 */
-	public boolean loadGroupsFile() {
+	public void loadGroupsFile() {
 		File groupFile = new File(groupsPath);
 		InputStreamReader reader = null;
 		if(groupFile.exists() && groupFile.isFile()) {
@@ -959,11 +967,10 @@ public class FileManager {
 			} catch (FileNotFoundException e) {}
 			if(reader != null) {
 				groupsConfig = YamlConfiguration.loadConfiguration(reader);
+				try {
+					reader.close();
+				} catch (IOException e) {}
 			}
-			try {
-				reader.close();
-			} catch (IOException e) {}
-
 		}
 		if(groupsConfig == null) {
 			groupsConfig = new YamlConfiguration();
@@ -972,14 +979,12 @@ public class FileManager {
 			RegionGroup group = new RegionGroup(plugin, groupName);
 			groups.put(groupName, group);
 		}
-		return true;
 	}
 	
 	/**
 	 * Load all region files
-	 * @return true
 	 */
-	public boolean loadRegionFiles() {
+	public void loadRegionFiles() {
 		regions.clear();
 		File file = new File(regionsPath);
 		if(!file.exists()) {
@@ -997,10 +1002,10 @@ public class FileManager {
 					} catch (FileNotFoundException e) {}
 					if(reader != null) {
 						config = YamlConfiguration.loadConfiguration(reader);
+						try {
+							reader.close();
+						} catch (IOException e) {}
 					}
-					try {
-						reader.close();
-					} catch (IOException e) {}
 					// Construct the correct type of region
 					if(RegionType.RENT.getValue().equals(config.getString("general.type"))) {
 						RentRegion rent = new RentRegion(plugin, config);
@@ -1060,8 +1065,6 @@ public class FileManager {
 				}
 			}.runTask(plugin);
 		}
-		// Warnings will be printed in console, no other things can go wrong
-		return true;
 	}
 	
 	

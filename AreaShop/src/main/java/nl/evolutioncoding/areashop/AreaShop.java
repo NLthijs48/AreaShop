@@ -191,7 +191,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
         
 		// Load all data from files and check versions
 	    fileManager = new FileManager(this);
-	    error = error & !fileManager.loadFiles();
+	    error = error | !fileManager.loadFiles();
 	    
 	    // Print loaded version of WG and WE in debug
 	    if(wgVersion != null) {

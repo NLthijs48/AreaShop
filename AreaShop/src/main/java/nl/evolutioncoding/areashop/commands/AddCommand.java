@@ -175,7 +175,7 @@ public class AddCommand extends CommandAreaShop {
 								plugin.getFileManager().addBuy(buy);
 								buy.handleSchematicEvent(RegionEvent.CREATED);
 								// Set the flags for the region
-								buy.updateRegionFlags();						
+								buy.updateRegionFlags();
 								// Run commands
 								buy.runEventCommands(RegionEvent.CREATED, false);
 							}

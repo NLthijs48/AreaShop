@@ -456,7 +456,8 @@ public class BuyRegion extends GeneralRegion {
 		
 		/* Remove friends and the owner */
 		clearFriends();
-		setBuyer(null);		
+		setBuyer(null);	
+		removeLastActiveTime();
 		
 		updateSigns();
 		// Run commands

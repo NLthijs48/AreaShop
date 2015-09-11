@@ -313,6 +313,10 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 	}
 	
+	public void removeLastActiveTime() {
+		setSetting("general.lastActive", null);
+	}
+	
 	/**
 	 * Get the World of the region
 	 * @return The World where the region is located

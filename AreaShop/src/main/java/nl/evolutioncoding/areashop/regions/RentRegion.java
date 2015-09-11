@@ -608,6 +608,7 @@ public class RentRegion extends GeneralRegion {
 		setRenter(null);
 		setRentedUntil(null);
 		setTimesExtended(-1);
+		removeLastActiveTime();
 		
 		updateSigns();
 		// Run commands

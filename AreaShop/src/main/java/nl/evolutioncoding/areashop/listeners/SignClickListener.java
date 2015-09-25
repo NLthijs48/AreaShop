@@ -30,6 +30,9 @@ public class SignClickListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onSignClick(PlayerInteractEvent event) {
+		if(event.isCancelled()) {
+			return;
+		}
 		Block block = event.getClickedBlock();
 		/* Check for clicking a sign and rightclicking */
 		if((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) 

@@ -1209,7 +1209,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public void saveRequired() {
 		replacementsCache = null; // Remove cache
-		AreaShop.debug("cache removed, property changed");
 		saveRequired = true;
 	}
 	

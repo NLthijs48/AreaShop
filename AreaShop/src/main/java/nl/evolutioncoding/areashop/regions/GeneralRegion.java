@@ -52,6 +52,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	protected AreaShop plugin = null;
 	private boolean saveRequired = false;
 	private boolean deleted = false;
+	
+	private HashMap<String, Object> replacementsCache = null;
+	private long replacementsCacheTime = 0;
 
 	/* Enum for region types */
 	public enum RegionType {		
@@ -508,6 +511,11 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return Map with the keys that need to be replaced with the value of the object
 	 */
 	public HashMap<String, Object> getAllReplacements() {
+		// Reply with cache if we have one
+		if(replacementsCache != null && (Calendar.getInstance().getTimeInMillis() - replacementsCacheTime) < 1000) {
+			return replacementsCache;
+		}
+		
 		HashMap<String, Object> result = getSpecificReplacements();
 		
 		result.put(AreaShop.tagRegionName, getName());
@@ -538,8 +546,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		dateString = date.format(Calendar.getInstance().getTime());
 		result.put(AreaShop.tagDateTimeShort, dateString);
 		
-		// TODO: add more? coordinates?
-		
+		replacementsCache = result;
+		replacementsCacheTime = Calendar.getInstance().getTimeInMillis();
 		return result;
 	}
 	
@@ -1200,6 +1208,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Indicate this region needs to be saved, saving will happen by a repeating task
 	 */
 	public void saveRequired() {
+		replacementsCache = null; // Remove cache
+		AreaShop.debug("cache removed, property changed");
 		saveRequired = true;
 	}
 	

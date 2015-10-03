@@ -1032,9 +1032,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public void resetRegionFlags() {
 		ProtectedRegion region = getRegion();
 		if(region != null) {
-			for(Flag<?> flag : DefaultFlag.getFlags()) {
-				region.setFlag(flag, null);			
-			}
+			region.setFlag(DefaultFlag.GREET_MESSAGE, null);
+			region.setFlag(DefaultFlag.FAREWELL_MESSAGE, null);
 		}
 	}
 	

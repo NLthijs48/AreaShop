@@ -692,6 +692,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		identifiers.addAll(this.getConfig().getStringList("minutes"));
 		identifiers.addAll(this.getConfig().getStringList("hours"));
 		identifiers.addAll(this.getConfig().getStringList("days"));
+		identifiers.addAll(this.getConfig().getStringList("weeks"));
 		identifiers.addAll(this.getConfig().getStringList("months"));
 		identifiers.addAll(this.getConfig().getStringList("years"));
 		if(!identifiers.contains(suffix)) {
@@ -723,6 +724,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		ArrayList<String> minutes = new ArrayList<String>(this.getConfig().getStringList("minutes"));
 		ArrayList<String> hours = new ArrayList<String>(this.getConfig().getStringList("hours"));
 		ArrayList<String> days = new ArrayList<String>(this.getConfig().getStringList("days"));
+		ArrayList<String> weeks = new ArrayList<String>(this.getConfig().getStringList("weeks"));
 		ArrayList<String> months = new ArrayList<String>(this.getConfig().getStringList("months"));
 		ArrayList<String> years = new ArrayList<String>(this.getConfig().getStringList("years"));
 		
@@ -740,6 +742,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			calendar.add(Calendar.HOUR, durationInt);
 		} else if(days.contains(durationString)) {
 			calendar.add(Calendar.DAY_OF_MONTH, durationInt);
+		} else if(weeks.contains(durationString)) {
+			calendar.add(Calendar.DAY_OF_MONTH, durationInt*7);
 		} else if(months.contains(durationString)) {
 			calendar.add(Calendar.MONTH, durationInt);
 		} else if(years.contains(durationString)) {

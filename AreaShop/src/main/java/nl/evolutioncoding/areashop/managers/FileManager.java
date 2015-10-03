@@ -1022,6 +1022,7 @@ public class FileManager {
 				public void run() {
 					List<GeneralRegion> noWorld = new ArrayList<GeneralRegion>();
 					List<GeneralRegion> noRegion = new ArrayList<GeneralRegion>();
+					List<GeneralRegion> incorrectDuration = new ArrayList<GeneralRegion>();
 					for(GeneralRegion region : AreaShop.getInstance().getFileManager().getRegions()) {
 						// Add broken regions to a list
 						if(region != null) {
@@ -1030,6 +1031,9 @@ public class FileManager {
 							}
 							if(region.getRegion() == null) {
 								noRegion.add(region);
+							}
+							if(region.isRentRegion() && !plugin.checkTimeFormat(((RentRegion)region).getDurationString())) {
+								incorrectDuration.add(region);
 							}
 						}
 					}					
@@ -1061,6 +1065,13 @@ public class FileManager {
 					}
 					if(noWorldRegions) {
 						plugin.getLogger().warning("Remove these regions from AreaShop with '/as del' or load the world(s) on the server again.");
+					}
+					if(!incorrectDuration.isEmpty()) {
+						List<String> incorrectDurationNames = new ArrayList<String>();
+						for(GeneralRegion region : incorrectDuration) {
+							incorrectDurationNames.add(region.getName());
+						}
+						plugin.getLogger().warning("The following regions have an incorrect time format as duration: "+Utils.createCommaSeparatedList(incorrectDurationNames));
 					}
 				}
 			}.runTask(plugin);

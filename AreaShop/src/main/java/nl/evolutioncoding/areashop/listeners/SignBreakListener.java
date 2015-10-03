@@ -60,7 +60,7 @@ public final class SignBreakListener implements Listener {
 	 * Called when the physics of a block change
 	 * @param event The event
 	 */
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onIndirectSignBreak(BlockPhysicsEvent event){
         Block block = event.getBlock();
         if(event.isCancelled()) {
@@ -71,12 +71,11 @@ public final class SignBreakListener implements Listener {
             Block attachedTo = block.getRelative(((org.bukkit.material.Sign)sign.getData()).getAttachedFace());
             if(attachedTo.getType() == Material.AIR){
 				/* Check if the rent sign is really the same as a saved rent */
-				GeneralRegion region = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
+				final GeneralRegion region = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
 				if(region == null) {
 					return;
 				}
-				region.removeSign(block.getLocation());
-				plugin.getLogger().warning("A sign of region " + region.getName() + " has been removed by indirectly breaking it (block below/behind is destroyed)");
+				event.setCancelled(true); // Cancel the sign breaking, will create a floating sign but at least it is not disconnected/gone
             }
         }
     }

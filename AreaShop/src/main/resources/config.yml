@@ -48,11 +48,12 @@ timeFormatChat: 'dd MMMMMMMMMMMMMMMMM yyyy HH:mm'
 ## Time indicators, used for specifing time periods (for example rent duration).
 ## Be careful with deleting words, will break settings using those, adding is no problem.
 seconds: [s, sec, secs, second, seconds]
-minutes: [m, min, mins, minute, minutes, minuten, minuut]
-hours: [h, hour, hours, uur, uren]
-days: [d, day, days, dag, dagen]
-months: [M,  month,  months, maanden, maand]
-years: [y, year, years, jaar, jaren]
+minutes: [m, min, mins, minute, minutes]
+hours: [h, hour, hours]
+days: [d, day, days]
+weeks: [w, week, weeks]
+months: [M,  month,  months]
+years: [y, year, years]
 ## Allow or disallow extending rental region when the player is above his limits enforced by the 'limitGroups' below.
 ## false will ensure a player will eventually lose his region when he has no access anymore (rankup with other limits for example)
 allowRegionExtendsWhenAboveLimits: false

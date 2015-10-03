@@ -688,6 +688,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		/* Check if the suffix is one of these values */
 		String suffix = time.substring(time.indexOf(' ')+1, time.length());
 		ArrayList<String> identifiers = new ArrayList<String>();
+		identifiers.addAll(this.getConfig().getStringList("seconds"));
 		identifiers.addAll(this.getConfig().getStringList("minutes"));
 		identifiers.addAll(this.getConfig().getStringList("hours"));
 		identifiers.addAll(this.getConfig().getStringList("days"));

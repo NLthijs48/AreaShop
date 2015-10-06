@@ -341,7 +341,7 @@ public class RentRegion extends GeneralRegion {
 	public boolean checkExpiration() {
 		long now = Calendar.getInstance().getTimeInMillis();
 		if(!isDeleted() && isRented() && now > getRentedUntil()) {
-			/* Send message to the player if online */
+			// Send message to the player if online
 			Player player = Bukkit.getPlayer(getRenter());
 			if(player != null) {
 				plugin.message(player, "unrent-expired", getName());
@@ -396,7 +396,7 @@ public class RentRegion extends GeneralRegion {
 	 */
 	@SuppressWarnings("deprecation")
 	public boolean rent(Player player) {		
-		/* Check if the player has permission */
+		//Check if the player has permission
 		if(player.hasPermission("areashop.rent")) {
 			if(plugin.getEconomy() == null) {
 				plugin.message(player, "general-noEconomy");
@@ -427,7 +427,6 @@ public class RentRegion extends GeneralRegion {
 					return false;
 				}				
 				// Check region limits if this is not extending
-				//AreaShop.debug("extend="+extend+", config thing="+config.getBoolean("allowRegionExtendsWhenAboveLimits"));
 				if(!(extend && config.getBoolean("allowRegionExtendsWhenAboveLimits"))) {
 					
 					LimitResult limitResult = null;
@@ -477,7 +476,7 @@ public class RentRegion extends GeneralRegion {
 				}
 
 				if(plugin.getEconomy().has(player, getWorldName(), getPrice())) {
-					/* Substract the money from the players balance */
+					// Substract the money from the players balance
 					EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getWorldName(), getPrice());
 					if(!r.transactionSuccess()) {
 						plugin.message(player, "rent-payError");
@@ -509,7 +508,7 @@ public class RentRegion extends GeneralRegion {
 						runEventCommands(RegionEvent.EXTENDED, true);
 					}
 					
-					/* Get the time until the region will be rented */
+					// Get the time until the region will be rented
 					Calendar calendar = Calendar.getInstance();
 					if(extend) {
 						calendar.setTimeInMillis(getRentedUntil());
@@ -518,7 +517,7 @@ public class RentRegion extends GeneralRegion {
 					SimpleDateFormat dateFull = new SimpleDateFormat(plugin.getConfig().getString("timeFormatChat"));
 					AreaShop.debug(player.getName() + " has rented region " + getName() + " for " + getFormattedPrice() + " until " + dateFull.format(calendar.getTime()));					
 					
-					/* Add values to the rent and send it to FileManager */
+					// Add values to the rent and send it to FileManager
 					setRentedUntil(calendar.getTimeInMillis());
 					setRenter(player.getUniqueId());
 					
@@ -530,11 +529,11 @@ public class RentRegion extends GeneralRegion {
 						setTimesExtended(getTimesExtended() + 1);
 					}
 					
-					/* Change the sign and the region flags */
+					// Change the sign and the region flags
 					updateSigns();
 					updateRegionFlags(RegionState.RENTED);
 					
-					/* Send message to the player */
+					// Send message to the player
 					if(extend) {
 						plugin.message(player, "rent-extended", getName(), dateFull.format(calendar.getTime()));
 					} else {
@@ -550,7 +549,7 @@ public class RentRegion extends GeneralRegion {
 					}
 					return true;
 				} else {
-					/* Player has not enough money */
+					// Player has not enough money
 					if(extend) {
 						plugin.message(player, "rent-lowMoneyExtend", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())), getFormattedPrice());
 					} else {
@@ -576,10 +575,28 @@ public class RentRegion extends GeneralRegion {
 		this.runEventCommands(RegionEvent.UNRENTED, true);
 		double moneyBack =  getMoneyBackAmount();
 		if(moneyBack > 0 && giveMoneyBack) {
-			/* Give back the money */
+			boolean noPayBack = false;
+			OfflinePlayer landlordPlayer = null;
+			if(getLandlord() != null) {
+				landlordPlayer = Bukkit.getOfflinePlayer(getLandlord());
+			}
+			String landlordName = getLandlordName();
+			EconomyResponse r = null;
+			if(landlordName != null) {
+				if(landlordPlayer != null && landlordPlayer.getName() != null) {
+					r = plugin.getEconomy().withdrawPlayer(landlordPlayer, getWorldName(), moneyBack);
+				} else {
+					r = plugin.getEconomy().withdrawPlayer(landlordName, getWorldName(), moneyBack);
+				}
+				if(r == null || !r.transactionSuccess()) {
+					noPayBack = true;
+				}
+			}			
+			
+			// Give back the money
 			OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());
-			if(player != null) {
-				EconomyResponse r = null;
+			if(player != null && !noPayBack) {
+				r = null;
 				boolean error = false;
 				try {
 					if(player != null && player.getName() != null) {
@@ -596,14 +613,14 @@ public class RentRegion extends GeneralRegion {
 			}
 		}
 		
-		/* Debug message */
+		// Debug message
 		AreaShop.debug(getPlayerName() + " has unrented " + getName() + ", got " + plugin.formatCurrency(moneyBack) + " money back");
 		
-		/* Update the signs and region flags */
+		// Update the signs and region flags
 		handleSchematicEvent(RegionEvent.UNRENTED);
 		updateRegionFlags(RegionState.FORRENT);
 		
-		/* Remove friends, the owner and renteduntil values */
+		// Remove friends, the owner and renteduntil values
 		clearFriends();
 		setRenter(null);
 		setRentedUntil(null);

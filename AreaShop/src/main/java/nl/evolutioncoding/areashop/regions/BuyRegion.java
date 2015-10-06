@@ -424,12 +424,30 @@ public class BuyRegion extends GeneralRegion {
 		this.runEventCommands(RegionEvent.SOLD, true);
 		
 		disableReselling();
-		/* Give part of the buying price back */
+		// Give part of the buying price back
 		double moneyBack =  getMoneyBackAmount();
 		if(moneyBack > 0 && giveMoneyBack) {
-			/* Give back the money */
+			boolean noPayBack = false;
+			OfflinePlayer landlordPlayer = null;
+			if(getLandlord() != null) {
+				landlordPlayer = Bukkit.getOfflinePlayer(getLandlord());
+			}
+			String landlordName = getLandlordName();
+			EconomyResponse r = null;
+			if(landlordName != null) {
+				if(landlordPlayer != null && landlordPlayer.getName() != null) {
+					r = plugin.getEconomy().withdrawPlayer(landlordPlayer, getWorldName(), moneyBack);
+				} else {
+					r = plugin.getEconomy().withdrawPlayer(landlordName, getWorldName(), moneyBack);
+				}
+				if(r == null || !r.transactionSuccess()) {
+					noPayBack = true;
+				}
+			}	
+			
+			// Give back the money
 			OfflinePlayer player = Bukkit.getOfflinePlayer(getBuyer());
-			if(player != null) {
+			if(player != null && !noPayBack) {
 				EconomyResponse response = null;
 				boolean error = false;
 				try {
@@ -447,14 +465,13 @@ public class BuyRegion extends GeneralRegion {
 			}
 		}
 		
-		/* Debug message */
 		AreaShop.debug(getPlayerName() + " has sold " + getName() + ", got " + plugin.formatCurrency(moneyBack) + " money back");
 
-		/* Update everything */
+		// Update everything
 		handleSchematicEvent(RegionEvent.SOLD);
 		updateRegionFlags(RegionState.FORSALE);
 		
-		/* Remove friends and the owner */
+		// Remove friends and the owner
 		clearFriends();
 		setBuyer(null);	
 		removeLastActiveTime();

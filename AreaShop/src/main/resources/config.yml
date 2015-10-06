@@ -12,9 +12,9 @@ language: EN
 ## The tags you need to write on the sign to trigger the plugin.
 signTags:
   ## Tag for adding a rent region.
-  rent: '[rent]'
+  rent: '[arent]'
   ## Tag for adding a buy region.
-  buy: '[buy]'
+  buy: '[abuy]'
   ## Tag for adding a sign to an existing region.
   add: '[as]'
 

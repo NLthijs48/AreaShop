@@ -1,4 +1,4 @@
-name: AreaShop 
+name: AreaShop
 main: nl.evolutioncoding.areashop.AreaShop
 version: ${project.version}
 description: "Selling and renting WorldGuard regions to your players, highly configurable."
@@ -235,10 +235,10 @@ permissions:
   areashop.addfriendall:
     description: Allows you to add friends to all regions
     default: op
-  areashop.delfriend: 
+  areashop.delfriend:
     description: Allows you to delete friends from your regions
     default: true
-  areashop.delfriendall: 
+  areashop.delfriendall:
     description: Allows you to delete friends from all regions
     default: op
   areashop.notifyupdate:

@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Finnish, Version: V2.2.0, Percentage translated: 100%                                                            ║
+# ║ Language: Finnish, Version: V2.2.1, Percentage translated: 92%                                                             ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -74,7 +74,6 @@ rent-lowMoneyRent: "Sinulla ei ole tarpeeksi rahaa vuokrata tätä alueetta (sin
 rent-someoneElse: "Joku muu on jo vuokraamassa tätä aluetta."
 rent-notRentable: "Tuo alue ei ole saatavissa vuokraamiselle."
 rent-maxExtends: "Et voi enään laajentaa tätä vuokra-aluetta (maksimi on %0% kertaa), kuitenkin vuokra-ajan päättymisen jälkeen voit vuokrata tämän uudestaan."
-rent-maxRentTime: "Et voi vuokrata tätä aluetta pidemmäksi ajaksi kerrallaan, maksimi aika on %0% minuuttia ja sinulla on nyt vuokra-aikaa jäljellä %1% minuuttia."
 rent-restrictedToWorld: "Sinun pitää olla '%0%' maailmassa vuokrataksesi tuon alueen (olet nyt '%1%')"
 rent-restrictedToRegion: "Sinun pitää olla alueen '%0%' sisässä vuokrataksesi sen."
 rent-expireWarning: "Sinun alueessa %region% on aikaa jäljellä %timeleft%, muista pidentää vuokra-aikaa jos haluat pitää sen."
@@ -110,13 +109,11 @@ sell-soldYours: "Sinun alueesi on myyty."
 sell-noPermission: "Sinulla ei ole oikeuksia myydä aluetta."
 sell-noPermissionOther: "Sinulla ei ole oikeuksia myydä jonkun toisen aluetta."
 
-reload-reloaded: "Kaikki tiedostot on päivitetty onnistuneesti."
 reload-updateStart: "&7Päivitetään %0% aluetta vauhdilla %1% per sekunti."
 reload-updateComplete: "&7Alueiden päivitys on valmis."
 reload-noPermission: "Sinulla ei ole oikeuksia päivittää config-tiedostoja."
 reload-updateCommandChanged: "'/as updaterents' ja '/as updatebuys' ovat poistettu, '/as reload'  päivittää alueet joten voit käyttää sitä komentoa."
 
-info-help: "/as info <all|rented|forrent|sold|forsale|player|region|nogroup>"
 info-noPermission: "Sinulla ei ole oikeuksia saada lisätietoja alueista."
 info-all-rents: "Alueet jotka ovat tehty vuokrattaviksi: &7%0%."
 info-all-noRents: "Vuokrattavissa olevia alueita ole."
@@ -171,13 +168,6 @@ info-regionRestrictedWorldBuy: "&2&l►&r Sinun täytyy olla maailmassa '%world%
 info-regionRestoringRent: "&2&l►&r Palautus päällä &7(alue nollaantuu vuokran lopettamisen yhteydessä)%0%."
 info-regionRestoringBuy: "&2&l►&r Palautus on päällä &7(alue nollaantuu myynnin jälkeen)%0%."
 info-regionRestoringProfile: "(profiili: %0%)"
-info-regionNoSign: "Kylttiä ei ole tehty tuolle alueelle."
-info-regionPriceDuration: "Hinta: &7%0% jokaista %1% kohtaan."
-info-regionPrice: "Hinta: &7%0%."
-info-regionRestore: "Palautus päällä: &7%0%."
-info-regionRestoreProfile: "Palautetaan profiili: &7%0%."
-info-regionTPLocation: "Teleporttaus-paikka: &7Maailma=%0%, X=%1%, Y=%2%, Z=%3%, Pitch=%4%, Yaw=%5%."
-info-regionNoTP: "Teleporttaus-paikkaa ei ole asetettu."
 info-regionNotExisting: "Aluetta ei ole olemassa: %0%."
 
 setrestore-help: "/as setrestore <alue> <true|false|general> [profiili]."
@@ -191,8 +181,6 @@ setprice-noPermission: "Sinulla ei ole oikeuksia vaihtaa hintaa millä alue myyd
 setprice-help: "/as set price <hinta> [alue], alue jolla seisot valitaan, jos et käytä alueen nimeä."
 setprice-notRegistered: "Aluetta ei ole olemassa: %0%."
 setprice-wrongPrice: "'%0%' ei ole kelvollinen hinta."
-setprice-successRent: "Alueen %0% hinta vaihdettu %1% per %2%."
-setprice-successBuy: "Alueen %0% hinta vaihdettu %1%."
 
 setduration-noPermission: "Sinulla ei ole oikeuksia vaihtaa vuokran pituutta."
 setduration-help: "/as setduration <määrä> <tunniste> [alue], alue jolla seisot valitaan, jos et käytä alueen nimeä."

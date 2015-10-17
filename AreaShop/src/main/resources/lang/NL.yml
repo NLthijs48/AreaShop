@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Dutch, Version: V2.2.0, Percentage translated: 100%                                                              ║
+# ║ Language: Dutch, Version: V2.2.1, Percentage translated: 100%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -9,6 +9,11 @@
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 total-maximum: "Je kunt niet meer dan %0% gebied(en) kopen en huren in totaal (je hebt er al %1% in groep '%2%')."
+
+general-notReady: "AreaShop is not niet volledig geladen, even geduld."
+general-noWorld: "Je kunt deze actie niet uitvoeren, de wereld van dit gebied is niet beschikbaar (wereld '%0%')."
+general-noRegion: "Je kunt deze actie niet uitvoeren, het WorldGuard gebied is niet beschikbaar (gebied '%0%')."
+general-noEconomy: "Er is geen Economy plugin geïnstalleerd of deze is incorrect opgezet, stel de server eigenaar hiervan op de hoogte."
 
 cmd-notValid: "Dat commando is niet geldig , gebruik '/as help' voor informatie."
 cmd-onlyByPlayer: "Dit commando kan alleen door een speler uitgevoert worden."
@@ -61,10 +66,12 @@ help-delFriend: "&6/as delfriend &7-&r Verwijder een vriend van je gebied."
 help-delFriendAll: "&6/as delfriend &7-&r Verwijder een vriend van een gebied."
 help-linksigns: "&6/as linksigns &7-&r Gebruik massa bord koppelen mode."
 help-stack: "&6/as stack &7-&r Creer meerdere gebieden en voeg ze toe."
+help-setlandlord: "&6/as setlandlord &7-&r Stel de landeigenaar in van een gebied."
 
 rent-help: "/as rent <gebiednaam>."
 rent-noPermission: "Je hebt geen toestemming om een gebied te huren."
 rent-maximum: "Je kunt niet meer dan %0% gebied(en) huren (je hebt er al %1% in groep '%2%')."
+rent-maximumExtend: "Je kunt dit gebied niet meer verlengen omdat je meer dan %0% gebied(en) bezit (je hebt er al %1% in groep '%2%')."
 rent-payError: "Er is iets mis gegaan met betalen, probeer het later opnieuw."
 rent-rented: "Je hebt %0% tot %1% gehuurd."
 rent-extended: "Je hebt je huur van %0% verlengt tot %1%."
@@ -74,13 +81,15 @@ rent-lowMoneyRent: "Je hebt niet genoeg geld om het gebied te huren (je hebt %0%
 rent-someoneElse: "Iemand anders heeft dit gebied al gehuurd."
 rent-notRentable: "Dat gebied is niet beschikbaar om te huren."
 rent-maxExtends: "Je kunt de huur niet meer verlengen (het maximum is %0% keer), je kunt echter wel het gebied opnieuw huren als het afgelopen is."
-rent-maxRentTime: "Je kunt dit huur gebied niet meer tijd van tevoren huren, de maximum tijd is %0% minuten en je hebt het al voor %1% minuten gehuurt."
+rent-maxRentTime: "Je kunt dit huur gebied niet meer tijd van tevoren huren, de maximum tijd is %0% en je hebt het al voor %1% gehuurt."
 rent-restrictedToWorld: "Je moet in de '%0%' wereld zijn om dit gebied te huren (je bent in '%1%')."
 rent-restrictedToRegion: "Je moet in '%0%' staan om hem te huren."
 rent-expireWarning: "Je gebied %region% heeft nog %timeleft% over, verleng het als je het wilt houden.."
 
 buy-help: "/as buy <gebiednaam>."
 buy-noPermission: "Je hebt geen toestemming om een gebied te kopen."
+buy-noPermissionResell: "Je hebt geen toestemming om een koop gebied in doorverkoop mode te kopen."
+buy-noPermissionNoResell: "Je hebt geen toestemming om een koop gebied die niet in doorverkoop mode staat te kopen."
 buy-notBuyable: "Dat gebied is niet beschikbaar om te kopen."
 buy-maximum: "Je kunt niet meer dan %0% gebied(en) kopen (je hebt er al %1% in de groep '%2%')."
 buy-payError: "Er is iets mis gegaan met betalen, probeer het later opnieuw."
@@ -110,13 +119,13 @@ sell-soldYours: "Je gebied is verkocht."
 sell-noPermission: "Je hebt geen toestemming om een gebied te verkopen."
 sell-noPermissionOther: "Je hebt geen toestemming om een gebied van iemand anders te verkopen."
 
-reload-reloaded: "Alle bestanden zijn succesvol herladen."
+reload-reloading: "Alle bestanden zijn herladen, gebieden aan het checken en updaten."
 reload-updateStart: "&7%0% gebieden aan het updaten met %1% per seconde."
 reload-updateComplete: "&7Updaten van gebieden compleet."
 reload-noPermission: "Je hebt geen toestemming om configuratiebestanden te herladen."
 reload-updateCommandChanged: "'/as updaterents' en '/as updatebuys' zijn verwijderd, '/as reload' updated nu ook de gebieden, gebruik dus dat commando."
 
-info-help: "/as info <all|rented|forrent|sold|forsale|player|region|nogroup>."
+info-help: "/as info\nall\nrented [groep]\nforrent [groep]\nsold [groep]\nforsale [groep]\nplayer <speler>\nregion <gebied>\nnogroup"
 info-noPermission: "Je hebt geen toestemming om informatie over gebieden te bekijken."
 info-all-rents: "Gebieden geregistreerd voor de verhuur: %0%."
 info-all-noRents: "Er zijn geen gebieden geregistreerd voor de verhuur."
@@ -134,6 +143,7 @@ info-sold: "Verkochte gebieden: %0%."
 info-noSold: "Alle gebieden zijn verkocht."
 info-forsale: "Gebieden te koop: %0%."
 info-noForsale: "Alle gebieden zijn verkocht."
+info-noFiltergroup: "Groep '%0%' bestaat niet en kan daardoor niet gebruikt worden om de resultaten te limiteren."
 info-playerHelp: "/as info player <naam>."
 info-playerRents: "Gebieden gehuurd door %0%: %1%."
 info-playerNoRents: "%0% heeft geen gebied gehuurd."
@@ -171,13 +181,7 @@ info-regionRestrictedWorldBuy: "&2&l►&r Je moet in de wereld '%world%' staan o
 info-regionRestoringRent: "&2&l►&r Herstel is ingeschakeld &7(gebied zal resetten bij een huurstop)%0%."
 info-regionRestoringBuy: "&2&l►&r Herstel is ingeschakeld &7(gebied zal resetten bij een verkoop)%0%."
 info-regionRestoringProfile: " (profiel: %0%)"
-info-regionNoSign: "Er is geen bordje geregistreerd voor dit gebied."
-info-regionPriceDuration: "Prijs: %0% voor elke %1%."
-info-regionPrice: "Prijs: %0%."
-info-regionRestore: "Herstellen ingeschakeld: %0%."
-info-regionRestoreProfile: "Herstel profiel: %0%."
-info-regionTPLocation: "Teleporteer locatie: &7Wereld=%0%, X=%1%, Y=%2%, Z=%3%, Helling=%4%, Draaiing=%5%."
-info-regionNoTP: "Geen teleporteer locatie ingesteld."
+info-regionLandlord: "&2&l►&r Landeigenaar: &7%landlord% (ontvangt het geld)."
 info-regionNotExisting: "Het aangegeven gebied is niet geregistreerd: %0%."
 
 setrestore-help: "/as setrestore <gebied> <true|false|general> [profiel]."
@@ -191,8 +195,10 @@ setprice-noPermission: "Je hebt geen toestemming om de prijs van een gebied te v
 setprice-help: "/as setprice <prijs> [gebied], het gebied waarin je staat zal worden gebruikt als je deze niet aangeeft."
 setprice-notRegistered: "Het aangegeven gebied is niet geregistreerd: %0%."
 setprice-wrongPrice: "'%0%' is geen geldige prijs."
-setprice-successRent: "Prijs van gebied %0% is veranderd naar %1% per %2%."
-setprice-successBuy: "De prijs van het gebied %0% is veranderd naar %1%."
+setprice-successRent: "Prijs van gebied %region% is veranderd naar %price% per %duration%."
+setprice-successBuy: "De prijs van het gebied %region% is veranderd naar %price%."
+setprice-successRemoved: "Prijs van %region% is verwijderd, hij zal nu de prijs van de groep of default.yml file gebruiken, nieuwe prijs: %price%."
+setprice-noLandlord: "Je hebt geen toestemming om de prijs te veranderen omdat je niet de landeigenaar bent van %region%."
 
 setduration-noPermission: "Je hebt geen toestemming om de duur van het huur gebied aan te passen."
 setduration-help: "/as setduration <aantal> <identificator> [gebied], het gebied waarin je staat zal worden gebruikt als je niets aangeeft."
@@ -200,6 +206,8 @@ setduration-notRegistered: "%0% is niet geregistreerd voor verhuur."
 setduration-wrongAmount: "'%0%' is geen geldig aantal, gebruik een geheel nummer."
 setduration-wrongFormat: "'%0%' is geen goed tijdsformaat, bekijk de documentatie op Bukkit."
 setduration-success: "Duur van het gebied %0% veranderd naar '%1%'."
+setduration-noLandlord: "Je hebt geen toestemming om de tijdsduur te veranderen omdat je niet de landeigenaar bent van %region%."
+setduration-successRemoved: "Tijdsduur van %region% is verwijderd, hij zal nu de tijdsduur van een group of default.yml gebruiken, nieuwe tijdsduur: %duration%."
 
 setup-noRegion: "Je hebt geen gebied aangegeven op de tweede regel."
 setup-wrongRegion: "Het aangegeven gebied bestaat niet."
@@ -215,6 +223,7 @@ setup-noPermissionRent: "Je hebt geen toestemming om huur gebieden op te zetten.
 setup-noPermissionBuy: "Je hebt geen toestemming om koop gebieden op te zetten."
 setup-couldNotDetect: "Meerdere gebieden gevonden met dezelfde prioriteit en/of parent/child relatie, geeft een specifieke aan op de tweede regel (2 van de gebieden die gevonden zijn: %0% en %1%)."
 setup-blacklisted: "%0% staat op de blacklist en kan niet toegevoegd worden aan AreaShop."
+setup-noPermission: "Je kunt de region '%0%' niet toevoegen, je bent geen owner/member of hebt geen toestemming."
 
 destroy-noPermissionRent: "Je hebt geen toestemming om huur gebieden te verwijderen."
 destroy-noPermissionBuy: "Je hebt geen toestemming om koop gebieden te verwijderen."
@@ -233,6 +242,8 @@ teleport-success: "Je bent naar %0% geteleporteerd."
 teleport-successSign: "Je bent geteleporteerd naar het bordje van %0%."
 teleport-noSafe: "Geen veilige plek gevonden in gebied %0%, verander het gebied of stel de teleporteer positie in."
 teleport-blocked: "Je kunt niet teleporteren omdat de positie buiten het gebied ligt en je geforceerd word erbinnen te teleporteren."
+teleport-changedToSign: "Je hebt alleen toestemming om te teleporteren naar het bord en niet binnen de region, teleporteren naar het bord."
+teleport-changedToNoSign: "Er is geen bord beschikbaar om naar te teleporteren, proberen om naar het gebied te teleporteren."
 
 setteleport-help: "/as settp [gebied] [reset], het gebied waar je in staat zal worden gebruikt als je deze niet aangeeft."
 setteleport-noPermission: "Je hebt geen toestemming om de teleporteer lokatie in te stellen."
@@ -292,6 +303,8 @@ add-blacklisted: "Op de blacklist: &7%0%."
 add-specifyWorld: "Geef de wereld van het gebied aan als je het commando vanuit de console gebruikt."
 add-incorrectWorld: "Wereld '%0%' niet gevonden, probeer opnieuw (hoofdlettergevoelig)."
 add-noRegion: "Gebied '%0%' bestaat niet in deze wereld."
+add-noPermissionRegions: "Geen  toestemming om toe te voegen: &7%0%."
+add-noPermissionOwnerMember: "&7Je bent geen member/owner van het gebied of hebt geen toestemming om je gebieden toe te voegen."
 
 del-noRegion: "Het aangegeven gebied is niet geregistreerd: %0%."
 del-noPermission: "Je hebt geen toestemming om gebieden te verwijderen."
@@ -394,6 +407,12 @@ stack-noSelection: "Je hebt geen selectie die aangeeft waar het eerste gebied wo
 stack-addStart: "&7%0% gebieden aan het toevoegen met %1% per seconde."
 stack-addComplete: "&7Toevoegen van gebieden voltooid."
 stack-unclearDirection: "Kijk precies in het noorden, oosten, zuiden of westen, op dit moment gedetecteert: %0%."
+
+setlandlord-help: "/as setlandlord <speler> [gebied], het gebied waar je in staat zal worden gebruikt als niet aangegeven."
+setlandlord-noPermission: "Je hebt geen toestemming om de landeigenaar in te stellen voor een gebied."
+setlandlord-didNotPlayBefore: "&7Opmerking: '%0%' heeft nog niet op de server gespeeld, gebruik je de goede speler?"
+setlandlord-noRegion: "Het aangegeven gebied is niet geregistreerd: %0%."
+setlandlord-success: "%0% is succesvol ingesteld als landeigenaar voor %1%."
 
 timeleft-years: "%0% jaren"
 timeleft-months: "%0% maanden"

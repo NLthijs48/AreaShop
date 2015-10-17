@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Polish, Version: V2.2.0, Percentage translated: 88%                                                              ║
+# ║ Language: Polish, Version: V2.2.1, Percentage translated: 81%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -72,7 +72,6 @@ rent-lowMoneyRent: "Nie masz wystarczajacej liczby pieniedzy, by wynajac ten reg
 rent-someoneElse: "Ktos juz wynajal ten region."
 rent-notRentable: "Ten region nie jest dostepny do wynajmu."
 rent-maxExtends: "Nie mozesz juz przedluzyc okresu wynajmu (maksymalna ilosc to %0% razy), aczkolwie kiedy skonczy sie okres wynajmu mozesz wynajac ten teren znowu."
-rent-maxRentTime: "Nie mozesz wiecej razy z gory wynajac tego regionu, maksymalny czas to %0% minut, a ty wynajmujesz go przez %1% minut."
 rent-restrictedToWorld: "Musisz byc w swiecie '%0%' zeby wypozyczyc ten region (jestes w '%1%')."
 rent-restrictedToRegion: "Musisz byc na terenie '%0%' zeby wynajac ten region."
 rent-expireWarning: "Czas wynajmu %region% konczy sie. Pozostalo %timeleft%. Przedluz wynajem jesli chcesz go zatrzymac."
@@ -106,13 +105,11 @@ sell-soldYours: "Twoj region zostal sprzedany."
 sell-noPermission: "Nie masz uprawnien, zeby sprzedac region."
 sell-noPermissionOther: "Nie masz uprawnien, by sprzedac region, ktorego nie posiadasz."
 
-reload-reloaded: "Przeladowano wszystkie pliki."
 reload-updateStart: "&7Odswiezono %0% regionow (%1%/sekunde)."
 reload-updateComplete: "&7Odswiezono wszystkie regiony."
 reload-noPermission: "Nie masz uprawnien, zeby przeladowac plugin."
 reload-updateCommandChanged: "'/as updaterents' i '/as updatebuys' zostaly usuniete, '/as reload' tez odswieza regiony, wiec uzywaj teraz tej komendy."
 
-info-help: "/as info <all|rented|forrent|sold|forsale|player|region|nogroup>."
 info-noPermission: "Nie masz uprawnien, by uzyskac informacje na temat regionow."
 info-all-rents: "Regiony do wynajecia: &7%0%."
 info-all-noRents: "Aktualnie nie ma regionow do wynajecia."
@@ -161,13 +158,6 @@ info-regionInactiveSell: "&2&l►&r Autosprzedaz po: &7%inactivetime% nieobecnos
 info-regionRestoringRent: "&2&l►&r Przywracanie jest wlaczone &7(Region bedzie resetowany po skonczeniu wynajmu)%0%."
 info-regionRestoringBuy: "&2&l►&r Przywracanie jest wlaczone &7(Region bedzie resetowany po sprzedazy)%0%."
 info-regionRestoringProfile: " (profil: %0%)"
-info-regionNoSign: "Do tego regionu nie ma przypisanych tabliczek."
-info-regionPriceDuration: "Cena: &7%0% za %1%."
-info-regionPrice: "Cena: &7%0%."
-info-regionRestore: "Przywracanie wlaczone: &7%0%."
-info-regionRestoreProfile: "Profil przywracania: &7%0%."
-info-regionTPLocation: "Lokalizacja teleportu: &7wiat=%0%, X=%1%, Y=%2%, Z=%3%, Wysokosc=%4%, Kierunek=%5%."
-info-regionNoTP: "Nie ma ustawionej lokalizacji teleportu."
 
 setrestore-help: "/as setrestore <region> <true|false|general> [profile]."
 setrestore-noPermission: "Nie masz uprawnien zeby zmieniac ustawienia odzyskiwania."
@@ -178,8 +168,6 @@ setrestore-successProfile: "Ustawiono ustawienia odzyskiwania %0% na '%1%' i pro
 setprice-noPermission: "Nie masz uprawnien, by zmienic cene regionu."
 setprice-help: "/as setprice <price> [nazwa_regionu], jesli nie wpiszesz nazwy uzyje regionu na ktorym stoisz."
 setprice-wrongPrice: "'%0%' nie jest poprawna cena."
-setprice-successRent: "Cena %0% zmieniona na %1% per %2%."
-setprice-successBuy: "Cena %0% zmieniona na %1%."
 
 setduration-noPermission: "Nie masz uprawnien by zmienic czas wynajmu."
 setduration-help: "/as setduration <amount> <identifier> [nazwa_regionu], jesli nie wpiszesz nazwy uzyje regionu na ktorym stoisz."

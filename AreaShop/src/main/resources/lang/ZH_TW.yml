@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Chinese (Taiwan), Version: V2.2.0, Percentage translated: 79%                                                    ║
+# ║ Language: Chinese (Taiwan), Version: V2.2.1, Percentage translated: 73%                                                    ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -70,7 +70,6 @@ rent-lowMoneyRent: "你沒有足夠的錢租賃該土地(你擁有%0%而你還�
 rent-someoneElse: "其他人已經租賃該土地"
 rent-notRentable: "該土地不能租賃"
 rent-maxExtends: "你已經無法再延展你的租期了(最大上限次數為%0%次), 然而在租期過後你可以再次租賃該土地"
-rent-maxRentTime: "你無法提前租賃該土地,最大上限時間為 %0% 分鐘,而你目前已經租賃該土地 %1% 分鐘"
 rent-restrictedToWorld: "你必須要在 '%0%'世界才能租賃該土地(你目前正在 '%1%')"
 rent-restrictedToRegion: "你必須要在 '%0%'才能租賃該土地"
 rent-expireWarning: "你的土地 %region% 還剩下%timeleft% ,如果你還想保留該土地請延展租期"
@@ -144,13 +143,6 @@ info-regionInactiveSell: "&2&l►&r  玩家閒置而自動出售的時間為: &7
 info-regionRestoringRent: "&2&l►&r  重製啟用 &7(土地將被重新設為未被租賃)%0%"
 info-regionRestoringBuy: "&2&l►&r 重製啟用 &7(土地將被重新設為出售)%0%"
 info-regionRestoringProfile: "(資料: %0%)"
-info-regionNoSign: "該土地沒有被註冊的告示牌"
-info-regionPriceDuration: "價格:每一個 %1% 為&7%0%"
-info-regionPrice: "價格: &7%0%"
-info-regionRestore: "重製啟用: &7%0%"
-info-regionRestoreProfile: "重製資料:&7%0%"
-info-regionTPLocation: "傳送地點: &7World=%0%, X=%1%, Y=%2%, Z=%3%, Pitch=%4%, Yaw=%5%"
-info-regionNoTP: "沒有設定的傳送地點"
 
 setrestore-help: "/as setrestore <region> <true|false|general> [profile]"
 setrestore-noPermission: "你沒有權限修改重製設定"
@@ -161,8 +153,6 @@ setrestore-successProfile: "成功設定重製由 %0% 至 '%1%' 而資料至 '%2
 setprice-noPermission: "你沒有權限修改土地價格"
 setprice-help: "/as setprice <price> [region], 若你不指定土地名稱,則預設為你所站立的土地"
 setprice-wrongPrice: "'%0%' 不是有效的價格"
-setprice-successRent: "土地價格由 %0% 修改至 %1% ,個別價格為 %2%"
-setprice-successBuy: "土地價格由 %0% 修改至 %1%"
 
 setduration-noPermission: "你沒有權限修改租期"
 setduration-help: "/as setduration <amount> <identifier> [region], 若你不指定土地名稱,則預設為你所站立的土地"

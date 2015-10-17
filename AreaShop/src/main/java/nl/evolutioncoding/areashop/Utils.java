@@ -237,7 +237,6 @@ public class Utils {
 	}	
 	public static List<GeneralRegion> getApplicableASRegions(Location location, RegionType type) {
 		List<GeneralRegion> result = new ArrayList<GeneralRegion>();
-		// TODO move to version specific classes
 		Set<ProtectedRegion> regions = AreaShop.getInstance().getWorldGuardHandler().getApplicableRegionsSet(location);
 		if(regions != null) {
 			List<GeneralRegion> candidates = new ArrayList<GeneralRegion>();

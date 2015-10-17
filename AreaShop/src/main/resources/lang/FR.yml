@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: French, Version: V2.2.0, Percentage translated: 99%                                                              ║
+# ║ Language: French, Version: V2.2.1, Percentage translated: 94%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -9,6 +9,11 @@
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 total-maximum: "Vous ne pouvez pas louer ou acheter plus de %0% région(s) au total (vous possédez déjà %1% dans le groupe '%2%')."
+
+general-notReady: "AreaShop n'a pas été encore lancé, merci d'attendre."
+general-noWorld: "Vous ne pouvez pas faire ceci, le monde de cette région est actuellement inaccessible (monde '%0%')."
+general-noRegion: "Vous ne pouvez pas faire ceci, la région WorldGuard n'est pas accessible region ('%0%')"
+general-noEconomy: "Il n'y a pas de plugin d'économie sur votre serveur, ou bien qu'il n'est pas correctement installé. Merci de prévenir l'opérateur du serveur dès que possible."
 
 cmd-notValid: "Cette commande est incorrecte, utilisez '/as help' pour plus de détails."
 cmd-onlyByPlayer: "Cette commande ne peut être utilisée que par un joueur."
@@ -74,7 +79,6 @@ rent-lowMoneyRent: "Vous n'avez pas assez d'argent pour louer cette région (vou
 rent-someoneElse: "Quelqu'un d'autre loue déjà cette région."
 rent-notRentable: "Cette région n'est pas disponible à la location."
 rent-maxExtends: "Vous ne pouvez plus prolonger cette location (le maximum est de %0% fois). Mais lorsque la location sera terminée, vous pourrez de nouveau louer cette région."
-rent-maxRentTime: "Vous ne pouvez pas louer plus longtemps à l'avance, le maximum est de %0% minutes et vous avez déjà loué pour %1% minutes."
 rent-restrictedToWorld: "Vous devez être dans le monde '%0%' pour louer cette région (vous êtes dans '%1%')."
 rent-restrictedToRegion: "Vous devez être dans la région '%0%' pour la louer."
 rent-expireWarning: "Votre région '%region%' n'a plus que %timeleft% de temps de location, soyez sûr d'allonger ce temps de location si vous voulez la conserver."
@@ -110,13 +114,12 @@ sell-soldYours: "Votre région a été vendue."
 sell-noPermission: "Vous n'avez pas la permission de vendre une région."
 sell-noPermissionOther: "Vous n'avez pas la permission de vendre une autre région."
 
-reload-reloaded: "Tous les fichiers ont été rechargés avec succès."
+reload-reloading: "Fichiers rechargés, vérification des locations et des mises à jour des régions."
 reload-updateStart: "&7Met à jour %0% régions, %1% par seconde."
 reload-updateComplete: "&7Mise à jour des régions terminée."
 reload-noPermission: "Vous n'avez pas la permission de recharger les fichiers."
 reload-updateCommandChanged: "'/as updaterents' et '/as updatebuys' ont été supprimées, '/as reload' est la commande à utiliser pour mettre à jour les régions."
 
-info-help: "/as info <all|rented|forrent|sold|forsale|player|region|nogroup>."
 info-noPermission: "Vous n'avez pas la permission d'avoir des informations à propos des régions."
 info-all-rents: "Régions enregistrées en location : &7%0%"
 info-all-noRents: "Il n'y a pas de régions enregistrées en location."
@@ -171,13 +174,6 @@ info-regionRestrictedWorldBuy: "&2&l►&r Vous devez à l'intérieur du monde '%
 info-regionRestoringRent: "&2&l►&r La restauration est activée &7(la région sera remise à zéro a la fin de la location)%0%"
 info-regionRestoringBuy: "&2&l►&r La restauration est activée &7(la région sera remise à zéro a la fin de la location)%0%"
 info-regionRestoringProfile: "(Profil : %0%)"
-info-regionNoSign: "Il n'y a pas de panneau enregistré pour cette région."
-info-regionPriceDuration: "Prix : &7%0% pour chaque %1%"
-info-regionPrice: "Prix : &7%0%"
-info-regionRestore: "Restauration activée : &7%0%"
-info-regionRestoreProfile: "Profil de restauration : &7%0%"
-info-regionTPLocation: "Lieu de téléportation : &7World=%0%, X=%1%, Y=%2%, Z=%3%, Pitch=%4%, Yaw=%5%"
-info-regionNoTP: "Aucun lieu de téléportation défini."
 info-regionNotExisting: "La région spécifiée n'est pas enregistrée : %0%."
 
 setrestore-help: "/as setrestore <region> <true|false|general> [profile]"
@@ -191,8 +187,8 @@ setprice-noPermission: "Vous n'avez pas la permission de changer le prix d'une r
 setprice-help: "/as setprice <price> [region], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 setprice-notRegistered: "La région spécifiée n'est pas enregistrée : %0%."
 setprice-wrongPrice: "'%0%' n'est pas un prix valide."
-setprice-successRent: "Prix de la région '%0%' changé de %1% à %2%."
-setprice-successBuy: "Prix de la région '%0%' changé à %1%."
+setprice-successRent: "Le prix de la région %region% à changé pour %price% par %duration%."
+setprice-successBuy: "Le prix de la région %region% a changé pour %price%"
 
 setduration-noPermission: "Vous n'avez pas la permission de changer le temps d'une location."
 setduration-help: "/as setduration <amount> <identifier> [region], la région dans laquelle vous vous trouvez sera utilisée si vous ne précisez pas quelle région doit être utilisée."

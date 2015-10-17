@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: English, Version: V2.2.0, Percentage translated: 100% (source), author: NLThijs48                                ║
+# ║ Language: English, Version: V2.2.1, Percentage translated: 100% (source), author: NLThijs48                                ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -88,6 +88,8 @@ rent-expireWarning: "Your region %region% has %timeleft% left, be sure to extend
 
 buy-help: "/as buy [regionname], the region you stand in will be used if not specified."
 buy-noPermission: "You don't have permission to buy a region."
+buy-noPermissionResell: "You don't have permission to buy a region in resell mode."
+buy-noPermissionNoResell: "You don't have permission to buy a region that is not in resell mode."
 buy-notBuyable: "That region is not available for buying."
 buy-maximum: "You can't buy more than %0% region(s) (you already have %1% in group '%2%')."
 buy-payError: "Something went wrong with paying, try again later."
@@ -429,4 +431,4 @@ greeting-forsale: "%region% can be bought for %price%."
 greeting-bought: "%region% is bought by %player%."
 greeting-resale: "%region% can be bought for %resaleprice% from %player%."
 
-update-playerNotify: "&2Update from AreaShop V%0% to %1% available, get the latest version at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/."
+update-playerNotify: "&2Update from AreaShop V%0% to %1% available, get the latest version at https://github.com/NLthijs48/AreaShop/releases."

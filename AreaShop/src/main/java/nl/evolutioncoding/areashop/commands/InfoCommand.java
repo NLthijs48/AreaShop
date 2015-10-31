@@ -137,21 +137,30 @@ public class InfoCommand extends CommandAreaShop {
 			// Player regions
 			else if(args[1].equalsIgnoreCase("player")) {
 				if(args.length > 2 && args[2] != null) {
+					// Rents
 					Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
 					for(RentRegion region : plugin.getFileManager().getRents()) {
 						if(region.isRented() && region.getPlayerName().equalsIgnoreCase(args[2])) {
 							regions.add(region);
 						}
 					}
-					displayMessage(sender, regions, null, "info-playerRents", "info-playerNoRents");	
-					
+					if(regions.isEmpty()) {
+						plugin.message(sender, "info-playerNoRents", args[2]);
+					} else {
+						plugin.message(sender, "info-playerRents", args[2], StringUtils.join(regions.iterator(), ", "));
+					}
+					// Buys
 					regions = new TreeSet<GeneralRegion>();
 					for(BuyRegion region : plugin.getFileManager().getBuys()) {
 						if(region.isSold() && region.getPlayerName().equalsIgnoreCase(args[2])) {
 							regions.add(region);
 						}
 					}
-					displayMessage(sender, regions, null, "info-playerBuys", "info-playerNoBuys");
+					if(regions.isEmpty()) {
+						plugin.message(sender, "info-playerNoBuys", args[2]);
+					} else {
+						plugin.message(sender, "info-playerBuys", args[2], StringUtils.join(regions.iterator(), ", "));
+					}
 				} else {
 					plugin.message(sender, "info-playerHelp");
 				}

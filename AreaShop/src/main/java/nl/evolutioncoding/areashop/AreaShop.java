@@ -42,7 +42,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author NLThijs48
  */
 public final class AreaShop extends JavaPlugin implements AreaShopInterface {
-	/* General variables */
+	// General variables
 	private static AreaShop instance = null;
 	
 	private WorldGuardPlugin worldGuard = null;
@@ -59,7 +59,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	private boolean updateAvailable = false;
 	private boolean ready = false;
 	
-	/* Folders and file names */
+	// Folders and file names
 	public static final String languageFolder = "lang";
 	public static final String schematicFolder = "schem";
 	public static final String schematicExtension = ".schematic";	
@@ -69,14 +69,14 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public static final String configFile = "config.yml";	
 	public static final String versionFile = "versions";
 	
-	/* Euro tag for in the config */
+	// Euro tag for in the config
 	public static final String currencyEuro = "%euro%";
 	
-	/* Constants for handling file versions */
+	// Constants for handling file versions
 	public static final String versionFiles = "files";
 	public static final int versionFilesCurrent = 3;
 	
-	/* Keys for replacing parts of flags, commands, strings */
+	// Keys for replacing parts of flags, commands, strings
 	public static final String tagPlayerName = "%player%";
 	public static final String tagPlayerUUID = "%uuid%";
 	public static final String tagWorldName = "%world%";

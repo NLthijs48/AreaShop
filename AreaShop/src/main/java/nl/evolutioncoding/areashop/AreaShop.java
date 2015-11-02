@@ -21,6 +21,7 @@ import nl.evolutioncoding.areashop.managers.CommandManager;
 import nl.evolutioncoding.areashop.managers.FileManager;
 import nl.evolutioncoding.areashop.managers.LanguageManager;
 import nl.evolutioncoding.areashop.managers.SignLinkerManager;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -266,10 +267,16 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 *  Called on shutdown or reload of the server 
 	 */
 	public void onDisable() {
+		// Update lastactive time for players that are online now
+		for(GeneralRegion region : fileManager.getRegions()) {
+			Player player = Bukkit.getPlayer(region.getOwner());
+			if(player != null) {
+				region.updateLastActiveTime();
+			}
+		}
 		fileManager.saveRequiredFilesAtOnce();		
 		Bukkit.getServer().getScheduler().cancelTasks(this);
 		
-		/* set variables to null to prevent memory leaks */
 		worldGuard = null;
 		worldEdit = null;
 		fileManager = null;

@@ -334,6 +334,7 @@ public class BuyRegion extends GeneralRegion {
 						this.runEventCommands(RegionEvent.RESELL, true);
 						// Set the owner
 						setBuyer(player.getUniqueId());
+						updateLastActiveTime();
 		
 						// Update everything
 						handleSchematicEvent(RegionEvent.RESELL);
@@ -379,6 +380,7 @@ public class BuyRegion extends GeneralRegion {
 						this.runEventCommands(RegionEvent.BOUGHT, true);
 						// Set the owner
 						setBuyer(player.getUniqueId());
+						updateLastActiveTime();
 		
 						// Update everything
 						handleSchematicEvent(RegionEvent.BOUGHT);

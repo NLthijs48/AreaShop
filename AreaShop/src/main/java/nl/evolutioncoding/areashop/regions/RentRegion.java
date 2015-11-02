@@ -520,6 +520,7 @@ public class RentRegion extends GeneralRegion {
 					// Add values to the rent and send it to FileManager
 					setRentedUntil(calendar.getTimeInMillis());
 					setRenter(player.getUniqueId());
+					updateLastActiveTime();
 					
 					// Fire schematic event and updated times extended
 					if(!extend) {

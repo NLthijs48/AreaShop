@@ -300,11 +300,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return -1;
 		}
 		Player player = Bukkit.getPlayer(getOwner());
+		long savedTime = getLongSetting("general.lastActive");
 		// Check if he is online currently
-		if(player != null) {
+		if(player != null || savedTime == 0) {
 			return Calendar.getInstance().getTimeInMillis();
 		}
-		return getLongSetting("general.lastActive");
+		return savedTime;
 	}
 	
 	/**

@@ -494,10 +494,10 @@ public class BuyRegion extends GeneralRegion {
 			return false;
 		}
 		long lastPlayed = getLastActiveTime();
-		AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
+		AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
 		if(Calendar.getInstance().getTimeInMillis() > (lastPlayed + inactiveSetting)) {
 			plugin.getLogger().info("Region " + getName() + " unrented because of inactivity for player " + getPlayerName());
-			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting*60*1000=" + inactiveSetting * 60 * 1000);
+			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
 			this.sell(true);
 			return true;
 		}

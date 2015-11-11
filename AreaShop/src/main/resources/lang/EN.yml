@@ -74,7 +74,8 @@ rent-maximum: "You can't rent more than %0% region(s) (you already have %1% in g
 rent-maximumExtend: "You can't extend this rent because you have more than %0% region(s) (you already have %1% in group '%2%')."
 rent-payError: "Something went wrong with paying, try again later."
 rent-rented: "You rented %0% until %1%."
-rent-extended: "You extended your rent of %0% until %1%." 
+rent-extended: "You extended your rent of %0% until %1%."
+rent-extendedToMax: "You extended your rent of %region% until %until% (which is the maximum rental time of %maxrenttime%)."
 rent-extend: "You can extend your rent by rightclicking the sign again or using /as rent."
 rent-lowMoneyExtend: "You don't have enough money to extend the rent (you have %0% and you need %1%)."
 rent-lowMoneyRent: "You don't have enough money to rent this region (you have %0% and you need %1%)."
@@ -85,6 +86,7 @@ rent-maxRentTime: "You cannot rent this region more time in advance, the maximum
 rent-restrictedToWorld: "You need to be in the '%0%' world to rent this region (you are in '%1%')."
 rent-restrictedToRegion: "You need to be inside '%0%' to rent it."
 rent-expireWarning: "Your region %region% has %timeleft% left, be sure to extend it if you want to keep it."
+rent-alreadyAtFull: "%region% is already at or above the maximum rental time, you cannot extend it yet."
 
 buy-help: "/as buy [regionname], the region you stand in will be used if not specified."
 buy-noPermission: "You don't have permission to buy a region."

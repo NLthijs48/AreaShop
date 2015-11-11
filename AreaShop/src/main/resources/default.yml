@@ -64,6 +64,8 @@ rent:
   warningOnLoginTime: '1 day'
   ## The profile for the expiration warnings as specified in the config.
   expirationWarningProfile: 'default'
+  ## If renting the region would go above 'maxRentTIme', then extend to the maximum instead of adding the full duration
+  extendToFullWhenAboveMaxRentTime: true
 
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

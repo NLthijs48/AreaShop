@@ -462,6 +462,8 @@ public class RentRegion extends GeneralRegion {
 				}
 				
 				// Check if there is enough time left before hitting maxRentTime
+				boolean extendToMax = false;
+				double price = getPrice();
 				long timeNow = Calendar.getInstance().getTimeInMillis();
 				long timeRented = 0;
 				long maxRentTime = getMaxRentTime();
@@ -471,13 +473,24 @@ public class RentRegion extends GeneralRegion {
 				if((timeRented + getDuration()) > (maxRentTime) 
 						&& !player.hasPermission("areashop.renttimebypass")
 						&& maxRentTime != -1) {
-					plugin.message(player, "rent-maxRentTime", this.millisToHumanFormat(maxRentTime), this.millisToHumanFormat(timeRented));
-					return false;
+					// Extend to the maximum instead of adding a full period
+					if(getBooleanSetting("rent.extendToFullWhenAboveMaxRentTime")) {
+						if(timeRented >= timeNow) {
+							plugin.message(player, "rent-alreadyAtFull", this);
+						} else {
+							extendToMax = true;
+							long toRentPart = maxRentTime - timeRented;
+							price = ((double)toRentPart)/getDuration()*price;
+						}
+					} else {		
+						plugin.message(player, "rent-maxRentTime", this.millisToHumanFormat(maxRentTime), this.millisToHumanFormat(timeRented));
+						return false;
+					}
 				}
 
-				if(plugin.getEconomy().has(player, getWorldName(), getPrice())) {
+				if(plugin.getEconomy().has(player, getWorldName(), price)) {
 					// Substract the money from the players balance
-					EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getWorldName(), getPrice());
+					EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getWorldName(), price);
 					if(!r.transactionSuccess()) {
 						plugin.message(player, "rent-payError");
 						return false;
@@ -491,12 +504,12 @@ public class RentRegion extends GeneralRegion {
 					r = null;
 					if(landlordName != null) {
 						if(landlordPlayer != null && landlordPlayer.getName() != null) {
-							r = plugin.getEconomy().depositPlayer(landlordPlayer, getWorldName(), getPrice());
+							r = plugin.getEconomy().depositPlayer(landlordPlayer, getWorldName(), price);
 						} else {
-							r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), getPrice());
+							r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), price);
 						}
 						if(r == null || !r.transactionSuccess()) {
-							plugin.getLogger().warning("Something went wrong with paying '" + landlordName + "' " + getFormattedPrice() + " for his rent of region " + getName() + " to " + player.getName());
+							plugin.getLogger().warning("Something went wrong with paying '" + landlordName + "' " + plugin.formatCurrency(price) + " for his rent of region " + getName() + " to " + player.getName());
 						}
 					}
 						
@@ -510,10 +523,13 @@ public class RentRegion extends GeneralRegion {
 					
 					// Get the time until the region will be rented
 					Calendar calendar = Calendar.getInstance();
-					if(extend) {
-						calendar.setTimeInMillis(getRentedUntil());
+					if(extendToMax) {
+						calendar.setTimeInMillis(calendar.getTimeInMillis() + getMaxRentTime());
+					} else if(extend) {
+						calendar.setTimeInMillis(getRentedUntil()+getDuration());
+					} else {
+						calendar.setTimeInMillis(calendar.getTimeInMillis() + getDuration());
 					}
-					calendar.setTimeInMillis(calendar.getTimeInMillis() + getDuration());
 					SimpleDateFormat dateFull = new SimpleDateFormat(plugin.getConfig().getString("timeFormatChat"));
 					AreaShop.debug(player.getName() + " has rented region " + getName() + " for " + getFormattedPrice() + " until " + dateFull.format(calendar.getTime()));					
 					
@@ -535,7 +551,9 @@ public class RentRegion extends GeneralRegion {
 					updateRegionFlags(RegionState.RENTED);
 					
 					// Send message to the player
-					if(extend) {
+					if(extendToMax) {
+						plugin.message(player, "rent-extendedToMax", this);
+					} else if(extend) {
 						plugin.message(player, "rent-extended", getName(), dateFull.format(calendar.getTime()));
 					} else {
 						plugin.message(player, "rent-rented", getName(), dateFull.format(calendar.getTime()));

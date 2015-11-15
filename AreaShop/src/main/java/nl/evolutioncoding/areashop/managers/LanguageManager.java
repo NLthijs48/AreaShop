@@ -1,23 +1,14 @@
 package nl.evolutioncoding.areashop.managers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import com.google.common.base.Charsets;
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import nl.evolutioncoding.areashop.AreaShop;
-import nl.evolutioncoding.areashop.regions.GeneralRegion;
-
-import org.bukkit.configuration.file.YamlConfiguration;
-
-import com.google.common.base.Charsets;
 
 public class LanguageManager {
 	private AreaShop plugin = null;
@@ -49,7 +40,10 @@ public class LanguageManager {
 		File langFolder;
 		langFolder = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder);
 		if(!langFolder.exists()) {
-			langFolder.mkdirs();
+			if(!langFolder.mkdirs()) {
+				plugin.getLogger().warning("Could not create language directory: " + langFolder.getAbsolutePath());
+				return;
+			}
 		}
 		
 		/* Create the language files, overwrites if a file already exists */
@@ -57,19 +51,17 @@ public class LanguageManager {
 		/* files would not be used, when translating your own use another */
 		/* file name as the default */
 		File langFile;
-		for(int i=0; i<languages.length; i++) {
-			langFile = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + File.separator + languages[i] + ".yml");
-			InputStream input = null;
-			OutputStream output = null;
-			try {
-				input = plugin.getResource(AreaShop.languageFolder + "/" + languages[i] + ".yml");
+		for(String language : languages) {
+			langFile = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + File.separator + language + ".yml");
+			try(
+					InputStream input = plugin.getResource(AreaShop.languageFolder + "/" + language + ".yml");
+					OutputStream output = new FileOutputStream(langFile)
+			) {
 				if(input == null) {
-					plugin.getLogger().warning("Could not save default language to the '" + AreaShop.languageFolder + "' folder: " + languages[i] + ".yml");
+					plugin.getLogger().warning("Could not save default language to the '" + AreaShop.languageFolder + "' folder: " + language + ".yml");
 					continue;
 				}
-				output = new FileOutputStream(langFile);
-		 
-				int read = 0;
+				int read;
 				byte[] bytes = new byte[1024];		 
 				while ((read = input.read(bytes)) != -1) {
 					output.write(bytes, 0, read);
@@ -77,11 +69,6 @@ public class LanguageManager {
 				input.close();
 				output.close();
 			} catch(IOException e) {
-				try {
-					input.close();
-					output.close();
-				} catch (IOException e1) {} catch (NullPointerException e2) {}
-				
 				plugin.getLogger().warning("Something went wrong saving a default language file: " + langFile.getPath());
 			}
 		}
@@ -95,41 +82,42 @@ public class LanguageManager {
 		Map<String, Object> map;
 		Set<String> set;
 		YamlConfiguration ymlFile;
-		
-		/* Save the current language file to the HashMap */
-		currentLanguage = new HashMap<String, String>();		
+
+		// Save the current language file to the HashMap
+		currentLanguage = new HashMap<>();
 		File file = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + File.separator + plugin.getConfig().getString("language") + ".yml");
-		InputStreamReader reader = null;
-		try {
-			reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
-		} catch (FileNotFoundException e1) {}
-		if(reader != null) {
+
+		try(
+				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8)
+		) {
 			ymlFile = YamlConfiguration.loadConfiguration(reader);
 			map = ymlFile.getValues(true);
 			set = map.keySet();
-			try {
-				for(String key : set) {
+			for(String key : set) {
+				if(map.get(key) instanceof String) {
 					currentLanguage.put(key, (String)map.get(key));
 				}
-			} catch(ClassCastException e) {}
+			}
+		} catch(IOException e) {
+			plugin.getLogger().warning("Could not load set language file: " + file.getAbsolutePath());
 		}
-		
-		/* Save the default strings to the HashMap */
-		defaultLanguage = new HashMap<String, String>();
+
+		// Save the default strings to the HashMap
+		defaultLanguage = new HashMap<>();
 		File standard = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + "/" + languages[0]+ ".yml");
-		InputStreamReader reader2 = null;
-		try {
-			reader2 = new InputStreamReader(new FileInputStream(standard), Charsets.UTF_8);
-		} catch (FileNotFoundException e1) {}
-		if(reader2 != null) {
-	        ymlFile = YamlConfiguration.loadConfiguration(reader2);   
-	        map = ymlFile.getValues(true);
+		try(
+				InputStreamReader reader = new InputStreamReader(new FileInputStream(standard), Charsets.UTF_8)
+		) {
+			ymlFile = YamlConfiguration.loadConfiguration(reader);
+			map = ymlFile.getValues(true);
 			set = map.keySet();
-			try {
-				for(String key : set) {
+			for(String key : set) {
+				if(map.get(key) instanceof String) {
 					defaultLanguage.put(key, (String)map.get(key));
 				}
-			} catch(ClassCastException e) {}
+			}
+		} catch(IOException e) {
+			plugin.getLogger().warning("Could not load default language file: " + file.getAbsolutePath());
 		}
 	}
 	
@@ -140,9 +128,9 @@ public class LanguageManager {
 	 * @return String The language string specified with the key
 	 */
 	public String getLang(String key, Object... params) {
-		String result = null;
-		
-		/* Get the language string */
+		String result;
+
+		// Get the language string
 		if(currentLanguage.containsKey(key)) {
 			result = currentLanguage.get(key);
 		} else {
@@ -152,15 +140,15 @@ public class LanguageManager {
 		if(result == null) {
 			plugin.getLogger().info("Wrong key for getting translation: " + key + ", please contact the author about this");
 		} else {
-			/* Replace all tags like %0% and if given a GeneralRegion apply all replacements */
+			// Replace all tags like %0% and if given a GeneralRegion apply all replacements
 			int number=0;
-		    for (int i=0; i<params.length; i++) {
-		    	if(params[i] != null) {
-		    		if(params[i] instanceof GeneralRegion) {
-		    			result = ((GeneralRegion)params[i]).applyAllReplacements(result);
-		    		} else {
-		    			result = result.replace("%" + number + "%", params[i].toString());
-		    			number++;
+			for(Object param : params) {
+				if(param != null) {
+					if(param instanceof GeneralRegion) {
+						result = ((GeneralRegion)param).applyAllReplacements(result);
+					} else {
+						result = result.replace("%" + number + "%", param.toString());
+						number++;
 		    		}
 		    	}
 		    }

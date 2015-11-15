@@ -1,17 +1,15 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
-
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SetlandlordCommand extends CommandAreaShop {
 
@@ -33,7 +31,7 @@ public class SetlandlordCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.setlandlord")) {
 			plugin.message(sender, "setlandlord-noPermission");
 			return;
@@ -43,8 +41,8 @@ public class SetlandlordCommand extends CommandAreaShop {
 			return;
 		}
 		@SuppressWarnings("deprecation")
-		OfflinePlayer player = Bukkit.getOfflinePlayer(args[1]);	
-		GeneralRegion region = null;
+		OfflinePlayer player = Bukkit.getOfflinePlayer(args[1]);
+		GeneralRegion region;
 		if(args.length < 3) {
 			if (sender instanceof Player) {
 				// get the region by location
@@ -79,7 +77,7 @@ public class SetlandlordCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			for(Player player : Bukkit.getOnlinePlayers()) {
 				result.add(player.getName());

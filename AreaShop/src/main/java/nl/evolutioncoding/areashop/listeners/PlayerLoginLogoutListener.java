@@ -1,12 +1,8 @@
 package nl.evolutioncoding.areashop.listeners;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,12 +13,15 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Checks for placement of signs for this plugin
  * @author NLThijs48
  */
 public final class PlayerLoginLogoutListener implements Listener {
-	AreaShop plugin;
+	private AreaShop plugin;
 	
 	/**
 	 * Constructor
@@ -76,7 +75,7 @@ public final class PlayerLoginLogoutListener implements Listener {
 			}
         }.runTaskTimer(plugin, 25, 25);	
 		// Check if the player has regions that use an old name of him and update them
-		final List<GeneralRegion> regions = new ArrayList<GeneralRegion>(plugin.getFileManager().getRegions());
+		final List<GeneralRegion> regions = new ArrayList<>(plugin.getFileManager().getRegions());
 		new BukkitRunnable() {
 			private int current = 0;
 			
@@ -130,7 +129,7 @@ public final class PlayerLoginLogoutListener implements Listener {
 	 * Update the last active time for all regions the player is owner off
 	 * @param player The player to update the active times for
 	 */
-	public void updateLastActive(Player player) {
+	private void updateLastActive(Player player) {
 		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
 			if(region.isOwner(player)) {
 				region.updateLastActiveTime();

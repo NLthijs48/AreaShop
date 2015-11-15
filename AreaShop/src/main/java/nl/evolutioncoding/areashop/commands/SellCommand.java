@@ -1,15 +1,13 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SellCommand extends CommandAreaShop {
 
@@ -33,12 +31,12 @@ public class SellCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.sell") && !sender.hasPermission("areashop.sellown")) {
 			plugin.message(sender, "sell-noPermission");
 			return;
 		}
-		BuyRegion buy = null;
+		BuyRegion buy;
 		if(args.length <= 1) {
 			if (sender instanceof Player) {
 				// get the region by location
@@ -86,7 +84,7 @@ public class SellCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			for(BuyRegion region : plugin.getFileManager().getBuys()) {
 				if(region.isSold()) {

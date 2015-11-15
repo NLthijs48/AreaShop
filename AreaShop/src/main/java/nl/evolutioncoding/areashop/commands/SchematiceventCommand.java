@@ -1,16 +1,14 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionEvent;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class SchematiceventCommand extends CommandAreaShop {
 
@@ -32,7 +30,7 @@ public class SchematiceventCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.schematicevents")) {
 			plugin.message(sender, "schemevent-noPermission");
 			return;
@@ -60,7 +58,7 @@ public class SchematiceventCommand extends CommandAreaShop {
 		}
 		// Check for a totally wrong event or a non matching event
 		if(exception) {
-			ArrayList<String> values = new ArrayList<String>();
+			ArrayList<String> values = new ArrayList<>();
 			for(RegionEvent value : RegionEvent.values()) {
 				values.add(value.getValue().toLowerCase());
 			}
@@ -74,7 +72,7 @@ public class SchematiceventCommand extends CommandAreaShop {
 
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			result.addAll(plugin.getFileManager().getRegionNames());
 		} else if(toComplete == 3) {

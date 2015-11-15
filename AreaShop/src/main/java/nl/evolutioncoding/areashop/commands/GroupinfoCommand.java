@@ -1,14 +1,12 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GroupinfoCommand extends CommandAreaShop {
 
@@ -31,7 +29,7 @@ public class GroupinfoCommand extends CommandAreaShop {
 
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.groupinfo")) {
 			plugin.message(sender, "groupinfo-noPermission");
 			return;
@@ -55,7 +53,7 @@ public class GroupinfoCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			result = plugin.getFileManager().getGroupNames();
 		}

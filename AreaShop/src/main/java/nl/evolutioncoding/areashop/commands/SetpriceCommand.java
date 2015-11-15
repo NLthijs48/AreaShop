@@ -1,17 +1,15 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SetpriceCommand extends CommandAreaShop {
 
@@ -33,7 +31,7 @@ public class SetpriceCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.setprice") && (!sender.hasPermission("areashop.setprice.landlord") && sender instanceof Player)) {
 			plugin.message(sender, "setprice-noPermission");
 			return;
@@ -41,8 +39,8 @@ public class SetpriceCommand extends CommandAreaShop {
 		if(args.length < 2 || args[1] == null) {
 			plugin.message(sender, "setprice-help");
 			return;
-		}		
-		GeneralRegion region = null;
+		}
+		GeneralRegion region;
 		if(args.length < 3) {
 			if (sender instanceof Player) {
 				// get the region by location
@@ -67,7 +65,7 @@ public class SetpriceCommand extends CommandAreaShop {
 			plugin.message(sender, "setprice-notRegistered", args[2]);
 			return;
 		}
-		if(!sender.hasPermission("areashop.setprice") && !region.isLandlord(((Player)sender).getUniqueId())) {
+		if(!sender.hasPermission("areashop.setprice") && !(sender instanceof Player && region.isLandlord(((Player)sender).getUniqueId()))) {
 			plugin.message(sender, "setprice-noLandlord", region);
 			return;
 		}
@@ -81,8 +79,8 @@ public class SetpriceCommand extends CommandAreaShop {
 			region.updateSigns();
 			region.updateRegionFlags();
 			return;
-		}		
-		double price = 0.0;
+		}
+		double price;
 		try {
 			price = Double.parseDouble(args[1]);
 		} catch(NumberFormatException e) {
@@ -103,7 +101,7 @@ public class SetpriceCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 3) {
 			result = plugin.getFileManager().getRegionNames();		
 		}

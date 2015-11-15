@@ -1,8 +1,7 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.managers.FileManager.AddResult;
@@ -10,16 +9,14 @@ import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionEvent;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionType;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddCommand extends CommandAreaShop {
 
@@ -41,7 +38,7 @@ public class AddCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(final CommandSender sender, Command command, final String[] args) {
+	public void execute(final CommandSender sender, final String[] args) {
 		if(		   !sender.hasPermission("areashop.createrent") 
 				&& !sender.hasPermission("areashop.createrent.member")
 				&& !sender.hasPermission("areashop.createrent.owner")
@@ -57,8 +54,8 @@ public class AddCommand extends CommandAreaShop {
 			plugin.message(sender, "add-help");
 			return;
 		}
-		List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
-		World world = null;
+		List<ProtectedRegion> regions = new ArrayList<>();
+		World world;
 		Player player = null;
 		if(sender instanceof Player) {
 			player = (Player)sender;
@@ -116,10 +113,10 @@ public class AddCommand extends CommandAreaShop {
 		AreaShop.debug("Starting add task with " + regions.size() + " regions");
         new BukkitRunnable() {
 			private int current = 0;
-			private ArrayList<String> namesSuccess = new ArrayList<String>();
-			private ArrayList<String> namesAlready = new ArrayList<String>();
-			private ArrayList<String> namesBlacklisted = new ArrayList<String>();
-			private ArrayList<String> namesNoPermission = new ArrayList<String>();
+			private ArrayList<String> namesSuccess = new ArrayList<>();
+			private ArrayList<String> namesAlready = new ArrayList<>();
+			private ArrayList<String> namesBlacklisted = new ArrayList<>();
+			private ArrayList<String> namesNoPermission = new ArrayList<>();
 			
 			@Override
 			public void run() {
@@ -128,8 +125,8 @@ public class AddCommand extends CommandAreaShop {
 						ProtectedRegion region = finalRegions.get(current);
 						// Determine if the player is an owner or member of the region
 						boolean isMember = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
-						boolean isOwner = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());						
-						String type = null;
+						boolean isOwner = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
+						String type;
 						if(isRent) {
 							type = "rent";				
 						} else {
@@ -205,7 +202,7 @@ public class AddCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			if(sender.hasPermission("areashop.createrent")) {
 				result.add("rent");

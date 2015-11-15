@@ -1,26 +1,23 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionEvent;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StackCommand extends CommandAreaShop {
 
@@ -42,7 +39,7 @@ public class StackCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		// Check permission
 		if(!sender.hasPermission("areashop.stack")) {
 			plugin.message(sender, "stack-noPermission");
@@ -63,13 +60,15 @@ public class StackCommand extends CommandAreaShop {
 		int tempAmount = -1;
 		try {
 			tempAmount = Integer.parseInt(args[1]);
-		} catch(NumberFormatException e) {}
+		} catch(NumberFormatException e) {
+			// Incorrect number
+		}
 		if(tempAmount <= 0) {
 			plugin.message(player, "stack-wrongAmount", args[1]);
 			return;
 		}
 		// Check gap
-		int gap = -1;
+		int gap;
 		try {
 			gap = Integer.parseInt(args[2]);
 		} catch(NumberFormatException e) {
@@ -119,7 +118,7 @@ public class StackCommand extends CommandAreaShop {
 		final boolean rentRegions = "rent".equalsIgnoreCase(args[4]);
 		final int amount = tempAmount;
 		final RegionGroup finalGroup = group;
-		String type = null;
+		String type;
 		if(rentRegions) {
 			type = "rent";
 		} else {
@@ -206,7 +205,7 @@ public class StackCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 5) {
 			result.add("rent");
 			result.add("buy");

@@ -1,15 +1,13 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SetdurationCommand extends CommandAreaShop {
 
@@ -31,7 +29,7 @@ public class SetdurationCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.setduration") && (!sender.hasPermission("areashop.setduration.landlord") && sender instanceof Player)) {
 			plugin.message(sender, "setduration-noPermission");
 			return;
@@ -44,7 +42,7 @@ public class SetdurationCommand extends CommandAreaShop {
 		if(args.length >= 2 && ("default".equalsIgnoreCase(args[1]) || "reset".equalsIgnoreCase(args[1]))) {
 			regionArgument = 2;
 		}
-		RentRegion rent = null;
+		RentRegion rent;
 		if(args.length <= regionArgument) {
 			if (sender instanceof Player) {
 				// get the region by location
@@ -69,7 +67,7 @@ public class SetdurationCommand extends CommandAreaShop {
 			plugin.message(sender, "setduration-notRegistered", args[regionArgument]);
 			return;
 		}
-		if(!sender.hasPermission("areashop.setduration") && !rent.isLandlord(((Player)sender).getUniqueId())) {
+		if(!sender.hasPermission("areashop.setduration") && !(sender instanceof Player && rent.isLandlord(((Player)sender).getUniqueId()))) {
 			plugin.message(sender, "setduration-noLandlord", rent);
 			return;
 		}	
@@ -98,7 +96,7 @@ public class SetdurationCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			result = plugin.getFileManager().getRentNames();
 		} else if(toComplete == 4) {

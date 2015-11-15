@@ -1,15 +1,14 @@
 package nl.evolutioncoding.areashop;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
+import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionType;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -17,11 +16,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
-import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public class Utils {
 
@@ -55,7 +53,7 @@ public class Utils {
 	
 	/**
 	 * Create a location from a map, reconstruction from the config values
-	 * @param map The map to reconstruct from
+	 * @param config The config section to reconstruct from
 	 * @return The location
 	 */
 	public static Location configToLocation(ConfigurationSection config) {
@@ -68,10 +66,10 @@ public class Utils {
 			return null;
 		}
 		Location result = new Location(
-				Bukkit.getWorld(config.getString("world")), 
-				(Double)config.getDouble("x"), 
-				(Double)config.getDouble("y"), 
-				(Double)config.getDouble("z"));
+				Bukkit.getWorld(config.getString("world")),
+				config.getDouble("x"),
+				config.getDouble("y"),
+				config.getDouble("z"));
 		if(config.isString("yaw") && config.isString("pitch")) {
 			result.setPitch(Float.parseFloat(config.getString("pitch")));
 			result.setYaw(Float.parseFloat(config.getString("yaw")));
@@ -84,7 +82,7 @@ public class Utils {
 	 * @param input Collection of object which should be concatenated with comma's in between
 	 * @return Innput object concatenated with comma's in between
 	 */
-	public static String createCommaSeparatedList(Collection<? extends Object> input) {
+	public static String createCommaSeparatedList(Collection<?> input) {
 		String result = "";
 		boolean first = true;
 		for(Object object : input) {
@@ -108,9 +106,10 @@ public class Utils {
 	public static long millisToTicks(long milliseconds) {
 		return milliseconds/50;
 	}
-	
-	public static final BlockFace[] facings = { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };
-    /**
+
+	private static final BlockFace[] facings = {BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST};
+
+	/**
 	* Get the facing direction based on the yaw
 	* @param yaw The horizontal angle that for example the player is looking
 	* @return The Block Face of the angle
@@ -128,7 +127,7 @@ public class Utils {
 	 * @return A list with all the AreaShop regions intersecting with the selection
 	 */
 	public static List<GeneralRegion> getASRegionsInSelection(Selection selection) {
-		ArrayList<GeneralRegion> result = new ArrayList<GeneralRegion>();
+		ArrayList<GeneralRegion> result = new ArrayList<>();
 		for(ProtectedRegion region : getWERegionsInSelection(selection)) {
 			GeneralRegion asRegion = AreaShop.getInstance().getFileManager().getRegion(region.getId());
 			if(asRegion != null) {
@@ -156,7 +155,7 @@ public class Utils {
 		// Get all regions inside or intersecting with the WorldEdit selection of the player
 		World world = selection.getWorld();
 		RegionManager regionManager = AreaShop.getInstance().getWorldGuard().getRegionManager(world);
-		ArrayList<ProtectedRegion> result = new ArrayList<ProtectedRegion>();
+		ArrayList<ProtectedRegion> result = new ArrayList<>();
 		Location selectionMin = selection.getMinimumPoint();
 		Location selectionMax = selection.getMaximumPoint();
 		for(ProtectedRegion region : regionManager.getRegions().values()) {
@@ -193,7 +192,7 @@ public class Utils {
 	 * @return empty list if no regions found, 1 member if 1 region is a priority, more if regions with the same priority
 	 */
 	public static List<ProtectedRegion> getApplicableRegions(Location location) {
-		List<ProtectedRegion> result = new ArrayList<ProtectedRegion>();
+		List<ProtectedRegion> result = new ArrayList<>();
 		Set<ProtectedRegion> regions = AreaShop.getInstance().getWorldGuardHandler().getApplicableRegionsSet(location);
 		if(regions != null) {
 			boolean first = true;
@@ -219,14 +218,14 @@ public class Utils {
 	
 	// Methods to get the most important AreaShop regions at a certain location
 	public static List<RentRegion> getApplicableRentRegions(Location location) {
-		List<RentRegion> result = new ArrayList<RentRegion>();
+		List<RentRegion> result = new ArrayList<>();
 		for(GeneralRegion region : getApplicableASRegions(location, RegionType.RENT)) {
 			result.add((RentRegion)region);
 		}
 		return result;
 	}
 	public static List<BuyRegion> getApplicableBuyRegions(Location location) {
-		List<BuyRegion> result = new ArrayList<BuyRegion>();
+		List<BuyRegion> result = new ArrayList<>();
 		for(GeneralRegion region : getApplicableASRegions(location, RegionType.BUY)) {
 			result.add((BuyRegion)region);
 		}
@@ -236,10 +235,10 @@ public class Utils {
 		return getApplicableASRegions(location, null);
 	}	
 	public static List<GeneralRegion> getApplicableASRegions(Location location, RegionType type) {
-		List<GeneralRegion> result = new ArrayList<GeneralRegion>();
+		List<GeneralRegion> result = new ArrayList<>();
 		Set<ProtectedRegion> regions = AreaShop.getInstance().getWorldGuardHandler().getApplicableRegionsSet(location);
 		if(regions != null) {
-			List<GeneralRegion> candidates = new ArrayList<GeneralRegion>();
+			List<GeneralRegion> candidates = new ArrayList<>();
 			for(ProtectedRegion pr : regions) {
 				GeneralRegion region = AreaShop.getInstance().getFileManager().getRegion(pr.getId());
 				if(region != null && (
@@ -262,7 +261,7 @@ public class Utils {
 					if(region.getRegion().getPriority() > result.get(0).getRegion().getPriority()) {
 						result.clear();
 						result.add(region);
-					} else if(region.getRegion().getParent() != null && region.getRegion().getParent().equals(result.get(0))) {
+					} else if(region.getRegion().getParent() != null && region.getRegion().getParent().equals(result.get(0).getRegion())) {
 						result.clear();
 						result.add(region);
 					} else {
@@ -271,7 +270,7 @@ public class Utils {
 				}
 			}
 		}
-		return new ArrayList<GeneralRegion>(result);
+		return new ArrayList<>(result);
 	}
 	
 }

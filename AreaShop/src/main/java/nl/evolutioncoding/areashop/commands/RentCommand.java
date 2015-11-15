@@ -1,15 +1,13 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RentCommand extends CommandAreaShop {
 
@@ -31,7 +29,7 @@ public class RentCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.rent")) {
 			plugin.message(sender, "rent-noPermission");
 			return;
@@ -53,10 +51,8 @@ public class RentCommand extends CommandAreaShop {
 			List<RentRegion> regions = Utils.getApplicableRentRegions(((Player) sender).getLocation());
 			if (regions.isEmpty()) {
 				plugin.message(sender, "cmd-noRegionsAtLocation");
-				return;
 			} else if (regions.size() > 1) {
 				plugin.message(sender, "cmd-moreRegionsAtLocation");
-				return;
 			} else {
 				regions.get(0).rent(player);
 			}	
@@ -65,7 +61,7 @@ public class RentCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			for(RentRegion region : plugin.getFileManager().getRents()) {
 				if(!region.isRented()) {

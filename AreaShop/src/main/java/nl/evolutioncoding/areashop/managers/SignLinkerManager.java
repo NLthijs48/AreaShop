@@ -1,16 +1,8 @@
 package nl.evolutioncoding.areashop.managers;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -26,6 +18,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.material.Sign;
 import org.bukkit.util.BlockIterator;
 
+import java.util.*;
+
 public class SignLinkerManager implements Listener {
 	private AreaShop plugin = null;
 	private Map<UUID, SignLinker> signLinkers;
@@ -33,7 +27,7 @@ public class SignLinkerManager implements Listener {
 	
 	public SignLinkerManager(AreaShop plugin) {
 		this.plugin = plugin;
-		signLinkers = new HashMap<UUID, SignLinker>();
+		signLinkers = new HashMap<>();
 		eventsRegistered = false;
 	}
 	
@@ -91,7 +85,7 @@ public class SignLinkerManager implements Listener {
 						linker.setRegion(regions.get(0));
 						return;
 					} else if(regions.size() > 1) {
-						Set<String> names = new HashSet<String>();
+						Set<String> names = new HashSet<>();
 						for(GeneralRegion region : regions) {
 							names.add(region.getName());
 						}
@@ -102,7 +96,6 @@ public class SignLinkerManager implements Listener {
 				}
 				// No regions found within the maximum range
 				plugin.message(player, "linksigns-noRegions");
-				return;			
 			} else if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 				Block block = null;
 				BlockIterator blockIterator = new BlockIterator(player, 100);
@@ -116,7 +109,7 @@ public class SignLinkerManager implements Listener {
 					plugin.message(player, "linksigns-noSign");
 					return;
 				}
-				
+
 				GeneralRegion signRegion = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
 				if(signRegion != null) {
 					plugin.message(player, "linksigns-alreadyRegistered", signRegion);
@@ -124,9 +117,7 @@ public class SignLinkerManager implements Listener {
 				}
 				Sign sign = (Sign)block.getState().getData();
 				linker.setSign(block.getLocation(), block.getType(), sign.getFacing());
-				return;
 			}
-			
 		}
 	}
 	
@@ -166,7 +157,7 @@ public class SignLinkerManager implements Listener {
 			if(!isComplete()) {
 				plugin.message(linker, "linksigns-regionFound", region);
 			}
-			finalize();
+			finish();
 		}
 		
 		public void setSign(Location location, Material type, BlockFace facing) {
@@ -177,10 +168,10 @@ public class SignLinkerManager implements Listener {
 			if(!isComplete()) {
 				plugin.message(linker, "linksigns-signFound", location.getBlockX(), location.getBlockY(), location.getBlockZ());
 			}
-			finalize();
+			finish();
 		}
-		
-		public void finalize() {
+
+		public void finish() {
 			if(isComplete()) {
 				region.addSign(location, type, facing, profile);
 				if(profile == null) {

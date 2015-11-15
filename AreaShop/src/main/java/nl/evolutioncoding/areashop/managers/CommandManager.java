@@ -1,44 +1,7 @@
 package nl.evolutioncoding.areashop.managers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import nl.evolutioncoding.areashop.AreaShop;
-import nl.evolutioncoding.areashop.commands.AddCommand;
-import nl.evolutioncoding.areashop.commands.AddfriendCommand;
-import nl.evolutioncoding.areashop.commands.AddsignCommand;
-import nl.evolutioncoding.areashop.commands.BuyCommand;
-import nl.evolutioncoding.areashop.commands.CommandAreaShop;
-import nl.evolutioncoding.areashop.commands.DelCommand;
-import nl.evolutioncoding.areashop.commands.DelfriendCommand;
-import nl.evolutioncoding.areashop.commands.DelsignCommand;
-import nl.evolutioncoding.areashop.commands.FindCommand;
-import nl.evolutioncoding.areashop.commands.GroupaddCommand;
-import nl.evolutioncoding.areashop.commands.GroupdelCommand;
-import nl.evolutioncoding.areashop.commands.GroupinfoCommand;
-import nl.evolutioncoding.areashop.commands.GrouplistCommand;
-import nl.evolutioncoding.areashop.commands.HelpCommand;
-import nl.evolutioncoding.areashop.commands.InfoCommand;
-import nl.evolutioncoding.areashop.commands.LinksignsCommand;
-import nl.evolutioncoding.areashop.commands.MeCommand;
-import nl.evolutioncoding.areashop.commands.ReloadCommand;
-import nl.evolutioncoding.areashop.commands.RentCommand;
-import nl.evolutioncoding.areashop.commands.ResellCommand;
-import nl.evolutioncoding.areashop.commands.SchematiceventCommand;
-import nl.evolutioncoding.areashop.commands.SellCommand;
-import nl.evolutioncoding.areashop.commands.SetdurationCommand;
-import nl.evolutioncoding.areashop.commands.SetlandlordCommand;
-import nl.evolutioncoding.areashop.commands.SetownerCommand;
-import nl.evolutioncoding.areashop.commands.SetpriceCommand;
-import nl.evolutioncoding.areashop.commands.SetrestoreCommand;
-import nl.evolutioncoding.areashop.commands.SetteleportCommand;
-import nl.evolutioncoding.areashop.commands.StackCommand;
-import nl.evolutioncoding.areashop.commands.StopresellCommand;
-import nl.evolutioncoding.areashop.commands.TeleportCommand;
-import nl.evolutioncoding.areashop.commands.UnrentCommand;
-
+import nl.evolutioncoding.areashop.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -46,9 +9,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 public class CommandManager implements CommandExecutor, TabCompleter {
-	AreaShop plugin;
-	ArrayList<CommandAreaShop> commands;
+	private AreaShop plugin;
+	private ArrayList<CommandAreaShop> commands;
 	
 	/**
 	 * Constructor
@@ -56,7 +24,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 	 */
 	public CommandManager(AreaShop plugin) {
 		this.plugin = plugin;
-		commands = new ArrayList<CommandAreaShop>();
+		commands = new ArrayList<>();
 		commands.add(new HelpCommand(plugin));
 		commands.add(new RentCommand(plugin));
 		commands.add(new UnrentCommand(plugin));
@@ -108,7 +76,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 	 */
 	public void showHelp(CommandSender target) {
 		/* Add all messages to a list */
-		ArrayList<String> messages = new ArrayList<String>();
+		ArrayList<String> messages = new ArrayList<>();
 		messages.add(plugin.getConfig().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-header"));
 		messages.add(plugin.getConfig().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-alias"));
 		for(CommandAreaShop command : commands) {
@@ -137,7 +105,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		boolean executed = false;		
 		for(int i=0; i<commands.size() && !executed; i++) {
 			if(commands.get(i).canExecute(command, args)) {
-				commands.get(i).execute(sender, command, args);
+				commands.get(i).execute(sender, args);
 				executed = true;
 			}
 		}
@@ -156,7 +124,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(!sender.hasPermission("areashop.tabcomplete")) {
 			return result;
 		}
@@ -182,7 +150,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		}
 		// Filter and sort the results
 		if(result.size() > 0) {
-			SortedSet<String> set = new TreeSet<String>();
+			SortedSet<String> set = new TreeSet<>();
 			for(String suggestion : result) {
 				if(suggestion.toLowerCase().startsWith(toCompletePrefix)) {
 					set.add(suggestion);

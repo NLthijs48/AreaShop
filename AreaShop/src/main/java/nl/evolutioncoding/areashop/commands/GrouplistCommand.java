@@ -1,13 +1,11 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GrouplistCommand extends CommandAreaShop {
 
@@ -29,7 +27,7 @@ public class GrouplistCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.grouplist")) {
 			plugin.message(sender, "grouplist-noPermission");
 			return;
@@ -44,7 +42,7 @@ public class GrouplistCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 
 }

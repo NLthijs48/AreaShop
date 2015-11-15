@@ -1,27 +1,18 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.*;
 
 public class InfoCommand extends CommandAreaShop {
 
@@ -50,7 +41,7 @@ public class InfoCommand extends CommandAreaShop {
 	 * @param keySomeFound The key of the message to display when some regions are found
 	 * @param keyNoneFound The key of the message to display when no regions are found
 	 */
-	public void displayMessage(CommandSender sender, Set<? extends GeneralRegion> regions, RegionGroup filterGroup, String keySomeFound, String keyNoneFound) {
+	private void displayMessage(CommandSender sender, Set<? extends GeneralRegion> regions, RegionGroup filterGroup, String keySomeFound, String keyNoneFound) {
 		if(filterGroup != null) {
 			Iterator<? extends GeneralRegion> it = regions.iterator();
 			while(it.hasNext()) {
@@ -68,7 +59,7 @@ public class InfoCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.info")) {
 			plugin.message(sender, "info-noPermission");
 			return;
@@ -76,7 +67,7 @@ public class InfoCommand extends CommandAreaShop {
 		if(args.length > 1 && args[1] != null) {
 			// Get filter group (only used by some commands)
 			RegionGroup filterGroup = null;
-			Set<String> groupFilters = new HashSet<String>(Arrays.asList("all", "rented", "forrent", "sold", "forsale"));
+			Set<String> groupFilters = new HashSet<>(Arrays.asList("all", "rented", "forrent", "sold", "forsale"));
 			if(groupFilters.contains(args[0].toLowerCase())) {
 				filterGroup = plugin.getFileManager().getGroup(args[2]);
 				if(filterGroup == null) {
@@ -96,7 +87,7 @@ public class InfoCommand extends CommandAreaShop {
 			
 			// Rented regions
 			else if(args[1].equalsIgnoreCase("rented")) {
-				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+				Set<GeneralRegion> regions = new TreeSet<>();
 				for(RentRegion region : plugin.getFileManager().getRents()) {
 					if(region.isRented()) {
 						regions.add(region);
@@ -106,7 +97,7 @@ public class InfoCommand extends CommandAreaShop {
 			} 
 			// Forrent regions
 			else if(args[1].equalsIgnoreCase("forrent")) {
-				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+				Set<GeneralRegion> regions = new TreeSet<>();
 				for(RentRegion region : plugin.getFileManager().getRents()) {
 					if(!region.isRented()) {
 						regions.add(region);
@@ -116,7 +107,7 @@ public class InfoCommand extends CommandAreaShop {
 			} 
 			// Sold regions
 			else if(args[1].equalsIgnoreCase("sold")) {
-				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+				Set<GeneralRegion> regions = new TreeSet<>();
 				for(BuyRegion region : plugin.getFileManager().getBuys()) {
 					if(region.isSold()) {
 						regions.add(region);
@@ -126,7 +117,7 @@ public class InfoCommand extends CommandAreaShop {
 			} 
 			// Forsale regions
 			else if(args[1].equalsIgnoreCase("forsale")) {
-				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+				Set<GeneralRegion> regions = new TreeSet<>();
 				for(BuyRegion region : plugin.getFileManager().getBuys()) {
 					if(!region.isSold()) {
 						regions.add(region);
@@ -138,7 +129,7 @@ public class InfoCommand extends CommandAreaShop {
 			else if(args[1].equalsIgnoreCase("player")) {
 				if(args.length > 2 && args[2] != null) {
 					// Rents
-					Set<GeneralRegion> regions = new TreeSet<GeneralRegion>();
+					Set<GeneralRegion> regions = new TreeSet<>();
 					for(RentRegion region : plugin.getFileManager().getRents()) {
 						if(region.isRented() && region.getPlayerName().equalsIgnoreCase(args[2])) {
 							regions.add(region);
@@ -150,7 +141,7 @@ public class InfoCommand extends CommandAreaShop {
 						plugin.message(sender, "info-playerRents", args[2], StringUtils.join(regions.iterator(), ", "));
 					}
 					// Buys
-					regions = new TreeSet<GeneralRegion>();
+					regions = new TreeSet<>();
 					for(BuyRegion region : plugin.getFileManager().getBuys()) {
 						if(region.isSold() && region.getPlayerName().equalsIgnoreCase(args[2])) {
 							regions.add(region);
@@ -243,7 +234,7 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionTeleportAt", rent, teleport.getWorld().getName(), teleport.getBlockX(), teleport.getBlockY(), teleport.getBlockZ(), (int)teleport.getPitch(), (int)teleport.getYaw());
 							}
 						}
-						List<String> signLocations = new ArrayList<String>();
+						List<String> signLocations = new ArrayList<>();
 						for(Location location : rent.getSignLocations()) {
 							signLocations.add(plugin.getLanguageManager().getLang("info-regionSignLocation", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 						}
@@ -302,7 +293,7 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionTeleportAt", buy, teleport.getWorld().getName(), teleport.getBlockX(), teleport.getBlockY(), teleport.getBlockZ(), (int)teleport.getPitch(), (int)teleport.getYaw());
 							}
 						}
-						List<String> signLocations = new ArrayList<String>();
+						List<String> signLocations = new ArrayList<>();
 						for(Location location : buy.getSignLocations()) {
 							signLocations.add(plugin.getLanguageManager().getLang("info-regionSignLocation", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 						}
@@ -336,7 +327,7 @@ public class InfoCommand extends CommandAreaShop {
 			/* List of regions without a group */
 			else if(args[1].equalsIgnoreCase("nogroup")) {
 				// Rental regions
-				Set<String> rents = new TreeSet<String>(plugin.getFileManager().getRentNames());
+				Set<String> rents = new TreeSet<>(plugin.getFileManager().getRentNames());
 				for(RegionGroup group : plugin.getFileManager().getGroups()) {
 					rents.removeAll(group.getMembers());
 				}
@@ -348,7 +339,7 @@ public class InfoCommand extends CommandAreaShop {
 				}
 				
 				// Buy regions
-				Set<String> buys = new TreeSet<String>(plugin.getFileManager().getBuyNames());
+				Set<String> buys = new TreeSet<>(plugin.getFileManager().getBuyNames());
 				for(RegionGroup group : plugin.getFileManager().getGroups()) {
 					buys.removeAll(group.getMembers());
 				}
@@ -388,7 +379,7 @@ public class InfoCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			result.addAll(Arrays.asList("all", "rented", "forrent", "sold", "forsale", "player", "region", "nogroup"));
 		} else if(toComplete == 3) {

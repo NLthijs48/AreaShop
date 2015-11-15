@@ -1,17 +1,15 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class FindCommand extends CommandAreaShop {
 
@@ -33,7 +31,7 @@ public class FindCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.find")) {
 			plugin.message(sender, "find-noPermission");
 			return;
@@ -74,7 +72,7 @@ public class FindCommand extends CommandAreaShop {
 		}
 		if(args[1].equalsIgnoreCase("buy")) {
 			List<BuyRegion> regions = plugin.getFileManager().getBuys();
-			List<BuyRegion> results = new ArrayList<BuyRegion>();
+			List<BuyRegion> results = new ArrayList<>();
 			for(BuyRegion region : regions) {
 				if(!region.isSold() 
 						&& ((region.getPrice() <= balance && !maxPriceSet) || (region.getPrice() <= maxPrice && maxPriceSet)) 
@@ -108,7 +106,7 @@ public class FindCommand extends CommandAreaShop {
 			}
 		} else {
 			List<RentRegion> regions = plugin.getFileManager().getRents();
-			List<RentRegion> results = new ArrayList<RentRegion>();
+			List<RentRegion> results = new ArrayList<>();
 			for(RentRegion region : regions) {
 				if(!region.isRented() 
 						&& ((region.getPrice() <= balance && !maxPriceSet) || (region.getPrice() <= maxPrice && maxPriceSet))
@@ -146,7 +144,7 @@ public class FindCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			result.add("buy");
 			result.add("rent");

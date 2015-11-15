@@ -1,15 +1,13 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResellCommand extends CommandAreaShop {
 
@@ -33,7 +31,7 @@ public class ResellCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.resell") && !sender.hasPermission("areashop.resellall")) {
 			plugin.message(sender, "resell-noPermissionOther");
 			return;
@@ -43,14 +41,14 @@ public class ResellCommand extends CommandAreaShop {
 			plugin.message(sender, "resell-help");
 			return;
 		}
-		double price = 0.0;
+		double price;
 		try {
 			price = Double.parseDouble(args[1]);
 		} catch(NumberFormatException e) {
 			plugin.message(sender, "resell-wrongPrice", args[1]);
 			return;
 		}
-		BuyRegion buy = null;
+		BuyRegion buy;
 		if(args.length <= 2) {
 			if (sender instanceof Player) {
 				// get the region by location
@@ -104,7 +102,7 @@ public class ResellCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		if(toComplete == 3) {
 			for(BuyRegion region : plugin.getFileManager().getBuys()) {
 				if(region.isSold() && !region.isInResellingMode()) {

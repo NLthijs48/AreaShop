@@ -1,11 +1,11 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract class for generalising command classes
@@ -38,11 +38,13 @@ public abstract class CommandAreaShop {
 	 * @param start The already given start of the command
 	 * @return A collection with all the possibilities for argument to complete
 	 */
-	public abstract List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender);
+	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
+		return new ArrayList<>();
+	}
 	
 	/**
 	 * Get the argument that comes after the base command that this command reacts to
-	 * @return
+	 * @return The string that should be in front of the command for this class to act
 	 */
 	public abstract String getCommandStart();
 	
@@ -56,10 +58,9 @@ public abstract class CommandAreaShop {
 	/**
 	 * Execute a (sub)command if the conditions are met
 	 * @param sender The commandSender that executed the command
-	 * @param commandAreaShop The command that has been executed
 	 * @param args The arguments that are given
 	 */
-	public abstract void execute(CommandSender sender, Command command, String[] args);	
+	public abstract void execute(CommandSender sender, String[] args);
 	
 	
 	

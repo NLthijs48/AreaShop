@@ -1,19 +1,17 @@
 package nl.evolutioncoding.areashop.handlers;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
+import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import nl.evolutioncoding.areashop.interfaces.AreaShopInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldGuardInterface;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
-import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class WorldGuardHandler5 extends WorldGuardInterface {
 
@@ -111,11 +109,7 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 			return false;
 		} else {
 			String name = Bukkit.getOfflinePlayer(player).getName();
-			if(name != null) {
-				return region.getMembers().contains(name);
-			} else {
-				return false;
-			}
+			return name != null && region.getMembers().contains(name);
 		}
 	}
 
@@ -125,11 +119,7 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 			return false;
 		} else {
 			String name = Bukkit.getOfflinePlayer(player).getName();
-			if(name != null) {
-				return region.getOwners().contains(name);
-			} else {
-				return false;
-			}
+			return name != null && region.getOwners().contains(name);
 		}
 	}
 	

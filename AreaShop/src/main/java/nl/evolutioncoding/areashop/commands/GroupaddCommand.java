@@ -1,18 +1,15 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.sk89q.worldedit.bukkit.selections.Selection;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GroupaddCommand extends CommandAreaShop {
 
@@ -34,7 +31,7 @@ public class GroupaddCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.groupadd")) {
 			plugin.message(sender, "groupadd-noPermission");
 			return;
@@ -63,10 +60,10 @@ public class GroupaddCommand extends CommandAreaShop {
 			if(regions.size() == 0) {
 				plugin.message(player, "cmd-noRegionsFound");
 				return;
-			}			
-			ArrayList<String> namesSuccess = new ArrayList<String>();
-			ArrayList<String> namesFailed = new ArrayList<String>();
-			ArrayList<GeneralRegion> toUpdate = new ArrayList<GeneralRegion>();
+			}
+			ArrayList<String> namesSuccess = new ArrayList<>();
+			ArrayList<String> namesFailed = new ArrayList<>();
+			ArrayList<GeneralRegion> toUpdate = new ArrayList<>();
 			for(GeneralRegion region : regions) {
 				if(group.addMember(region)) {
 					namesSuccess.add(region.getName());
@@ -101,7 +98,7 @@ public class GroupaddCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			result = plugin.getFileManager().getGroupNames();
 		} else if(toComplete == 3) {

@@ -1,31 +1,19 @@
 package nl.evolutioncoding.areashop.regions;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.interfaces.GeneralRegionInterface;
 import nl.evolutioncoding.areashop.managers.FileManager;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
@@ -35,21 +23,20 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import javax.annotation.Nonnull;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion> {
-	protected YamlConfiguration config;
-	private static ArrayList<Material> canSpawnIn  = new ArrayList<Material>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
-	private static ArrayList<Material> cannotSpawnOn = new ArrayList<Material>(Arrays.asList(Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.CACTUS, Material.IRON_FENCE, Material.FENCE_GATE, Material.THIN_GLASS, Material.NETHER_FENCE, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE, Material.STAINED_GLASS_PANE));
-	private static ArrayList<Material> cannotSpawnBeside = new ArrayList<Material>(Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CACTUS));
-	protected AreaShop plugin = null;
+	YamlConfiguration config;
+	private static ArrayList<Material> canSpawnIn = new ArrayList<>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
+	private static ArrayList<Material> cannotSpawnOn = new ArrayList<>(Arrays.asList(Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.CACTUS, Material.IRON_FENCE, Material.FENCE_GATE, Material.THIN_GLASS, Material.NETHER_FENCE, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE, Material.STAINED_GLASS_PANE));
+	private static ArrayList<Material> cannotSpawnBeside = new ArrayList<>(Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CACTUS));
+	AreaShop plugin = null;
 	private boolean saveRequired = false;
 	private boolean deleted = false;
 	
@@ -62,7 +49,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		BUY("buy");
 		
 		private final String value;
-		private RegionType(String value) {
+
+		RegionType(String value) {
 			this.value = value;
 		}
 		public String getValue() {
@@ -82,7 +70,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		RESELL("resell");
 		
 		private final String value;
-		private RegionEvent(String value) {
+
+		RegionEvent(String value) {
 			this.value = value;
 		}
 		public String getValue() {
@@ -99,7 +88,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		RESELL("resell");
 		
 		private final String value;
-		private RegionState(String value) {
+
+		RegionState(String value) {
 			this.value = value;
 		}
 		public String getValue() {
@@ -115,7 +105,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		SHIFTLEFTCLICK("shiftLeftClick");
 		
 		private final String value;
-		private ClickType(String value) {
+
+		ClickType(String value) {
 			this.value = value;
 		}
 		public String getValue() {
@@ -131,20 +122,21 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		EXTEND("extend");
 		
 		private final String value;
-		private LimitType(String value) {
+
+		LimitType(String value) {
 			this.value = value;
 		}
 		public String getValue() {
 			return value;
 		}
-	} 
-	
-	public GeneralRegion(AreaShop plugin, YamlConfiguration config) {
+	}
+
+	GeneralRegion(AreaShop plugin, YamlConfiguration config) {
 		this.plugin = plugin;
 		this.config = config;
 	}
-	
-	protected GeneralRegion(AreaShop plugin, String name, World world) {
+
+	GeneralRegion(AreaShop plugin, String name, World world) {
 		this.plugin = plugin;
 		
 		config = new YamlConfiguration();
@@ -161,8 +153,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public abstract RegionType getType();	
 
 	// Sorting by name
+
+	/**
+	 * Compare this region to another region by name
+	 * @param o The region to compare to
+	 * @return 0 if the names are the same, below zero if this region is earlier in the alphabet, otherwise above zero
+	 */
 	@Override
-	public int compareTo(GeneralRegion o) {
+	public int compareTo(@Nonnull GeneralRegion o) {
 		return getName().compareTo(o.getName());
 	}
 	
@@ -226,7 +224,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return A List with all sign locations
 	 */
 	public List<Location> getSignLocations() {
-		List<Location> result = new ArrayList<Location>();
+		List<Location> result = new ArrayList<>();
 		if(config.getConfigurationSection("general.signs") == null) {
 			return result;
 		}
@@ -241,14 +239,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return The teleport location, or null if not set
 	 */
 	public Location getTeleportLocation() {
-		Location result = null;
+		Location result;
 		result = Utils.configToLocation(config.getConfigurationSection("general.teleportLocation"));
 		return result;
 	}
 	
 	/**
 	 * Check if the region has been deleted
-	 * @return
+	 * @return true if the region has been deleted, otherwise false
 	 */
 	public boolean isDeleted() {
 		return deleted;
@@ -383,7 +381,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(landlord != null) {
 			try {
 				return UUID.fromString(landlord);
-			} catch(IllegalArgumentException e) {}
+			} catch(IllegalArgumentException e) {
+				// Incorrect UUID
+			}
 		}
 		return null;
 	}
@@ -413,8 +413,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			setSetting("general.landlord", landlord.toString());
 		}
 		String properName = plugin.toName(landlord);
-		if(properName != null) {
-			name = properName;
+		if(properName == null) {
+			properName = name;
 		}
 		setSetting("general.landlordName", properName);
 	}
@@ -486,7 +486,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return A Set with all groups of this region
 	 */
 	public Set<RegionGroup> getGroups() {
-		Set<RegionGroup> result = new HashSet<RegionGroup>();
+		Set<RegionGroup> result = new HashSet<>();
 		for(RegionGroup group : plugin.getFileManager().getGroups()) {
 			if(group.isMember(this)) {
 				result.add(group);
@@ -500,7 +500,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return A list of groups this region is part of
 	 */
 	public List<String> getGroupNames() {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		for(RegionGroup group : getGroups()) {
 			result.add(group.getName());
 		}
@@ -634,9 +634,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @param player The UUID of the player to add
 	 */
 	public void addFriend(UUID player) {
-		Set<String> friends = new HashSet<String>(config.getStringList("general.friends"));
+		Set<String> friends = new HashSet<>(config.getStringList("general.friends"));
 		friends.add(player.toString());
-		List<String> list = new ArrayList<String>(friends);
+		List<String> list = new ArrayList<>(friends);
 		setSetting("general.friends", list);
 	}
 	
@@ -645,9 +645,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @param player The UUID of the player to delete
 	 */
 	public void deleteFriend(UUID player) {
-		Set<String> friends = new HashSet<String>(config.getStringList("general.friends"));
+		Set<String> friends = new HashSet<>(config.getStringList("general.friends"));
 		friends.remove(player.toString());
-		List<String> list = new ArrayList<String>(friends);
+		List<String> list = new ArrayList<>(friends);
 		if(list.isEmpty()) {
 			setSetting("general.friends", null);
 		} else {
@@ -660,13 +660,11 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return Friends added to this region
 	 */
 	public Set<UUID> getFriends() {
-		HashSet<UUID> result = new HashSet<UUID>();
+		HashSet<UUID> result = new HashSet<>();
 		for(String friend : config.getStringList("general.friends")) {
 			try {
 				UUID id = UUID.fromString(friend);
-				if(id != null) {
-					result.add(id);
-				}
+				result.add(id);
 			} catch(IllegalArgumentException e) {
 				// Don't add it
 			}
@@ -679,7 +677,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return Friends added to this region
 	 */
 	public Set<String> getFriendNames() {
-		HashSet<String> result = new HashSet<String>();
+		HashSet<String> result = new HashSet<>();
 		for(UUID friend : getFriends()) {
 			OfflinePlayer player = Bukkit.getOfflinePlayer(friend);
 			if(player != null) {
@@ -765,7 +763,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return true if this region has a sign at the location, otherwise false
 	 */
 	public boolean isSignOfRegion(Location location) {
-		Set<String> signs = null;
+		Set<String> signs;
 		if(config.getConfigurationSection("general.signs") == null) {
 			return false;
 		}
@@ -785,14 +783,13 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	
 	/**
 	 * Check if a sign needs periodic updating
-	 * @param signName
-	 * @return
+	 * @return true if the signs of this region need periodic updating, otherwise false
 	 */
 	public boolean needsPeriodicUpdating() {
 		if(isDeleted() || !isRentRegion()) {
 			return false;
 		}
-		Set<String> signs = new HashSet<String>();
+		Set<String> signs = new HashSet<>();
 		if(config.getConfigurationSection("general.signs") != null) {
 			signs = config.getConfigurationSection("general.signs").getKeys(false);
 		}
@@ -804,7 +801,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			}			
 			// Get the prefix
 			String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".line";
-			String line = null;
+			String line;
 			// Get the lines
 			for(int i=1; i<5; i++) {
 				line = plugin.getConfig().getString(prefix + i);
@@ -835,8 +832,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		for(String sign : signs) {
 			Location location = Utils.configToLocation(config.getConfigurationSection("general.signs." + sign + ".location"));
 			if(location == null) {
-				// TODO: Remove the sign if the location is wrong?
-				AreaShop.debug("  location null");
+				AreaShop.debug("Sign location incorrect region=" + getName() + ", signKey="+sign);
 				result = false;
 			} else {
 				// Get the profile set in the config
@@ -845,7 +841,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 					profile = getStringSetting("general.signProfile");
 				}
 				// Get the prefix
-				String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".";			
+				String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".";
 				// Get the lines
 				String[] signLines = new String[4];
 				signLines[0] = plugin.getConfig().getString(prefix + "line1");
@@ -854,16 +850,16 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				signLines[3] = plugin.getConfig().getString(prefix + "line4");
 				// Check if the sign should be present
 				Block block = location.getBlock();
-				if(!plugin.getConfig().isSet(prefix) 
-						|| (	   (signLines[0] == null || signLines[0].length() == 0) 
-								&& (signLines[1] == null || signLines[1].length() == 0) 
-								&& (signLines[2] == null || signLines[2].length() == 0) 
+				if(!plugin.getConfig().isSet(prefix)
+						|| ((signLines[0] == null || signLines[0].length() == 0)
+						&& (signLines[1] == null || signLines[1].length() == 0)
+						&& (signLines[2] == null || signLines[2].length() == 0)
 								&& (signLines[3] == null || signLines[3].length() == 0) )) {
 					block.setType(Material.AIR);
-				} else {				
+				} else {
 					Sign signState = null;
 					if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
-						Material signType = null;
+						Material signType;
 						try {
 							signType = Material.valueOf(config.getString("general.signs." + sign + ".signType"));
 						} catch(NullPointerException | IllegalArgumentException e) {
@@ -902,14 +898,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 						if(signLines[i] == null) {
 							signState.setLine(i, "");
 							continue;
-						}					
-						signLines[i] = applyAllReplacements(signLines[i]);					
-						signLines[i] = plugin.fixColors(signLines[i]);	
+						}
+						signLines[i] = applyAllReplacements(signLines[i]);
+						signLines[i] = plugin.fixColors(signLines[i]);
 						signState.setLine(i, signLines[i]);
 					}
 					signState.update();
 				}
-			}		
+			}
 		}
 		return result;
 	}
@@ -932,10 +928,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	
 	/**
 	 * Save all blocks in a region for restoring later
-	 * @param regionName The name of the region
-	 * @param world The world that it is in
 	 * @param fileName The name of the file to save to (extension and folder will be added)
-	 * @return
+	 * @return true if the region has been saved properly, otherwise false
 	 */
 	public boolean saveRegionBlocks(String fileName) {
 		// Check if the region is correct
@@ -963,10 +957,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	
 	/**
 	 * Restore all blocks in a region for restoring later
-	 * @param regionName The name of the region
-	 * @param world The world that it is in
 	 * @param fileName The name of the file to save to (extension and folder will be added)
-	 * @return
+	 * @return true if the region has been restored properly, otherwise false
 	 */
 	public boolean restoreRegionBlocks(String fileName) {
 		if(getRegion() == null) {
@@ -1052,10 +1044,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	
 	/**
 	 * Set the region flags/options to the values of a ConfigurationSection
-	 * @param player The player that does it
-	 * @param region The region 
-	 * @param flags
-	 * @return
+	 * @param flags The configuration settings to apply to the region
+	 * @return true if the flags have been set correctly, otherwise false
 	 */
 	protected boolean setRegionFlags(ConfigurationSection flags) {
 		boolean result = true;		
@@ -1072,10 +1062,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			AreaShop.debug("Region '" + getName() + "' does not exist, setting flags failed");
 			return false;
 		}
-		Iterator<String> it = flagNames.iterator();
 		// Loop through all flags that are set in the config
-		while(it.hasNext()) {
-			String flagName = it.next();
+		for(String flagName : flagNames) {
 			String value = flags.getString(flagName);
 			value = applyAllReplacements(value);
 			// In the config normal Bukkit color codes are used, those only need to be translated on 5.X WorldGuard versions
@@ -1129,7 +1117,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		                region.setFlag(groupFlag, null);
 		            }
 	                //AreaShop.debug("  Flag " + flagName + " reset (+ possible group of flag)");
-		        	continue;
 		        } else {
 		        	if(groupFlag == null) {
 		        		flagSetting = value;
@@ -1176,9 +1163,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		plugin.getFileManager().saveIsRequiredForRegionWorld(getWorldName());
 		return result;
 	}
-	
+
 	/**
-	 * Translate the color codes you put in greeting/farwell messages to the weird color codes of WorldGuard
+	 * Translate the color codes you put in greeting/farewell messages to the weird color codes of WorldGuard
 	 * @param message The message where the color codes should be translated (this message has bukkit color codes)
 	 * @return The string with the WorldGuard color codes
 	 */
@@ -1241,8 +1228,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	
 	/**
 	 * Set the teleport location of this region
-	 * @param regionName
-	 * @param location
+	 * @param location The location to set as teleport location
 	 */
 	public void setTeleport(Location location) {
 		if(location == null) {
@@ -1256,12 +1242,11 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	/**
 	 * Teleport a player to the region
 	 * @param player Player that should be teleported
-	 * @param regionName The name of the region the player should be teleported to
 	 * @param checkPermissions Set to true if teleport permissions should be checked, false otherwise
 	 */
 	public boolean teleportPlayer(Player player, boolean toSign, boolean checkPermissions) {
 		int checked = 1;
-		boolean owner = false;
+		boolean owner;
 		boolean friend = getFriends().contains(player.getUniqueId());
 		Location startLocation = null;
 		ProtectedRegion region = getRegion();
@@ -1440,7 +1425,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 					}
 				}
 			}
-			west = west || !west;
+			west = west || !track;
 			
 			// Top side
 			track = false;
@@ -1606,7 +1591,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return false;
 		}
 		// Check all blocks around
-		ArrayList<Material> around = new ArrayList<Material>(Arrays.asList(
+		ArrayList<Material> around = new ArrayList<>(Arrays.asList(
 				feet.getRelative(BlockFace.NORTH).getType(),
 				feet.getRelative(BlockFace.NORTH_EAST).getType(),
 				feet.getRelative(BlockFace.EAST).getType(),
@@ -1814,14 +1799,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(extend) {
 			exclude = this;
 		}
-		String typePath = null;
+		String typePath;
 		if(type == RegionType.RENT) {
 			typePath = "rents";
 		} else {
 			typePath = "buys";
 		}
 		// Check all limitgroups the player has
-		List<String> groups = new ArrayList<String>(plugin.getConfig().getConfigurationSection("limitGroups").getKeys(false));
+		List<String> groups = new ArrayList<>(plugin.getConfig().getConfigurationSection("limitGroups").getKeys(false));
 		while(!groups.isEmpty()) {
 			String group = groups.get(0);
 			if(player.hasPermission("areashop.limits." + group) && this.matchesLimitGroup(group)) {
@@ -1829,7 +1814,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				int typeLimit = plugin.getConfig().getInt("limitGroups." + group + "."+typePath);
 				//AreaShop.debug("typeLimitOther="+typeLimit+", typePath="+typePath);
 				int totalCurrent = hasRegionsInLimitGroup(player, group, plugin.getFileManager().getRegions(), exclude);
-				int typeCurrent = 0;
+				int typeCurrent;
 				if(type == RegionType.RENT) {
 					typeCurrent = hasRegionsInLimitGroup(player, group, plugin.getFileManager().getRents(), exclude);
 				} else {
@@ -1845,7 +1830,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				String typeHighestGroup = group;
 				groups.remove(group);
 				// Get the highest number from the groups of the same category
-				List<String> groupsCopy = new ArrayList<String>(groups);
+				List<String> groupsCopy = new ArrayList<>(groups);
 				for(String checkGroup : groupsCopy) {
 					if(player.hasPermission("areashop.limits." + checkGroup) && this.matchesLimitGroup(checkGroup)) {
 						if(limitGroupsOfSameCategory(group, checkGroup)) {
@@ -1871,7 +1856,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				}
 				// Check if the limits stop the player from buying the region
 				if(typeCurrent >= typeLimit) {
-					LimitType limitType = null;
+					LimitType limitType;
 					if(type == RegionType.RENT) {
 						if(extend) {
 							limitType = LimitType.EXTEND;
@@ -1944,17 +1929,15 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		List<String> firstWorlds = plugin.getConfig().getStringList("limitGroups." + firstGroup + ".worlds");
 		List<String> secondWorlds = plugin.getConfig().getStringList("limitGroups." + secondGroup + ".worlds");
-		if(!firstWorlds.containsAll(secondWorlds) || !secondWorlds.containsAll(firstWorlds)) {
-			return false;
-		}		
-		return true;
+		return !(!firstWorlds.containsAll(secondWorlds) || !secondWorlds.containsAll(firstWorlds));
 	}
 	
 	/**
 	 * Get the amount of regions a player has matching a certain limits group (config.yml > limitGroups)
 	 * @param player The player to check the amount for
 	 * @param limitGroup The group to check
-	 * @param buyRegions All the regions a player has bought or rented
+	 * @param regions All the regions a player has bought or rented
+	 * @param exclude Exclude this region from the count
 	 * @return The number of regions that the player has bought or rented matching the limit group (worlds and groups filters)
 	 */
 	public int hasRegionsInLimitGroup(Player player, String limitGroup, List<? extends GeneralRegion> regions, GeneralRegion exclude) {
@@ -2033,8 +2016,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				continue;
 			}			
 			command = applyAllReplacements(command);
-			
-			boolean result = false;
+
+			boolean result;
 			String error = null;
 			String stacktrace = null;
 			try {
@@ -2059,7 +2042,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				if(error == null) {
 					AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", result=" + result);
 				} else {
-					AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", result=" + result + ", error=" + error + ", stacktrace:");
+					AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", error=" + error + ", stacktrace:");
 					AreaShop.debug(stacktrace);
 					AreaShop.debug("--- End of stacktrace ---");
 				}
@@ -2105,7 +2088,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}	
 		// Run player commands if specified
 		String playerPath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Player";
-		List<String> playerCommands = new ArrayList<String>();
+		List<String> playerCommands = new ArrayList<>();
 		for(String command : plugin.getConfig().getStringList(playerPath)) {
 			playerCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));
 		}
@@ -2113,7 +2096,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		
 		// Run console commands if specified
 		String consolePath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Console";
-		List<String> consoleCommands = new ArrayList<String>();
+		List<String> consoleCommands = new ArrayList<>();
 		for(String command : plugin.getConfig().getStringList(consolePath)) {
 			consoleCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));
 		}

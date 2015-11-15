@@ -1,11 +1,6 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 public class HelpCommand extends CommandAreaShop {
@@ -28,14 +23,7 @@ public class HelpCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		plugin.getCommandManager().showHelp(sender);
 	}
-	
-	@Override
-	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		ArrayList<String> result = new ArrayList<String>();
-		return result;
-	}
-
 }

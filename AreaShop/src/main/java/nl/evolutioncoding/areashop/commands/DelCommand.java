@@ -1,19 +1,16 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.sk89q.worldedit.bukkit.selections.Selection;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DelCommand extends CommandAreaShop {
 
@@ -35,7 +32,7 @@ public class DelCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(		   !sender.hasPermission("areashop.destroybuy")
 				&& !sender.hasPermission("areashop.destroybuy.landlord")
 			
@@ -62,10 +59,10 @@ public class DelCommand extends CommandAreaShop {
 				return;
 			}
 			// Start removing the region that he has permission for
-			ArrayList<String> namesSuccess = new ArrayList<String>();
-			ArrayList<String> namesFailed = new ArrayList<String>();
+			ArrayList<String> namesSuccess = new ArrayList<>();
+			ArrayList<String> namesFailed = new ArrayList<>();
 			for(GeneralRegion region : regions) {
-				boolean isLandlord = sender instanceof Player && region.isLandlord(((Player)sender).getUniqueId());
+				boolean isLandlord = region.isLandlord(((Player)sender).getUniqueId());
 				if(region.isRentRegion()) {
 					if(!sender.hasPermission("areashop.destroyrent") && !(isLandlord && sender.hasPermission("areashop.destroyrent.landlord"))) {
 						namesFailed.add(region.getName());
@@ -118,7 +115,7 @@ public class DelCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			result = plugin.getFileManager().getRegionNames();
 		}

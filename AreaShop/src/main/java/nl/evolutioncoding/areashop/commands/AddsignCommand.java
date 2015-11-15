@@ -1,22 +1,19 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
+import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.material.Sign;
 import org.bukkit.util.BlockIterator;
 
-import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class AddsignCommand extends CommandAreaShop {
 
@@ -38,7 +35,7 @@ public class AddsignCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.addsign")) {
 			plugin.message(sender, "addsign-noPermission");
 			return;
@@ -63,7 +60,7 @@ public class AddsignCommand extends CommandAreaShop {
 			return;
 		}
 
-		GeneralRegion region = null;
+		GeneralRegion region;
 		if(args.length > 1) {
 			// Get region by argument
 			region = plugin.getFileManager().getRegion(args[1]);
@@ -110,7 +107,7 @@ public class AddsignCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			result.addAll(plugin.getFileManager().getRegionNames());
 		} else if(toComplete == 3) {

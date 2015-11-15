@@ -1,17 +1,16 @@
 package nl.evolutioncoding.areashop.regions;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.UUID;
-
 import net.milkbowl.vault.economy.EconomyResponse;
 import nl.evolutioncoding.areashop.AreaShop;
-
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class BuyRegion extends GeneralRegion {
 
@@ -48,7 +47,9 @@ public class BuyRegion extends GeneralRegion {
 		if(buyer != null) {
 			try {
 				return UUID.fromString(buyer);
-			} catch(IllegalArgumentException e) {}
+			} catch(IllegalArgumentException e) {
+				// Incorrect UUID
+			}
 		}
 		return null;
 	}
@@ -59,19 +60,11 @@ public class BuyRegion extends GeneralRegion {
 	 * @return true if this player owns this region, otherwise false
 	 */
 	public boolean isBuyer(Player player) {
-		if(player == null) {
-			return false;
-		} else {
-			return isBuyer(player.getUniqueId());
-		}
+		return player != null && isBuyer(player.getUniqueId());
 	}
 	public boolean isBuyer(UUID player) {
 		UUID buyer = getBuyer();
-		if(buyer == null || player == null) {
-			return false;
-		} else {
-			return buyer.equals(player);
-		}
+		return !(buyer == null || player == null) && buyer.equals(player);
 	}
 	
 	/**
@@ -153,7 +146,7 @@ public class BuyRegion extends GeneralRegion {
 	
 	/**
 	 * Change the price of the region
-	 * @param price
+	 * @param price The price to set this region to
 	 */
 	public void setPrice(double price) {
 		setSetting("buy.price", price);
@@ -210,7 +203,7 @@ public class BuyRegion extends GeneralRegion {
 	@Override
 	public HashMap<String, Object> getSpecificReplacements() {
 		// Fill the replacements map with things specific to a BuyRegion
-		HashMap<String, Object> result = new HashMap<String, Object>();
+		HashMap<String, Object> result = new HashMap<>();
 		result.put(AreaShop.tagPrice, getFormattedPrice());
 		result.put(AreaShop.tagRawPrice, getPrice());
 		result.put(AreaShop.tagPlayerName, getPlayerName());
@@ -252,7 +245,7 @@ public class BuyRegion extends GeneralRegion {
 	 */
 	@SuppressWarnings("deprecation")
 	public boolean buy(Player player) {
-		/* Check if the player has permission */
+		// Check if the player has permission
 		if(player.hasPermission("areashop.buy")) {
 			if(plugin.getEconomy() == null) {
 				plugin.message(player, "general-noEconomy");
@@ -276,7 +269,7 @@ public class BuyRegion extends GeneralRegion {
 			if(getRegion() == null) {
 				plugin.message(player, "general-noRegion", getName());
 				return false;
-			}			
+			}
 			if(!isSold() || (isInResellingMode() && !isBuyer(player))) {
 				boolean isResell = isInResellingMode();
 				// Check if the players needs to be in the world or region for buying
@@ -304,14 +297,14 @@ public class BuyRegion extends GeneralRegion {
 					// Should not be reached, but is safe like this
 					return false;
 				}
-				
-				/* Check if the player has enough money */
+
+				// Check if the player has enough money
 				if((!isResell && plugin.getEconomy().has(player, getWorldName(), getPrice())) || (isResell && plugin.getEconomy().has(player, getWorldName(), getResellPrice()))) {
 					UUID oldOwner = getBuyer();
 					if(isResell && oldOwner != null) {
 						clearFriends();
 						double resellPrice = getResellPrice();
-						/* Transfer the money to the previous owner */
+						// Transfer the money to the previous owner
 						EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getWorldName(), getResellPrice());
 						if(!r.transactionSuccess()) {
 							plugin.message(player, "buy-payError");
@@ -322,11 +315,12 @@ public class BuyRegion extends GeneralRegion {
 						String oldOwnerName = getPlayerName();
 						if(oldOwnerPlayer != null && oldOwnerPlayer.getName() != null) {
 							r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
+							oldOwnerName = oldOwnerPlayer.getName();
 						} else if (oldOwnerName != null) {
 							r = plugin.getEconomy().depositPlayer(oldOwnerName, getWorldName(), getResellPrice());
 						}
 						if(r == null || !r.transactionSuccess()) {
-							plugin.getLogger().warning("Something went wrong with paying '" + oldOwnerPlayer.getName() + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + player.getName());
+							plugin.getLogger().warning("Something went wrong with paying '" + oldOwnerName + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + player.getName());
 						}
 						// Resell is done, disable that now
 						disableReselling();
@@ -342,12 +336,12 @@ public class BuyRegion extends GeneralRegion {
 						updateRegionFlags();
 
 						// Send message to the player
-						plugin.message(player, "buy-successResale", getName(), oldOwnerPlayer.getName());
+						plugin.message(player, "buy-successResale", getName(), oldOwnerName);
 						Player seller = Bukkit.getPlayer(oldOwner);
 						if(seller != null) {
 							plugin.message(player, "buy-successSeller", getName(), getPlayerName(), resellPrice);
-						}						
-						AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + getFormattedPrice() + " from " + oldOwnerPlayer.getName());
+						}
+						AreaShop.debug(player.getName() + " has bought region " + getName() + " for " + getFormattedPrice() + " from " + oldOwnerName);
 						// Run commands
 						this.runEventCommands(RegionEvent.RESELL, false);
 					} else {
@@ -363,7 +357,6 @@ public class BuyRegion extends GeneralRegion {
 							landlordPlayer = Bukkit.getOfflinePlayer(getLandlord());
 						}
 						String landlordName = getLandlordName();
-						r = null;
 						if(landlordName != null) {
 							if(landlordPlayer != null && landlordPlayer.getName() != null) {
 								r = plugin.getEconomy().depositPlayer(landlordPlayer, getWorldName(), getPrice());
@@ -394,8 +387,8 @@ public class BuyRegion extends GeneralRegion {
 					}				
 					return true;
 				} else {
-					/* Player has not enough money */
-					String requiredMoney = "";
+					// Player has not enough money
+					String requiredMoney;
 					if(isResell) {
 						requiredMoney = getFormattedResellPrice();
 					} else {
@@ -418,10 +411,13 @@ public class BuyRegion extends GeneralRegion {
 	
 	/**
 	 * Sell a buyed region, get part of the money back
-	 * @param regionName
+	 * @param giveMoneyBack true if the player should be given money back, otherwise false
 	 */
 	@SuppressWarnings("deprecation")
 	public void sell(boolean giveMoneyBack) {
+		if(plugin.getEconomy() == null) {
+			return;
+		}
 		// Run commands
 		this.runEventCommands(RegionEvent.SOLD, true);
 		
@@ -435,7 +431,7 @@ public class BuyRegion extends GeneralRegion {
 				landlordPlayer = Bukkit.getOfflinePlayer(getLandlord());
 			}
 			String landlordName = getLandlordName();
-			EconomyResponse r = null;
+			EconomyResponse r;
 			if(landlordName != null) {
 				if(landlordPlayer != null && landlordPlayer.getName() != null) {
 					r = plugin.getEconomy().withdrawPlayer(landlordPlayer, getWorldName(), moneyBack);
@@ -453,7 +449,7 @@ public class BuyRegion extends GeneralRegion {
 				EconomyResponse response = null;
 				boolean error = false;
 				try {
-					if(player != null && player.getName() != null) {
+					if(player.getName() != null) {
 						response = plugin.getEconomy().depositPlayer(player, getWorldName(), moneyBack);
 					} else if(getPlayerName() != null) {
 						response = plugin.getEconomy().depositPlayer(getPlayerName(), getWorldName(), moneyBack);
@@ -471,13 +467,14 @@ public class BuyRegion extends GeneralRegion {
 
 		// Update everything
 		handleSchematicEvent(RegionEvent.SOLD);
-		updateRegionFlags(RegionState.FORSALE);
+		AreaShop.debug("friends before sell: " + getFriendNames().toString());
 		
 		// Remove friends and the owner
 		clearFriends();
 		setBuyer(null);	
 		removeLastActiveTime();
-		
+
+		updateRegionFlags(RegionState.FORSALE);
 		updateSigns();
 		// Run commands
 		this.runEventCommands(RegionEvent.SOLD, false);

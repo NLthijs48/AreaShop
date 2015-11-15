@@ -1,12 +1,7 @@
 package nl.evolutioncoding.areashop;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.UUID;
-import java.util.logging.Logger;
-
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.milkbowl.vault.economy.Economy;
 import nl.evolutioncoding.areashop.Updater.UpdateResult;
 import nl.evolutioncoding.areashop.Updater.UpdateType;
@@ -22,7 +17,6 @@ import nl.evolutioncoding.areashop.managers.FileManager;
 import nl.evolutioncoding.areashop.managers.LanguageManager;
 import nl.evolutioncoding.areashop.managers.SignLinkerManager;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -35,8 +29,12 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Main class for the AreaShop plugin
@@ -387,7 +385,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	
 	/**
 	 * Get the current chatPrefix
-	 * @return
+	 * @return The current chatPrefix
 	 */
 	public String getChatPrefix() {
 		return chatprefix;
@@ -694,7 +692,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		
 		/* Check if the suffix is one of these values */
 		String suffix = time.substring(time.indexOf(' ')+1, time.length());
-		ArrayList<String> identifiers = new ArrayList<String>();
+		ArrayList<String> identifiers = new ArrayList<>();
 		identifiers.addAll(this.getConfig().getStringList("seconds"));
 		identifiers.addAll(this.getConfig().getStringList("minutes"));
 		identifiers.addAll(this.getConfig().getStringList("hours"));
@@ -727,19 +725,21 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(0);
 
-		ArrayList<String> seconds = new ArrayList<String>(this.getConfig().getStringList("seconds"));
-		ArrayList<String> minutes = new ArrayList<String>(this.getConfig().getStringList("minutes"));
-		ArrayList<String> hours = new ArrayList<String>(this.getConfig().getStringList("hours"));
-		ArrayList<String> days = new ArrayList<String>(this.getConfig().getStringList("days"));
-		ArrayList<String> weeks = new ArrayList<String>(this.getConfig().getStringList("weeks"));
-		ArrayList<String> months = new ArrayList<String>(this.getConfig().getStringList("months"));
-		ArrayList<String> years = new ArrayList<String>(this.getConfig().getStringList("years"));
+		ArrayList<String> seconds = new ArrayList<>(this.getConfig().getStringList("seconds"));
+		ArrayList<String> minutes = new ArrayList<>(this.getConfig().getStringList("minutes"));
+		ArrayList<String> hours = new ArrayList<>(this.getConfig().getStringList("hours"));
+		ArrayList<String> days = new ArrayList<>(this.getConfig().getStringList("days"));
+		ArrayList<String> weeks = new ArrayList<>(this.getConfig().getStringList("weeks"));
+		ArrayList<String> months = new ArrayList<>(this.getConfig().getStringList("months"));
+		ArrayList<String> years = new ArrayList<>(this.getConfig().getStringList("years"));
 		
 		String durationString = duration.substring(duration.indexOf(' ')+1, duration.length());
 		int durationInt = 0;
 		try {
 			durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));
-		} catch(NumberFormatException exception) {}
+		} catch(NumberFormatException exception) {
+			// No Number found, add zero
+		}
 		
 		if(seconds.contains(durationString)) {
 			calendar.add(Calendar.SECOND, durationInt);
@@ -874,18 +874,16 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * @return the name of the player
 	 */
 	public String toName(String uuid) {
-		if(uuid == null) {
-			return "";
-		} else {
-			UUID parsed = null;
+		String result = "";
+		if(uuid != null) {
 			try {
-				parsed = UUID.fromString(uuid);
-			} catch(IllegalArgumentException e) {}
-			if(parsed == null) {
-				return "";
+				UUID parsed = UUID.fromString(uuid);
+				result = this.toName(parsed);
+			} catch(IllegalArgumentException e) {
+				// Incorrect UUID
 			}
-			return this.toName(parsed);			
 		}
+		return result;
 	}
 	/**
 	 * Conversion to name by uuid object

@@ -1,15 +1,13 @@
 package nl.evolutioncoding.areashop.commands;
 
+import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import nl.evolutioncoding.areashop.AreaShop;
-import nl.evolutioncoding.areashop.Utils;
-
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class LinksignsCommand extends CommandAreaShop {
 
@@ -31,7 +29,7 @@ public class LinksignsCommand extends CommandAreaShop {
 	}
 
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.linksigns")) {
 			plugin.message(sender, "linksigns-noPermission");
 			return;
@@ -61,7 +59,7 @@ public class LinksignsCommand extends CommandAreaShop {
 	
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			result.addAll(plugin.getFileManager().getRegionNames());
 		} else if(toComplete == 3) {

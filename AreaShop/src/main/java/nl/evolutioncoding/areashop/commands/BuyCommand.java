@@ -1,15 +1,13 @@
 package nl.evolutioncoding.areashop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
-
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BuyCommand extends CommandAreaShop {
 
@@ -31,7 +29,7 @@ public class BuyCommand extends CommandAreaShop {
 	}
 	
 	@Override
-	public void execute(CommandSender sender, Command command, String[] args) {
+	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.buy")) {
 			plugin.message(sender, "buy-noPermission");
 			return;
@@ -53,10 +51,8 @@ public class BuyCommand extends CommandAreaShop {
 			List<BuyRegion> regions = Utils.getApplicableBuyRegions(((Player) sender).getLocation());
 			if (regions.isEmpty()) {
 				plugin.message(sender, "cmd-noRegionsAtLocation");
-				return;
 			} else if (regions.size() > 1) {
 				plugin.message(sender, "cmd-moreRegionsAtLocation");
-				return;
 			} else {
 				regions.get(0).buy(player);
 			}
@@ -65,7 +61,7 @@ public class BuyCommand extends CommandAreaShop {
 
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		if(toComplete == 2) {
 			for(BuyRegion region : plugin.getFileManager().getBuys()) {
 				if(!region.isSold()) {

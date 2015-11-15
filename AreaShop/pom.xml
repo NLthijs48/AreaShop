@@ -33,8 +33,40 @@
     </dependency>
     <dependency>
       <groupId>nl.evolutioncoding</groupId>
+      <artifactId>areashop-worldguard-5</artifactId>
+      <version>WorldGuard-5</version>
+      <type>jar</type>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>nl.evolutioncoding</groupId>
+      <artifactId>areashop-worldguard-6</artifactId>
+      <version>WorldGuard-6</version>
+      <type>jar</type>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>nl.evolutioncoding</groupId>
       <artifactId>areashop-interface</artifactId>
       <version>AreaShopInterface</version>
+      <type>jar</type>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>nl.evolutioncoding</groupId>
+      <artifactId>areashop-worldedit-5</artifactId>
+      <version>WorldEdit-5</version>
+      <type>jar</type>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>nl.evolutioncoding</groupId>
+      <artifactId>areashop-worldedit-6</artifactId>
+      <version>WorldEdit-6</version>
       <type>jar</type>
       <scope>compile</scope>
       <optional>true</optional>

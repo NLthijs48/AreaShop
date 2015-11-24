@@ -55,6 +55,7 @@ permissions:
       areashop.notifyupdate: true
       areashop.stack: true
       areashop.setlandlord: true
+      areashop.linksigns: true
   areashop.landlord.*:
     description: Give access to all landlord features
     children:

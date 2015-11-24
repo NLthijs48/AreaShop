@@ -25,7 +25,8 @@
 [►Modules, packages and classes overview](https://github.com/NLthijs48/AreaShop/wiki/Modules,-packages-and-classes-overview)<br/>
 **Connections:**
 [►AreaShop in Spigot Resources](http://www.spigotmc.org/resources/areashop.2991/)&nbsp;&nbsp;
-[►AreaShop on BukkitDev](http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/)
+[►AreaShop on BukkitDev](http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/)&nbsp;&nbsp;
+[►Dev builds on Jenkins](http://ci.frostcast.net/job/AreaShop/)
 
 ***
 

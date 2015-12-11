@@ -5,6 +5,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.milkbowl.vault.economy.Economy;
 import nl.evolutioncoding.areashop.Updater.UpdateResult;
 import nl.evolutioncoding.areashop.Updater.UpdateType;
+import nl.evolutioncoding.areashop.features.DebugFeature;
+import nl.evolutioncoding.areashop.features.Feature;
 import nl.evolutioncoding.areashop.interfaces.AreaShopInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldEditInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldGuardInterface;
@@ -23,6 +25,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -31,9 +34,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -211,7 +212,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			this.getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
 			this.getServer().getPluginManager().registerEvents(new SignClickListener(this), this);			
 			this.getServer().getPluginManager().registerEvents(new PlayerLoginLogoutListener(this), this);
-			
+
+			setupFeatures();
 			setupTasks();
 	        
 		    // Startup the CommandManager (registers itself for the command)
@@ -284,7 +286,23 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		debug = false;
 		ready = false;
 		updater = null;
-	}	
+	}
+
+	/**
+	 * Instanciate and register all Feature classes
+	 */
+	public void setupFeatures() {
+		Set<Feature> features = new HashSet<>();
+
+		features.add(new DebugFeature(this));
+
+		// Register as listener when necessary
+		for(Feature feature : features) {
+			if(feature instanceof Listener) {
+				this.getServer().getPluginManager().registerEvents((Listener)feature, this);
+			}
+		}
+	}
 	
 	/**
 	 * Indicates if the plugin is ready to be used
@@ -537,6 +555,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * @param params The parameters to inject into the message string
 	 */
 	public void configurableMessage(Object target, String key, boolean prefix, Object... params) {
+		if(target == null) {
+			return;
+		}
 		String langString = this.fixColors(languageManager.getLang(key, params));
 		if(langString == null || langString.equals("")) {
 			// Do nothing, message is not available or disabled

@@ -296,7 +296,7 @@ public class FileManager {
 		if(rent != null) {
 			rent.setDeleted();
 			if(rent.isRented()) {
-				rent.unRent(giveMoneyBack);
+				rent.unRent(giveMoneyBack, null);
 			}
 			// Handle schematics and run commands
 			rent.handleSchematicEvent(RegionEvent.DELETED);
@@ -359,7 +359,7 @@ public class FileManager {
 		if(buy != null) {
 			buy.setDeleted();
 			if(buy.isSold()) {
-				buy.sell(giveMoneyBack);
+				buy.sell(giveMoneyBack, null);
 			}
 			// Handle schematics and run commands
 			buy.handleSchematicEvent(RegionEvent.DELETED);

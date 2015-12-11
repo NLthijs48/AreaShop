@@ -65,21 +65,7 @@ public class SellCommand extends CommandAreaShop {
 			plugin.message(sender, "sell-notBought");
 			return;
 		}
-		if(sender.hasPermission("areashop.sell")) {
-			plugin.message(sender, "sell-sold", buy.getPlayerName());
-			buy.sell(true);
-		} else {
-			if(sender.hasPermission("areashop.sellown") && sender instanceof Player) {
-				if(buy.getBuyer().equals(((Player)sender).getUniqueId())) {
-					plugin.message(sender, "sell-soldYours");
-					buy.sell(true);
-				} else {
-					plugin.message(sender, "sell-noPermissionOther");
-				}
-			} else {
-				plugin.message(sender, "sell-noPermission");
-			}									
-		}		
+		buy.sell(true, sender);
 	}
 	
 	@Override

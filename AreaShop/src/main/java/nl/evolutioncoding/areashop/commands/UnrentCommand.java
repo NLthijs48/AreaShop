@@ -64,22 +64,8 @@ public class UnrentCommand extends CommandAreaShop {
 		if(!rent.isRented()) {
 			plugin.message(sender, "unrent-notRented");
 			return;
-		}		
-		if(sender.hasPermission("areashop.unrent")) {
-			plugin.message(sender, "unrent-other", rent.getPlayerName());
-			rent.unRent(true);
-		} else {
-			if(sender.hasPermission("areashop.unrentown") && sender instanceof Player) {
-				if(rent.getRenter().equals(((Player)sender).getUniqueId())) {
-					plugin.message(sender, "unrent-unrented");
-					rent.unRent(true);
-				} else {
-					plugin.message(sender, "unrent-noPermissionOther");
-				}
-			} else {
-				plugin.message(sender, "unrent-noPermission");
-			}
-		}			
+		}
+		rent.unRent(true, sender);
 	}
 	
 	@Override

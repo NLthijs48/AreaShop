@@ -46,7 +46,7 @@ public class SchematiceventCommand extends CommandAreaShop {
 			return;
 		}
 		if(region.getRegion() == null) {
-			plugin.message(sender, "general-noRegion", region.getName());
+			plugin.message(sender, "general-noRegion", region);
 			return;
 		}		
 		RegionEvent event = null;

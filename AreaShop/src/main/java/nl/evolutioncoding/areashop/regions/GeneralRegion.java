@@ -10,6 +10,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.events.NotifyAreaShopEvent;
+import nl.evolutioncoding.areashop.events.notify.RegionUpdateEvent;
 import nl.evolutioncoding.areashop.interfaces.GeneralRegionInterface;
 import nl.evolutioncoding.areashop.managers.FileManager;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -173,7 +175,25 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public boolean equals(Object region) {
 		return region instanceof GeneralRegion && ((GeneralRegion)region).getName().equals(getName());
 	}
-	
+
+
+	/**
+	 * Broadcast an event to indicate that region settings have been changed.
+	 * This will update region flags, signs, etc.
+	 */
+	public void update() {
+		Bukkit.getServer().getPluginManager().callEvent(new RegionUpdateEvent(this));
+	}
+
+	/**
+	 * Broadcast the given event and update the region status
+	 * @param event The update event that should be broadcasted
+	 */
+	public void notifyAndUpdate(NotifyAreaShopEvent event) {
+		Bukkit.getPluginManager().callEvent(event);
+		update();
+	}
+
 	/**
 	 * Update the region flags according the region data
 	 */
@@ -780,6 +800,29 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		return false;
 	}
+
+	/**
+	 * Method to send a message to a CommandSender, using chatprefix if it is a player
+	 * Automatically includes the region in the message, enabling the use of all variables
+	 * @param target The CommandSender you wan't to send the message to (e.g. a player)
+	 * @param key    The key to get the translation
+	 * @param prefix Specify if the message should have a prefix
+	 * @param params The parameters to inject into the message string
+	 */
+	public void configurableMessage(Object target, String key, boolean prefix, Object... params) {
+		Object[] newParams = new Object[params.length + 1];
+		newParams[0] = this;
+		System.arraycopy(params, 0, newParams, 1, params.length);
+		plugin.configurableMessage(target, key, prefix, newParams);
+	}
+
+	public void messageNoPrefix(Object target, String key, Object... params) {
+		configurableMessage(target, key, false, params);
+	}
+
+	public void message(Object target, String key, Object... params) {
+		configurableMessage(target, key, true, params);
+	}
 	
 	/**
 	 * Check if a sign needs periodic updating
@@ -1251,11 +1294,11 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		Location startLocation = null;
 		ProtectedRegion region = getRegion();
 		if(getWorld() == null) {
-			plugin.message(player, "general-noWorld", getWorldName());
+			message(player, "general-noWorld");
 			return false;
 		}
 		if(getRegion() == null) {
-			plugin.message(player, "general-noRegion", getName());
+			message(player, "general-noRegion");
 			return false;
 		}	
 		if(isRentRegion()) {
@@ -1269,27 +1312,27 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			if(		  (!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
 					|| !toSign && !owner && !friend && !player.hasPermission("areashop.teleportall") && player.hasPermission("areashop.teleportsignall")
 					|| !toSign && !owner && friend && !player.hasPermission("areashop.teleportfriend") && player.hasPermission("areashop.teleportfriendsign"))) {
-				plugin.message(player, "teleport-changedToSign");
+				message(player, "teleport-changedToSign");
 				toSign = true;
 			}
 			// Check permissions
 			if(owner && !player.hasPermission("areashop.teleport") && !toSign) {
-				plugin.message(player, "teleport-noPermission");
+				message(player, "teleport-noPermission");
 				return false;
 			} else if(!owner && !player.hasPermission("areashop.teleportall") && !toSign && !friend) {
-				plugin.message(player, "teleport-noPermissionOther");
+				message(player, "teleport-noPermissionOther");
 				return false;
 			} else if(!owner && !player.hasPermission("areashop.teleportfriend") && !toSign && friend) {
-				plugin.message(player, "teleport-noPermissionFriend");
+				message(player, "teleport-noPermissionFriend");
 				return false;
 			} else if(owner && !player.hasPermission("areashop.teleportsign") && toSign) {
-				plugin.message(player, "teleport-noPermissionSign");
+				message(player, "teleport-noPermissionSign");
 				return false;
 			} else if(!owner && !player.hasPermission("areashop.teleportsignall") && toSign && !friend) {
-				plugin.message(player, "teleport-noPermissionOtherSign");
+				message(player, "teleport-noPermissionOtherSign");
 				return false;
 			} else if(!owner && !player.hasPermission("areashop.teleportfriendsign") && toSign && friend) {
-				plugin.message(player, "teleport-noPermissionFriendSign");
+				message(player, "teleport-noPermissionFriendSign");
 				return false;
 			}
 		}
@@ -1304,7 +1347,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				startLocation.setYaw(player.getLocation().getYaw());
 			} else {
 				// No sign available
-				plugin.message(player, "teleport-changedToNoSign");
+				message(player, "teleport-changedToNoSign");
 				toSign = false;
 			}
 		}		
@@ -1347,7 +1390,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		int radius = 1;
 		boolean blocksInRegion = region.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
 		if(!blocksInRegion && insideRegion) {
-			plugin.message(player, "teleport-blocked", getName());
+			message(player, "teleport-blocked");
 			return false;
 		}
 		boolean done = isSafe(safeLocation) && ((blocksInRegion && insideRegion) || (!insideRegion));
@@ -1550,15 +1593,15 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		if(done && isSafe(safeLocation)) {
 			if(toSign) {
-				plugin.message(player, "teleport-successSign", getName());
+				message(player, "teleport-successSign");
 			} else {
-				plugin.message(player, "teleport-success", getName());
+				message(player, "teleport-success");
 			}			
 			player.teleport(safeLocation);
 			AreaShop.debug("Found location: " + safeLocation.toString() + " Tries: " + (checked-1));
 			return true;
 		} else {
-			plugin.message(player, "teleport-noSafe", getName(), checked-1, maxTries);
+			message(player, "teleport-noSafe", checked-1, maxTries);
 			AreaShop.debug("No location found, checked " + (checked-1) + " spots of max " + maxTries);
 			return false;
 		}	

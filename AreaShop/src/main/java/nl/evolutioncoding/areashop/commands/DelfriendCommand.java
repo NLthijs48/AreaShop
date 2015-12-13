@@ -82,8 +82,7 @@ public class DelfriendCommand extends CommandAreaShop {
 				return;
 			}
 			region.deleteFriend(friend.getUniqueId());
-			region.updateRegionFlags();
-			region.updateSigns();
+			region.update();
 			plugin.message(sender, "delfriend-successOther", friend.getName(), region.getName());
 		} else {
 			if(sender.hasPermission("areashop.delfriend") && sender instanceof Player) {
@@ -94,8 +93,7 @@ public class DelfriendCommand extends CommandAreaShop {
 						return;
 					}
 					region.deleteFriend(friend.getUniqueId());
-					region.updateRegionFlags();
-					region.updateSigns();
+					region.update();
 					plugin.message(sender, "delfriend-success", friend.getName(), region.getName());
 				} else {
 					plugin.message(sender, "delfriend-noPermissionOther");

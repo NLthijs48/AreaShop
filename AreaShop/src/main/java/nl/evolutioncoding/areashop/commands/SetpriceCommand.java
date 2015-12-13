@@ -75,9 +75,8 @@ public class SetpriceCommand extends CommandAreaShop {
 			} else if(region.isBuyRegion()) {
 				((BuyRegion)region).removePrice();
 			}
+			region.update();
 			plugin.message(sender, "setprice-successRemoved", region);
-			region.updateSigns();
-			region.updateRegionFlags();
 			return;
 		}
 		double price;
@@ -87,7 +86,6 @@ public class SetpriceCommand extends CommandAreaShop {
 			plugin.message(sender, "setprice-wrongPrice", args[1]);
 			return;
 		}
-		AreaShop.debug("price: " + price + ", raw: " + args[1]);
 		if(region.isRentRegion()) {
 			((RentRegion)region).setPrice(price);
 			plugin.message(sender, "setprice-successRent", region);
@@ -95,8 +93,7 @@ public class SetpriceCommand extends CommandAreaShop {
 			((BuyRegion)region).setPrice(price);
 			plugin.message(sender, "setprice-successBuy", region);
 		}
-		region.updateSigns();
-		region.updateRegionFlags();
+		region.update();
 	}
 	
 	@Override

@@ -3,9 +3,11 @@ package nl.evolutioncoding.areashop.commands;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.events.notify.RemovedRegionEvent;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -77,7 +79,8 @@ public class DelCommand extends CommandAreaShop {
 						plugin.getFileManager().removeBuy((BuyRegion)region, true);
 						namesSuccess.add(region.getName());
 					}
-				}				
+				}
+				Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(region));
 			}
 			// send messages
 			if(namesSuccess.size() != 0) {
@@ -110,6 +113,7 @@ public class DelCommand extends CommandAreaShop {
 					plugin.message(sender, "destroy-noPermissionBuy");
 				}
 			}
+			Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(region));
 		}
 	}
 	

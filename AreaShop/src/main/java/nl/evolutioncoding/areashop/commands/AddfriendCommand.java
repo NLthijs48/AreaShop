@@ -92,8 +92,7 @@ public class AddfriendCommand extends CommandAreaShop {
 				return;
 			}
 			region.addFriend(friend.getUniqueId());
-			region.updateRegionFlags();
-			region.updateSigns();
+			region.update();
 			plugin.message(sender, "addfriend-successOther", friend.getName(), region.getName());
 		} else {
 			if(sender.hasPermission("areashop.addfriend") && sender instanceof Player) {
@@ -112,8 +111,7 @@ public class AddfriendCommand extends CommandAreaShop {
 						return;
 					}
 					region.addFriend(friend.getUniqueId());
-					region.updateRegionFlags();
-					region.updateSigns();
+					region.update();
 					plugin.message(sender, "addfriend-success", friend.getName(), region.getName());
 				} else {
 					plugin.message(sender, "addfriend-noPermissionOther");

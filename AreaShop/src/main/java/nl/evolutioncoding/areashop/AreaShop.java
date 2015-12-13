@@ -7,6 +7,8 @@ import nl.evolutioncoding.areashop.Updater.UpdateResult;
 import nl.evolutioncoding.areashop.Updater.UpdateType;
 import nl.evolutioncoding.areashop.features.DebugFeature;
 import nl.evolutioncoding.areashop.features.Feature;
+import nl.evolutioncoding.areashop.features.SignDisplayFeature;
+import nl.evolutioncoding.areashop.features.WorldGuardRegionFlagsFeature;
 import nl.evolutioncoding.areashop.interfaces.AreaShopInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldEditInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldGuardInterface;
@@ -295,6 +297,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		Set<Feature> features = new HashSet<>();
 
 		features.add(new DebugFeature(this));
+		features.add(new SignDisplayFeature(this));
+		features.add(new WorldGuardRegionFlagsFeature(this));
 
 		// Register as listener when necessary
 		for(Feature feature : features) {

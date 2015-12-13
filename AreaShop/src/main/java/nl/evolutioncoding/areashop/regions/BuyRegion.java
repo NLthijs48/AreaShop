@@ -348,8 +348,9 @@ public class BuyRegion extends GeneralRegion {
 
 						// Update everything
 						handleSchematicEvent(RegionEvent.RESELL);
-						updateSigns();
-						updateRegionFlags();
+
+						// Notify about updates
+						this.notifyAndUpdate(new ResoldRegionEvent(this, oldOwner));
 
 						// Send message to the player
 						message(player, "buy-successResale", oldOwnerName);
@@ -357,8 +358,6 @@ public class BuyRegion extends GeneralRegion {
 						if(seller != null) {
 							message(player, "buy-successSeller", resellPrice);
 						}
-						// Notify about updates
-						this.notifyAndUpdate(new ResoldRegionEvent(this, oldOwner));
 						// Run commands
 						this.runEventCommands(RegionEvent.RESELL, false);
 					} else {
@@ -404,8 +403,6 @@ public class BuyRegion extends GeneralRegion {
 
 						// Update everything
 						handleSchematicEvent(RegionEvent.BOUGHT);
-						updateSigns();
-						updateRegionFlags();
 
 						// Send message to the player
 						message(player, "buy-succes");
@@ -528,8 +525,6 @@ public class BuyRegion extends GeneralRegion {
 		// Update everything
 		handleSchematicEvent(RegionEvent.SOLD);
 
-		updateRegionFlags(RegionState.FORSALE);
-		updateSigns();
 		// Run commands
 		this.runEventCommands(RegionEvent.SOLD, false);
 		return true;

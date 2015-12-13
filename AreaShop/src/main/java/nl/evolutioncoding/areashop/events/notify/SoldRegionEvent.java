@@ -5,11 +5,19 @@ import nl.evolutioncoding.areashop.regions.BuyRegion;
 
 import java.util.UUID;
 
+/**
+ * Broadcasted when a region is sold
+ */
 public class SoldRegionEvent extends NotifyAreaShopEvent {
 
 	private BuyRegion region;
 	private UUID oldBuyer;
 
+	/**
+	 * Constructor
+	 * @param region   The region that has been sold
+	 * @param oldBuyer The player for which the region has been sold
+	 */
 	public SoldRegionEvent(BuyRegion region, UUID oldBuyer) {
 		this.region = region;
 		this.oldBuyer = oldBuyer;

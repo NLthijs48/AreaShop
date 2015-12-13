@@ -6,6 +6,8 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.events.notify.AddedRegionEvent;
+import nl.evolutioncoding.areashop.events.notify.RemovedRegionEvent;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionEvent;
@@ -206,6 +208,7 @@ public class FileManager {
 			return;
 		}
 		regions.put(rent.getName().toLowerCase(), rent);
+		Bukkit.getPluginManager().callEvent(new AddedRegionEvent(rent));
 	}
 	/**
 	 * Add a rent to the list and mark it as to-be-saved
@@ -226,6 +229,7 @@ public class FileManager {
 			return;
 		}
 		regions.put(buy.getName().toLowerCase(), buy);
+		Bukkit.getPluginManager().callEvent(new AddedRegionEvent(buy));
 	}
 	/**
 	 * Add a buy to the list and mark it as to-be-saved
@@ -301,8 +305,8 @@ public class FileManager {
 			// Handle schematics and run commands
 			rent.handleSchematicEvent(RegionEvent.DELETED);
 			rent.runEventCommands(RegionEvent.DELETED, true);
-			
-			/* Delete the signs and the variable */
+
+			// Delete the signs and the variable
 			if(rent.getWorld() != null) {
 				for(Location sign : rent.getSignLocations()) {
 					sign.getBlock().setType(Material.AIR);
@@ -328,7 +332,10 @@ public class FileManager {
 				}
 			}
 			result = true;
-			
+
+			// Broadcast event
+			Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(rent));
+
 			// Run commands
 			rent.runEventCommands(RegionEvent.DELETED, false);
 		}		
@@ -394,7 +401,10 @@ public class FileManager {
 			}
 			
 			result = true;
-			
+
+			// Broadcast event
+			Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(buy));
+
 			// Run commands
 			buy.runEventCommands(RegionEvent.DELETED, false);
 		}		
@@ -424,7 +434,7 @@ public class FileManager {
 				for(int i=0; i<plugin.getConfig().getInt("signs.regionsPerTick"); i++) {
 					if(current < regions.size()) {
 						if(regions.get(current).needsPeriodicUpdating()) {
-							regions.get(current).updateSigns();
+							regions.get(current).update();
 						}
 						current++;
 					}
@@ -460,71 +470,6 @@ public class FileManager {
 	}
 	
 	/**
-	 * Update all rent signs
-	 * @param confirmationReceiver who needs to get the confirmation message, null if nobody
-	 */
-	public void updateRentSignsAndFlags(final CommandSender confirmationReceiver) {
-		final List<RentRegion> regions = new ArrayList<>(getRents());
-		new BukkitRunnable() {
-			private int current = 0;
-			private boolean result = true;
-			@Override
-			public void run() {
-				for(int i=0; i<plugin.getConfig().getInt("update.regionsPerTick"); i++) {
-					if(current < regions.size()) {
-						result = regions.get(current).updateSigns() && result;
-						regions.get(current).updateRegionFlags();
-						current++;
-					}
-				}
-				if(current >= regions.size()) {
-					if(confirmationReceiver != null) {
-						if(result) {
-							plugin.message(confirmationReceiver, "rents-updated");
-						} else {
-							plugin.message(confirmationReceiver, "rents-notUpdated");
-						}
-					}
-					this.cancel();
-				}
-			}
-		}.runTaskTimer(plugin, 1, 1);
-	}
-	
-	/**
-	 * Update all buy signs
-	 * @param confirmationReceiver who needs to get the confirmation message, null if nobody
-	 */
-	public void updateBuySignsAndFlags(final CommandSender confirmationReceiver) {
-		final List<BuyRegion> regions = new ArrayList<>(getBuys());
-		new BukkitRunnable() {
-			private int current = 0;
-			private boolean result = true;
-			
-			@Override
-			public void run() {
-				for(int i=0; i<plugin.getConfig().getInt("update.regionsPerTick"); i++) {
-					if(current < regions.size()) {
-						regions.get(current).updateSigns();
-						regions.get(current).updateRegionFlags();
-						current++;
-					} 
-				}
-				if(current >= regions.size()) {
-					if(confirmationReceiver != null) {
-						if(result) {
-							plugin.message(confirmationReceiver, "buys-updated");
-						} else {
-							plugin.message(confirmationReceiver, "buys-notUpdated");
-						}
-					}
-					this.cancel();
-				}
-			}
-		}.runTaskTimer(plugin, 1, 1);		
-	}
-	
-	/**
 	 * Update regions in a task to minimize lag
 	 * @param regions Regions to update
 	 */
@@ -539,8 +484,7 @@ public class FileManager {
 			public void run() {
 				for(int i=0; i<regionsPerTick; i++) {
 					if(current < regions.size()) {
-						regions.get(current).updateSigns();
-						regions.get(current).updateRegionFlags();
+						regions.get(current).update();
 						current++;
 					} 
 				}

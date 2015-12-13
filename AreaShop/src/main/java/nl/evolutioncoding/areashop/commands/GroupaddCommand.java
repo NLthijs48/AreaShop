@@ -87,8 +87,7 @@ public class GroupaddCommand extends CommandAreaShop {
 				return;
 			}
 			if(group.addMember(region)) {
-				region.updateRegionFlags();
-				region.updateSigns();
+				region.update();
 				plugin.message(sender, "groupadd-success", region.getName(), group.getName(), group.getMembers().size());
 			} else {
 				plugin.message(sender, "groupadd-failed", region.getName(), group.getName());

@@ -102,7 +102,7 @@ public class AddsignCommand extends CommandAreaShop {
 		} else {
 			plugin.message(sender, "addsign-successProfile", region, profile);
 		}
-		region.updateSigns();
+		region.update();
 	}
 	
 	@Override

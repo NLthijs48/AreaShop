@@ -117,6 +117,7 @@ public class AddCommand extends CommandAreaShop {
 			private ArrayList<String> namesAlready = new ArrayList<>();
 			private ArrayList<String> namesBlacklisted = new ArrayList<>();
 			private ArrayList<String> namesNoPermission = new ArrayList<>();
+			private ArrayList<String> namesExternal = new ArrayList<>();
 			
 			@Override
 			public void run() {
@@ -140,12 +141,10 @@ public class AddCommand extends CommandAreaShop {
 						} else if(result == AddResult.NOPERMISSION) {
 							namesNoPermission.add(region.getId());
 						} else {
-							namesSuccess.add(region.getId());
 							// Check if the player should be landlord
 							boolean landlord = (!sender.hasPermission("areashop.create" + type)
 								&& ((sender.hasPermission("areashop.create" + type + ".owner") && isOwner)
-								|| (sender.hasPermission("areashop.create" + type + ".member") && isMember)));					
-							
+									|| (sender.hasPermission("areashop.create" + type + ".member") && isMember)));
 							if(isRent) {
 								RentRegion rent = new RentRegion(plugin, region.getId(), finalWorld);
 								// Set landlord
@@ -156,10 +155,12 @@ public class AddCommand extends CommandAreaShop {
 								rent.runEventCommands(RegionEvent.CREATED, true);						
 								plugin.getFileManager().addRent(rent);
 								rent.handleSchematicEvent(RegionEvent.CREATED);
-								// Set the flags for the region
-								rent.updateRegionFlags();
+
+								rent.update();
+
 								// Run commands
 								rent.runEventCommands(RegionEvent.CREATED, false);
+								namesSuccess.add(region.getId());
 							} else {
 								BuyRegion buy = new BuyRegion(plugin, region.getId(), finalWorld);
 								// Set landlord
@@ -171,10 +172,12 @@ public class AddCommand extends CommandAreaShop {
 								
 								plugin.getFileManager().addBuy(buy);
 								buy.handleSchematicEvent(RegionEvent.CREATED);
-								// Set the flags for the region
-								buy.updateRegionFlags();
+
+								buy.update();
+
 								// Run commands
 								buy.runEventCommands(RegionEvent.CREATED, false);
+								namesSuccess.add(region.getId());
 							}
 						}
 						current++;

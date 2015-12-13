@@ -495,7 +495,6 @@ public class RentRegion extends GeneralRegion {
 
 					// Substract the money from the players balance
 					EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getWorldName(), price);
-					AreaShop.debug("price: " + price);
 					if(!r.transactionSuccess()) {
 						message(player, "rent-payError");
 						AreaShop.debug("Something went wrong with getting money from " + player.getName() + " while renting " + getName() + ": " + r.errorMessage);
@@ -535,15 +534,11 @@ public class RentRegion extends GeneralRegion {
 					} else {
 						calendar.setTimeInMillis(calendar.getTimeInMillis() + getDuration());
 					}
-					SimpleDateFormat dateFull = new SimpleDateFormat(plugin.getConfig().getString("timeFormatChat"));
 
 					// Add values to the rent and send it to FileManager
 					setRentedUntil(calendar.getTimeInMillis());
 					setRenter(player.getUniqueId());
 					updateLastActiveTime();
-
-					// Notify about updates
-					this.notifyAndUpdate(new RentedRegionEvent(this, extend));
 
 					// Fire schematic event and updated times extended
 					if(!extend) {
@@ -553,8 +548,8 @@ public class RentRegion extends GeneralRegion {
 						setTimesExtended(getTimesExtended() + 1);
 					}
 
-					updateSigns();
-					updateRegionFlags(RegionState.RENTED);
+					// Notify about updates
+					this.notifyAndUpdate(new RentedRegionEvent(this, extend));
 					
 					// Send message to the player
 					if(extendToMax) {
@@ -684,8 +679,6 @@ public class RentRegion extends GeneralRegion {
 		// Notify about updates
 		this.notifyAndUpdate(new UnrentedRegionEvent(this, oldRenter));
 
-		updateRegionFlags(RegionState.FORRENT);
-		updateSigns();
 		// Run commands
 		this.runEventCommands(RegionEvent.UNRENTED, false);
 		return true;

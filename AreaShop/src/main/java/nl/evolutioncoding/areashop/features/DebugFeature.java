@@ -14,56 +14,56 @@ public class DebugFeature extends Feature implements Listener {
 
 	@EventHandler
 	public void buyingRegion(BuyingRegionEvent event) {
-		AreaShop.debug(event.getPlayer().getName() + " is trying to buy " + event.getRegion().getName());
+		AreaShop.debug("BuyingRegionEvent: " + event.getPlayer().getName() + " is trying to buy " + event.getRegion().getName());
 	}
 
 	@EventHandler
 	public void boughtRegion(BoughtRegionEvent event) {
-		AreaShop.debug(event.getRegion().getPlayerName() + " bought " + event.getRegion().getName());
+		AreaShop.debug("BoughtRegionEvent: " + event.getRegion().getPlayerName() + " bought " + event.getRegion().getName());
 	}
 
 	@EventHandler
 	public void sellingRegion(SellingRegionEvent event) {
-		AreaShop.debug(event.getRegion().getName() + " is trying to sell " + event.getRegion().getName());
+		AreaShop.debug("SellingRegionEvent: " + event.getRegion().getName() + " is trying to sell " + event.getRegion().getName());
 	}
 
 	@EventHandler
 	public void soldRegion(SoldRegionEvent event) {
-		AreaShop.debug(event.getRegion().getName() + " sold " + event.getRegion().getName());
+		AreaShop.debug("SoldRegionEvent: " + event.getRegion().getName() + " sold " + event.getRegion().getName());
 	}
 
 	@EventHandler
 	public void resellingRegion(ResellingRegionEvent event) {
-		AreaShop.debug(event.getRegion().getName() + " is trying to resell " + event.getRegion().getName());
+		AreaShop.debug("ResellingRegionEvent: " + event.getRegion().getName() + " is trying to resell " + event.getRegion().getName());
 	}
 
 	@EventHandler
 	public void resoldRegion(ResoldRegionEvent event) {
-		AreaShop.debug(event.getRegion().getName() + " resold " + event.getRegion().getName());
+		AreaShop.debug("ResoldRegionEvent: " + event.getRegion().getName() + " resold " + event.getRegion().getName());
 	}
 
 	@EventHandler
 	public void rentingRegion(RentingRegionEvent event) {
-		AreaShop.debug(event.getPlayer().getName() + " is trying to rent " + event.getRegion().getName() + ", extending=" + event.isExtending());
+		AreaShop.debug("RentingRegionEvent: " + event.getPlayer().getName() + " is trying to rent " + event.getRegion().getName() + ", extending=" + event.isExtending());
 	}
 
 	@EventHandler
 	public void rentedRegion(RentedRegionEvent event) {
-		AreaShop.debug(event.getRegion().getPlayerName() + " rented " + event.getRegion().getName() + ", extending=" + event.hasExtended());
+		AreaShop.debug("RentedRegionEvent: " + event.getRegion().getPlayerName() + " rented " + event.getRegion().getName() + ", extending=" + event.hasExtended());
 	}
 
 	@EventHandler
 	public void unrentingRegion(UnrentingRegionEvent event) {
-		AreaShop.debug(event.getRegion().getPlayerName() + " is trying to unrent " + event.getRegion().getName());
+		AreaShop.debug("UnrentingRegionEvent: " + event.getRegion().getPlayerName() + " is trying to unrent " + event.getRegion().getName());
 	}
 
 	@EventHandler
 	public void unrentedRegion(UnrentedRegionEvent event) {
-		AreaShop.debug(event.getRegion().getPlayerName() + " unrented " + event.getRegion().getName());
+		AreaShop.debug("UnrentedRegionEvent: " + event.getRegion().getPlayerName() + " unrented " + event.getRegion().getName());
 	}
 
 	@EventHandler
 	public void regionUpdate(RegionUpdateEvent event) {
-		AreaShop.debug(event.getRegion().getName() + " updated");
+		AreaShop.debug("RegionUpdateEvent: " + event.getRegion().getName() + " updated");
 	}
 }

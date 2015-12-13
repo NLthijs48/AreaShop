@@ -154,17 +154,14 @@ public final class SignChangeListener implements Listener {
 				
 				plugin.getFileManager().addRent(rent);
 				rent.handleSchematicEvent(RegionEvent.CREATED);
-				// Update the sign later because this event will do it first
+				plugin.message(player, "setup-rentSuccess", rent.getName());
+				// Update the region after the event has written its lines
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						rent.updateSigns();						
+						rent.update();
 					}
 				}.runTaskLater(plugin, 1);
-				
-				// Set the flags for the region
-				rent.updateRegionFlags();
-				plugin.message(player, "setup-rentSuccess", rent.getName());
 				// Run commands
 				rent.runEventCommands(RegionEvent.CREATED, false);
 			}
@@ -263,18 +260,15 @@ public final class SignChangeListener implements Listener {
 				
 				plugin.getFileManager().addBuy(buy);
 				buy.handleSchematicEvent(RegionEvent.CREATED);
-				// Update the sign later because this event will do it first
+				plugin.message(player, "setup-buySuccess", region.getId());
+				// Update the region after the event has written its lines
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						buy.updateSigns();						
+						buy.update();
 					}
 				}.runTaskLater(plugin, 1);
-				
-				// Set the flags for the region
-				buy.updateRegionFlags();
-				plugin.message(player, "setup-buySuccess", region.getId());
-				
+
 				// Run commands
 				buy.runEventCommands(RegionEvent.CREATED, false);
 			}
@@ -317,16 +311,15 @@ public final class SignChangeListener implements Listener {
 				region.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
 				plugin.message(player, "addsign-successProfile", region, thirdLine);
 			}
-			
-			// Update the sign later because this event will do it first
+
+			// Update the region later because this event will do it first
 			final GeneralRegion regionUpdate = region;
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					regionUpdate.updateSigns();						
+					regionUpdate.update();
 				}
 			}.runTaskLater(plugin, 1);
-			
 		}
 	}
 }

@@ -1,13 +1,8 @@
 package nl.evolutioncoding.areashop.regions;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.events.NotifyAreaShopEvent;
@@ -18,10 +13,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
@@ -79,8 +72,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		public String getValue() {
 			return value;
 		}
-	} 
-	
+	}
+
 	/* Enum for Region states */
 	public enum RegionState {
 		FORRENT("forrent"),
@@ -88,7 +81,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		FORSALE("forsale"),
 		SOLD("sold"),
 		RESELL("resell");
-		
+
 		private final String value;
 
 		RegionState(String value) {
@@ -98,8 +91,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return value;
 		}
 	}
-	
-	/* Enum for Region states */
+
+	/* Enum for click types */
 	public enum ClickType {
 		RIGHTCLICK("rightClick"),
 		LEFTCLICK("leftClick"),
@@ -115,8 +108,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return value;
 		}
 	}
-	
-	/* Enum for region types */
+
+	/* Enum for limit types */
 	public enum LimitType {		
 		RENTS("rents"),
 		BUYS("buys"),
@@ -176,6 +169,13 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		return region instanceof GeneralRegion && ((GeneralRegion)region).getName().equals(getName());
 	}
 
+	/**
+	 * Get the config file that is used to store the region information
+	 * @return The config file that stores the region information
+	 */
+	public YamlConfiguration getConfig() {
+		return config;
+	}
 
 	/**
 	 * Broadcast an event to indicate that region settings have been changed.
@@ -192,38 +192,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public void notifyAndUpdate(NotifyAreaShopEvent event) {
 		Bukkit.getPluginManager().callEvent(event);
 		update();
-	}
-
-	/**
-	 * Update the region flags according the region data
-	 */
-	public void updateRegionFlags(RegionState toState) {
-		// Get state setting
-		String setting = toState.getValue();
-		ConfigurationSection section = plugin.getConfig().getConfigurationSection("flagProfiles." + getStringSetting("general.flagProfile") + "." + setting);
-		setRegionFlags(section);
-	}
-
-	/**
-	 * Update the region flags according the region data
-	 */
-	public void updateRegionFlags() {
-		// Get state setting
-		RegionState toState = null;
-		if(isRentRegion()) {
-			if(((RentRegion)this).isRented()) {
-				toState = RegionState.RENTED;
-			} else {
-				toState = RegionState.FORRENT;
-			}	
-		} else if(isBuyRegion()) {
-			if(((BuyRegion)this).isSold()) {
-				toState = RegionState.SOLD;
-			} else {
-				toState = RegionState.FORSALE;
-			}
-		}
-		updateRegionFlags(toState);
 	}
 	
 	/**
@@ -857,103 +825,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	}
 	
 	/**
-	 * Update the signs connected to this region
-	 * @return true if the update was successful, otherwise false
-	 */
-	public boolean updateSigns() {
-		if(isDeleted()) {
-			return false;
-		}
-		boolean result = true;
-		Set<String> signs = null;
-		if(config.getConfigurationSection("general.signs") != null) {
-			signs = config.getConfigurationSection("general.signs").getKeys(false);
-		}
-		if(signs == null) {
-			return true;
-		}
-		for(String sign : signs) {
-			Location location = Utils.configToLocation(config.getConfigurationSection("general.signs." + sign + ".location"));
-			if(location == null) {
-				AreaShop.debug("Sign location incorrect region=" + getName() + ", signKey="+sign);
-				result = false;
-			} else {
-				// Get the profile set in the config
-				String profile = config.getString("general.signs." + sign + ".profile");
-				if(profile == null || profile.length() == 0) {
-					profile = getStringSetting("general.signProfile");
-				}
-				// Get the prefix
-				String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".";
-				// Get the lines
-				String[] signLines = new String[4];
-				signLines[0] = plugin.getConfig().getString(prefix + "line1");
-				signLines[1] = plugin.getConfig().getString(prefix + "line2");
-				signLines[2] = plugin.getConfig().getString(prefix + "line3");
-				signLines[3] = plugin.getConfig().getString(prefix + "line4");
-				// Check if the sign should be present
-				Block block = location.getBlock();
-				if(!plugin.getConfig().isSet(prefix)
-						|| ((signLines[0] == null || signLines[0].length() == 0)
-						&& (signLines[1] == null || signLines[1].length() == 0)
-						&& (signLines[2] == null || signLines[2].length() == 0)
-								&& (signLines[3] == null || signLines[3].length() == 0) )) {
-					block.setType(Material.AIR);
-				} else {
-					Sign signState = null;
-					if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
-						Material signType;
-						try {
-							signType = Material.valueOf(config.getString("general.signs." + sign + ".signType"));
-						} catch(NullPointerException | IllegalArgumentException e) {
-							signType = null;
-						}
-						if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
-							AreaShop.debug("  setting sign failed");
-							continue;
-						}
-						block.setType(signType);
-						signState = (Sign)block.getState();
-						org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
-						BlockFace signFace;
-						try {
-							signFace = BlockFace.valueOf(config.getString("general.signs." + sign + ".facing"));
-						} catch(NullPointerException | IllegalArgumentException e) {
-							signFace = null;
-						}
-						if(signFace != null) {
-							signData.setFacingDirection(signFace);
-							signState.setData(signData);
-						}
-					}
-					if(signState == null) {
-						signState = (Sign)block.getState();
-					}
-					org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
-					if(!config.isString("general.signs." + sign + ".signType")) {
-						setSetting("general.signs." + sign + ".signType", signState.getType().toString());
-					}
-					if(!config.isString("general.signs." + sign + ".facing")) {
-						setSetting("general.signs." + sign + ".facing", signData.getFacing().toString());
-					}
-					// Apply replacements and color and then set it on the sign
-					for(int i=0; i<signLines.length; i++) {
-						if(signLines[i] == null) {
-							signState.setLine(i, "");
-							continue;
-						}
-						signLines[i] = applyAllReplacements(signLines[i]);
-						signLines[i] = plugin.fixColors(signLines[i]);
-						signState.setLine(i, signLines[i]);
-					}
-					signState.update();
-				}
-			}
-		}
-		return result;
-	}
-	
-	/**
 	 * Change the restore setting
 	 * @param restore true, false or general
 	 */
@@ -1071,167 +942,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			region.setFlag(DefaultFlag.GREET_MESSAGE, null);
 			region.setFlag(DefaultFlag.FAREWELL_MESSAGE, null);
 		}
-	}
-	
-	/**
-	 * Set a WorldGuard regin flag
-	 * @param region The WorldGuard region to set
-	 * @param flag The flag to set
-	 * @param value The value to set the flag to
-	 * @throws InvalidFlagFormat When the value of the flag is wrong
-	 */
-	protected static <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value) throws InvalidFlagFormat {
-        region.setFlag(flag, flag.parseInput(WorldGuardPlugin.inst(), null, value));
-    }
-	
-	
-	/**
-	 * Set the region flags/options to the values of a ConfigurationSection
-	 * @param flags The configuration settings to apply to the region
-	 * @return true if the flags have been set correctly, otherwise false
-	 */
-	protected boolean setRegionFlags(ConfigurationSection flags) {
-		boolean result = true;		
-		if(flags == null) {
-			AreaShop.debug("Flags section is null for region " + getName());
-			return false;
-		}
-		Set<String> flagNames = flags.getKeys(false);
-		WorldGuardPlugin worldGuard = plugin.getWorldGuard();		
-		
-		// Get the region
-		ProtectedRegion region = getRegion();
-		if(region == null) {
-			AreaShop.debug("Region '" + getName() + "' does not exist, setting flags failed");
-			return false;
-		}
-		// Loop through all flags that are set in the config
-		for(String flagName : flagNames) {
-			String value = flags.getString(flagName);
-			value = applyAllReplacements(value);
-			// In the config normal Bukkit color codes are used, those only need to be translated on 5.X WorldGuard versions
-			if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {
-				value = translateBukkitToWorldGuardColors(value);
-			}
-			if(flagName.equalsIgnoreCase("members")) {
-				plugin.getWorldGuardHandler().setMembers(region, value);
-				//AreaShop.debug("  Flag " + flagName + " set: " + members.toUserFriendlyString());
-			} else if(flagName.equalsIgnoreCase("owners")) {
-				plugin.getWorldGuardHandler().setOwners(region, value);
-				//AreaShop.debug("  Flag " + flagName + " set: " + owners.toUserFriendlyString());
-			} else if(flagName.equalsIgnoreCase("priority")) {
-				try {
-					int priority = Integer.parseInt(value);
-					region.setPriority(priority);				
-					//AreaShop.debug("  Flag " + flagName + " set: " + value);
-				} catch(NumberFormatException e) {
-					plugin.getLogger().warning("The value of flag " + flagName + " is not a number");
-					result = false;
-				}
-			} else if(flagName.equalsIgnoreCase("parent")) {
-				if(getWorld() == null || worldGuard.getRegionManager(getWorld()) == null) {
-					continue;
-				}
-				ProtectedRegion parentRegion = worldGuard.getRegionManager(getWorld()).getRegion(value);
-				if(parentRegion != null) {
-					try {
-						region.setParent(parentRegion);
-						//AreaShop.debug("  Flag " + flagName + " set: " + value);
-					} catch (CircularInheritanceException e) {
-						plugin.getLogger().warning("The parent set in the config is not correct (circular inheritance)");
-					}
-				} else {
-					plugin.getLogger().warning("The parent set in the config is not correct (region does not exist)");
-				}				
-			} else {		
-				// Parse all other normal flags (groups are also handled)
-				String flagSetting = null;
-				com.sk89q.worldguard.protection.flags.RegionGroup groupValue = null;
-	
-		        Flag<?> foundFlag = DefaultFlag.fuzzyMatchFlag(flagName);
-		        if(foundFlag == null) {
-		        	plugin.getLogger().warning("Found wrong flag in flagProfiles section: " + flagName + ", check if that is the correct WorldGuard flag");
-		        	continue;
-		        }
-	            RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
-		        if(value == null || value.isEmpty()) {
-		        	region.setFlag(foundFlag, null);
-		            if (groupFlag != null) {
-		                region.setFlag(groupFlag, null);
-		            }
-	                //AreaShop.debug("  Flag " + flagName + " reset (+ possible group of flag)");
-		        } else {
-		        	if(groupFlag == null) {
-		        		flagSetting = value;
-		        	} else {
-			        	for(String part : value.split(" ")) {
-			        		if(part.startsWith("g:")) {
-			    	            if(part.length() > 2) {
-			    	            	try {
-			    	            		groupValue = groupFlag.parseInput(worldGuard, null, part.substring(2));
-			    	            	} catch(InvalidFlagFormat e) {
-			    	            		plugin.getLogger().warning("Found wrong group value for flag " + flagName);
-			    	            	}
-			    	            }
-			        		} else {
-			        			if(flagSetting == null) {
-			        				flagSetting = part;
-			        			} else {
-			        				flagSetting += " " + part;
-			        			}
-			        		}
-			        	}
-		        	}
-		        	if (flagSetting != null) {
-			            try {
-			                setFlag(region, foundFlag, flagSetting);
-			                //AreaShop.debug("  Flag " + flagName + " set: " + flagSetting);
-			            } catch (InvalidFlagFormat e) {
-			            	plugin.getLogger().warning("Found wrong value for flag " + flagName);
-			            }
-			        } 
-		        	if(groupValue != null) {
-		        		if(groupValue == groupFlag.getDefault()) {
-		        			region.setFlag(groupFlag, null);
-		        			//AreaShop.debug("    Group of flag " + flagName + " set to default: " + groupValue);
-		        		} else {
-		        			region.setFlag(groupFlag, groupValue);
-		        			//AreaShop.debug("    Group of flag " + flagName + " set: " + groupValue);
-		        		}
-		        	}
-		        }
-			}
-		}
-		// Indicate that the regions needs to be saved
-		plugin.getFileManager().saveIsRequiredForRegionWorld(getWorldName());
-		return result;
-	}
-
-	/**
-	 * Translate the color codes you put in greeting/farewell messages to the weird color codes of WorldGuard
-	 * @param message The message where the color codes should be translated (this message has bukkit color codes)
-	 * @return The string with the WorldGuard color codes
-	 */
-	public String translateBukkitToWorldGuardColors(String message) {
-		String result = message;
-		result = result.replace("&c", "&r");
-        result = result.replace("&4", "&R");
-        result = result.replace("&e", "&y");
-        result = result.replace("&6", "&Y");
-        result = result.replace("&a", "&g");
-        result = result.replace("&2", "&G");
-        result = result.replace("&b", "&c");
-        result = result.replace("&3", "&C");
-        result = result.replace("&9", "&b");
-        result = result.replace("&1", "&B");
-        result = result.replace("&d", "&p");
-        result = result.replace("&5", "&P");
-        result = result.replace("&0", "&0");
-        result = result.replace("&8", "&1");
-        result = result.replace("&7", "&2");
-        result = result.replace("&f", "&w");
-        result = result.replace("&r", "&x");
-		return result;
 	}
 	
 	/**

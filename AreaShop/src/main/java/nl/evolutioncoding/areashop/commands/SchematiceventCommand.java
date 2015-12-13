@@ -66,7 +66,7 @@ public class SchematiceventCommand extends CommandAreaShop {
 			return;	
 		}		
 		region.handleSchematicEvent(event);
-		region.updateSigns();
+		region.update();
 		plugin.message(sender, "schemevent-success", args[2], region.getName());
 	}
 

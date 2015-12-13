@@ -179,7 +179,7 @@ public class SignLinkerManager implements Listener {
 				} else {
 					plugin.message(linker, "addsign-successProfile", region, profile);
 				}
-				region.updateSigns();
+				region.update();
 				reset();
 				
 				plugin.message(linker, "linksigns-next");

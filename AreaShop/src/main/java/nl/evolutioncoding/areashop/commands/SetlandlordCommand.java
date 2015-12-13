@@ -72,6 +72,7 @@ public class SetlandlordCommand extends CommandAreaShop {
 			playerName = args[1];
 		}
 		region.setLandlord(player.getUniqueId(), playerName);
+		region.update();
 		plugin.message(sender, "setlandlord-success", playerName, region.getName());
 	}
 	

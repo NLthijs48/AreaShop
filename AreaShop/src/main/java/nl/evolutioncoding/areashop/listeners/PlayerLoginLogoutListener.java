@@ -93,14 +93,12 @@ public final class PlayerLoginLogoutListener implements Listener {
 							if(region.isBuyRegion()) {
 								if(!player.getName().equals(region.getStringSetting("buy.buyerName"))) {
 									region.setSetting("buy.buyerName", player.getName());
-									region.updateRegionFlags();
-									region.updateSigns();
+									region.update();
 								}
 							} else if(region.isRentRegion()) {
 								if(!player.getName().equals(region.getStringSetting("rent.renterName"))) {
 									region.setSetting("rent.renterName", player.getName());
-									region.updateRegionFlags();
-									region.updateSigns();
+									region.update();
 								}
 							}
 						}

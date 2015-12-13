@@ -72,10 +72,9 @@ public class SetdurationCommand extends CommandAreaShop {
 			return;
 		}	
 		if("default".equalsIgnoreCase(args[1]) || "reset".equalsIgnoreCase(args[1])) {
-			plugin.message(sender, "setduration-successRemoved", rent);
 			rent.setDuration(null);
-			rent.updateRegionFlags();
-			rent.updateSigns();
+			rent.update();
+			plugin.message(sender, "setduration-successRemoved", rent);
 			return;
 		}
 		try {
@@ -89,8 +88,7 @@ public class SetdurationCommand extends CommandAreaShop {
 			return;
 		}					
 		rent.setDuration(args[1]+" "+args[2]);
-		rent.updateRegionFlags();
-		rent.updateSigns();
+		rent.update();
 		plugin.message(sender, "setduration-success", rent.getName(), rent.getDurationString());
 	}
 	

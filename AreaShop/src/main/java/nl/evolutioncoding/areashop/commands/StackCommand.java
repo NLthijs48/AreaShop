@@ -177,8 +177,8 @@ public class StackCommand extends CommandAreaShop {
 							rent.runEventCommands(RegionEvent.CREATED, true);						
 							plugin.getFileManager().addRent(rent);
 							rent.handleSchematicEvent(RegionEvent.CREATED);
-							rent.updateRegionFlags();
 							rent.runEventCommands(RegionEvent.CREATED, false);
+							rent.update();
 						} else {
 							BuyRegion buy = new BuyRegion(plugin, region.getId(), selection.getWorld());
 							if(finalGroup != null) {
@@ -187,9 +187,9 @@ public class StackCommand extends CommandAreaShop {
 							buy.runEventCommands(RegionEvent.CREATED, true);
 							plugin.getFileManager().addBuy(buy);
 							buy.handleSchematicEvent(RegionEvent.CREATED);
-							buy.updateRegionFlags();						
 							buy.runEventCommands(RegionEvent.CREATED, false);
-						}						
+							buy.update();
+						}
 						current++;
 					} 
 				}

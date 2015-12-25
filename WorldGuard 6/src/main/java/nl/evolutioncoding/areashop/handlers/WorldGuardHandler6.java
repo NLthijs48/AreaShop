@@ -1,17 +1,15 @@
 package nl.evolutioncoding.areashop.handlers;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import nl.evolutioncoding.areashop.interfaces.AreaShopInterface;
-import nl.evolutioncoding.areashop.interfaces.WorldGuardInterface;
-
-import org.bukkit.Location;
-
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import nl.evolutioncoding.areashop.interfaces.AreaShopInterface;
+import nl.evolutioncoding.areashop.interfaces.WorldGuardInterface;
+import org.bukkit.Location;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class WorldGuardHandler6 extends WorldGuardInterface {
 
@@ -33,7 +31,7 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 					}
 				} else if(owner.startsWith("n:")) {
 					if(owner.length() > 2) {
-						owners.addPlayer(owner);
+						owners.addPlayer(owner.substring(2));
 					}							
 				} else {				
 					UUID uuid;						
@@ -68,7 +66,7 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 					}
 				} else if(member.startsWith("n:")) {
 					if(member.length() > 2) {
-						members.addPlayer(member);
+						members.addPlayer(member.substring(2));
 					}							
 				} else {
 					UUID uuid;						

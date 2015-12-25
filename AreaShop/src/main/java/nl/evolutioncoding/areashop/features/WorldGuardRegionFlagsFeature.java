@@ -150,7 +150,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 	}
 
 	/**
-	 * Set a WorldGuard regin flag
+	 * Set a WorldGuard region flag
 	 * @param region The WorldGuard region to set
 	 * @param flag   The flag to set
 	 * @param value  The value to set the flag to

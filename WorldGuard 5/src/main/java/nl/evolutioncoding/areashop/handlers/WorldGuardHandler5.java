@@ -33,7 +33,7 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 					}
 				} else if(owner.startsWith("n:")) {
 					if(owner.length() > 2) {
-						owners.addPlayer(owner);
+						owners.addPlayer(owner.substring(2));
 					}							
 				} else {
 					UUID uuid;						
@@ -70,7 +70,7 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 					}
 				} else if(member.startsWith("n:")) {
 					if(member.length() > 2) {
-						members.addPlayer(member);
+						members.addPlayer(member.substring(2));
 					}							
 				} else {
 					UUID uuid;						

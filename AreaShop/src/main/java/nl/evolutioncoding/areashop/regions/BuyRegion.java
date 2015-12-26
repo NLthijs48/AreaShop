@@ -508,9 +508,9 @@ public class BuyRegion extends GeneralRegion {
 		}
 
 		if(own) {
-			plugin.message(executor, "sell-soldYours");
+			message(executor, "sell-soldYours");
 		} else {
-			plugin.message(executor, "sell-sold");
+			message(executor, "sell-sold");
 		}
 
 		// Remove friends and the owner

@@ -2,6 +2,7 @@ package nl.evolutioncoding.areashop.regions;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.events.ask.BuyingRegionEvent;
 import nl.evolutioncoding.areashop.events.ask.ResellingRegionEvent;
 import nl.evolutioncoding.areashop.events.ask.SellingRegionEvent;
@@ -84,7 +85,7 @@ public class BuyRegion extends GeneralRegion {
 			setSetting("buy.buyerName", null);
 		} else {
 			setSetting("buy.buyer", buyer.toString());
-			setSetting("buy.buyerName", plugin.toName(buyer));
+			setSetting("buy.buyerName", Utils.toName(buyer));
 		}
 	}
 	
@@ -93,7 +94,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The name of the player that owns this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return <UNKNOWN>
 	 */
 	public String getPlayerName() {
-		String result = plugin.toName(getBuyer());
+		String result = Utils.toName(getBuyer());
 		if(result == null || result.isEmpty()) {
 			result = getStringSetting("buy.buyerName");
 			if(result == null || result.isEmpty()) {
@@ -140,7 +141,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The formatted string of the price
 	 */
 	public String getFormattedPrice() {
-		return plugin.formatCurrency(getPrice());
+		return Utils.formatCurrency(getPrice());
 	}
 	
 	/**
@@ -148,7 +149,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The formatted string of the resellprice
 	 */
 	public String getFormattedResellPrice() {
-		return plugin.formatCurrency(getResellPrice());
+		return Utils.formatCurrency(getResellPrice());
 	}
 	
 	/**
@@ -204,7 +205,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return String with currency symbols and proper fractional part
 	 */
 	public String getFormattedMoneyBackAmount() {
-		return plugin.formatCurrency(getMoneyBackAmount());
+		return Utils.formatCurrency(getMoneyBackAmount());
 	}
 	
 	@Override
@@ -234,7 +235,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The number of milliseconds until the region is unrented while player is offline
 	 */
 	public long getInactiveTimeUntilSell() {
-		return plugin.getDurationFromMinutesOrStringInput(getStringSetting("buy.inactiveTimeUntilSell"));
+		return Utils.getDurationFromMinutesOrStringInput(getStringSetting("buy.inactiveTimeUntilSell"));
 	}
 	
 	/**
@@ -413,9 +414,9 @@ public class BuyRegion extends GeneralRegion {
 				} else {
 					// Player has not enough money
 					if(isResell) {
-						message(player, "buy-lowMoneyResell", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
+						message(player, "buy-lowMoneyResell", Utils.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
 					} else {
-						message(player, "buy-lowMoney", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
+						message(player, "buy-lowMoney", Utils.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
 					}
 				}
 			} else {

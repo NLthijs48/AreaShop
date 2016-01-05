@@ -34,9 +34,8 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -464,77 +463,77 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public void setupTasks() {
         // Rent expiration timer
-        long expirationCheck = Utils.millisToTicks(getDurationFromSecondsOrString("expiration.delay"));
-        final AreaShop finalPlugin = this;
-        if(expirationCheck > 0) {
+		long expirationCheck = Utils.millisToTicks(Utils.getDurationFromSecondsOrString("expiration.delay"));
+		final AreaShop finalPlugin = this;
+		if(expirationCheck > 0) {
 	        new BukkitRunnable() {
 				@Override
 				public void run() {
 					if(isReady()) {
 						finalPlugin.getFileManager().checkRents();
-						AreaShop.debug("Checking rent expirations...");
+						AreaShop.debugTask("Checking rent expirations...");
 					} else {
-						AreaShop.debug("Skipped checking rent expirations, plugin not ready");
+						AreaShop.debugTask("Skipped checking rent expirations, plugin not ready");
 					}
 				}
 	        }.runTaskTimer(this, 1, expirationCheck);
         }
 	    // Inactive unrenting/selling timer
-        long inactiveCheck = Utils.millisToTicks(getDurationFromMinutesOrString("inactive.delay"));
-        if(inactiveCheck > 0) {
-	        new BukkitRunnable() {
+		long inactiveCheck = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("inactive.delay"));
+		if(inactiveCheck > 0) {
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					if(isReady()) {
 						finalPlugin.getFileManager().checkForInactiveRegions();
-						AreaShop.debug("Checking for regions with players that are inactive too long...");
+						AreaShop.debugTask("Checking for regions with players that are inactive too long...");
 					} else {
-						AreaShop.debug("Skipped checking for regions of inactive players, plugin not ready");
+						AreaShop.debugTask("Skipped checking for regions of inactive players, plugin not ready");
 					}
 				}
 	        }.runTaskTimer(this, inactiveCheck, inactiveCheck);	     
         }	        
 	    // Periodic updating of signs for timeleft tags
-        long periodicUpdate = Utils.millisToTicks(getDurationFromSecondsOrString("signs.delay"));
-        if(periodicUpdate > 0) {
-	        new BukkitRunnable() {
+		long periodicUpdate = Utils.millisToTicks(Utils.getDurationFromSecondsOrString("signs.delay"));
+		if(periodicUpdate > 0) {
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					if(isReady()) {
 						finalPlugin.getFileManager().performPeriodicSignUpdate();
-						AreaShop.debug("Performing periodic sign update...");
+						AreaShop.debugTask("Performing periodic sign update...");
 					} else {
-						AreaShop.debug("Skipped performing periodic sign update, plugin not ready");
+						AreaShop.debugTask("Skipped performing periodic sign update, plugin not ready");
 					}
 				}
 	        }.runTaskTimer(this, periodicUpdate, periodicUpdate);	     
         }
         // Saving regions and group settings
-        long saveFiles = Utils.millisToTicks(getDurationFromMinutesOrString("saving.delay"));
-        if(saveFiles > 0) {
-	        new BukkitRunnable() {
+		long saveFiles = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("saving.delay"));
+		if(saveFiles > 0) {
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					if(isReady()) {
 						finalPlugin.getFileManager().saveRequiredFiles();
-						AreaShop.debug("Saving required files...");
+						AreaShop.debugTask("Saving required files...");
 					} else {
-						AreaShop.debug("Skipped saving required files, plugin not ready");
+						AreaShop.debugTask("Skipped saving required files, plugin not ready");
 					}
 				}
 	        }.runTaskTimer(this, saveFiles, saveFiles);	     
         }
         // Sending warnings about rent regions to online players
-       long expireWarning = Utils.millisToTicks(getDurationFromMinutesOrString("expireWarning.delay"));
-        if(expireWarning > 0) {
-	        new BukkitRunnable() {
+		long expireWarning = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("expireWarning.delay"));
+		if(expireWarning > 0) {
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					if(isReady()) {
 						finalPlugin.getFileManager().sendRentExpireWarnings();
-						AreaShop.debug("Sending rent expire warnings...");
+						AreaShop.debugTask("Sending rent expire warnings...");
 					} else {
-						AreaShop.debug("Skipped sending rent expire warnings, plugin not ready");
+						AreaShop.debugTask("Skipped sending rent expire warnings, plugin not ready");
 					}
 				}
 	        }.runTaskTimer(this, expireWarning, expireWarning);	     
@@ -545,7 +544,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				@Override
 				public void run() {
 					finalPlugin.getFileManager().updateAllRegions();
-					AreaShop.debug("Updating all regions at startup...");
+					AreaShop.debugTask("Updating all regions at startup...");
 				}
 	        }.runTaskLater(this, 20L);	     
         }
@@ -562,13 +561,13 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		if(target == null) {
 			return;
 		}
-		String langString = this.fixColors(languageManager.getLang(key, params));
+		String langString = Utils.applyColors(languageManager.getLang(key, params));
 		if(langString == null || langString.equals("")) {
 			// Do nothing, message is not available or disabled
 		} else {
 			if(target instanceof Player) {
 				if(prefix) {
-					((Player)target).sendMessage(this.fixColors(chatprefix) + langString);
+					((Player)target).sendMessage(Utils.applyColors(chatprefix)+langString);
 				} else {
 					((Player)target).sendMessage(langString);
 				}
@@ -595,97 +594,10 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public void message(Object target, String key, Object... params) {
 		configurableMessage(target, key, true, params);
 	}
+
 	
 	/**
-	 * Convert color and formatting codes to bukkit values
-	 * @param input Start string with color and formatting codes in it
-	 * @return String with the color and formatting codes in the bukkit format
-	 */
-	public String fixColors(String input) {
-		String result = null;
-		if(input != null) {
-			result =  ChatColor.translateAlternateColorCodes('&', input);	
-			result = result.replaceAll("�", "\u20AC");
-		}		
-		return result;
-	}
-	
-	/**
-	 * Format the currency amount with the characters before and after
-	 * @return Currency character format string
-	 * @param amount Amount of money to format
-	 */
-	public String formatCurrency(double amount) {
-		String before = this.getConfig().getString("moneyCharacter");
-		before = before.replace(currencyEuro, "\u20ac");
-		String after = this.getConfig().getString("moneyCharacterAfter");
-		after = after.replace(currencyEuro, "\u20ac");
-	    String result;
-	    // Check for infinite and NaN
-	    if(Double.isInfinite(amount)) {
-			result = "\u221E"; // Infinite symbol
-		} else if(Double.isNaN(amount)) {
-			result = "NaN";
-		} else {	    
-			// Add metric 
-			double metricAbove = getConfig().getDouble("metricSuffixesAbove");
-			if(metricAbove != -1 && amount >= metricAbove) {
-				if(amount >= 1000000000000000000000000.0) {
-					amount = amount/1000000000000000000000000.0;
-					after = "Y" + after;
-				} else if(amount >= 1000000000000000000000.0) {
-					amount = amount/1000000000000000000000.0;
-					after = "Z" + after;
-				} else if(amount >= 1000000000000000000.0) {
-					amount = amount/1000000000000000000.0;
-					after = "E" + after;
-				} else if(amount >= 1000000000000000.0) {
-					amount = amount/1000000000000000.0;
-					after = "P" + after;
-				} else if(amount >= 1000000000000.0) {
-					amount = amount/1000000000000.0;
-					after = "T" + after;
-				} else if(amount >= 1000000000.0) {
-					amount = amount/1000000000.0;
-					after = "G" + after;
-				} else if(amount >= 1000000.0) {
-					amount = amount/1000000.0;
-					after = "M" + after;
-				} else if(amount >= 1000.0) {
-					amount = amount/1000.0;
-					after = "k" + after;
-				}
-				BigDecimal bigDecimal = new BigDecimal(amount);
-				if(bigDecimal.toString().contains(".")) {
-					int frontLength = bigDecimal.toString().substring(0, bigDecimal.toString().indexOf('.')).length();
-				    bigDecimal = bigDecimal.setScale(getConfig().getInt("fractionalNumbers") + (3-frontLength), RoundingMode.HALF_UP);
-				}
-			    result = bigDecimal.toString();
-			} else {
-				BigDecimal bigDecimal = new BigDecimal(amount);
-				bigDecimal = bigDecimal.setScale(getConfig().getInt("fractionalNumbers"), RoundingMode.HALF_UP);
-				amount = bigDecimal.doubleValue();
-			    result = bigDecimal.toString();
-				if(getConfig().getBoolean("hideEmptyFractionalPart") && (amount%1.0) == 0.0 && result.contains(".")) {
-					result = result.substring(0, result.indexOf('.'));
-				}
-			}
-		}
-		result = result.replace(".", getConfig().getString("decimalMark"));
-		return before + result + after;
-	}	
-	
-	/**
-	 * Function for quitting the plugin, NOT USED ATM
-	 */
-	public void quit() {
-		this.getLogger().info("Plugin will be stopped");
-		Bukkit.getPluginManager().disablePlugin(this);
-	}
-	
-	
-	/**
-	 * Return the config configured by the user or the default
+	 * Return the config
 	 */
 	@Override
 	public YamlConfiguration getConfig() {
@@ -702,159 +614,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		} catch (Exception e) {
 		    AreaShop.debug("Could not start Metrics");
 		}
-	}	
-	
-	/**
-	 * Checks if the string is a correct time period
-	 * @param time String that has to be checked
-	 * @return true if format is correct, false if not
-	 */
-	public boolean checkTimeFormat(String time) {
-		/* Check if the string is not empty and check the length */
-		if(time == null || time.length() <= 1 || time.indexOf(' ') == -1 || time.indexOf(' ') >= (time.length()-1)) {
-			return false;
-		}
-		
-		/* Check if the suffix is one of these values */
-		String suffix = time.substring(time.indexOf(' ')+1, time.length());
-		ArrayList<String> identifiers = new ArrayList<>();
-		identifiers.addAll(this.getConfig().getStringList("seconds"));
-		identifiers.addAll(this.getConfig().getStringList("minutes"));
-		identifiers.addAll(this.getConfig().getStringList("hours"));
-		identifiers.addAll(this.getConfig().getStringList("days"));
-		identifiers.addAll(this.getConfig().getStringList("weeks"));
-		identifiers.addAll(this.getConfig().getStringList("months"));
-		identifiers.addAll(this.getConfig().getStringList("years"));
-		if(!identifiers.contains(suffix)) {
-			return false;
-		}
-		
-		/* check if the part before the space is a number */
-		String prefix = time.substring(0, (time.indexOf(' ')));
-		return prefix.matches("\\d+");
 	}
-	
-	/**
-	 * Methode to tranlate a duration string to a millisecond value
-	 * @param duration The duration string
-	 * @return The duration in milliseconds translated from the durationstring, or if it is invalid then 0
-	 */
-	public long durationStringToLong(String duration) {
-		if(duration == null) {
-			return 0;
-		} else if(duration.equalsIgnoreCase("disabled") || duration.equalsIgnoreCase("unlimited")) {
-			return -1;
-		} else if(duration.indexOf(' ') == -1) {
-			return 0;
-		}
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(0);
 
-		ArrayList<String> seconds = new ArrayList<>(this.getConfig().getStringList("seconds"));
-		ArrayList<String> minutes = new ArrayList<>(this.getConfig().getStringList("minutes"));
-		ArrayList<String> hours = new ArrayList<>(this.getConfig().getStringList("hours"));
-		ArrayList<String> days = new ArrayList<>(this.getConfig().getStringList("days"));
-		ArrayList<String> weeks = new ArrayList<>(this.getConfig().getStringList("weeks"));
-		ArrayList<String> months = new ArrayList<>(this.getConfig().getStringList("months"));
-		ArrayList<String> years = new ArrayList<>(this.getConfig().getStringList("years"));
-		
-		String durationString = duration.substring(duration.indexOf(' ')+1, duration.length());
-		int durationInt = 0;
-		try {
-			durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));
-		} catch(NumberFormatException exception) {
-			// No Number found, add zero
-		}
-		
-		if(seconds.contains(durationString)) {
-			calendar.add(Calendar.SECOND, durationInt);
-		} else if(minutes.contains(durationString)) {
-			calendar.add(Calendar.MINUTE, durationInt);
-		} else if(hours.contains(durationString)) {
-			calendar.add(Calendar.HOUR, durationInt);
-		} else if(days.contains(durationString)) {
-			calendar.add(Calendar.DAY_OF_MONTH, durationInt);
-		} else if(weeks.contains(durationString)) {
-			calendar.add(Calendar.DAY_OF_MONTH, durationInt*7);
-		} else if(months.contains(durationString)) {
-			calendar.add(Calendar.MONTH, durationInt);
-		} else if(years.contains(durationString)) {
-			calendar.add(Calendar.YEAR, durationInt);
-		}		
-		return calendar.getTimeInMillis();
-	}
-	
-	/**
-	 * Get setting from config that could be only a number indicating seconds
-	 * or a string indicating a duration string
-	 * @param path Path of the setting to read
-	 * @return milliseconds that the setting indicates
-	 */
-	public long getDurationFromSecondsOrString(String path) {
-		if(getConfig().isLong(path) || getConfig().isInt(path)) {
-			long setting = getConfig().getLong(path);
-			if(setting != -1) {
-				setting = setting*1000;
-			}
-			return setting;
-		} else {
-			return durationStringToLong(getConfig().getString(path));
-		}
-	}
-	/**
-	 * Get setting from config that could be only a number indicating minutes
-	 * or a string indicating a duration string
-	 * @param path Path of the setting to read
-	 * @return milliseconds that the setting indicates
-	 */
-	public long getDurationFromMinutesOrString(String path) {
-		if(getConfig().isLong(path) || getConfig().isInt(path)) {
-			long setting = getConfig().getLong(path);
-			if(setting != -1) {
-				setting = setting*60*1000;
-			}
-			return setting;
-		} else {
-			return durationStringToLong(getConfig().getString(path));
-		}
-	}
-	
-	/**
-	 * Parse a time setting that could be minutes or a duration string
-	 * @param input The string to parse
-	 * @return milliseconds that the string indicates
-	 */
-	public long getDurationFromMinutesOrStringInput(String input) {
-		long number;
-		try {
-			number = Long.parseLong(input);
-			if(number != -1) {
-				number = number*60*1000;
-			}
-			return number;
-		} catch(NumberFormatException e) {
-			return durationStringToLong(input);			
-		}
-	}
-	
-	/**
-	 * Parse a time setting that could be seconds or a duration string
-	 * @param input The string to parse
-	 * @return seconds that the string indicates
-	 */
-	public long getDurationFromSecondsOrStringInput(String input) {
-		long number;
-		try {
-			number = Long.parseLong(input);
-			if(number != -1) {
-				number = number*1000;
-			}
-			return number;
-		} catch(NumberFormatException e) {
-			return durationStringToLong(input);			
-		}
-	}
-	
+
 	/**
 	 * Sends an debug message to the console
 	 * @param message The message that should be printed to the console
@@ -870,7 +632,17 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public void debugI(String message) {
 		AreaShop.debug(message);
 	}
-	
+
+	/**
+	 * Print debug message for periodic task
+	 * @param message The message to print
+	 */
+	public static void debugTask(String message) {
+		if(AreaShop.getInstance().getConfig().getBoolean("debugTask")) {
+			AreaShop.debug(message);
+		}
+	}
+
 	/**
 	 * Reload all files of the plugin and update all regions
 	 * confirmationReceiver The CommandSender that should receive confirmation messages, null for nobody
@@ -878,8 +650,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public void reload(final CommandSender confirmationReceiver) {
 		setReady(false);
 		fileManager.saveRequiredFilesAtOnce();
-		chatprefix = this.getConfig().getString("chatPrefix");
-		debug = this.getConfig().getBoolean("debug");
 		fileManager.loadFiles();
 		languageManager.startup();
 		message(confirmationReceiver, "reload-reloading");
@@ -891,55 +661,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public void reload() {
 		reload(null);
-	}
-	
-	/**
-	 * Conversion to name by uuid
-	 * @param uuid The uuid in string format
-	 * @return the name of the player
-	 */
-	public String toName(String uuid) {
-		String result = "";
-		if(uuid != null) {
-			try {
-				UUID parsed = UUID.fromString(uuid);
-				result = this.toName(parsed);
-			} catch(IllegalArgumentException e) {
-				// Incorrect UUID
-			}
-		}
-		return result;
-	}
-	/**
-	 * Conversion to name by uuid object
-	 * @param uuid The uuid in string format
-	 * @return the name of the player
-	 */
-	public String toName(UUID uuid) {
-		if(uuid == null) {
-			return "";
-		} else {
-			String name = Bukkit.getOfflinePlayer(uuid).getName();
-			if(name != null) {
-				return name;
-			}
-			return "";
-		}
-	}
-	
-	/**
-	 * Conversion from name to uuid
-	 * @param name The name of the player
-	 * @return The uuid of the player
-	 */
-	@SuppressWarnings("deprecation") // Fake deprecation by Bukkit to inform developers, method will stay
-	public String toUUID(String name) {
-		if(name == null) {
-			return null;
-		} else {
-			return Bukkit.getOfflinePlayer(name).getUniqueId().toString();
-		}
-		
 	}
 	
 }

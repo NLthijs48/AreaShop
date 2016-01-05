@@ -83,7 +83,7 @@ public class SetdurationCommand extends CommandAreaShop {
 			plugin.message(sender, "setduration-wrongAmount", args[1]);
 			return;
 		}
-		if(!plugin.checkTimeFormat(args[1] + " " + args[2])) {
+		if(!Utils.checkTimeFormat(args[1]+" "+args[2])) {
 			plugin.message(sender, "setduration-wrongFormat", args[1]+" "+args[2]);
 			return;
 		}					

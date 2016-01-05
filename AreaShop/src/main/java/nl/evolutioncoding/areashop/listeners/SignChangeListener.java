@@ -115,7 +115,7 @@ public final class SignChangeListener implements Listener {
 				plugin.message(player, "setup-alreadyRentSign");
 			} else if(addResult == AddResult.NOPERMISSION) {
 				plugin.message(player, "setup-noPermission", secondLine);
-			} else if(thirdLine != null && thirdLine.length() != 0 && !plugin.checkTimeFormat(thirdLine)) {
+			} else if(thirdLine != null && thirdLine.length() != 0 && !Utils.checkTimeFormat(thirdLine)) {
 				plugin.message(player, "setup-wrongDuration");
 			} else {
 				double price = 0.0;

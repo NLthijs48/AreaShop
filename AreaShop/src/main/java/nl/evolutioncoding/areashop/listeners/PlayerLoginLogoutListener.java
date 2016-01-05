@@ -1,6 +1,7 @@
 package nl.evolutioncoding.areashop.listeners;
 
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 import org.bukkit.entity.Player;
@@ -64,7 +65,7 @@ public final class PlayerLoginLogoutListener implements Listener {
 						if(warningSetting == null || warningSetting.isEmpty()) {
 							continue;
 						}
-						long warningTime = plugin.durationStringToLong(warningSetting);
+						long warningTime = Utils.durationStringToLong(warningSetting);
 						if(region.getTimeLeft() < warningTime) {
 							// Send the warning message later to let it appear after general MOTD messages
 							AreaShop.getInstance().message(player, "rent-expireWarning", region);		        

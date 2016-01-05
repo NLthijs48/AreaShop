@@ -1,6 +1,7 @@
 package nl.evolutioncoding.areashop.features;
 
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.events.ask.*;
 import nl.evolutioncoding.areashop.events.notify.*;
 import org.bukkit.event.EventHandler;
@@ -29,7 +30,7 @@ public class DebugFeature extends Feature implements Listener {
 
 	@EventHandler
 	public void soldRegion(SoldRegionEvent event) {
-		AreaShop.debug("SoldRegionEvent: " + event.getRegion().getName() + " sold " + event.getRegion().getName());
+		AreaShop.debug("SoldRegionEvent: "+Utils.toName(event.getOldBuyer())+" sold "+event.getRegion().getName());
 	}
 
 	@EventHandler
@@ -39,7 +40,7 @@ public class DebugFeature extends Feature implements Listener {
 
 	@EventHandler
 	public void resoldRegion(ResoldRegionEvent event) {
-		AreaShop.debug("ResoldRegionEvent: " + event.getRegion().getName() + " resold " + event.getRegion().getName());
+		AreaShop.debug("ResoldRegionEvent: "+Utils.toName(event.getFromPlayer())+" resold "+event.getRegion().getName()+" to "+event.getRegion().getPlayerName());
 	}
 
 	@EventHandler
@@ -59,11 +60,11 @@ public class DebugFeature extends Feature implements Listener {
 
 	@EventHandler
 	public void unrentedRegion(UnrentedRegionEvent event) {
-		AreaShop.debug("UnrentedRegionEvent: " + event.getRegion().getPlayerName() + " unrented " + event.getRegion().getName());
+		AreaShop.debug("UnrentedRegionEvent: "+Utils.toName(event.getOldRenter())+" unrented "+event.getRegion().getName());
 	}
 
 	@EventHandler
 	public void regionUpdate(RegionUpdateEvent event) {
-		AreaShop.debug("RegionUpdateEvent: " + event.getRegion().getName() + " updated");
+		//AreaShop.debug("RegionUpdateEvent: " + event.getRegion().getName() + " updated");
 	}
 }

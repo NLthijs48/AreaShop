@@ -36,7 +36,7 @@ public class LanguageManager {
 	 * Saves the default language files if not already present
 	 */
 	public void saveDefaults() {
-		/* Create the language folder if it not exists */
+		// Create the language folder if it not exists
 		File langFolder;
 		langFolder = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder);
 		if(!langFolder.exists()) {
@@ -45,11 +45,11 @@ public class LanguageManager {
 				return;
 			}
 		}
-		
-		/* Create the language files, overwrites if a file already exists */
-		/* Overriding is necessary because otherwise with an update the new lang */
-		/* files would not be used, when translating your own use another */
-		/* file name as the default */
+
+		// Create the language files, overwrites if a file already exists
+		// Overriding is necessary because otherwise with an update the new lang
+		// files would not be used, when translating your own use another
+		// file name as the default
 		File langFile;
 		for(String language : languages) {
 			langFile = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder + File.separator + language + ".yml");

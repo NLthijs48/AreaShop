@@ -10,23 +10,54 @@ import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionType;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
 
 public class Utils {
 
 	// Not used
 	private Utils() {}
 
-	
+	private static YamlConfiguration config;
+	private static ArrayList<String> identifiers;
+	private static ArrayList<String> seconds;
+	private static ArrayList<String> minutes;
+	private static ArrayList<String> hours;
+	private static ArrayList<String> days;
+	private static ArrayList<String> weeks;
+	private static ArrayList<String> months;
+	private static ArrayList<String> years;
+
+	public static void initialize(YamlConfiguration pluginConfig) {
+		config = pluginConfig;
+
+		// Setup individual identifiers
+		seconds = new ArrayList<>(config.getStringList("seconds"));
+		minutes = new ArrayList<>(config.getStringList("minutes"));
+		hours = new ArrayList<>(config.getStringList("hours"));
+		days = new ArrayList<>(config.getStringList("days"));
+		weeks = new ArrayList<>(config.getStringList("weeks"));
+		months = new ArrayList<>(config.getStringList("months"));
+		years = new ArrayList<>(config.getStringList("years"));
+		// Setup all time identifiers
+		identifiers = new ArrayList<>();
+		identifiers.addAll(seconds);
+		identifiers.addAll(minutes);
+		identifiers.addAll(hours);
+		identifiers.addAll(days);
+		identifiers.addAll(weeks);
+		identifiers.addAll(months);
+		identifiers.addAll(years);
+	}
+
 	/**
 	 * Create a map from a location, to save it in the config
 	 * @param location The location to transform
@@ -272,7 +303,278 @@ public class Utils {
 		}
 		return new ArrayList<>(result);
 	}
-	
+
+
+	/**
+	 * Convert color and formatting codes to bukkit values
+	 * @param input Start string with color and formatting codes in it
+	 * @return String with the color and formatting codes in the bukkit format
+	 */
+	public static String applyColors(String input) {
+		String result = null;
+		if(input != null) {
+			result = ChatColor.translateAlternateColorCodes('&', input);
+		}
+		return result;
+	}
+
+
+	/**
+	 * Format the currency amount with the characters before and after
+	 * @param amount Amount of money to format
+	 * @return Currency character format string
+	 */
+	public static String formatCurrency(double amount) {
+		String before = config.getString("moneyCharacter");
+		before = before.replace(AreaShop.currencyEuro, "\u20ac");
+		String after = config.getString("moneyCharacterAfter");
+		after = after.replace(AreaShop.currencyEuro, "\u20ac");
+		String result;
+		// Check for infinite and NaN
+		if(Double.isInfinite(amount)) {
+			result = "\u221E"; // Infinite symbol
+		} else if(Double.isNaN(amount)) {
+			result = "NaN";
+		} else {
+			// Add metric
+			double metricAbove = config.getDouble("metricSuffixesAbove");
+			if(metricAbove != -1 && amount >= metricAbove) {
+				if(amount >= 1000000000000000000000000.0) {
+					amount = amount/1000000000000000000000000.0;
+					after = "Y"+after;
+				} else if(amount >= 1000000000000000000000.0) {
+					amount = amount/1000000000000000000000.0;
+					after = "Z"+after;
+				} else if(amount >= 1000000000000000000.0) {
+					amount = amount/1000000000000000000.0;
+					after = "E"+after;
+				} else if(amount >= 1000000000000000.0) {
+					amount = amount/1000000000000000.0;
+					after = "P"+after;
+				} else if(amount >= 1000000000000.0) {
+					amount = amount/1000000000000.0;
+					after = "T"+after;
+				} else if(amount >= 1000000000.0) {
+					amount = amount/1000000000.0;
+					after = "G"+after;
+				} else if(amount >= 1000000.0) {
+					amount = amount/1000000.0;
+					after = "M"+after;
+				} else if(amount >= 1000.0) {
+					amount = amount/1000.0;
+					after = "k"+after;
+				}
+				BigDecimal bigDecimal = new BigDecimal(amount);
+				if(bigDecimal.toString().contains(".")) {
+					int frontLength = bigDecimal.toString().substring(0, bigDecimal.toString().indexOf('.')).length();
+					bigDecimal = bigDecimal.setScale(config.getInt("fractionalNumbers")+(3-frontLength), RoundingMode.HALF_UP);
+				}
+				result = bigDecimal.toString();
+			} else {
+				BigDecimal bigDecimal = new BigDecimal(amount);
+				bigDecimal = bigDecimal.setScale(config.getInt("fractionalNumbers"), RoundingMode.HALF_UP);
+				amount = bigDecimal.doubleValue();
+				result = bigDecimal.toString();
+				if(config.getBoolean("hideEmptyFractionalPart") && (amount%1.0) == 0.0 && result.contains(".")) {
+					result = result.substring(0, result.indexOf('.'));
+				}
+			}
+		}
+		result = result.replace(".", config.getString("decimalMark"));
+		return before+result+after;
+	}
+
+
+	/**
+	 * Checks if the string is a correct time period
+	 * @param time String that has to be checked
+	 * @return true if format is correct, false if not
+	 */
+	public static boolean checkTimeFormat(String time) {
+		// Check if the string is not empty and check the length
+		if(time == null || time.length() <= 1 || time.indexOf(' ') == -1 || time.indexOf(' ') >= (time.length()-1)) {
+			return false;
+		}
+
+		// Check if the suffix is one of these values
+		String suffix = time.substring(time.indexOf(' ')+1, time.length());
+		if(!identifiers.contains(suffix)) {
+			return false;
+		}
+
+		// check if the part before the space is a number
+		String prefix = time.substring(0, (time.indexOf(' ')));
+		return prefix.matches("\\d+");
+	}
+
+	/**
+	 * Methode to tranlate a duration string to a millisecond value
+	 * @param duration The duration string
+	 * @return The duration in milliseconds translated from the durationstring, or if it is invalid then 0
+	 */
+	public static long durationStringToLong(String duration) {
+		if(duration == null) {
+			return 0;
+		} else if(duration.equalsIgnoreCase("disabled") || duration.equalsIgnoreCase("unlimited")) {
+			return -1;
+		} else if(duration.indexOf(' ') == -1) {
+			return 0;
+		}
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(0);
+
+		String durationString = duration.substring(duration.indexOf(' ')+1, duration.length());
+		int durationInt = 0;
+		try {
+			durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));
+		} catch(NumberFormatException exception) {
+			// No Number found, add zero
+		}
+
+		if(seconds.contains(durationString)) {
+			calendar.add(Calendar.SECOND, durationInt);
+		} else if(minutes.contains(durationString)) {
+			calendar.add(Calendar.MINUTE, durationInt);
+		} else if(hours.contains(durationString)) {
+			calendar.add(Calendar.HOUR, durationInt);
+		} else if(days.contains(durationString)) {
+			calendar.add(Calendar.DAY_OF_MONTH, durationInt);
+		} else if(weeks.contains(durationString)) {
+			calendar.add(Calendar.DAY_OF_MONTH, durationInt*7);
+		} else if(months.contains(durationString)) {
+			calendar.add(Calendar.MONTH, durationInt);
+		} else if(years.contains(durationString)) {
+			calendar.add(Calendar.YEAR, durationInt);
+		}
+		return calendar.getTimeInMillis();
+	}
+
+	// LEGACY TIME INPUT CONVERSION
+
+	/**
+	 * Get setting from config that could be only a number indicating seconds
+	 * or a string indicating a duration string
+	 * @param path Path of the setting to read
+	 * @return milliseconds that the setting indicates
+	 */
+	public static long getDurationFromSecondsOrString(String path) {
+		if(config.isLong(path) || config.isInt(path)) {
+			long setting = config.getLong(path);
+			if(setting != -1) {
+				setting = setting*1000;
+			}
+			return setting;
+		} else {
+			return durationStringToLong(config.getString(path));
+		}
+	}
+
+	/**
+	 * Get setting from config that could be only a number indicating minutes
+	 * or a string indicating a duration string
+	 * @param path Path of the setting to read
+	 * @return milliseconds that the setting indicates
+	 */
+	public static long getDurationFromMinutesOrString(String path) {
+		if(config.isLong(path) || config.isInt(path)) {
+			long setting = config.getLong(path);
+			if(setting != -1) {
+				setting = setting*60*1000;
+			}
+			return setting;
+		} else {
+			return durationStringToLong(config.getString(path));
+		}
+	}
+
+	/**
+	 * Parse a time setting that could be minutes or a duration string
+	 * @param input The string to parse
+	 * @return milliseconds that the string indicates
+	 */
+	public static long getDurationFromMinutesOrStringInput(String input) {
+		long number;
+		try {
+			number = Long.parseLong(input);
+			if(number != -1) {
+				number = number*60*1000;
+			}
+			return number;
+		} catch(NumberFormatException e) {
+			return durationStringToLong(input);
+		}
+	}
+
+	/**
+	 * Parse a time setting that could be seconds or a duration string
+	 * @param input The string to parse
+	 * @return seconds that the string indicates
+	 */
+	public static long getDurationFromSecondsOrStringInput(String input) {
+		long number;
+		try {
+			number = Long.parseLong(input);
+			if(number != -1) {
+				number = number*1000;
+			}
+			return number;
+		} catch(NumberFormatException e) {
+			return durationStringToLong(input);
+		}
+	}
+
+	// NAME <-> UUID CONVERSION
+
+	/**
+	 * Conversion to name by uuid
+	 * @param uuid The uuid in string format
+	 * @return the name of the player
+	 */
+	public static String toName(String uuid) {
+		String result = "";
+		if(uuid != null) {
+			try {
+				UUID parsed = UUID.fromString(uuid);
+				result = toName(parsed);
+			} catch(IllegalArgumentException e) {
+				// Incorrect UUID
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Conversion to name by uuid object
+	 * @param uuid The uuid in string format
+	 * @return the name of the player
+	 */
+	public static String toName(UUID uuid) {
+		if(uuid == null) {
+			return "";
+		} else {
+			String name = Bukkit.getOfflinePlayer(uuid).getName();
+			if(name != null) {
+				return name;
+			}
+			return "";
+		}
+	}
+
+	/**
+	 * Conversion from name to uuid
+	 * @param name The name of the player
+	 * @return The uuid of the player
+	 */
+	@SuppressWarnings("deprecation") // Fake deprecation by Bukkit to inform developers, method will stay
+	public static String toUUID(String name) {
+		if(name == null) {
+			return null;
+		} else {
+			return Bukkit.getOfflinePlayer(name).getUniqueId().toString();
+		}
+
+	}
+
 }
 
 

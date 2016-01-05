@@ -114,7 +114,7 @@ public class SignDisplayFeature extends Feature implements Listener {
 							continue;
 						}
 						signLines[i] = region.applyAllReplacements(signLines[i]);
-						signLines[i] = plugin.fixColors(signLines[i]);
+						signLines[i] = Utils.applyColors(signLines[i]);
 						signState.setLine(i, signLines[i]);
 					}
 					signState.update();

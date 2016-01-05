@@ -2,6 +2,7 @@ package nl.evolutioncoding.areashop.regions;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.events.ask.RentingRegionEvent;
 import nl.evolutioncoding.areashop.events.ask.UnrentingRegionEvent;
 import nl.evolutioncoding.areashop.events.notify.RentedRegionEvent;
@@ -95,7 +96,7 @@ public class RentRegion extends GeneralRegion {
 			setSetting("rent.renterName", null);
 		} else {
 			setSetting("rent.renter", renter.toString());
-			setSetting("rent.renterName", plugin.toName(renter));
+			setSetting("rent.renterName", Utils.toName(renter));
 		}
 	}
 	
@@ -171,7 +172,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return Name of the player renting this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return <UNKNOWN>
 	 */
 	public String getPlayerName() {
-		String result = plugin.toName(getRenter());
+		String result = Utils.toName(getRenter());
 		if(result == null || result.isEmpty()) {
 			result = config.getString("rent.renterName");
 			if(result == null || result.isEmpty()) {
@@ -214,15 +215,15 @@ public class RentRegion extends GeneralRegion {
 	 * @return The formatted string of the price
 	 */
 	public String getFormattedPrice() {
-		return plugin.formatCurrency(getPrice());
+		return Utils.formatCurrency(getPrice());
 	}
 
 	/**
 	 * Get the duration of 1 rent period
 	 * @return The duration in milliseconds of 1 rent period
 	 */
-	public long getDuration() {		
-		return plugin.durationStringToLong(getDurationString());
+	public long getDuration() {
+		return Utils.durationStringToLong(getDurationString());
 	}
 	
 	/**
@@ -258,7 +259,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The number of milliseconds until the region is unrented while player is offline
 	 */
 	public long getInactiveTimeUntilUnrent() {
-		return plugin.getDurationFromMinutesOrStringInput(getStringSetting("rent.inactiveTimeUntilUnrent"));
+		return Utils.getDurationFromMinutesOrStringInput(getStringSetting("rent.inactiveTimeUntilUnrent"));
 	}
 	
 	/**
@@ -318,7 +319,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return String with currency symbols and proper fractional part
 	 */
 	public String getFormattedMoneyBackAmount() {
-		return plugin.formatCurrency(getMoneyBackAmount());
+		return Utils.formatCurrency(getMoneyBackAmount());
 	}
 	
 	/**
@@ -326,7 +327,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The maximum rent time in milliseconds
 	 */
 	public long getMaxRentTime() {
-		return plugin.getDurationFromMinutesOrStringInput(getStringSetting("rent.maxRentTime"));
+		return Utils.getDurationFromMinutesOrStringInput(getStringSetting("rent.maxRentTime"));
 	}
 	
 	/**
@@ -367,7 +368,7 @@ public class RentRegion extends GeneralRegion {
 				return;
 			}
 			for(String timeBefore : section.getKeys(false)) {
-				long timeBeforeParsed = plugin.durationStringToLong(timeBefore);
+				long timeBeforeParsed = Utils.durationStringToLong(timeBefore);
 				if(timeBeforeParsed <= 0) {
 					return;
 				}
@@ -513,7 +514,7 @@ public class RentRegion extends GeneralRegion {
 							r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), price);
 						}
 						if(r == null || !r.transactionSuccess()) {
-							plugin.getLogger().warning("Something went wrong with paying '" + landlordName + "' " + plugin.formatCurrency(price) + " for his rent of region " + getName() + " to " + player.getName());
+							plugin.getLogger().warning("Something went wrong with paying '"+landlordName+"' "+Utils.formatCurrency(price)+" for his rent of region "+getName()+" to "+player.getName());
 						}
 					}
 						
@@ -571,9 +572,9 @@ public class RentRegion extends GeneralRegion {
 				} else {
 					// Player has not enough money
 					if(extend) {
-						message(player, "rent-lowMoneyExtend", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
+						message(player, "rent-lowMoneyExtend", Utils.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
 					} else {
-						message(player, "rent-lowMoneyRent", plugin.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
+						message(player, "rent-lowMoneyRent", Utils.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
 					}
 				}
 			} else {

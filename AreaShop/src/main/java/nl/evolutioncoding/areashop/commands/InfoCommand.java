@@ -323,8 +323,8 @@ public class InfoCommand extends CommandAreaShop {
 					plugin.message(sender, "info-regionHelp");
 				}
 			}
-				
-			/* List of regions without a group */
+
+			// List of regions without a group
 			else if(args[1].equalsIgnoreCase("nogroup")) {
 				// Rental regions
 				Set<String> rents = new TreeSet<>(plugin.getFileManager().getRentNames());

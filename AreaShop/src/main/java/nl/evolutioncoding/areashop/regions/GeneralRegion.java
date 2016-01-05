@@ -38,7 +38,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	private HashMap<String, Object> replacementsCache = null;
 	private long replacementsCacheTime = 0;
 
-	/* Enum for region types */
+	// Enum for region types
 	public enum RegionType {		
 		RENT("rent"),
 		BUY("buy");
@@ -51,9 +51,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		public String getValue() {
 			return value;
 		}
-	} 
-	
-	/* Enum for schematic event types */
+	}
+
+	// Enum for schematic event types
 	public enum RegionEvent {		
 		CREATED("created"),
 		DELETED("deleted"),
@@ -74,7 +74,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 	}
 
-	/* Enum for Region states */
+	// Enum for Region states
 	public enum RegionState {
 		FORRENT("forrent"),
 		RENTED("rented"),
@@ -92,7 +92,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 	}
 
-	/* Enum for click types */
+	// Enum for click types
 	public enum ClickType {
 		RIGHTCLICK("rightClick"),
 		LEFTCLICK("leftClick"),
@@ -109,7 +109,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 	}
 
-	/* Enum for limit types */
+	// Enum for limit types
 	public enum LimitType {		
 		RENTS("rents"),
 		BUYS("buys"),
@@ -381,7 +381,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return The name of the landlord, if unavailable by UUID it will return the old cached name, if that is unavailable it will return <UNKNOWN>
 	 */
 	public String getLandlordName() {
-		String result = plugin.toName(getLandlord());
+		String result = Utils.toName(getLandlord());
 		if(result == null || result.isEmpty()) {
 			result = config.getString("general.landlordName");
 			if(result == null || result.isEmpty()) {
@@ -400,7 +400,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(landlord != null) {
 			setSetting("general.landlord", landlord.toString());
 		}
-		String properName = plugin.toName(landlord);
+		String properName = Utils.toName(landlord);
 		if(properName == null) {
 			properName = name;
 		}
@@ -1536,7 +1536,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public LimitResult limitsAllow(RegionType type, Player player) {
 		return limitsAllow(type, player, false);
 	}
-	
+
 	/**
 	 * Check if the player can buy/rent this region, detailed info in the result object
 	 * @param type The type of region to check

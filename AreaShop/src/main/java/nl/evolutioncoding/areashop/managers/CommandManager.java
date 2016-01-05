@@ -1,6 +1,7 @@
 package nl.evolutioncoding.areashop.managers;
 
 import nl.evolutioncoding.areashop.AreaShop;
+import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -56,8 +57,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new LinksignsCommand(plugin));
 		commands.add(new StackCommand(plugin));
 		commands.add(new SetlandlordCommand(plugin));
-		
-		/* Register commands in bukkit */
+
+		// Register commands in bukkit
 		plugin.getCommand("AreaShop").setExecutor(this);	
 		plugin.getCommand("AreaShop").setTabCompleter(this);
 	}	
@@ -75,7 +76,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 	 * @param target The CommandSender to show the help to
 	 */
 	public void showHelp(CommandSender target) {
-		/* Add all messages to a list */
+		// Add all messages to a list
 		ArrayList<String> messages = new ArrayList<>();
 		messages.add(plugin.getConfig().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-header"));
 		messages.add(plugin.getConfig().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-alias"));
@@ -85,13 +86,13 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 				messages.add(help);
 			}
 		}
-		
-		/* Send the messages to the target */
+
+		// Send the messages to the target
 		for(String message : messages) {
 			if(!plugin.getConfig().getBoolean("useColorsInConsole") && !(target instanceof Player)) {
-				target.sendMessage(ChatColor.stripColor(plugin.fixColors(message)));
+				target.sendMessage(ChatColor.stripColor(Utils.applyColors(message)));
 			} else {
-				target.sendMessage(plugin.fixColors(message));
+				target.sendMessage(Utils.applyColors(message));
 			}
 		}
 	}

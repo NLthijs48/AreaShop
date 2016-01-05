@@ -45,8 +45,8 @@ public class FileManager {
 	private HashMap<String,Integer> versions = null;
 	private String versionPath = null;
 	private String schemFolder = null;
-	
-	/* Enum for region types */
+
+	// Enum for region types
 	public enum AddResult {		
 		BLACKLISTED("blacklisted"),
 		NOPERMISSION("nopermission"),
@@ -686,7 +686,7 @@ public class FileManager {
 	public void loadVersions() {
 		File file = new File(versionPath);
 		if(file.exists()) {
-			/* Load versions from the file */
+			// Load versions from the file
 			try {
 				ObjectInputStream input = new ObjectInputStream(new FileInputStream(versionPath));
 				versions = (HashMap<String,Integer>)input.readObject();
@@ -727,7 +727,7 @@ public class FileManager {
 		// Load config.yml + add defaults from .jar
 		boolean result = loadConfigFile();
 		// Load default.yml + add defaults from .jar
-		result = result & loadDefaultFile();
+		result &= loadDefaultFile();
 		// Convert old formats to the latest (object saving to .yml saving)
 		preUpdateFiles();
 		// Load region files (regions folder)
@@ -735,7 +735,7 @@ public class FileManager {
 		// Convert old formats to the latest (changes in .yml saving format)
 		postUpdateFiles();
 		// Load groups.yml
-		loadGroupsFile();
+		result &= loadGroupsFile();
 
 		return result;
 	}
@@ -825,19 +825,25 @@ public class FileManager {
 			plugin.getLogger().warning("Something went wrong while reading the config.yml file: " + configFile.getAbsolutePath());
 			result = false;
 		}
+		Utils.initialize(config);
 		return result;
 	}
 	
 	/**
 	 * Load the groups.yml file from disk
 	 */
-	public void loadGroupsFile() {
+	public boolean loadGroupsFile() {
+		boolean result = true;
 		File groupFile = new File(groupsPath);
 		if(groupFile.exists() && groupFile.isFile()) {
 			try(
 					InputStreamReader reader = new InputStreamReader(new FileInputStream(groupFile), Charsets.UTF_8)
 			) {
 				groupsConfig = YamlConfiguration.loadConfiguration(reader);
+				if(config.getKeys(false).size() == 0) {
+					plugin.getLogger().warning("File 'groups.yml' is empty, check for errors in the log.");
+					result = false;
+				}
 			} catch(IOException e) {
 				plugin.getLogger().warning("Could not load groups.yml file: " + groupFile.getAbsolutePath());
 			}
@@ -849,6 +855,7 @@ public class FileManager {
 			RegionGroup group = new RegionGroup(plugin, groupName);
 			groups.put(groupName, group);
 		}
+		return result;
 	}
 	
 	/**
@@ -876,6 +883,9 @@ public class FileManager {
 							InputStreamReader reader = new InputStreamReader(new FileInputStream(regionFile), Charsets.UTF_8)
 					) {
 						config = YamlConfiguration.loadConfiguration(reader);
+						if(config.getKeys(false).size() == 0) {
+							plugin.getLogger().warning("Region file '"+regionFile.getName()+"' is empty, check for errors in the log.");
+						}
 					} catch(IOException e) {
 						plugin.getLogger().warning("Something went wrong reading region file: " + regionFile.getAbsolutePath());
 						continue;
@@ -906,7 +916,7 @@ public class FileManager {
 							if(region.getRegion() == null) {
 								noRegion.add(region);
 							}
-							if(region.isRentRegion() && !plugin.checkTimeFormat(((RentRegion)region).getDurationString())) {
+							if(region.isRentRegion() && !Utils.checkTimeFormat(((RentRegion)region).getDurationString())) {
 								incorrectDuration.add(region);
 							}
 						}
@@ -1084,7 +1094,7 @@ public class FileManager {
 						}
 						if(rent.get("playeruuid") != null) {
 							config.set("rent.renter", rent.get("playeruuid"));
-							config.set("rent.renterName", plugin.toName(rent.get("playeruuid")));
+							config.set("rent.renterName", Utils.toName(rent.get("playeruuid")));
 							config.set("rent.rentedUntil", Long.parseLong(rent.get("rented")));
 						}
 						try {
@@ -1208,7 +1218,7 @@ public class FileManager {
 						}
 						if(buy.get("playeruuid") != null) {
 							config.set("buy.buyer", buy.get("playeruuid"));
-							config.set("buy.buyerName", plugin.toName(buy.get("playeruuid")));
+							config.set("buy.buyerName", Utils.toName(buy.get("playeruuid")));
 						}
 						try {
 							config.save(new File(regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml"));

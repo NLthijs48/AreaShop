@@ -319,7 +319,7 @@ del-failed: "No permission to remove or not registered: &7%0%."
 
 addsign-help: "/as addsign [region] [profile]."
 addsign-noSign: "You are not looking at a sign."
-addsign-noRegion: "Region '%0%' cannot be found."
+addsign-noRegion: "Region '%0%' is not known in AreaShop, check if you added it to AreaShop already."
 addsign-noRegions: "No region found around the sign position."
 addsign-couldNotDetect: "Found multiple regions around the sign, specify region as extra argument (2 of the regions that were found: %0% and %1%)."
 addsign-couldNotDetectSign: "Found multiple regions around the sign, specify region on the second line (2 of the regions that were found: %0% and %1%)."

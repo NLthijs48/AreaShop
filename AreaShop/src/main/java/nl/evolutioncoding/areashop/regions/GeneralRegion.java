@@ -1838,17 +1838,20 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		String profile = config.getString("general.signs." + signName + ".profile");
 		if(profile == null || profile.length() == 0) {
 			profile = getStringSetting("general.signProfile");
-		}	
-		// Run player commands if specified
+		}
+
+		// Get paths (state may change after running them)
 		String playerPath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Player";
+		String consolePath = "signProfiles."+profile+"."+getState().getValue().toLowerCase()+"."+clickType.getValue()+"Console";
+
+		// Run player commands if specified
 		List<String> playerCommands = new ArrayList<>();
 		for(String command : plugin.getConfig().getStringList(playerPath)) {
 			playerCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));
 		}
 		runCommands(clicker, playerCommands);
-		
+
 		// Run console commands if specified
-		String consolePath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Console";
 		List<String> consoleCommands = new ArrayList<>();
 		for(String command : plugin.getConfig().getStringList(consolePath)) {
 			consoleCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));

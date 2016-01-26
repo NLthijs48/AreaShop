@@ -21,6 +21,7 @@ import org.bukkit.material.Sign;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Checks for placement of signs for this plugin
@@ -69,8 +70,7 @@ public final class SignChangeListener implements Listener {
 			
 			// If the secondLine does not contain a name try to find the region by location
 			if(secondLine == null || secondLine.length() == 0) {
-				// TODO move to version specific classes or use available method
-				ApplicableRegionSet regions = regionManager.getApplicableRegions(event.getBlock().getLocation());
+				Set<ProtectedRegion> regions = plugin.getWorldGuardHandler().getApplicableRegionsSet(event.getBlock().getLocation());
 				if(regions != null) {
 					boolean first = true;
 					ProtectedRegion candidate = null;

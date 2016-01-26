@@ -259,6 +259,7 @@ flagProfiles:
       members: '%uuid%, %friendsuuid%' # Add the renter and added friends as region members.
       greeting: '%lang:prefix%%lang:greeting-rented%'
       interact: 'deny g:non_members' # Only allow region members/owners to use things in the region (chests, crafting bench, etc)
+      build: 'deny g:non_members' # Only allow region members/owners to build (change to 'deny' to disallow building)
     forsale:
       priority: 10
       members: ''
@@ -268,11 +269,13 @@ flagProfiles:
       members: '%uuid%, %friendsuuid%'
       greeting: '%lang:prefix%%lang:greeting-bought%'
       interact: 'deny g:non_members'
+      build: 'deny g:non_members'
     resale:
       priority: 10
       members: '%uuid%, %friendsuuid%'
       greeting: '%lang:prefix%%lang:greeting-resale%'
       interact: 'deny g:non_members'
+      build: 'deny g:non_members'
 ## Profiles that specify when players should get messages about their rental region that almost runs out.
 ## Time identifiers specify how much time before the rent is actually over the player should be notified.
 ## When warnPlayer is set to true a message will be send that is specified in the language file.

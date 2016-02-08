@@ -1075,8 +1075,15 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				middle = middle.setY(region.getMinimumPoint().getBlockY());
 			} else if("top".equalsIgnoreCase(configSetting)) {
 				middle = middle.setY(region.getMaximumPoint().getBlockY());
-			} else {
+			} else if("middle".equalsIgnoreCase(configSetting)) {
 				middle = middle.setY(middle.getBlockY());
+			} else {
+				try {
+					int vertical = Integer.parseInt(configSetting);
+					middle = middle.setY(vertical);
+				} catch(NumberFormatException e) {
+					plugin.getLogger().warning("Could not parse general.teleportLocationY: '"+configSetting+"'");
+				}
 			}
 			startLocation = new Location(getWorld(), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
 		}

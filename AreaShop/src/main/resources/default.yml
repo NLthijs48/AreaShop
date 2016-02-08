@@ -18,7 +18,7 @@ general:
   ## The profile for the WorldGuard flags from the 'flagProfiles' section in the config.
   flagProfile: 'default'
   ## The y location within the region to start searching for safe teleport spots (x and z will be in the middle of the region).
-  ## Possible values: bottom, middle, top.
+  ## Possible values: bottom, middle, top, integer.
   teleportLocationY: bottom
   ## If true the teleportation algorithm only allows telportation to inside the region, otherwise it will expand
   ## a cube from the starting point to check for safe spots (then it could end outside of the region).

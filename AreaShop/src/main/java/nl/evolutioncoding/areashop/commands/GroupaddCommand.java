@@ -88,9 +88,9 @@ public class GroupaddCommand extends CommandAreaShop {
 			}
 			if(group.addMember(region)) {
 				region.update();
-				plugin.message(sender, "groupadd-success", region.getName(), group.getName(), group.getMembers().size());
+				plugin.message(sender, "groupadd-success", group.getName(), group.getMembers().size(), region);
 			} else {
-				plugin.message(sender, "groupadd-failed", region.getName(), group.getName());
+				plugin.message(sender, "groupadd-failed", group.getName(), region);
 			}
 		}
 	}

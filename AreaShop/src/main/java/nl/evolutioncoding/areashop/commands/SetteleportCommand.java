@@ -73,10 +73,10 @@ public class SetteleportCommand extends CommandAreaShop {
 			owner = player.getUniqueId().equals(((BuyRegion)region).getBuyer());
 		}
 		if(!player.hasPermission("areashop.setteleport")) {
-			plugin.message(player, "setteleport-noPermission");
+			plugin.message(player, "setteleport-noPermission", region);
 			return;
 		} else if(!owner && !player.hasPermission("areashop.setteleportall")) {
-			plugin.message(player, "setteleport-noPermissionOther");
+			plugin.message(player, "setteleport-noPermissionOther", region);
 			return;
 		}
 
@@ -84,16 +84,16 @@ public class SetteleportCommand extends CommandAreaShop {
 		if(args.length > 2 && args[2] != null && (args[2].equalsIgnoreCase("reset") || args[2].equalsIgnoreCase("yes") || args[2].equalsIgnoreCase("true"))) {
 			region.setTeleport(null);
 			region.update();
-			plugin.message(player, "setteleport-reset", region.getName());
+			plugin.message(player, "setteleport-reset", region);
 			return;
 		}
 		if(!player.hasPermission("areashop.setteleportoutsideregion") && (wgRegion == null || !wgRegion.contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
-			plugin.message(player, "setteleport-notInside", region.getName());
+			plugin.message(player, "setteleport-notInside", region);
 			return;
 		}
 		region.setTeleport(player.getLocation());
 		region.update();
-		plugin.message(player, "setteleport-success", region.getName());
+		plugin.message(player, "setteleport-success", region);
 	}
 	
 	@Override

@@ -83,7 +83,7 @@ public class SetpriceCommand extends CommandAreaShop {
 		try {
 			price = Double.parseDouble(args[1]);
 		} catch(NumberFormatException e) {
-			plugin.message(sender, "setprice-wrongPrice", args[1]);
+			plugin.message(sender, "setprice-wrongPrice", args[1], region);
 			return;
 		}
 		if(region.isRentRegion()) {

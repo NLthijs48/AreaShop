@@ -89,9 +89,9 @@ public class GroupdelCommand extends CommandAreaShop {
 			}	
 			if(group.removeMember(region)) {
 				region.update();
-				plugin.message(sender, "groupdel-success", region.getName(), group.getName(), group.getMembers().size());
+				plugin.message(sender, "groupdel-success", group.getName(), group.getMembers().size(), region);
 			} else {
-				plugin.message(sender, "groupdel-failed", region.getName(), group.getName());
+				plugin.message(sender, "groupdel-failed", group.getName(), region);
 			}
 		}
 	}

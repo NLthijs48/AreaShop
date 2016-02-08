@@ -60,7 +60,7 @@ public class DelCommand extends CommandAreaShop {
 				plugin.message(player, "cmd-noRegionsFound");
 				return;
 			}
-			// Start removing the region that he has permission for
+			// Start removing the regions that he has permission for
 			ArrayList<String> namesSuccess = new ArrayList<>();
 			ArrayList<String> namesFailed = new ArrayList<>();
 			for(GeneralRegion region : regions) {
@@ -100,17 +100,17 @@ public class DelCommand extends CommandAreaShop {
 				// Remove the rent if the player has permission
 				if(sender.hasPermission("areashop.destroyrent") || (isLandlord && sender.hasPermission("areashop.destroyrent.landlord"))) {
 					plugin.getFileManager().removeRent((RentRegion)region, true);
-					plugin.message(sender, "destroy-successRent", region.getName());
+					plugin.message(sender, "destroy-successRent", region);
 				} else {
-					plugin.message(sender, "destroy-noPermissionRent");
+					plugin.message(sender, "destroy-noPermissionRent", region);
 				}
 			} else if(region.isBuyRegion()) {
 				// Remove the buy if the player has permission
 				if(sender.hasPermission("areashop.destroybuy") || (isLandlord && sender.hasPermission("areashop.destroybuy.landlord"))) {
 					plugin.getFileManager().removeBuy((BuyRegion)region, true);
-					plugin.message(sender, "destroy-successBuy", region.getName());
+					plugin.message(sender, "destroy-successBuy", region);
 				} else {
-					plugin.message(sender, "destroy-noPermissionBuy");
+					plugin.message(sender, "destroy-noPermissionBuy", region);
 				}
 			}
 			Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(region));

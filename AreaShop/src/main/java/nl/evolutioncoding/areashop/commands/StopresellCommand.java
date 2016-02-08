@@ -80,10 +80,10 @@ public class StopresellCommand extends CommandAreaShop {
 				buy.update();
 				plugin.message(sender, "stopresell-success", buy);
 			} else {
-				plugin.message(sender, "stopresell-noPermissionOther");
+				plugin.message(sender, "stopresell-noPermissionOther", buy);
 			}
 		} else {
-			plugin.message(sender, "stopresell-noPermission");
+			plugin.message(sender, "stopresell-noPermission", buy);
 		}	
 	}
 	

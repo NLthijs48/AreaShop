@@ -86,13 +86,13 @@ public class AddsignCommand extends CommandAreaShop {
 			profile = args[2];
 			Set<String> profiles = plugin.getConfig().getConfigurationSection("signProfiles").getKeys(false);
 			if(!profiles.contains(profile)) {
-				plugin.message(sender, "addsign-wrongProfile", Utils.createCommaSeparatedList(profiles));
+				plugin.message(sender, "addsign-wrongProfile", Utils.createCommaSeparatedList(profiles), region);
 				return;
 			}
 		}
 		GeneralRegion signRegion = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
 		if(signRegion != null) {
-			plugin.message(sender, "addsign-alreadyRegistered", signRegion.getName());
+			plugin.message(sender, "addsign-alreadyRegistered", signRegion);
 			return;
 		}
 		
@@ -100,7 +100,7 @@ public class AddsignCommand extends CommandAreaShop {
 		if(profile == null) {
 			plugin.message(sender, "addsign-success", region);
 		} else {
-			plugin.message(sender, "addsign-successProfile", region, profile);
+			plugin.message(sender, "addsign-successProfile", profile, region);
 		}
 		region.update();
 	}

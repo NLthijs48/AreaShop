@@ -62,12 +62,12 @@ public class SchematiceventCommand extends CommandAreaShop {
 			for(RegionEvent value : RegionEvent.values()) {
 				values.add(value.getValue().toLowerCase());
 			}
-			plugin.message(sender, "schemevent-wrongEvent", args[2], Utils.createCommaSeparatedList(values));
+			plugin.message(sender, "schemevent-wrongEvent", args[2], Utils.createCommaSeparatedList(values), region);
 			return;	
 		}		
 		region.handleSchematicEvent(event);
 		region.update();
-		plugin.message(sender, "schemevent-success", args[2], region.getName());
+		plugin.message(sender, "schemevent-success", args[2], region);
 	}
 
 	@Override

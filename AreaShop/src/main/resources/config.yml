@@ -90,6 +90,8 @@ limitGroups:
 ## %uuid%           The UUID of the player that rents/buys the region.
 ## %friends%        The names of friends added to this region separated by ', '.
 ## %friendsuuid%    The UUID's of friends added to this region separated by ', '.
+## $landlord$       The name of the landlord.
+## %landlorduuid%   The UUID of the landlord.
 ## %price%          The price of the region formatted with the configured characters before and after the number.
 ## %rawprice%       The price without formatting, like '10.0' or '7.77'.
 ## %duration%       The duration of a rent region, for example '1 d', '4 minutes' or '2 years'.

@@ -60,7 +60,7 @@ public class DelsignCommand extends CommandAreaShop {
 			plugin.message(sender, "delsign-noRegion");
 			return;
 		}
-		plugin.message(sender, "delsign-success", region.getName());
+		plugin.message(sender, "delsign-success", region);
 		region.removeSign(block.getLocation());
 		region.update();
 	}

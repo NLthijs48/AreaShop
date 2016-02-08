@@ -54,9 +54,9 @@ public class SetrestoreCommand extends CommandAreaShop {
 		}
 		if(args.length > 3) {
 			region.setSchematicProfile(args[3]);
-			plugin.message(sender, "setrestore-successProfile", region.getName(), valueString, args[3]);
+			plugin.message(sender, "setrestore-successProfile", valueString, args[3], region);
 		} else {
-			plugin.message(sender, "setrestore-success", region.getName(), valueString);
+			plugin.message(sender, "setrestore-success", valueString, region);
 		}
 		region.update();
 	}

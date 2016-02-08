@@ -309,7 +309,7 @@ public final class SignChangeListener implements Listener {
 				plugin.message(player, "addsign-success", region);
 			} else {
 				region.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
-				plugin.message(player, "addsign-successProfile", region, thirdLine);
+				plugin.message(player, "addsign-successProfile", thirdLine, region);
 			}
 
 			// Update the region later because this event will do it first

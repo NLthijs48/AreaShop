@@ -75,49 +75,49 @@ public class AddfriendCommand extends CommandAreaShop {
 		if(sender.hasPermission("areashop.addfriendall")) {
 			if((region.isRentRegion() && !((RentRegion)region).isRented())
 					|| (region.isBuyRegion() && !((BuyRegion)region).isSold())) {
-				plugin.message(sender, "addfriend-noOwner");
+				plugin.message(sender, "addfriend-noOwner", region);
 				return;
 			}	
 			OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
 			if(friend.getLastPlayed() == 0 && !plugin.getConfig().getBoolean("addFriendNotExistingPlayers")) {
-				plugin.message(sender, "addfriend-notVisited", args[1]);
+				plugin.message(sender, "addfriend-notVisited", args[1], region);
 				return;
 			}
 			if(region.getFriends().contains(friend.getUniqueId())) {
-				plugin.message(sender, "addfriend-alreadyAdded", friend.getName());
+				plugin.message(sender, "addfriend-alreadyAdded", friend.getName(), region);
 				return;
 			}
 			if(region.isOwner(friend.getUniqueId())) {
-				plugin.message(sender, "addfriend-self", friend.getName());
+				plugin.message(sender, "addfriend-self", friend.getName(), region);
 				return;
 			}
 			region.addFriend(friend.getUniqueId());
 			region.update();
-			plugin.message(sender, "addfriend-successOther", friend.getName(), region.getName());
+			plugin.message(sender, "addfriend-successOther", friend.getName(), region);
 		} else {
 			if(sender.hasPermission("areashop.addfriend") && sender instanceof Player) {
 				if(region.isOwner((Player)sender)) {
 					OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
 					if(friend.getLastPlayed() == 0 && !plugin.getConfig().getBoolean("addFriendNotExistingPlayers")) {
-						plugin.message(sender, "addfriend-notVisited", args[1]);
+						plugin.message(sender, "addfriend-notVisited", args[1], region);
 						return;
 					}
 					if(region.getFriends().contains(friend.getUniqueId())) {
-						plugin.message(sender, "addfriend-alreadyAdded", friend.getName());
+						plugin.message(sender, "addfriend-alreadyAdded", friend.getName(), region);
 						return;
 					}
 					if(region.isOwner(friend.getUniqueId())) {
-						plugin.message(sender, "addfriend-self", friend.getName());
+						plugin.message(sender, "addfriend-self", friend.getName(), region);
 						return;
 					}
 					region.addFriend(friend.getUniqueId());
 					region.update();
-					plugin.message(sender, "addfriend-success", friend.getName(), region.getName());
+					plugin.message(sender, "addfriend-success", friend.getName(), region);
 				} else {
-					plugin.message(sender, "addfriend-noPermissionOther");
+					plugin.message(sender, "addfriend-noPermissionOther", region);
 				}
 			} else {
-				plugin.message(sender, "addfriend-noPermission");
+				plugin.message(sender, "addfriend-noPermission", region);
 			}
 		}
 	}

@@ -89,9 +89,9 @@ public class FindCommand extends CommandAreaShop {
 					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
 				}
 				if(maxPriceSet) {
-					plugin.message(player, "find-successMax", "buy", region.getName(), Utils.formatCurrency(maxPrice), onlyInGroup);
+					plugin.message(player, "find-successMax", "buy", Utils.formatCurrency(maxPrice), onlyInGroup, region);
 				} else {
-					plugin.message(player, "find-success", "buy", region.getName(), Utils.formatCurrency(balance), onlyInGroup);
+					plugin.message(player, "find-success", "buy", Utils.formatCurrency(balance), onlyInGroup, region);
 				}
 				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {
@@ -123,9 +123,9 @@ public class FindCommand extends CommandAreaShop {
 					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
 				}
 				if(maxPriceSet) {
-					plugin.message(player, "find-successMax", "rent", region.getName(), Utils.formatCurrency(maxPrice), onlyInGroup);
+					plugin.message(player, "find-successMax", "rent", Utils.formatCurrency(maxPrice), onlyInGroup, region);
 				} else {
-					plugin.message(player, "find-success", "rent", region.getName(), Utils.formatCurrency(balance), onlyInGroup);
+					plugin.message(player, "find-success", "rent", Utils.formatCurrency(balance), onlyInGroup, region);
 				}
 				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {

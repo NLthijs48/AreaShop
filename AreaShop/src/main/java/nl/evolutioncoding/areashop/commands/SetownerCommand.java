@@ -71,11 +71,11 @@ public class SetownerCommand extends CommandAreaShop {
 		}
 		
 		if(region.isRentRegion() && !sender.hasPermission("areashop.setownerrent")) {
-			plugin.message(sender, "setowner-noPermissionRent");
+			plugin.message(sender, "setowner-noPermissionRent", region);
 			return;
 		}
 		if(region.isBuyRegion() && !sender.hasPermission("areashop.setownerbuy")) {
-			plugin.message(sender, "setowner-noPermissionBuy");
+			plugin.message(sender, "setowner-noPermissionBuy", region);
 			return;
 		}
 		
@@ -86,7 +86,7 @@ public class SetownerCommand extends CommandAreaShop {
 			uuid = player.getUniqueId();
 		}
 		if(uuid == null) {
-			plugin.message(sender, "setowner-noPlayer", args[1]);
+			plugin.message(sender, "setowner-noPlayer", args[1], region);
 			return;
 		}		
 		

@@ -80,16 +80,16 @@ public class SetdurationCommand extends CommandAreaShop {
 		try {
 			Integer.parseInt(args[1]);
 		} catch(NumberFormatException e) {
-			plugin.message(sender, "setduration-wrongAmount", args[1]);
+			plugin.message(sender, "setduration-wrongAmount", args[1], rent);
 			return;
 		}
 		if(!Utils.checkTimeFormat(args[1]+" "+args[2])) {
-			plugin.message(sender, "setduration-wrongFormat", args[1]+" "+args[2]);
+			plugin.message(sender, "setduration-wrongFormat", args[1]+" "+args[2], rent);
 			return;
 		}					
 		rent.setDuration(args[1]+" "+args[2]);
 		rent.update();
-		plugin.message(sender, "setduration-success", rent.getName(), rent.getDurationString());
+		plugin.message(sender, "setduration-success", rent);
 	}
 	
 	@Override

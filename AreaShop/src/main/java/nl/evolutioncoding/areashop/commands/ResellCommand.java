@@ -91,10 +91,10 @@ public class ResellCommand extends CommandAreaShop {
 				buy.update();
 				plugin.message(sender, "resell-success", buy);
 			} else {
-				plugin.message(sender, "resell-noPermissionOther");
+				plugin.message(sender, "resell-noPermissionOther", buy);
 			}
 		} else {
-			plugin.message(sender, "resell-noPermission");
+			plugin.message(sender, "resell-noPermission", buy);
 		}	
 	}
 	

@@ -62,7 +62,7 @@ public class SellCommand extends CommandAreaShop {
 			return;
 		}
 		if(!buy.isSold()) {
-			plugin.message(sender, "sell-notBought");
+			plugin.message(sender, "sell-notBought", buy);
 			return;
 		}
 		buy.sell(true, sender);

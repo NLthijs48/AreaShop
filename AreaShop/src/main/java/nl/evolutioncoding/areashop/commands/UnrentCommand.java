@@ -62,7 +62,7 @@ public class UnrentCommand extends CommandAreaShop {
 			return;
 		}		
 		if(!rent.isRented()) {
-			plugin.message(sender, "unrent-notRented");
+			plugin.message(sender, "unrent-notRented", rent);
 			return;
 		}
 		rent.unRent(true, sender);

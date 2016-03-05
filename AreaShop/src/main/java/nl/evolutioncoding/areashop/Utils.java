@@ -9,14 +9,13 @@ import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionType;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -56,6 +55,26 @@ public class Utils {
 		identifiers.addAll(weeks);
 		identifiers.addAll(months);
 		identifiers.addAll(years);
+	}
+
+	/**
+	 * Gets the online players
+	 * Provides backwards compatibility for 1.7- where it returns an array
+	 * @return Online players
+	 */
+	@SuppressWarnings("unchecked")
+	public static Collection<? extends Player> getOnlinePlayers() {
+		try {
+			Method onlinePlayerMethod = Server.class.getMethod("getOnlinePlayers");
+			if(onlinePlayerMethod.getReturnType().equals(Collection.class)) {
+				return ((Collection<? extends Player>)onlinePlayerMethod.invoke(Bukkit.getServer()));
+			} else {
+				return Arrays.asList((Player[])onlinePlayerMethod.invoke(Bukkit.getServer()));
+			}
+		} catch(Exception ex) {
+			AreaShop.debug("getOnlinePlayers error: "+ex.getMessage());
+		}
+		return new HashSet<>();
 	}
 
 	/**

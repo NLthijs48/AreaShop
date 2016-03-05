@@ -245,7 +245,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 								new BukkitRunnable() {
 									@Override
 									public void run() {
-										for(Player player : Bukkit.getOnlinePlayers()) {
+										for(Player player : Utils.getOnlinePlayers()) {
 											if(player.hasPermission("areashop.notifyupdate")) {
 												AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());	
 											}

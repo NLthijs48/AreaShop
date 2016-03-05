@@ -7,7 +7,6 @@ import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -384,7 +383,7 @@ public class InfoCommand extends CommandAreaShop {
 			result.addAll(Arrays.asList("all", "rented", "forrent", "sold", "forsale", "player", "region", "nogroup"));
 		} else if(toComplete == 3) {
 			if(start[2].equalsIgnoreCase("player")) {
-				for(Player player : Bukkit.getOnlinePlayers()) {
+				for(Player player : Utils.getOnlinePlayers()) {
 					result.add(player.getName());
 				}
 			} else if(start[2].equalsIgnoreCase("region")) {

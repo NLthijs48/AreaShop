@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class LanguageManager {
 	private AreaShop plugin = null;
-	private String languages[] = {"EN", "NL", "DE", "FR", "FI", "PL", "ZH_TW"};
+	private String languages[] = {"EN", "NL", "DE", "CS", "FR", "FI", "PL"};
 	private HashMap<String, String> currentLanguage, defaultLanguage;
 	
 	/**

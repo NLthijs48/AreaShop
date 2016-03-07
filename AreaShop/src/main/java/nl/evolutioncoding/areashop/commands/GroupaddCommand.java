@@ -25,7 +25,7 @@ public class GroupaddCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.groupadd")) {
-			return plugin.getLanguageManager().getLang("help-groupadd");
+			return "help-groupadd";
 		}
 		return null;
 	}

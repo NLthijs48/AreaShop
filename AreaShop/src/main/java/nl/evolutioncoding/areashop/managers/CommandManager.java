@@ -1,14 +1,11 @@
 package nl.evolutioncoding.areashop.managers;
 
 import nl.evolutioncoding.areashop.AreaShop;
-import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.commands.*;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,22 +75,17 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 	public void showHelp(CommandSender target) {
 		// Add all messages to a list
 		ArrayList<String> messages = new ArrayList<>();
-		messages.add(plugin.getConfig().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-header"));
-		messages.add(plugin.getConfig().getString("chatPrefix") + plugin.getLanguageManager().getLang("help-alias"));
+		plugin.message(target, "help-header");
+		plugin.message(target, "help-alias");
 		for(CommandAreaShop command : commands) {
 			String help = command.getHelp(target);
 			if(help != null && help.length() != 0) {
 				messages.add(help);
 			}
 		}
-
 		// Send the messages to the target
 		for(String message : messages) {
-			if(!plugin.getConfig().getBoolean("useColorsInConsole") && !(target instanceof Player)) {
-				target.sendMessage(ChatColor.stripColor(Utils.applyColors(message)));
-			} else {
-				target.sendMessage(Utils.applyColors(message));
-			}
+			plugin.messageNoPrefix(target, message);
 		}
 	}
 	

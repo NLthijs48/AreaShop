@@ -26,9 +26,9 @@ public class SetteleportCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.teleportall")) {
-			return plugin.getLanguageManager().getLang("help-setteleportAll");
+			return "help-setteleportAll";
 		} else if(target.hasPermission("areashop.teleport")) {
-			return plugin.getLanguageManager().getLang("help-setteleport");
+			return "help-setteleport";
 		}
 		return null;
 	}

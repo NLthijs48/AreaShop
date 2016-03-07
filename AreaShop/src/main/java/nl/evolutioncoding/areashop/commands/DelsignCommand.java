@@ -25,7 +25,7 @@ public class DelsignCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.delsign")) {
-			return plugin.getLanguageManager().getLang("help-delsign");
+			return "help-delsign";
 		}
 		return null;
 	}

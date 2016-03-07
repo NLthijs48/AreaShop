@@ -2,6 +2,7 @@ package nl.evolutioncoding.areashop.commands;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.messages.Message;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
 import nl.evolutioncoding.areashop.regions.RentRegion;
@@ -26,7 +27,7 @@ public class FindCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.find")) {
-			return plugin.getLanguageManager().getLang("help-find");
+			return "help-find";
 		}
 		return null;
 	}
@@ -84,9 +85,9 @@ public class FindCommand extends CommandAreaShop {
 			if(!results.isEmpty()) {
 				// Draw a random one
 				BuyRegion region = results.get(new Random().nextInt(results.size()));
-			    String onlyInGroup = "";
+				Message onlyInGroup = Message.none();
 				if(group != null) {
-					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
+					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}
 				if(maxPriceSet) {
 					plugin.message(player, "find-successMax", "buy", Utils.formatCurrency(maxPrice), onlyInGroup, region);
@@ -95,9 +96,9 @@ public class FindCommand extends CommandAreaShop {
 				}
 				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {
-			    String onlyInGroup = "";
+				Message onlyInGroup = Message.none();
 				if(group != null) {
-					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
+					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}
 				if(maxPriceSet) {
 					plugin.message(player, "find-noneFoundMax", "buy", Utils.formatCurrency(maxPrice), onlyInGroup);
@@ -118,9 +119,9 @@ public class FindCommand extends CommandAreaShop {
 			if(!results.isEmpty()) {
 				// Draw a random one
 				RentRegion region = results.get(new Random().nextInt(results.size()));
-			    String onlyInGroup = "";
+				Message onlyInGroup = Message.none();
 				if(group != null) {
-					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
+					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}
 				if(maxPriceSet) {
 					plugin.message(player, "find-successMax", "rent", Utils.formatCurrency(maxPrice), onlyInGroup, region);
@@ -129,9 +130,9 @@ public class FindCommand extends CommandAreaShop {
 				}
 				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {
-			    String onlyInGroup = "";
+				Message onlyInGroup = Message.none();
 				if(group != null) {
-					onlyInGroup = plugin.getLanguageManager().getLang("find-onlyInGroup", args[3]);
+					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}
 				if(maxPriceSet) {
 					plugin.message(player, "find-noneFoundMax", "rent", Utils.formatCurrency(maxPrice), onlyInGroup);

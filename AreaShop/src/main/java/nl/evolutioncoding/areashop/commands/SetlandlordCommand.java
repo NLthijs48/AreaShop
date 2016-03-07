@@ -25,7 +25,7 @@ public class SetlandlordCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.setlandlord")) {
-			return plugin.getLanguageManager().getLang("help-setlandlord");
+			return "help-setlandlord";
 		}
 		return null;
 	}

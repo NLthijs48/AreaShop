@@ -23,7 +23,7 @@ public class LinksignsCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.linksigns")) {
-			return plugin.getLanguageManager().getLang("help-linksigns");
+			return "help-linksigns";
 		}
 		return null;
 	}

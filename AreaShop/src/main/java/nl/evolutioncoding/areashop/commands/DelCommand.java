@@ -28,7 +28,7 @@ public class DelCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.destroyrent") || target.hasPermission("areashop.destroybuy")) {
-			return plugin.getLanguageManager().getLang("help-del");
+			return "help-del";
 		}
 		return null;
 	}

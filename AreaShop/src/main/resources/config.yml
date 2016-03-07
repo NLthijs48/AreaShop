@@ -7,7 +7,12 @@
 # │ GENERAL: Options that influence the global state of the plugin                                                             │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ## Chatprefix used for all messages in the chat, also changes the greeting messages.
-chatPrefix: '&2[AreaShop]&r '
+chatPrefix:
+  - '&2[AreaShop]&r'
+  - '  hover: &fAreaShop region management plugin'
+  - '  hover: &fClick to check the available commands'
+  - '  command: /areashop help'
+  - ' '
 ## The language file that should be used, check the 'lang' folder for build-in languages (use the filename without .yml here).
 ## More information can be found here: https://github.com/NLthijs48/AreaShop/wiki/Language-support.
 language: EN
@@ -319,6 +324,8 @@ sendStats: true
 checkForUpdates: true
 ## Use colors when sending messages to console and log files.
 useColorsInConsole: false
+## Use tellraw style messages
+useFancyMessages: true
 ## Post error messages in the console when a command run from the config fails (from the 'runCommands' section for example).
 postCommandErrors: true
 ## Update all region flags and signs after starting the plugin (uses the 'regionsPerTick' setting from the 'update' section).

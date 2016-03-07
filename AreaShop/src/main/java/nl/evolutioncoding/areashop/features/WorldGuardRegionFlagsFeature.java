@@ -8,6 +8,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.events.notify.RegionUpdateEvent;
+import nl.evolutioncoding.areashop.messages.Message;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
@@ -49,8 +50,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 		}
 		// Loop through all flags that are set in the config
 		for(String flagName : flagNames) {
-			String value = flags.getString(flagName);
-			value = region.applyAllReplacements(value);
+			String value = Message.fromString(flags.getString(flagName)).replacements(region).getPlain();
 			// In the config normal Bukkit color codes are used, those only need to be translated on 5.X WorldGuard versions
 			if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {
 				value = translateBukkitToWorldGuardColors(value);

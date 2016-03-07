@@ -29,3 +29,5 @@ local.properties
 
 # IntelliJ IDEA
 *.iml
+.idea
+dependency-reduced-pom.xml

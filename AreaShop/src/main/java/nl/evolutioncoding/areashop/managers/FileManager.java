@@ -819,7 +819,13 @@ public class FileManager {
 				config.addDefaults(YamlConfiguration.loadConfiguration(normal));
 				// Set the debug and chatprefix variables
 				plugin.setDebug(this.getConfig().getBoolean("debug"));
-				plugin.setChatprefix(this.getConfig().getString("chatPrefix"));
+				if(getConfig().isList("chatPrefix")) {
+					plugin.setChatprefix(getConfig().getStringList("chatPrefix"));
+				} else {
+					ArrayList<String> list = new ArrayList<>();
+					list.add(getConfig().getString("chatPrefix"));
+					plugin.setChatprefix(list);
+				}
 			}
 		} catch(IOException e) {
 			plugin.getLogger().warning("Something went wrong while reading the config.yml file: " + configFile.getAbsolutePath());

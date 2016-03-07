@@ -2,6 +2,7 @@ package nl.evolutioncoding.areashop.commands;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.messages.Message;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
@@ -27,7 +28,7 @@ public class InfoCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.info")) {
-			return plugin.getLanguageManager().getLang("help-info");
+			return "help-info";
 		}
 		return null;
 	}
@@ -225,7 +226,7 @@ public class InfoCommand extends CommandAreaShop {
 							Location teleport = rent.getTeleportLocation();
 							if(teleport == null) {
 								if(rent.isRented()) {
-									plugin.messageNoPrefix(sender, "info-regionNoTeleport", rent, plugin.getLanguageManager().getLang("info-regionTeleportHint", rent));
+									plugin.messageNoPrefix(sender, "info-regionNoTeleport", rent, Message.fromKey("info-regionTeleportHint").replacements(rent));
 								} else {
 									plugin.messageNoPrefix(sender, "info-regionNoTeleport", rent, "");
 								}
@@ -235,17 +236,17 @@ public class InfoCommand extends CommandAreaShop {
 						}
 						List<String> signLocations = new ArrayList<>();
 						for(Location location : rent.getSignLocations()) {
-							signLocations.add(plugin.getLanguageManager().getLang("info-regionSignLocation", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+							signLocations.add(Message.fromKey("info-regionSignLocation").replacements(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()).getPlain());
 						}
 						if(!signLocations.isEmpty()) {
-							plugin.messageNoPrefix(sender, "info-regionSigns", Utils.createCommaSeparatedList(signLocations));
+							plugin.messageNoPrefix(sender, "info-regionSigns", signLocations.toArray());
 						}
 						if(sender.hasPermission("areashop.groupinfo") && !rent.getGroupNames().isEmpty()) {
 							plugin.messageNoPrefix(sender, "info-regionGroups", Utils.createCommaSeparatedList(rent.getGroupNames()));
 						}
 						if(rent.isRestoreEnabled()) {
 							if(sender.hasPermission("areashop.setrestore")) {
-								plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent, plugin.getLanguageManager().getLang("info-regionRestoringProfile", rent.getRestoreProfile()));
+								plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent, Message.fromKey("info-regionRestoringProfile").replacements(rent.getRestoreProfile()));
 							} else {
 								plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent, "");
 							}
@@ -284,7 +285,7 @@ public class InfoCommand extends CommandAreaShop {
 							Location teleport = buy.getTeleportLocation();
 							if(teleport == null) {
 								if(buy.isSold()) {
-									plugin.messageNoPrefix(sender, "info-regionNoTeleport", buy, plugin.getLanguageManager().getLang("info-regionTeleportHint", buy));
+									plugin.messageNoPrefix(sender, "info-regionNoTeleport", buy, Message.fromKey("info-regionTeleportHint").replacements(buy));
 								} else {
 									plugin.messageNoPrefix(sender, "info-regionNoTeleport", buy, "");
 								}
@@ -294,17 +295,17 @@ public class InfoCommand extends CommandAreaShop {
 						}
 						List<String> signLocations = new ArrayList<>();
 						for(Location location : buy.getSignLocations()) {
-							signLocations.add(plugin.getLanguageManager().getLang("info-regionSignLocation", location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+							signLocations.add(Message.fromKey("info-regionSignLocation").replacements(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()).getPlain());
 						}
 						if(!signLocations.isEmpty()) {
-							plugin.messageNoPrefix(sender, "info-regionSigns", Utils.createCommaSeparatedList(signLocations));
+							plugin.messageNoPrefix(sender, "info-regionSigns", signLocations.toArray());
 						}
 						if(sender.hasPermission("areashop.groupinfo") && !buy.getGroupNames().isEmpty()) {
 							plugin.messageNoPrefix(sender, "info-regionGroups", Utils.createCommaSeparatedList(buy.getGroupNames()));
 						}
 						if(buy.isRestoreEnabled()) {
 							if(sender.hasPermission("areashop.setrestore")) {
-								plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy, plugin.getLanguageManager().getLang("info-regionRestoringProfile", buy.getRestoreProfile()));
+								plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy, Message.fromKey("info-regionRestoringProfile").replacements(buy.getRestoreProfile()));
 							} else {
 								plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy, "");
 							}

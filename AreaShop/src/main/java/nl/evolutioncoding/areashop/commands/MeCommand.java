@@ -24,7 +24,7 @@ public class MeCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.me")) {
-			return plugin.getLanguageManager().getLang("help-me");
+			return "help-me";
 		}
 		return null;
 	}

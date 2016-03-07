@@ -25,7 +25,7 @@ public class GroupdelCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.groupdel")) {
-			return plugin.getLanguageManager().getLang("help-groupdel");
+			return "help-groupdel";
 		}
 		return null;
 	}

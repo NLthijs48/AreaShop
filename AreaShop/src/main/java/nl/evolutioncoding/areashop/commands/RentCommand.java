@@ -23,7 +23,7 @@ public class RentCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.rent")) {
-			return plugin.getLanguageManager().getLang("help-rent");
+			return "help-rent";
 		}
 		return null;
 	}

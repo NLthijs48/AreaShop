@@ -27,9 +27,9 @@ public class DelfriendCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.delfriendall")) {
-			return plugin.getLanguageManager().getLang("help-delFriendAll");
+			return "help-delFriendAll";
 		} else if(target.hasPermission("areashop.delfriend")) {
-			return plugin.getLanguageManager().getLang("help-delFriend");
+			return "help-delFriend";
 		}
 		return null;
 	}

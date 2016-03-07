@@ -22,7 +22,7 @@ public class GroupinfoCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.groupinfo")) {
-			return plugin.getLanguageManager().getLang("help-groupinfo");
+			return "help-groupinfo";
 		}
 		return null;
 	}

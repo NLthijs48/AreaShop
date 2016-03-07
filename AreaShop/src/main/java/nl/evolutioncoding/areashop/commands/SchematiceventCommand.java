@@ -24,7 +24,7 @@ public class SchematiceventCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.schematicevents")) {
-			return plugin.getLanguageManager().getLang("help-schemevent");
+			return "help-schemevent";
 		}
 		return null;
 	}

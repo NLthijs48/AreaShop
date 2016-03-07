@@ -17,7 +17,7 @@ public class HelpCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.help")) {
-			return plugin.getLanguageManager().getLang("help-help");
+			return "help-help";
 		}
 		return null;
 	}

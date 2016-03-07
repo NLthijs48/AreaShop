@@ -23,7 +23,7 @@ public class SetdurationCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.setduration")) {
-			return plugin.getLanguageManager().getLang("help-setduration");
+			return "help-setduration";
 		}
 		return null;
 	}

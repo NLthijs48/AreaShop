@@ -32,7 +32,7 @@ public class AddCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.createrent") || target.hasPermission("areashop.createbuy")) {
-			return plugin.getLanguageManager().getLang("help-add");
+			return "help-add";
 		}
 		return null;
 	}

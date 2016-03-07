@@ -243,7 +243,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return String indicating the inactive time until unrent
 	 */
 	public String getFormattedInactiveTimeUntilSell() {
-		return this.millisToHumanFormat(getInactiveTimeUntilSell());
+		return Utils.millisToHumanFormat(getInactiveTimeUntilSell());
 	}
 	
 	/**

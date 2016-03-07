@@ -29,7 +29,7 @@ public class SetownerCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.setownerrent") || target.hasPermission("areashop.setownerbuy")) {
-			return plugin.getLanguageManager().getLang("help-setowner");
+			return "help-setowner";
 		}
 		return null;
 	}

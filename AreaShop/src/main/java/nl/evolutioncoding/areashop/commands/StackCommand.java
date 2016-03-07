@@ -6,6 +6,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.messages.Message;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionEvent;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
@@ -33,7 +34,7 @@ public class StackCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.stack")) {
-			return plugin.getLanguageManager().getLang("help-stack");
+			return "help-stack";
 		}
 		return null;
 	}
@@ -124,9 +125,9 @@ public class StackCommand extends CommandAreaShop {
 		} else {
 			type = "buy";
 		}
-		String groupsMessage = "";
+		Message groupsMessage = Message.none();
 		if(group != null) {
-			groupsMessage = plugin.getLanguageManager().getLang("stack-addToGroup", group.getName());
+			groupsMessage = Message.fromKey("stack-addToGroup").replacements(group.getName());
 		}		
 		plugin.message(player, "stack-accepted", amount, type, gap, namePrefix, groupsMessage);
 		plugin.message(player, "stack-addStart", amount, regionsPerTick*20);

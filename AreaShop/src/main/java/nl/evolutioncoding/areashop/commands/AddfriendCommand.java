@@ -27,9 +27,9 @@ public class AddfriendCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.addfriendall")) {
-			return plugin.getLanguageManager().getLang("help-addFriendAll");
+			return "help-addFriendAll";
 		} else if(target.hasPermission("areashop.addfriend")) {
-			return plugin.getLanguageManager().getLang("help-addFriend");
+			return "help-addFriend";
 		}
 		return null;
 	}

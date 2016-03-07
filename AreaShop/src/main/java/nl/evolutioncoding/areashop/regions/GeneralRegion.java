@@ -9,6 +9,7 @@ import nl.evolutioncoding.areashop.events.NotifyAreaShopEvent;
 import nl.evolutioncoding.areashop.events.notify.RegionUpdateEvent;
 import nl.evolutioncoding.areashop.interfaces.GeneralRegionInterface;
 import nl.evolutioncoding.areashop.managers.FileManager;
+import nl.evolutioncoding.areashop.messages.Message;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -23,8 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion> {
 	YamlConfiguration config;
@@ -549,23 +548,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(source == null || source.length() == 0) {
 			return "";
 		}
-		// Apply language replacements
-		Pattern regex = Pattern.compile("%lang:[^% [-]]+%");
-		Matcher matcher = regex.matcher(source);
-		while(matcher.find()) {
-			String match = matcher.group();
-			String key = match.substring(6, match.length()-1);
-			String languageString;
-			if(key.equalsIgnoreCase("prefix")) {
-				languageString = plugin.getChatPrefix();
-			} else {
-				languageString = plugin.getLanguageManager().getLang(key);
-			}
-			if(languageString != null) {
-				source = source.replace(match, languageString);
-			}
-			//AreaShop.debug("match=" + match + ", key=" + key + ", lanString=" + languageString + ", replaced=" + source);
-		}		
 		// Apply static replacements
 		HashMap<String, Object> replacements = getAllReplacements();
 		for(String tag : replacements.keySet()) {
@@ -781,7 +763,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		Object[] newParams = new Object[params.length + 1];
 		newParams[0] = this;
 		System.arraycopy(params, 0, newParams, 1, params.length);
-		plugin.configurableMessage(target, key, prefix, newParams);
+		Message.fromKey(key).prefix(prefix).replacements(newParams).send(target);
 	}
 
 	public void messageNoPrefix(Object target, String key, Object... params) {
@@ -890,47 +872,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			AreaShop.debug("Restored schematic for region " + getName());
 		}
 		return result;
-	}
-	
-	/**
-	 * Convert milliseconds to a human readable format
-	 * @param milliseconds The amount of milliseconds to convert
-	 * @return A formatted string based on the language file
-	 */
-	public String millisToHumanFormat(long milliseconds) {
-		long timeLeft = milliseconds + 500;
-		// To seconds
-		timeLeft = timeLeft/1000;
-		if(timeLeft <= 0) {
-			return plugin.getLanguageManager().getLang("timeleft-ended");
-		} else if(timeLeft == 1) {
-			return plugin.getLanguageManager().getLang("timeleft-second", timeLeft);
-		} else if(timeLeft <= 120) {
-			return plugin.getLanguageManager().getLang("timeleft-seconds", timeLeft);
-		}
-		// To minutes
-		timeLeft = timeLeft/60;
-		if(timeLeft <= 120) {
-			return plugin.getLanguageManager().getLang("timeleft-minutes", timeLeft);
-		}
-		// To hours
-		timeLeft = timeLeft/60;
-		if(timeLeft <= 48) {
-			return plugin.getLanguageManager().getLang("timeleft-hours", timeLeft);
-		}
-		// To days
-		timeLeft = timeLeft/24;
-		if(timeLeft <= 60) {
-			return plugin.getLanguageManager().getLang("timeleft-days", timeLeft);
-		}
-		// To months
-		timeLeft = timeLeft/30;
-		if(timeLeft <= 24) {
-			return plugin.getLanguageManager().getLang("timeleft-months", timeLeft);
-		}
-		// To years
-		timeLeft = timeLeft/12;
-		return plugin.getLanguageManager().getLang("timeleft-years", timeLeft);
 	}
 	
 	/**
@@ -1123,7 +1064,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
 						continue;
 					}
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1141,7 +1082,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
 						continue;
 					}
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1159,7 +1100,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
 						continue;
 					}
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1177,7 +1118,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
 						continue;
 					}
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1195,7 +1136,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			}
 			if(!done && !top) {
 				safeLocation = startLocation.clone().add(0, radius, 0);
-				if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+				if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 					checked++;
 					done = isSafe(safeLocation) || checked > maxTries;
 					blocksInRegion = true;
@@ -1206,7 +1147,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				// North
 				for(int x=-r+1; x<=r && !done; x++) {
 					safeLocation = startLocation.clone().add(x, radius, -r);
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1216,7 +1157,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				// East
 				for(int z=-r+1; z<=r && !done; z++) {
 					safeLocation = startLocation.clone().add(r, radius, z);
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1226,7 +1167,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				// South side
 				for(int x=r-1; x>=-r && !done; x--) {
 					safeLocation = startLocation.clone().add(x, radius, r);
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1236,7 +1177,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				// West side
 				for(int z=r-1; z>=-r && !done; z--) {
 					safeLocation = startLocation.clone().add(-r, radius, z);
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1254,7 +1195,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			}
 			if(!done && !bottom) {
 				safeLocation = startLocation.clone().add(0, -radius, 0);
-				if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+				if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 					checked++;
 					done = isSafe(safeLocation) || checked > maxTries;
 					blocksInRegion = true;
@@ -1265,7 +1206,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				// North
 				for(int x=-r+1; x<=r && !done; x++) {
 					safeLocation = startLocation.clone().add(x, -radius, -r);
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1275,7 +1216,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				// East
 				for(int z=-r+1; z<=r && !done; z++) {
 					safeLocation = startLocation.clone().add(r, -radius, z);
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1285,7 +1226,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				// South side
 				for(int x=r-1; x>=-r && !done; x--) {
 					safeLocation = startLocation.clone().add(x, -radius, r);
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -1295,7 +1236,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				// West side
 				for(int z=r-1; z>=-r && !done; z--) {
 					safeLocation = startLocation.clone().add(-r, -radius, z);
-					if((insideRegion && region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())) || !insideRegion) {
+					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;

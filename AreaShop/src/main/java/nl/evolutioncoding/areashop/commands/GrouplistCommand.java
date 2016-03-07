@@ -21,7 +21,7 @@ public class GrouplistCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.grouplist")) {
-			return plugin.getLanguageManager().getLang("help-grouplist");
+			return "help-grouplist";
 		}
 		return null;
 	}

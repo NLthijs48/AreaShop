@@ -17,7 +17,7 @@ public class ReloadCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.reload")) {
-			return plugin.getLanguageManager().getLang("help-reload");
+			return "help-reload";
 		}
 		return null;
 	}

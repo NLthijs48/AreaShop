@@ -49,9 +49,9 @@ public abstract class CommandAreaShop {
 	public abstract String getCommandStart();
 	
 	/**
-	 * Returns the correct help string for the reciever
+	 * Returns the correct help string key to be used on the help page
 	 * @param target The CommandSender that the help message is for
-	 * @return The help message according to the permissions of the reciever
+	 * @return The help message key according to the permissions of the reciever
 	 */
 	public abstract String getHelp(CommandSender target);
 	

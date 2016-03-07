@@ -23,9 +23,9 @@ public class SellCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.sell")) {
-			return plugin.getLanguageManager().getLang("help-sell");
+			return "help-sell";
 		} else if(target.hasPermission("areashop.sellown")) {
-			return plugin.getLanguageManager().getLang("help-sellOwn");
+			return "help-sellOwn";
 		}
 		return null;
 	}

@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static nl.evolutioncoding.areashop.Utils.millisToHumanFormat;
+
 public class RentRegion extends GeneralRegion {
 	private long warningsDoneUntil = Calendar.getInstance().getTimeInMillis();
 	
@@ -154,7 +156,7 @@ public class RentRegion extends GeneralRegion {
 		}
 		result.put(AreaShop.tagMaxExtends, this.getMaxExtends());
 		result.put(AreaShop.tagExtendsLeft, getMaxExtends() - getTimesExtended());
-		result.put(AreaShop.tagMaxRentTime, this.millisToHumanFormat(getMaxRentTime()));
+		result.put(AreaShop.tagMaxRentTime, millisToHumanFormat(getMaxRentTime()));
 		result.put(AreaShop.tagMaxInactiveTime, this.getFormattedInactiveTimeUntilUnrent());
 		return result;
 	}
@@ -251,7 +253,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return Time left on the rent, for example '29 days', '3 months', '1 second'
 	 */
 	public String getTimeLeftString() {
-		return millisToHumanFormat(getTimeLeft());
+		return Utils.millisToHumanFormat(getTimeLeft());
 	}
 	
 	/**
@@ -267,7 +269,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return String indicating the inactive time until unrent
 	 */
 	public String getFormattedInactiveTimeUntilUnrent() {
-		return this.millisToHumanFormat(getInactiveTimeUntilUnrent());
+		return Utils.millisToHumanFormat(getInactiveTimeUntilUnrent());
 	}
 	
 	/**

@@ -3,8 +3,6 @@ package nl.evolutioncoding.areashop;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.milkbowl.vault.economy.Economy;
-import nl.evolutioncoding.areashop.Updater.UpdateResult;
-import nl.evolutioncoding.areashop.Updater.UpdateType;
 import nl.evolutioncoding.areashop.features.DebugFeature;
 import nl.evolutioncoding.areashop.features.Feature;
 import nl.evolutioncoding.areashop.features.SignDisplayFeature;
@@ -12,17 +10,21 @@ import nl.evolutioncoding.areashop.features.WorldGuardRegionFlagsFeature;
 import nl.evolutioncoding.areashop.interfaces.AreaShopInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldEditInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldGuardInterface;
+import nl.evolutioncoding.areashop.lib.Metrics;
+import nl.evolutioncoding.areashop.lib.Updater;
+import nl.evolutioncoding.areashop.lib.Updater.UpdateResult;
+import nl.evolutioncoding.areashop.lib.Updater.UpdateType;
 import nl.evolutioncoding.areashop.listeners.PlayerLoginLogoutListener;
 import nl.evolutioncoding.areashop.listeners.SignBreakListener;
 import nl.evolutioncoding.areashop.listeners.SignChangeListener;
 import nl.evolutioncoding.areashop.listeners.SignClickListener;
 import nl.evolutioncoding.areashop.managers.CommandManager;
 import nl.evolutioncoding.areashop.managers.FileManager;
-import nl.evolutioncoding.areashop.managers.LanguageManager;
 import nl.evolutioncoding.areashop.managers.SignLinkerManager;
+import nl.evolutioncoding.areashop.messages.LanguageManager;
+import nl.evolutioncoding.areashop.messages.Message;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -35,8 +37,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Main class for the AreaShop plugin
@@ -55,7 +57,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	private CommandManager commandManager = null;
 	private SignLinkerManager signLinkerManager = null;
 	private boolean debug = false;
-	private String chatprefix = null;
+	private List<String> chatprefix = null;
 	private Updater updater = null;
 	private boolean updateAvailable = false;
 	private boolean ready = false;
@@ -335,7 +337,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Set the chatprefix to use in the chat (loaded from config normally)
 	 * @param chatprefix The string to use in front of chat messages (supports formatting codes like &1)
 	 */
-	public void setChatprefix(String chatprefix) {
+	public void setChatprefix(List<String> chatprefix) {
 		this.chatprefix = chatprefix;
 	}
  
@@ -408,7 +410,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Get the current chatPrefix
 	 * @return The current chatPrefix
 	 */
-	public String getChatPrefix() {
+	public List<String> getChatPrefix() {
 		return chatprefix;
 	}
 	
@@ -549,50 +551,13 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	        }.runTaskLater(this, 20L);	     
         }
 	}
-	
-	/**
-	 * Method to send a message to a CommandSender, using chatprefix if it is a player
-	 * @param target The CommandSender you wan't to send the message to (e.g. a player)
-	 * @param key The key to get the translation
-	 * @param prefix Specify if the message should have a prefix
-	 * @param params The parameters to inject into the message string
-	 */
-	public void configurableMessage(Object target, String key, boolean prefix, Object... params) {
-		if(target == null) {
-			return;
-		}
-		String langString = Utils.applyColors(languageManager.getLang(key, params));
-		if(langString == null || langString.equals("")) {
-			// Do nothing, message is not available or disabled
-		} else {
-			if(target instanceof Player) {
-				if(prefix) {
-					((Player)target).sendMessage(Utils.applyColors(chatprefix)+langString);
-				} else {
-					((Player)target).sendMessage(langString);
-				}
-			} else if(target instanceof CommandSender) {
-				if(!getConfig().getBoolean("useColorsInConsole")) {
-					langString = ChatColor.stripColor(langString);
-				}
-				((CommandSender)target).sendMessage(langString);
-			}	
-			else if(target instanceof Logger) {
-				if(!getConfig().getBoolean("useColorsInConsole")) {
-					langString = ChatColor.stripColor(langString);
-				}
-				((Logger)target).info(langString);
-			} else {
-				langString = ChatColor.stripColor(langString);
-				this.getLogger().info("Could not send message, target is wrong: " + langString);
-			}
-		}
+
+	public void messageNoPrefix(Object target, String key, Object... replacements) {
+		Message.fromKey(key).replacements(replacements).send(target);
 	}
-	public void messageNoPrefix(Object target, String key, Object... params) {
-		configurableMessage(target, key, false, params);
-	}
-	public void message(Object target, String key, Object... params) {
-		configurableMessage(target, key, true, params);
+
+	public void message(Object target, String key, Object... replacements) {
+		Message.fromKey(key).prefix().replacements(replacements).send(target);
 	}
 
 	

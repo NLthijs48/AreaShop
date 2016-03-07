@@ -23,7 +23,7 @@ public class BuyCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.buy")) {
-			return plugin.getLanguageManager().getLang("help-buy");
+			return "help-buy";
 		}
 		return null;
 	}

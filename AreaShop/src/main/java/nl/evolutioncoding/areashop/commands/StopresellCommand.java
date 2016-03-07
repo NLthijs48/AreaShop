@@ -23,9 +23,9 @@ public class StopresellCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.stopresellall")) {
-			return plugin.getLanguageManager().getLang("help-stopResellAll");
+			return "help-stopResellAll";
 		} else if(target.hasPermission("areashop.stopresell")) {
-			return plugin.getLanguageManager().getLang("help-stopResell");
+			return "help-stopResell";
 		}
 		return null;
 	}

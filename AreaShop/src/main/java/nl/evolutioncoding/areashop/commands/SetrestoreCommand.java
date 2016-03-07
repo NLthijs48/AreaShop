@@ -21,7 +21,7 @@ public class SetrestoreCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.setrestore")) {
-			return plugin.getLanguageManager().getLang("help-setrestore");
+			return "help-setrestore";
 		}
 		return null;
 	}

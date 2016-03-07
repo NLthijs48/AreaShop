@@ -5,6 +5,7 @@ import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import nl.evolutioncoding.areashop.messages.Message;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionType;
@@ -155,6 +156,47 @@ public class Utils {
 	 */
 	public static long millisToTicks(long milliseconds) {
 		return milliseconds/50;
+	}
+
+	/**
+	 * Convert milliseconds to a human readable format
+	 * @param milliseconds The amount of milliseconds to convert
+	 * @return A formatted string based on the language file
+	 */
+	public static String millisToHumanFormat(long milliseconds) {
+		long timeLeft = milliseconds+500;
+		// To seconds
+		timeLeft = timeLeft/1000;
+		if(timeLeft <= 0) {
+			return Message.fromKey("timeleft-ended").getPlain();
+		} else if(timeLeft == 1) {
+			return Message.fromKey("timeleft-second").replacements(timeLeft).getPlain();
+		} else if(timeLeft <= 120) {
+			return Message.fromKey("timeleft-seconds").replacements(timeLeft).getPlain();
+		}
+		// To minutes
+		timeLeft = timeLeft/60;
+		if(timeLeft <= 120) {
+			return Message.fromKey("timeleft-minutes").replacements(timeLeft).getPlain();
+		}
+		// To hours
+		timeLeft = timeLeft/60;
+		if(timeLeft <= 48) {
+			return Message.fromKey("timeleft-hours").replacements(timeLeft).getPlain();
+		}
+		// To days
+		timeLeft = timeLeft/24;
+		if(timeLeft <= 60) {
+			return Message.fromKey("timeleft-days").replacements(timeLeft).getPlain();
+		}
+		// To months
+		timeLeft = timeLeft/30;
+		if(timeLeft <= 24) {
+			return Message.fromKey("timeleft-months").replacements(timeLeft).getPlain();
+		}
+		// To years
+		timeLeft = timeLeft/12;
+		return Message.fromKey("timeleft-years").replacements(timeLeft).getPlain();
 	}
 
 	private static final BlockFace[] facings = {BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST};

@@ -1,7 +1,6 @@
 package nl.evolutioncoding.areashop.listeners;
 
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import nl.evolutioncoding.areashop.AreaShop;
@@ -81,8 +80,12 @@ public final class SignChangeListener implements Listener {
 						} else {
 							if(pr.getPriority() > candidate.getPriority()) {
 								candidate = pr;
+							} else if(pr.getPriority() < candidate.getPriority()) {
+								// Already got the correct one
 							} else if(pr.getParent() != null && pr.getParent().equals(candidate)) {
 								candidate = pr;
+							} else if(candidate.getParent() != null && candidate.getParent().equals(pr)) {
+								// Already got the correct one
 							} else {
 								plugin.message(player, "setup-couldNotDetect", candidate.getId(), pr.getId());
 								return;
@@ -171,20 +174,17 @@ public final class SignChangeListener implements Listener {
 				plugin.message(player, "setup-noPermissionBuy");				
 				return;
 			}
-			
+
 			// Get the other lines
 			String secondLine = event.getLine(1);
 			String thirdLine = event.getLine(2);
-			
+
 			// Get the regionManager for accessing regions
 			RegionManager regionManager = plugin.getWorldGuard().getRegionManager(event.getPlayer().getWorld());
-			if(regionManager == null) {
-				return;
-			}
-		
+
 			// If the secondLine does not contain a name try to find the region by location
 			if(secondLine == null || secondLine.length() == 0) {
-				ApplicableRegionSet regions = regionManager.getApplicableRegions(event.getBlock().getLocation());
+				Set<ProtectedRegion> regions = plugin.getWorldGuardHandler().getApplicableRegionsSet(event.getBlock().getLocation());
 				if(regions != null) {
 					boolean first = true;
 					ProtectedRegion candidate = null;
@@ -195,9 +195,13 @@ public final class SignChangeListener implements Listener {
 						} else {
 							if(pr.getPriority() > candidate.getPriority()) {
 								candidate = pr;
+							} else if(pr.getPriority() < candidate.getPriority()) {
+								// Already got the correct one
 							} else if(pr.getParent() != null && pr.getParent().equals(candidate)) {
 								candidate = pr;
-							} else if(pr.getPriority() == candidate.getPriority()) {
+							} else if(candidate.getParent() != null && candidate.getParent().equals(pr)) {
+								// Already got the correct one
+							} else {
 								plugin.message(player, "setup-couldNotDetect", candidate.getId(), pr.getId());
 								return;
 							}
@@ -208,7 +212,7 @@ public final class SignChangeListener implements Listener {
 					}
 				}
 			}
-			
+
 			boolean priceSet = thirdLine != null && thirdLine.length() != 0;
 			// Check if all the lines are correct			
 			if(secondLine == null || secondLine.length() == 0) {

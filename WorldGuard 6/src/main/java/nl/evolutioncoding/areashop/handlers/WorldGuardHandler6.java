@@ -1,7 +1,7 @@
 package nl.evolutioncoding.areashop.handlers;
 
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import nl.evolutioncoding.areashop.interfaces.AreaShopInterface;
 import nl.evolutioncoding.areashop.interfaces.WorldGuardInterface;
@@ -84,15 +84,17 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 			}
 		}
 		region.setMembers(members);
-		//System.out.println("  Flag " + flagName + " set: " + members.toUserFriendlyString());		
+		//System.out.println("  Flag " + flagName + " set: " + members.toUserFriendlyString());
 	}
 	
 	@Override
 	public Set<ProtectedRegion> getApplicableRegionsSet(Location location) {
 		Set<ProtectedRegion> result = new HashSet<ProtectedRegion>();
-		ApplicableRegionSet regions = pluginInterface.getWorldGuard().getRegionManager(location.getWorld()).getApplicableRegions(location);
-		for(ProtectedRegion region : regions) {
-			result.add(region);
+		Vector vector = new Vector(location.getX(), location.getY(), location.getZ());
+		for(ProtectedRegion region : pluginInterface.getWorldGuard().getRegionManager(location.getWorld()).getRegions().values()) {
+			if(region.contains(vector)) {
+				result.add(region);
+			}
 		}
 		return result;
 	}

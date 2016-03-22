@@ -450,11 +450,9 @@ public class RentRegion extends GeneralRegion {
 				}
 				
 				// Check if the player can still extend this rent
-				if(extend && !player.hasPermission("areashop.rentextendbypass")) {
-					if(getMaxExtends() >= 0 && getTimesExtended() >= getMaxExtends()) {
-						message(player, "rent-maxExtends");
-						return false;
-					}
+				if(extend && !player.hasPermission("areashop.rentextendbypass") && getMaxExtends() >= 0 && getTimesExtended() >= getMaxExtends()) {
+					message(player, "rent-maxExtends");
+					return false;
 				}
 				
 				// Check if there is enough time left before hitting maxRentTime

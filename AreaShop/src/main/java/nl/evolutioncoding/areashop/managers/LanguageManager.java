@@ -39,11 +39,9 @@ public class LanguageManager {
 		// Create the language folder if it not exists
 		File langFolder;
 		langFolder = new File(plugin.getDataFolder() + File.separator + AreaShop.languageFolder);
-		if(!langFolder.exists()) {
-			if(!langFolder.mkdirs()) {
-				plugin.getLogger().warning("Could not create language directory: " + langFolder.getAbsolutePath());
-				return;
-			}
+		if(!langFolder.exists() && !langFolder.mkdirs()) {
+			plugin.getLogger().warning("Could not create language directory: " + langFolder.getAbsolutePath());
+			return;
 		}
 
 		// Create the language files, overwrites if a file already exists

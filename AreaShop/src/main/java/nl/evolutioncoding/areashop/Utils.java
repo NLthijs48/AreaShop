@@ -22,10 +22,7 @@ import java.util.*;
 
 public class Utils {
 
-	// Not used
-	private Utils() {}
-
-	private static YamlConfiguration config;
+    private static YamlConfiguration config;
 	private static ArrayList<String> identifiers;
 	private static ArrayList<String> seconds;
 	private static ArrayList<String> minutes;
@@ -35,6 +32,9 @@ public class Utils {
 	private static ArrayList<String> months;
 	private static ArrayList<String> years;
 
+	// Not used
+    private Utils() {}
+    
 	public static void initialize(YamlConfiguration pluginConfig) {
 		config = pluginConfig;
 

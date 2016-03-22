@@ -27,7 +27,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileManager {
-	private static FileManager instance = null;
+    
+	private static final String WORLD = "world";
+    private static final String PLAYERUUID = "playeruuid";
+    private static final String PROFILE = "profile";
+    private static final String RESTORE = "restore";
+    private static final String RENTS_STR = "rents";
+    private static final String AREASHOP_CREATE = "areashop.create";
+
+    private static FileManager instance = null;
 	
 	private AreaShop plugin = null;
 	private HashMap<String, GeneralRegion> regions = null;
@@ -274,10 +282,10 @@ public class FileManager {
 		} else {
 			typeString = "buy";
 		}
-		AreaShop.debug("  permissions: .create=" + sender.hasPermission("areashop.create" + typeString) + ", .create.owner=" + sender.hasPermission("areashop.create" + typeString + ".owner") + ", .create.member=" + sender.hasPermission("areashop.create" + typeString + ".member"));
-		if(!(sender.hasPermission("areashop.create" + typeString)
-				|| (sender.hasPermission("areashop.create" + typeString + ".owner") && isOwner)
-				|| (sender.hasPermission("areashop.create" + typeString + ".member") && isMember))) {
+		AreaShop.debug("  permissions: .create=" + sender.hasPermission(AREASHOP_CREATE + typeString) + ", .create.owner=" + sender.hasPermission(AREASHOP_CREATE + typeString + ".owner") + ", .create.member=" + sender.hasPermission(AREASHOP_CREATE + typeString + ".member"));
+		if(!(sender.hasPermission(AREASHOP_CREATE + typeString)
+				|| (sender.hasPermission(AREASHOP_CREATE + typeString + ".owner") && isOwner)
+				|| (sender.hasPermission(AREASHOP_CREATE + typeString + ".member") && isMember))) {
 			return AddResult.NOPERMISSION;
 		}
 		GeneralRegion asRegion = plugin.getFileManager().getRegion(region.getId());
@@ -979,7 +987,7 @@ public class FileManager {
 		
 		// Update to YAML based format
 		if(fileStatus == null || fileStatus < 2) {
-			String rentPath = plugin.getDataFolder() + File.separator + "rents";
+			String rentPath = plugin.getDataFolder() + File.separator + RENTS_STR;
 			String buyPath = plugin.getDataFolder() + File.separator + "buys";
 			File rentFile = new File(rentPath);
 			File buyFile = new File(buyPath);
@@ -993,8 +1001,8 @@ public class FileManager {
 					plugin.getLogger().warning("Could not create directory: " + oldFolderFile.getAbsolutePath());
 				}
 				
-				if(versions.get("rents") == null) {
-					versions.put("rents", -1);
+				if(versions.get(RENTS_STR) == null) {
+					versions.put(RENTS_STR, -1);
 				}
 				
 				HashMap<String, HashMap<String, String>> rents = null;
@@ -1017,14 +1025,14 @@ public class FileManager {
 				} else {
 					// Move old file
 					try {
-						Files.move(new File(rentPath), new File(oldFolderPath + "rents"));
+						Files.move(new File(rentPath), new File(oldFolderPath + RENTS_STR));
 					} catch (Exception e) {
 						plugin.getLogger().warning("  Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
 					}
 					// Check if conversion is needed
-					if(versions.get("rents") < 1) {
+					if(versions.get(RENTS_STR) < 1) {
 						// Upgrade the rent to the latest version
-						if(versions.get("rents") < 0) {
+						if(versions.get(RENTS_STR) < 0) {
 							for(String rentName : rents.keySet()) {
 								HashMap<String,String> rent = rents.get(rentName);
 								// Save the rentName in the hashmap and use a small caps rentName as key
@@ -1034,29 +1042,29 @@ public class FileManager {
 									rents.put(rentName.toLowerCase(), rent);
 								}
 								// Save the default setting for region restoring
-								if(rent.get("restore") == null) {
-									rent.put("restore", "general");
+								if(rent.get(RESTORE) == null) {
+									rent.put(RESTORE, "general");
 								}
 								// Save the default setting for the region restore profile
-								if(rent.get("profile") == null) {
-									rent.put("profile", "default");
+								if(rent.get(PROFILE) == null) {
+									rent.put(PROFILE, "default");
 								}
 								// Change to version 0
-								versions.put("rents", 0);
+								versions.put(RENTS_STR, 0);
 							}
 							plugin.getLogger().info("  Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
 						}
-						if(versions.get("rents") < 1) {
+						if(versions.get(RENTS_STR) < 1) {
 							for(String rentName : rents.keySet()) {
 								HashMap<String,String> rent = rents.get(rentName);
 								if(rent.get("player") != null) {
 									@SuppressWarnings("deprecation")  // Fake deprecation by Bukkit to inform developers, method will stay
 									OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(rent.get("player"));
-									rent.put("playeruuid", offlinePlayer.getUniqueId().toString());		
+									rent.put(PLAYERUUID, offlinePlayer.getUniqueId().toString());		
 									rent.remove("player");
 								}
 								// Change version to 1
-								versions.put("rents", 1);
+								versions.put(RENTS_STR, 1);
 							}
 							plugin.getLogger().info("  Updated version of '" + rentPath + "' from 0 to 1 (switch to UUID's for player identification)");
 						}				
@@ -1071,30 +1079,30 @@ public class FileManager {
 						YamlConfiguration config = new YamlConfiguration();
 						config.set("general.name", rent.get("name").toLowerCase());
 						config.set("general.type", "rent");
-						config.set("general.world", rent.get("world"));
-						config.set("general.signs.0.location.world", rent.get("world"));
+						config.set("general.world", rent.get(WORLD));
+						config.set("general.signs.0.location.world", rent.get(WORLD));
 						config.set("general.signs.0.location.x", Double.parseDouble(rent.get("x")));
 						config.set("general.signs.0.location.y", Double.parseDouble(rent.get("y")));
 						config.set("general.signs.0.location.z", Double.parseDouble(rent.get("z")));
 						config.set("rent.price", Double.parseDouble(rent.get("price")));
 						config.set("rent.duration", rent.get("duration"));
-						if(rent.get("restore") != null && !rent.get("restore").equals("general")) {
-							config.set("general.enableRestore", rent.get("restore"));
+						if(rent.get(RESTORE) != null && !rent.get(RESTORE).equals("general")) {
+							config.set("general.enableRestore", rent.get(RESTORE));
 						}
-						if(rent.get("profile") != null && !rent.get("profile").equals("default")) {
-							config.set("general.schematicProfile", rent.get("profile"));
+						if(rent.get(PROFILE) != null && !rent.get(PROFILE).equals("default")) {
+							config.set("general.schematicProfile", rent.get(PROFILE));
 						}
 						if(rent.get("tpx") != null) {
-							config.set("general.teleportLocation.world", rent.get("world"));
+							config.set("general.teleportLocation.world", rent.get(WORLD));
 							config.set("general.teleportLocation.x", Double.parseDouble(rent.get("tpx")));
 							config.set("general.teleportLocation.y", Double.parseDouble(rent.get("tpy")));
 							config.set("general.teleportLocation.z", Double.parseDouble(rent.get("tpz")));
 							config.set("general.teleportLocation.yaw", rent.get("tpyaw"));
 							config.set("general.teleportLocation.pitch", rent.get("tppitch"));
 						}
-						if(rent.get("playeruuid") != null) {
-							config.set("rent.renter", rent.get("playeruuid"));
-							config.set("rent.renterName", Utils.toName(rent.get("playeruuid")));
+						if(rent.get(PLAYERUUID) != null) {
+							config.set("rent.renter", rent.get(PLAYERUUID));
+							config.set("rent.renterName", Utils.toName(rent.get(PLAYERUUID)));
 							config.set("rent.rentedUntil", Long.parseLong(rent.get("rented")));
 						}
 						try {
@@ -1107,7 +1115,7 @@ public class FileManager {
 				}
 				
 				// Change version number
-				versions.remove("rents");
+				versions.remove(RENTS_STR);
 				versions.put(AreaShop.versionFiles, AreaShop.versionFilesCurrent);			
 				saveVersions();			
 			}
@@ -1159,12 +1167,12 @@ public class FileManager {
 									buys.put(buyName.toLowerCase(), buy);
 								}
 								// Save the default setting for region restoring
-								if(buy.get("restore") == null) {
-									buy.put("restore", "general");
+								if(buy.get(RESTORE) == null) {
+									buy.put(RESTORE, "general");
 								}
 								// Save the default setting for the region restore profile
-								if(buy.get("profile") == null) {
-									buy.put("profile", "default");
+								if(buy.get(PROFILE) == null) {
+									buy.put(PROFILE, "default");
 								}
 								// Change to version 0
 								versions.put("buys", 0);
@@ -1177,7 +1185,7 @@ public class FileManager {
 								if(buy.get("player") != null) {
 									@SuppressWarnings("deprecation")  // Fake deprecation by Bukkit to inform developers, method will stay
 									OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(buy.get("player"));
-									buy.put("playeruuid", offlinePlayer.getUniqueId().toString());		
+									buy.put(PLAYERUUID, offlinePlayer.getUniqueId().toString());		
 									buy.remove("player");
 								}
 								// Change version to 1
@@ -1196,29 +1204,29 @@ public class FileManager {
 						YamlConfiguration config = new YamlConfiguration();
 						config.set("general.name", buy.get("name").toLowerCase());
 						config.set("general.type", "buy");
-						config.set("general.world", buy.get("world"));
-						config.set("general.signs.0.location.world", buy.get("world"));
+						config.set("general.world", buy.get(WORLD));
+						config.set("general.signs.0.location.world", buy.get(WORLD));
 						config.set("general.signs.0.location.x", Double.parseDouble(buy.get("x")));
 						config.set("general.signs.0.location.y", Double.parseDouble(buy.get("y")));
 						config.set("general.signs.0.location.z", Double.parseDouble(buy.get("z")));
 						config.set("buy.price", Double.parseDouble(buy.get("price")));
-						if(buy.get("restore") != null && !buy.get("restore").equals("general")) {
-							config.set("general.enableRestore", buy.get("restore"));
+						if(buy.get(RESTORE) != null && !buy.get(RESTORE).equals("general")) {
+							config.set("general.enableRestore", buy.get(RESTORE));
 						}
-						if(buy.get("profile") != null && !buy.get("profile").equals("default")) {
-							config.set("general.schematicProfile", buy.get("profile"));
+						if(buy.get(PROFILE) != null && !buy.get(PROFILE).equals("default")) {
+							config.set("general.schematicProfile", buy.get(PROFILE));
 						}
 						if(buy.get("tpx") != null) {
-							config.set("general.teleportLocation.world", buy.get("world"));
+							config.set("general.teleportLocation.world", buy.get(WORLD));
 							config.set("general.teleportLocation.x", Double.parseDouble(buy.get("tpx")));
 							config.set("general.teleportLocation.y", Double.parseDouble(buy.get("tpy")));
 							config.set("general.teleportLocation.z", Double.parseDouble(buy.get("tpz")));
 							config.set("general.teleportLocation.yaw", buy.get("tpyaw"));
 							config.set("general.teleportLocation.pitch", buy.get("tppitch"));
 						}
-						if(buy.get("playeruuid") != null) {
-							config.set("buy.buyer", buy.get("playeruuid"));
-							config.set("buy.buyerName", Utils.toName(buy.get("playeruuid")));
+						if(buy.get(PLAYERUUID) != null) {
+							config.set("buy.buyer", buy.get(PLAYERUUID));
+							config.set("buy.buyerName", Utils.toName(buy.get(PLAYERUUID)));
 						}
 						try {
 							config.save(new File(regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml"));

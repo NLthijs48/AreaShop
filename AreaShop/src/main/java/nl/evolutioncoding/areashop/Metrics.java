@@ -374,7 +374,7 @@ public class Metrics {
             appendJSONPair(json, "ping", "1");
         }
 
-        if(graphs.size() > 0) {
+        if(!graphs.isEmpty()) {
             synchronized(graphs) {
                 json.append(',');
                 json.append('"');

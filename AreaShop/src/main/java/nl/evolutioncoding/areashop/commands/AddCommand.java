@@ -72,7 +72,7 @@ public class AddCommand extends CommandAreaShop {
 			}
 			world = selection.getWorld();
 			regions = Utils.getWERegionsInSelection(selection);
-			if(regions.size() == 0) {
+			if(regions.isEmpty()) {
 				plugin.message(player, "cmd-noWERegionsFound");
 				return;
 			}

@@ -79,7 +79,7 @@ public class FileManager {
 		schemFolder = plugin.getDataFolder() + File.separator + AreaShop.schematicFolder;
 		worldRegionsRequireSaving = new HashSet<>();
 		File schemFile = new File(schemFolder);
-		if(!schemFile.exists() & !schemFile.mkdirs()) {
+		if(!schemFile.exists() && !schemFile.mkdirs()) {
 			plugin.getLogger().warning("Could not create schematic files directory: " + schemFile.getAbsolutePath());
 		}
 		loadVersions();
@@ -989,7 +989,7 @@ public class FileManager {
 			boolean buyFileFound = false, rentFileFound = false;
 			if(rentFile.exists()) {
 				rentFileFound = true;
-				if(!oldFolderFile.exists() & !oldFolderFile.mkdirs()) {
+				if(!oldFolderFile.exists() && !oldFolderFile.mkdirs()) {
 					plugin.getLogger().warning("Could not create directory: " + oldFolderFile.getAbsolutePath());
 				}
 				
@@ -1063,7 +1063,7 @@ public class FileManager {
 					}		
 					// Save rents to new format
 					File regionsFile = new File(regionsPath);
-					if(!regionsFile.exists() & !regionsFile.mkdirs()) {
+					if(!regionsFile.exists() && !regionsFile.mkdirs()) {
 						plugin.getLogger().warning("Could not create directory: " + regionsFile.getAbsolutePath());
 						return;
 					}
@@ -1113,7 +1113,7 @@ public class FileManager {
 			}
 			if(buyFile.exists()) {
 				buyFileFound = true;
-				if(!oldFolderFile.exists() & !oldFolderFile.mkdirs()) {
+				if(!oldFolderFile.exists() && !oldFolderFile.mkdirs()) {
 					plugin.getLogger().warning("Could not create directory: " + oldFolderFile.getAbsolutePath());
 					return;
 				}
@@ -1189,7 +1189,7 @@ public class FileManager {
 				
 					// Save buys to new format
 					File regionsFile = new File(regionsPath);
-					if(!regionsFile.exists() & !regionsFile.mkdirs()) {
+					if(!regionsFile.exists() && !regionsFile.mkdirs()) {
 						plugin.getLogger().warning("Could not create directory: " + regionsFile.getAbsolutePath());
 					}
 					for(HashMap<String, String> buy : buys.values()) {

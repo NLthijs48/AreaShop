@@ -856,11 +856,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		File saveFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
         // Create parent directories
         File parent = saveFile.getParentFile();
-        if (parent != null && !parent.exists()) {
-            if (!parent.mkdirs()) {
-            	plugin.getLogger().warning("Did not save region " + getName() + ", schematic directory could not be created: " + saveFile);
-                return false;
-            }
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            plugin.getLogger().warning("Did not save region " + getName() + ", schematic directory could not be created: " + saveFile);
+            return false;
         }		
 		boolean result = plugin.getWorldEditHandler().saveRegionBlocks(saveFile, this);
 		if(result) {

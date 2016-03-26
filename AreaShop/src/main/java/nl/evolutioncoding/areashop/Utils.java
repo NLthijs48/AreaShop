@@ -67,7 +67,7 @@ public class Utils {
 		try {
 			Method onlinePlayerMethod = Server.class.getMethod("getOnlinePlayers");
 			if(onlinePlayerMethod.getReturnType().equals(Collection.class)) {
-				return ((Collection<? extends Player>)onlinePlayerMethod.invoke(Bukkit.getServer()));
+				return (Collection<? extends Player>)onlinePlayerMethod.invoke(Bukkit.getServer());
 			} else {
 				return Arrays.asList((Player[])onlinePlayerMethod.invoke(Bukkit.getServer()));
 			}
@@ -422,7 +422,7 @@ public class Utils {
 		}
 
 		// check if the part before the space is a number
-		String prefix = time.substring(0, (time.indexOf(' ')));
+		String prefix = time.substring(0, time.indexOf(' '));
 		return prefix.matches("\\d+");
 	}
 

@@ -307,7 +307,7 @@ public class RentRegion extends GeneralRegion {
 	 */
 	public double getMoneyBackAmount() {
 		Long currentTime = Calendar.getInstance().getTimeInMillis();
-		Double timeLeft = (double) ((getRentedUntil() - currentTime));
+		Double timeLeft = (double) (getRentedUntil() - currentTime);
 		double percentage = (getMoneyBackPercentage()) / 100.0;
 		Double timePeriod = (double) (getDuration());
 		double periods = timeLeft / timePeriod;

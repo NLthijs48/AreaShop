@@ -142,9 +142,9 @@ public class AddCommand extends CommandAreaShop {
 							namesNoPermission.add(region.getId());
 						} else {
 							// Check if the player should be landlord
-							boolean landlord = (!sender.hasPermission("areashop.create" + type)
+							boolean landlord = !sender.hasPermission("areashop.create" + type)
 								&& ((sender.hasPermission("areashop.create" + type + ".owner") && isOwner)
-									|| (sender.hasPermission("areashop.create" + type + ".member") && isMember)));
+									|| (sender.hasPermission("areashop.create" + type + ".member") && isMember));
 							if(isRent) {
 								RentRegion rent = new RentRegion(plugin, region.getId(), finalWorld);
 								// Set landlord

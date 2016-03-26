@@ -1718,7 +1718,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public boolean matchesLimitGroup(String group) {
 		List<String> worlds = plugin.getConfig().getStringList("limitGroups." + group + ".worlds");
 		List<String> groups = plugin.getConfig().getStringList("limitGroups." + group + ".groups");
-		if((worlds == null || worlds.isEmpty() || worlds.contains(getWorldName()))) {
+		if(worlds == null || worlds.isEmpty() || worlds.contains(getWorldName())) {
 			if(groups == null || groups.isEmpty()) {
 				return true;
 			} else {

@@ -136,9 +136,9 @@ public final class SignChangeListener implements Listener {
 				final RentRegion rent = new RentRegion(plugin, secondLine, event.getPlayer().getWorld());
 				boolean isMember = plugin.getWorldGuardHandler().containsMember(rent.getRegion(), player.getUniqueId());
 				boolean isOwner = plugin.getWorldGuardHandler().containsOwner(rent.getRegion(), player.getUniqueId());
-				boolean landlord = (!player.hasPermission("areashop.createrent")
+				boolean landlord = !player.hasPermission("areashop.createrent")
 						&& ((player.hasPermission("areashop.createrent.owner") && isOwner)
-						|| (player.hasPermission("areashop.createrent.member") && isMember)));					
+						|| (player.hasPermission("areashop.createrent.member") && isMember));					
 
 				if(landlord) {
 					rent.setLandlord(player.getUniqueId(), player.getName());
@@ -247,9 +247,9 @@ public final class SignChangeListener implements Listener {
 				final BuyRegion buy = new BuyRegion(plugin, secondLine, event.getPlayer().getWorld());
 				boolean isMember = plugin.getWorldGuardHandler().containsMember(buy.getRegion(), player.getUniqueId());
 				boolean isOwner = plugin.getWorldGuardHandler().containsOwner(buy.getRegion(), player.getUniqueId());
-				boolean landlord = (!player.hasPermission("areashop.createbuy")
+				boolean landlord = !player.hasPermission("areashop.createbuy")
 						&& ((player.hasPermission("areashop.createbuy.owner") && isOwner)
-						|| (player.hasPermission("areashop.createbuy.member") && isMember)));					
+						|| (player.hasPermission("areashop.createbuy.member") && isMember));					
 
 				if(landlord) {
 					buy.setLandlord(player.getUniqueId(), player.getName());

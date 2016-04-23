@@ -354,8 +354,8 @@ public class BuyRegion extends GeneralRegion {
 						this.notifyAndUpdate(new ResoldRegionEvent(this, oldOwner));
 
 						// Send message to the player
-						message(player, "buy-successResale", oldOwnerName);
 						Player seller = Bukkit.getPlayer(oldOwner);
+						message(seller, "buy-successResale", oldOwnerName);
 						if(seller != null) {
 							message(player, "buy-successSeller", resellPrice);
 						}

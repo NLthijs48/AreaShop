@@ -220,7 +220,7 @@ public class Metrics {
                         }
                     }
                 }
-            }, 0, PING_INTERVAL * 1200);
+            }, 0, PING_INTERVAL * 1200L);
 
             return true;
         }

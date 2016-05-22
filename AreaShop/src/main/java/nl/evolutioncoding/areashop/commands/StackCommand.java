@@ -103,13 +103,13 @@ public class StackCommand extends CommandAreaShop {
 		}
 		final Location shift = new Location(selection.getWorld(), 0, 0, 0);
 		if(facing == BlockFace.SOUTH) {
-			shift.setZ(-selection.getLength() - gap);
+			shift.setZ(-selection.getLength() - (double)gap);
 		} else if(facing == BlockFace.WEST) {
-			shift.setX(selection.getWidth() + gap);
+			shift.setX(selection.getWidth() + (double)gap);
 		} else if(facing == BlockFace.NORTH) {
-			shift.setZ(selection.getLength() + gap);
+			shift.setZ(selection.getLength() + (double)gap);
 		} else if(facing == BlockFace.EAST) {
-			shift.setX(-selection.getWidth() - gap);
+			shift.setX(-selection.getWidth() - (double)gap);
 		}
 		AreaShop.debug("  calculated shift vector: " + shift + ", with facing=" + facing);
 		// Create regions and add them to AreaShop

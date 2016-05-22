@@ -41,7 +41,7 @@ public class RegionGroup {
 			AreaShop.debug("group save required because of changed member size");
 			saveRequired();
 		}
-		if(getMembers().size() == 0) {
+		if(getMembers().isEmpty()) {
 			plugin.getFileManager().removeGroup(this);
 		}
 	}

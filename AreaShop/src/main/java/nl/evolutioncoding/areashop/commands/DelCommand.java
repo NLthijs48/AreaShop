@@ -56,7 +56,7 @@ public class DelCommand extends CommandAreaShop {
 				return;
 			}			
 			List<GeneralRegion> regions = Utils.getASRegionsInSelection(selection);
-			if(regions == null || regions.size() == 0) {
+			if(regions == null || regions.isEmpty()) {
 				plugin.message(player, "cmd-noRegionsFound");
 				return;
 			}
@@ -83,10 +83,10 @@ public class DelCommand extends CommandAreaShop {
 				Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(region));
 			}
 			// send messages
-			if(namesSuccess.size() != 0) {
+			if(!namesSuccess.isEmpty()) {
 				plugin.message(sender, "del-success", Utils.createCommaSeparatedList(namesSuccess));
 			}
-			if(namesFailed.size() != 0) {
+			if(!namesFailed.isEmpty()) {
 				plugin.message(sender, "del-failed", Utils.createCommaSeparatedList(namesFailed));
 			}
 		} else {

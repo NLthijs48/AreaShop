@@ -771,7 +771,7 @@ public class FileManager {
 				InputStreamReader normal = new InputStreamReader(plugin.getResource(AreaShop.defaultFile), Charsets.UTF_8)
 		) {
 			defaultConfig = YamlConfiguration.loadConfiguration(custom);
-			if(defaultConfig.getKeys(false).size() == 0) {
+			if(defaultConfig.getKeys(false).isEmpty()) {
 				plugin.getLogger().warning("File 'default.yml' is empty, check for errors in the log.");
 				result = false;
 			} else {
@@ -812,7 +812,7 @@ public class FileManager {
 				InputStreamReader normal = new InputStreamReader(plugin.getResource(AreaShop.configFile), Charsets.UTF_8)
 		) {
 			config = YamlConfiguration.loadConfiguration(custom);
-			if(config.getKeys(false).size() == 0) {
+			if(config.getKeys(false).isEmpty()) {
 				plugin.getLogger().warning("File 'config.yml' is empty, check for errors in the log.");
 				result = false;
 			} else {
@@ -840,7 +840,7 @@ public class FileManager {
 					InputStreamReader reader = new InputStreamReader(new FileInputStream(groupFile), Charsets.UTF_8)
 			) {
 				groupsConfig = YamlConfiguration.loadConfiguration(reader);
-				if(config.getKeys(false).size() == 0) {
+				if(config.getKeys(false).isEmpty()) {
 					plugin.getLogger().warning("File 'groups.yml' is empty, check for errors in the log.");
 					result = false;
 				}
@@ -883,7 +883,7 @@ public class FileManager {
 							InputStreamReader reader = new InputStreamReader(new FileInputStream(regionFile), Charsets.UTF_8)
 					) {
 						config = YamlConfiguration.loadConfiguration(reader);
-						if(config.getKeys(false).size() == 0) {
+						if(config.getKeys(false).isEmpty()) {
 							plugin.getLogger().warning("Region file '"+regionFile.getName()+"' is empty, check for errors in the log.");
 						}
 					} catch(IOException e) {

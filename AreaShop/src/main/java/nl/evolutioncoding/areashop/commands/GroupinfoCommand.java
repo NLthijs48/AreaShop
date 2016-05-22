@@ -44,7 +44,7 @@ public class GroupinfoCommand extends CommandAreaShop {
 			return;
 		}
 		List<String> members = group.getMembers();
-		if(members.size() == 0) {
+		if(members.isEmpty()) {
 			plugin.message(sender, "groupinfo-noMembers", group.getName());
 		} else {
 			plugin.message(sender, "groupinfo-members", group.getName(), Utils.createCommaSeparatedList(members));

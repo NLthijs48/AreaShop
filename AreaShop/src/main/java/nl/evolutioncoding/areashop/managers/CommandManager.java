@@ -150,7 +150,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 			}
 		}
 		// Filter and sort the results
-		if(result.size() > 0) {
+		if(!result.isEmpty()) {
 			SortedSet<String> set = new TreeSet<>();
 			for(String suggestion : result) {
 				if(suggestion.toLowerCase().startsWith(toCompletePrefix)) {

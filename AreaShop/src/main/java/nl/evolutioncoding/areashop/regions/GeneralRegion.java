@@ -197,7 +197,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Get the tag replacements, used in commands or signs
 	 * @return A map with strings like '%region%' linking to the value to replace it with
 	 */
-	public abstract HashMap<String, Object> getSpecificReplacements();
+	public abstract Map<String, Object> getSpecificReplacements();
 	
 	/**
 	 * Get the state of a region
@@ -498,13 +498,13 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Get all the replacements for this region
 	 * @return Map with the keys that need to be replaced with the value of the object
 	 */
-	public HashMap<String, Object> getAllReplacements() {
+	public Map<String, Object> getAllReplacements() {
 		// Reply with cache if we have one
 		if(replacementsCache != null && (Calendar.getInstance().getTimeInMillis() - replacementsCacheTime) < 1000) {
 			return replacementsCache;
 		}
 		
-		HashMap<String, Object> result = getSpecificReplacements();
+		HashMap<String, Object> result = (HashMap<String, Object>) getSpecificReplacements();
 		
 		result.put(AreaShop.tagRegionName, getName());
 		result.put(AreaShop.tagRegionType, getType().getValue().toLowerCase());
@@ -549,7 +549,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return "";
 		}
 		// Apply static replacements
-		HashMap<String, Object> replacements = getAllReplacements();
+		HashMap<String, Object> replacements = (HashMap<String, Object>) getAllReplacements();
 		for(String tag : replacements.keySet()) {
 			Object replacement = replacements.get(tag);
 			if(replacement != null) {

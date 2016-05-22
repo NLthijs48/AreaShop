@@ -64,7 +64,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 	 * Get the list with AreaShop commands
 	 * @return The list with AreaShop commands
 	 */
-	public ArrayList<CommandAreaShop> getCommands() {
+	public List<CommandAreaShop> getCommands() {
 		return commands;
 	}
 	

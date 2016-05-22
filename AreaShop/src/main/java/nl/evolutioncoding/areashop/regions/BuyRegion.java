@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class BuyRegion extends GeneralRegion {
@@ -209,7 +210,7 @@ public class BuyRegion extends GeneralRegion {
 	}
 	
 	@Override
-	public HashMap<String, Object> getSpecificReplacements() {
+	public Map<String, Object> getSpecificReplacements() {
 		// Fill the replacements map with things specific to a BuyRegion
 		HashMap<String, Object> result = new HashMap<>();
 		result.put(AreaShop.tagPrice, getFormattedPrice());

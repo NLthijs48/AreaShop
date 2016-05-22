@@ -17,7 +17,9 @@ import java.util.Set;
 
 public class SignDisplayFeature extends Feature implements Listener {
 
-	public SignDisplayFeature(AreaShop plugin) {
+	private static final String GENERAL_SIGNS = "general.signs.";
+
+    public SignDisplayFeature(AreaShop plugin) {
 		super(plugin);
 	}
 
@@ -44,13 +46,13 @@ public class SignDisplayFeature extends Feature implements Listener {
 			return true;
 		}
 		for(String sign : signs) {
-			Location location = Utils.configToLocation(config.getConfigurationSection("general.signs." + sign + ".location"));
+			Location location = Utils.configToLocation(config.getConfigurationSection(GENERAL_SIGNS + sign + ".location"));
 			if(location == null) {
 				AreaShop.debug("Sign location incorrect region=" + region.getName() + ", signKey=" + sign);
 				result = false;
 			} else {
 				// Get the profile set in the config
-				String profile = config.getString("general.signs." + sign + ".profile");
+				String profile = config.getString(GENERAL_SIGNS + sign + ".profile");
 				if(profile == null || profile.length() == 0) {
 					profile = region.getStringSetting("general.signProfile");
 				}
@@ -75,7 +77,7 @@ public class SignDisplayFeature extends Feature implements Listener {
 					if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
 						Material signType;
 						try {
-							signType = Material.valueOf(config.getString("general.signs." + sign + ".signType"));
+							signType = Material.valueOf(config.getString(GENERAL_SIGNS + sign + ".signType"));
 						} catch(NullPointerException | IllegalArgumentException e) {
 							signType = null;
 						}
@@ -88,7 +90,7 @@ public class SignDisplayFeature extends Feature implements Listener {
 						org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 						BlockFace signFace;
 						try {
-							signFace = BlockFace.valueOf(config.getString("general.signs." + sign + ".facing"));
+							signFace = BlockFace.valueOf(config.getString(GENERAL_SIGNS + sign + ".facing"));
 						} catch(NullPointerException | IllegalArgumentException e) {
 							signFace = null;
 						}
@@ -101,11 +103,11 @@ public class SignDisplayFeature extends Feature implements Listener {
 						signState = (Sign)block.getState();
 					}
 					org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
-					if(!config.isString("general.signs." + sign + ".signType")) {
-						region.setSetting("general.signs." + sign + ".signType", signState.getType().toString());
+					if(!config.isString(GENERAL_SIGNS + sign + ".signType")) {
+						region.setSetting(GENERAL_SIGNS + sign + ".signType", signState.getType().toString());
 					}
-					if(!config.isString("general.signs." + sign + ".facing")) {
-						region.setSetting("general.signs." + sign + ".facing", signData.getFacing().toString());
+					if(!config.isString(GENERAL_SIGNS + sign + ".facing")) {
+						region.setSetting(GENERAL_SIGNS + sign + ".facing", signData.getFacing().toString());
 					}
 					// Apply replacements and color and then set it on the sign
 					for(int i = 0; i < signLines.length; i++) {

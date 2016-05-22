@@ -26,7 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion> {
-	YamlConfiguration config;
+	private static final String GENERAL_SIGNS = "general.signs";
+    YamlConfiguration config;
 	private static ArrayList<Material> canSpawnIn = new ArrayList<>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
 	private static ArrayList<Material> cannotSpawnOn = new ArrayList<>(Arrays.asList(Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.CACTUS, Material.IRON_FENCE, Material.FENCE_GATE, Material.THIN_GLASS, Material.NETHER_FENCE, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE, Material.STAINED_GLASS_PANE));
 	private static ArrayList<Material> cannotSpawnBeside = new ArrayList<>(Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CACTUS));
@@ -212,10 +213,10 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public List<Location> getSignLocations() {
 		List<Location> result = new ArrayList<>();
-		if(config.getConfigurationSection("general.signs") == null) {
+		if(config.getConfigurationSection(GENERAL_SIGNS) == null) {
 			return result;
 		}
-		for(String signName : config.getConfigurationSection("general.signs").getKeys(false)) {
+		for(String signName : config.getConfigurationSection(GENERAL_SIGNS).getKeys(false)) {
 			result.add(Utils.configToLocation(config.getConfigurationSection("general.signs." + signName + ".location")));
 		}
 		return result;
@@ -698,10 +699,10 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public String getSignName(Location location) {
 		String result = null;
-		if(config.getConfigurationSection("general.signs") == null) {
+		if(config.getConfigurationSection(GENERAL_SIGNS) == null) {
 			return null;
 		}
-		for(String signName : config.getConfigurationSection("general.signs").getKeys(false)) {
+		for(String signName : config.getConfigurationSection(GENERAL_SIGNS).getKeys(false)) {
 			if(location.equals(Utils.configToLocation(config.getConfigurationSection("general.signs." + signName + ".location")))) {
 				result = signName;
 			}
@@ -734,10 +735,10 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public boolean isSignOfRegion(Location location) {
 		Set<String> signs;
-		if(config.getConfigurationSection("general.signs") == null) {
+		if(config.getConfigurationSection(GENERAL_SIGNS) == null) {
 			return false;
 		}
-		signs = config.getConfigurationSection("general.signs").getKeys(false);
+		signs = config.getConfigurationSection(GENERAL_SIGNS).getKeys(false);
 		for(String sign : signs) {
 			Location signLocation = Utils.configToLocation(config.getConfigurationSection("general.signs." + sign + ".location"));
 			if(signLocation != null
@@ -783,8 +784,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return false;
 		}
 		Set<String> signs = new HashSet<>();
-		if(config.getConfigurationSection("general.signs") != null) {
-			signs = config.getConfigurationSection("general.signs").getKeys(false);
+		if(config.getConfigurationSection(GENERAL_SIGNS) != null) {
+			signs = config.getConfigurationSection(GENERAL_SIGNS).getKeys(false);
 		}
 		for(String sign : signs) {
 			// Get the profile set in the config

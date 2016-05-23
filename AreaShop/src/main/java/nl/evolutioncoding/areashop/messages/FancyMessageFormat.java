@@ -229,6 +229,9 @@ public class FancyMessageFormat {
 				messagePart = new InteractiveMessagePart();
 				message.add(messagePart);
 			} else /* if Interactive formatting */ {
+				if(message.isEmpty()) {
+					continue;
+				}
 				messagePart = message.getLast();
 				Tag tag = interactiveTag.tag;
 				if(tag instanceof ClickType) {
@@ -280,8 +283,8 @@ public class FancyMessageFormat {
 						line = nextTag.subsequentContent;
 					}
 
-					if(!textToAdd.isEmpty()) {
-						// Add a text part with the correct formatting
+					// Add a text part with the correct formatting
+					if((tagged && nextTag.tag == ControlTag.BREAK) || !textToAdd.isEmpty()) {
 						TextMessagePart part = new TextMessagePart();
 						part.text = textToAdd;
 						part.formatTypes = new HashSet<>(currentLineFormatting);
@@ -300,7 +303,9 @@ public class FancyMessageFormat {
 						} else if(tag instanceof FormatCloseTag) {
 							currentLineFormatting.remove(((FormatCloseTag)tag).closes);
 						} else if(tag == ControlTag.BREAK) {
-							targetList.getLast().text += '\n';
+							if(!targetList.isEmpty()) {
+								targetList.getLast().text += '\n';
+							}
 							continue lineLoop;
 						} else if(tag == ControlTag.RESET) {
 							currentLineFormatting.clear();
@@ -328,10 +333,10 @@ public class FancyMessageFormat {
 	 * Null if nothing is found.
 	 */
 	private static TaggedContent getNextTag(String line, boolean parseBreak) {
-		Pattern pattern = Pattern.compile("\\[[a-zA-Z1-9]\\]|&[1-9abcdeflonskr]");
+		Pattern pattern = Pattern.compile("\\[[a-zA-Z1-9]+\\]|&[1-9abcdeflonskr]");
 		Matcher matcher = pattern.matcher(line);
 		// TODO Fix for escape things, and something with parseBreak?
-		if(matcher.find()) {
+		while(matcher.find()) {
 			Tag tag = null;
 			if(matcher.group().startsWith("&")) {
 				for(Color color : Color.class.getEnumConstants()) {
@@ -344,13 +349,16 @@ public class FancyMessageFormat {
 						tag = format;
 					}
 				}
-				if(matcher.group().charAt(1) == 'r') {
+				if(matcher.group().charAt(1) == SIMPLE_FORMAT_RESET_CHAR) {
 					tag = ControlTag.RESET;
 				}
 			} else {
 				tag = BRACKET_TAG_LIST.get(matcher.group().substring(1, matcher.group().length()-1).toLowerCase());
 			}
-			return new TaggedContent(line.substring(0, matcher.start()), tag, line.substring(matcher.end()));
+			// Continue search if we found something like [abc] that is not a tag
+			if(tag != null) {
+				return new TaggedContent(line.substring(0, matcher.start()), tag, line.substring(matcher.end()));
+			}
 		}
 		return null;
 

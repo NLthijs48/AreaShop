@@ -197,8 +197,8 @@ public class Message {
 		while(shouldReplace) {
 			List<String> original = new ArrayList<>(message);
 
-			replaceLanguageVariables();
 			replaceArgumentVariables();
+			replaceLanguageVariables();
 
 			shouldReplace = !message.equals(original);
 			round++;

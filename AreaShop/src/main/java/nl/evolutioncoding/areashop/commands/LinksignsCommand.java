@@ -1,7 +1,7 @@
 package nl.evolutioncoding.areashop.commands;
 
 import nl.evolutioncoding.areashop.AreaShop;
-import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.messages.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -49,7 +49,14 @@ public class LinksignsCommand extends CommandAreaShop {
 				profile = args[1];
 				Set<String> profiles = plugin.getConfig().getConfigurationSection("signProfiles").getKeys(false);
 				if(!profiles.contains(profile)) {
-					plugin.message(sender, "addsign-wrongProfile", Utils.createCommaSeparatedList(profiles));
+					ArrayList<String> message = new ArrayList<>();
+					for(String p : profiles) {
+						if(!message.isEmpty()) {
+							message.add(", ");
+						}
+						message.addAll(Message.fromKey("addsign-profile").replacements(p).get());
+					}
+					plugin.message(sender, "addsign-wrongProfile", Message.fromList(message));
 					return;
 				}
 			}

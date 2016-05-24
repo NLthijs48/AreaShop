@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public class GroupdelCommand extends CommandAreaShop {
 
@@ -61,25 +62,23 @@ public class GroupdelCommand extends CommandAreaShop {
 				plugin.message(player, "cmd-noRegionsFound");
 				return;
 			}
-			ArrayList<String> namesSuccess = new ArrayList<>();
-			ArrayList<String> namesFailed = new ArrayList<>();
-			ArrayList<GeneralRegion> toUpdate = new ArrayList<>();
+			TreeSet<GeneralRegion> regionsSuccess = new TreeSet<>();
+			TreeSet<GeneralRegion> regionsFailed = new TreeSet<>();
 			for(GeneralRegion region : regions) {
 				if(group.removeMember(region)) {
-					namesSuccess.add(region.getName());
-					toUpdate.add(region);
+					regionsSuccess.add(region);
 				} else {
-					namesFailed.add(region.getName());
+					regionsFailed.add(region);
 				}
 			}
-			if(namesSuccess.size() != 0) {
-				plugin.message(player, "groupdel-weSuccess", group.getName(), Utils.createCommaSeparatedList(namesSuccess));
+			if(regionsSuccess.size() != 0) {
+				plugin.message(player, "groupdel-weSuccess", group.getName(), Utils.regionListMessage(regionsSuccess));
 			}
-			if(namesFailed.size() != 0) {
-				plugin.message(player, "groupdel-weFailed", group.getName(), Utils.createCommaSeparatedList(namesFailed));
+			if(regionsFailed.size() != 0) {
+				plugin.message(player, "groupdel-weFailed", group.getName(), Utils.regionListMessage(regionsFailed));
 			}
 			// Update all regions, this does it in a task, updating them without lag
-			plugin.getFileManager().updateRegions(toUpdate, player);
+			plugin.getFileManager().updateRegions(new ArrayList<>(regionsSuccess), player);
 			group.saveRequired();
 		} else {
 			GeneralRegion region = plugin.getFileManager().getRegion(args[2]);

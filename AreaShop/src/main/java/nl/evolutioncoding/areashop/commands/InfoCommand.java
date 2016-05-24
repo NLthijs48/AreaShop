@@ -7,7 +7,6 @@ import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RegionGroup;
 import nl.evolutioncoding.areashop.regions.RentRegion;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -54,7 +53,7 @@ public class InfoCommand extends CommandAreaShop {
 		if(regions.isEmpty()) {
 			plugin.message(sender, keyNoneFound);
 		} else {
-			plugin.message(sender, keySomeFound, StringUtils.join(regions.iterator(), ", "));
+			plugin.message(sender, keySomeFound, Utils.regionListMessage(regions));
 		}
 	}
 	
@@ -138,7 +137,7 @@ public class InfoCommand extends CommandAreaShop {
 					if(regions.isEmpty()) {
 						plugin.message(sender, "info-playerNoRents", args[2]);
 					} else {
-						plugin.message(sender, "info-playerRents", args[2], StringUtils.join(regions.iterator(), ", "));
+						plugin.message(sender, "info-playerRents", args[2], Utils.regionListMessage(regions));
 					}
 					// Buys
 					regions = new TreeSet<>();
@@ -150,7 +149,7 @@ public class InfoCommand extends CommandAreaShop {
 					if(regions.isEmpty()) {
 						plugin.message(sender, "info-playerNoBuys", args[2]);
 					} else {
-						plugin.message(sender, "info-playerBuys", args[2], StringUtils.join(regions.iterator(), ", "));
+						plugin.message(sender, "info-playerBuys", args[2], Utils.regionListMessage(regions));
 					}
 				} else {
 					plugin.message(sender, "info-playerHelp");
@@ -326,28 +325,14 @@ public class InfoCommand extends CommandAreaShop {
 
 			// List of regions without a group
 			else if(args[1].equalsIgnoreCase("nogroup")) {
-				// Rental regions
-				Set<String> rents = new TreeSet<>(plugin.getFileManager().getRentNames());
+				Set<GeneralRegion> regions = new TreeSet<>(plugin.getFileManager().getRegions());
 				for(RegionGroup group : plugin.getFileManager().getGroups()) {
-					rents.removeAll(group.getMembers());
+					regions.removeAll(group.getMemberRegions());
 				}
-				String message = StringUtils.join(rents, ", ");
-				if(message.equals("")) {
-					plugin.message(sender, "info-nogroupNoRents");
+				if(regions.isEmpty()) {
+					plugin.message(sender, "info-nogroupNone");
 				} else {
-					plugin.message(sender, "info-nogroupRents", message);
-				}
-				
-				// Buy regions
-				Set<String> buys = new TreeSet<>(plugin.getFileManager().getBuyNames());
-				for(RegionGroup group : plugin.getFileManager().getGroups()) {
-					buys.removeAll(group.getMembers());
-				}
-				message = StringUtils.join(buys, ", ");
-				if(message.equals("")) {
-					plugin.message(sender, "info-nogroupNoBuys");
-				} else {
-					plugin.message(sender, "info-nogroupBuys", message);
+					plugin.message(sender, "info-nogroupRegions", Utils.regionListMessage(regions));
 				}
 			} else {
 				plugin.message(sender, "info-help");

@@ -6,6 +6,7 @@ import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.managers.FileManager.AddResult;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionEvent;
 import nl.evolutioncoding.areashop.regions.GeneralRegion.RegionType;
 import nl.evolutioncoding.areashop.regions.RentRegion;
@@ -17,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public class AddCommand extends CommandAreaShop {
 
@@ -113,11 +115,11 @@ public class AddCommand extends CommandAreaShop {
 		AreaShop.debug("Starting add task with " + regions.size() + " regions");
         new BukkitRunnable() {
 			private int current = 0;
-			private ArrayList<String> namesSuccess = new ArrayList<>();
-			private ArrayList<String> namesAlready = new ArrayList<>();
-			private ArrayList<String> namesBlacklisted = new ArrayList<>();
-			private ArrayList<String> namesNoPermission = new ArrayList<>();
-			private ArrayList<String> namesExternal = new ArrayList<>();
+			private TreeSet<GeneralRegion> regionsSuccess = new TreeSet<>();
+			private TreeSet<GeneralRegion> regionsAlready = new TreeSet<>();
+			private TreeSet<String> namesBlacklisted = new TreeSet<>();
+			private TreeSet<String> namesNoPermission = new TreeSet<>();
+			private TreeSet<String> namesExternal = new TreeSet<>();
 			
 			@Override
 			public void run() {
@@ -129,13 +131,13 @@ public class AddCommand extends CommandAreaShop {
 						boolean isOwner = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
 						String type;
 						if(isRent) {
-							type = "rent";				
+							type = "rent";
 						} else {
 							type = "buy";
 						}
 						AddResult result = plugin.getFileManager().checkRegionAdd(sender, region, isRent ? RegionType.RENT : RegionType.BUY);
 						if(result == AddResult.ALREADYADDED) {
-							namesAlready.add(region.getId());
+							regionsAlready.add(plugin.getFileManager().getRegion(region.getId()));
 						} else if(result == AddResult.BLACKLISTED) {
 							namesBlacklisted.add(region.getId());
 						} else if(result == AddResult.NOPERMISSION) {
@@ -160,7 +162,7 @@ public class AddCommand extends CommandAreaShop {
 
 								// Run commands
 								rent.runEventCommands(RegionEvent.CREATED, false);
-								namesSuccess.add(region.getId());
+								regionsSuccess.add(rent);
 							} else {
 								BuyRegion buy = new BuyRegion(plugin, region.getId(), finalWorld);
 								// Set landlord
@@ -177,18 +179,18 @@ public class AddCommand extends CommandAreaShop {
 
 								// Run commands
 								buy.runEventCommands(RegionEvent.CREATED, false);
-								namesSuccess.add(region.getId());
+								regionsSuccess.add(buy);
 							}
 						}
 						current++;
 					}
 				}
 				if(current >= finalRegions.size()) {
-					if(!namesSuccess.isEmpty()) {
-						plugin.message(sender, "add-success", args[1], Utils.createCommaSeparatedList(namesSuccess));
+					if(!regionsSuccess.isEmpty()) {
+						plugin.message(sender, "add-success", args[1], Utils.regionListMessage(regionsSuccess));
 					}
-					if(!namesAlready.isEmpty()) {
-						plugin.message(sender, "add-failed", Utils.createCommaSeparatedList(namesAlready));
+					if(!regionsAlready.isEmpty()) {
+						plugin.message(sender, "add-failed", Utils.regionListMessage(regionsAlready));
 					}
 					if(!namesBlacklisted.isEmpty()) {
 						plugin.message(sender, "add-blacklisted", Utils.createCommaSeparatedList(namesBlacklisted));

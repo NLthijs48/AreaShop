@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public class DelCommand extends CommandAreaShop {
 
@@ -62,19 +63,19 @@ public class DelCommand extends CommandAreaShop {
 			}
 			// Start removing the regions that he has permission for
 			ArrayList<String> namesSuccess = new ArrayList<>();
-			ArrayList<String> namesFailed = new ArrayList<>();
+			TreeSet<GeneralRegion> namesFailed = new TreeSet<>();
 			for(GeneralRegion region : regions) {
 				boolean isLandlord = region.isLandlord(((Player)sender).getUniqueId());
 				if(region.isRentRegion()) {
 					if(!sender.hasPermission("areashop.destroyrent") && !(isLandlord && sender.hasPermission("areashop.destroyrent.landlord"))) {
-						namesFailed.add(region.getName());
+						namesFailed.add(region);
 					} else {
 						plugin.getFileManager().removeRent((RentRegion)region, true);
 						namesSuccess.add(region.getName());
 					}					
 				} else if(region.isBuyRegion()) {
 					if(!sender.hasPermission("areashop.destroybuy") && !(isLandlord && sender.hasPermission("areashop.destroybuy.landlord"))) {
-						namesFailed.add(region.getName());
+						namesFailed.add(region);
 					} else {
 						plugin.getFileManager().removeBuy((BuyRegion)region, true);
 						namesSuccess.add(region.getName());
@@ -87,7 +88,7 @@ public class DelCommand extends CommandAreaShop {
 				plugin.message(sender, "del-success", Utils.createCommaSeparatedList(namesSuccess));
 			}
 			if(namesFailed.size() != 0) {
-				plugin.message(sender, "del-failed", Utils.createCommaSeparatedList(namesFailed));
+				plugin.message(sender, "del-failed", Utils.regionListMessage(namesFailed));
 			}
 		} else {
 			GeneralRegion region = plugin.getFileManager().getRegion(args[1]);

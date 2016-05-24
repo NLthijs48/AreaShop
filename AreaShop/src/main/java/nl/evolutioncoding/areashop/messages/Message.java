@@ -18,7 +18,7 @@ public class Message {
 	public static final String VARIABLEEND = "%";
 	public static final String LANGUAGEVARIABLE = "lang:";
 	public static final String CHATLANGUAGEVARIABLE = "prefix";
-	public static final int REPLACEMENTLIMIT = 50;
+	public static final int REPLACEMENTLIMIT = 20;
 
 	private List<String> message;
 	private Object[] replacements;
@@ -54,7 +54,6 @@ public class Message {
 	 * @return this
 	 */
 	public static Message fromString(String message) {
-		AreaShop.debug("fromString: "+message);
 		return new Message().setMessage(message);
 	}
 
@@ -63,7 +62,7 @@ public class Message {
 	 * @param message The message to use
 	 * @return this
 	 */
-	public static Message fromString(List<String> message) {
+	public static Message fromList(List<String> message) {
 		return new Message().setMessage(message);
 	}
 
@@ -198,7 +197,7 @@ public class Message {
 			List<String> original = new ArrayList<>(message);
 
 			replaceArgumentVariables();
-			replaceLanguageVariables();
+			replaceLanguageVariables(0);
 
 			shouldReplace = !message.equals(original);
 			round++;
@@ -227,10 +226,9 @@ public class Message {
 					if(param instanceof GeneralRegion) {
 						message.set(i, ((GeneralRegion)param).applyAllReplacements(message.get(i)));
 					} else if(param instanceof Message) {
-						Pattern variables = Pattern.compile(Pattern.quote(VARIABLESTART)+i+Pattern.quote(VARIABLEEND));
+						Pattern variables = Pattern.compile(Pattern.quote(VARIABLESTART)+number+Pattern.quote(VARIABLEEND));
 						Matcher matches = variables.matcher(message.get(i));
 						if(matches.find()) {
-							String variable = matches.group();
 							// insert message
 							FancyMessageFormat.insertMessage(message, ((Message)param).get(), i, matches.start(), matches.end());
 							// Reset to start of the line, redo matching because the line changed and the inserted part might contain variables again
@@ -249,8 +247,12 @@ public class Message {
 	/**
 	 * Replace all language variables in a message
 	 */
-	private void replaceLanguageVariables() {
+	private void replaceLanguageVariables(int recursed) {
 		if(message == null || message.size() == 0) {
+			return;
+		}
+		if(recursed > REPLACEMENTLIMIT) {
+			AreaShop.getInstance().getLogger().warning("Reached replacement limit for message "+key+", probably has replacements loops, resulting message: "+message.toString());
 			return;
 		}
 		Pattern variables = Pattern.compile(Pattern.quote(VARIABLESTART)+"lang:[^%\\s]+(\\|[^"+Pattern.quote(VARIABLEEND)+"]*)*"+Pattern.quote(VARIABLEEND)); // Variables cannot contain spaces and percent characters, and area enclosed by percent characters
@@ -278,5 +280,10 @@ public class Message {
 				i--;
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Message(key:"+key+", message:"+message+")";
 	}
 }

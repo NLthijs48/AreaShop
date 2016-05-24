@@ -8,9 +8,9 @@
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ## Chatprefix used for all messages in the chat, also changes the greeting messages.
 chatPrefix:
-  - '&2[AreaShop]&r'
-  - '  hover: &fAreaShop region management plugin'
-  - '  hover: &fClick to check the available commands'
+  - '[darkgreen][AreaShop][reset]'
+  - '  hover: AreaShop region management plugin'
+  - '  hover: Click to check the available commands'
   - '  command: /areashop help'
   - ' '
 ## The language file that should be used, check the 'lang' folder for build-in languages (use the filename without .yml here).

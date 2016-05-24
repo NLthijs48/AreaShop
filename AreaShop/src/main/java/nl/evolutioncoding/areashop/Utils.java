@@ -59,6 +59,22 @@ public class Utils {
 	}
 
 	/**
+	 * Create a message with a list of regions
+	 * @param regions The region to use
+	 * @return A Message object containing the region list
+	 */
+	public static Message regionListMessage(Collection<? extends GeneralRegion> regions) {
+		List<String> message = new ArrayList<>();
+		for(GeneralRegion region : regions) {
+			if(!message.isEmpty()) {
+				message.add(", ");
+			}
+			message.addAll(Message.fromKey("region").replacements(region).get());
+		}
+		return Message.fromList(message);
+	}
+
+	/**
 	 * Gets the online players
 	 * Provides backwards compatibility for 1.7- where it returns an array
 	 * @return Online players

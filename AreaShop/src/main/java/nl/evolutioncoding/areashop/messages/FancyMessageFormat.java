@@ -333,7 +333,7 @@ public class FancyMessageFormat {
 	 * Null if nothing is found.
 	 */
 	private static TaggedContent getNextTag(String line, boolean parseBreak) {
-		Pattern pattern = Pattern.compile("\\[[a-zA-Z1-9]+\\]|&[1-9abcdeflonskr]");
+		Pattern pattern = Pattern.compile("\\[[/a-zA-Z1-9]+\\]|&[1-9abcdeflonskr]");
 		Matcher matcher = pattern.matcher(line);
 		// TODO Fix for escape things, and something with parseBreak?
 		while(matcher.find()) {
@@ -700,28 +700,30 @@ public class FancyMessageFormat {
 		WHITE('f'),
 		BLACK('0'),
 		BLUE('9'),
-		DARK_BLUE('1'),
+		DARK_BLUE('1', "darkblue"),
 		GREEN('a'),
-		DARK_GREEN('2'),
+		DARK_GREEN('2', "darkgreen"),
 		AQUA('b'),
-		DARK_AQUA('3'),
+		DARK_AQUA('3', "darkaqua"),
 		RED('c'),
-		DARK_RED('4'),
-		LIGHT_PURPLE('d'),
-		DARK_PURPLE('5'),
+		DARK_RED('4', "darkred"),
+		LIGHT_PURPLE('d', "lightpurple"),
+		DARK_PURPLE('5', "darkpurple"),
 		YELLOW('e'),
 		GOLD('6'),
-		GRAY('7'),
-		DARK_GRAY('8');
+		GRAY('7', "grey"),
+		DARK_GRAY('8', "dark_grey", "darkgray", "darkgrey");
 
 		final char bytecode;
 		final String jsonValue;
 		final String[] tags;
 
-		Color(char bytecode) {
+		Color(char bytecode, String... extraTags) {
 			this.bytecode = bytecode;
 			this.jsonValue = this.name().toLowerCase();
-			this.tags = new String[]{this.name().toLowerCase()};
+			this.tags = new String[extraTags.length+1];
+			this.tags[0] = this.name().toLowerCase();
+			System.arraycopy(extraTags, 0, this.tags, 1, extraTags.length);
 		}
 
 		@Override
@@ -740,7 +742,7 @@ public class FancyMessageFormat {
 		BOLD('l', "bold", "b", "bold"),
 		ITALIC('o', "italic", "i", "italic"),
 		UNDERLINE('n', "underlined", "u", "underline"),
-		STRIKETHROUGH('s', "strikethrough", "s", "strikethrough"),
+		STRIKETHROUGH('s', "strikethrough", "s", "strike", "strikethrough"),
 		OBFUSCATE('k', "obfuscated", "obfuscate");
 
 		final char bytecode;

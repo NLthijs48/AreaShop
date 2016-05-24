@@ -157,7 +157,7 @@ public final class SignChangeListener implements Listener {
 				
 				plugin.getFileManager().addRent(rent);
 				rent.handleSchematicEvent(RegionEvent.CREATED);
-				plugin.message(player, "setup-rentSuccess", rent.getName());
+				plugin.message(player, "setup-rentSuccess", rent);
 				// Update the region after the event has written its lines
 				new BukkitRunnable() {
 					@Override
@@ -264,7 +264,7 @@ public final class SignChangeListener implements Listener {
 				
 				plugin.getFileManager().addBuy(buy);
 				buy.handleSchematicEvent(RegionEvent.CREATED);
-				plugin.message(player, "setup-buySuccess", region.getId());
+				plugin.message(player, "setup-buySuccess", buy);
 				// Update the region after the event has written its lines
 				new BukkitRunnable() {
 					@Override

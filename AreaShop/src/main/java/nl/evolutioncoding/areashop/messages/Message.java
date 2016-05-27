@@ -66,7 +66,6 @@ public class Message {
 		return new Message().setMessage(message);
 	}
 
-
 	/**
 	 * Get the message with all replacements done
 	 * @return Message as a list
@@ -197,7 +196,7 @@ public class Message {
 			List<String> original = new ArrayList<>(message);
 
 			replaceArgumentVariables();
-			replaceLanguageVariables(0);
+			replaceLanguageVariables();
 
 			shouldReplace = !message.equals(original);
 			round++;
@@ -229,10 +228,7 @@ public class Message {
 						Pattern variables = Pattern.compile(Pattern.quote(VARIABLESTART)+number+Pattern.quote(VARIABLEEND));
 						Matcher matches = variables.matcher(message.get(i));
 						if(matches.find()) {
-							// insert message
 							FancyMessageFormat.insertMessage(message, ((Message)param).get(), i, matches.start(), matches.end());
-							// Reset to start of the line, redo matching because the line changed and the inserted part might contain variables again
-							i--;
 						}
 						number++;
 					} else {
@@ -247,15 +243,18 @@ public class Message {
 	/**
 	 * Replace all language variables in a message
 	 */
-	private void replaceLanguageVariables(int recursed) {
+	private void replaceLanguageVariables() {
 		if(message == null || message.size() == 0) {
 			return;
 		}
-		if(recursed > REPLACEMENTLIMIT) {
-			AreaShop.getInstance().getLogger().warning("Reached replacement limit for message "+key+", probably has replacements loops, resulting message: "+message.toString());
-			return;
-		}
-		Pattern variables = Pattern.compile(Pattern.quote(VARIABLESTART)+"lang:[^%\\s]+(\\|[^"+Pattern.quote(VARIABLEEND)+"]*)*"+Pattern.quote(VARIABLEEND)); // Variables cannot contain spaces and percent characters, and area enclosed by percent characters
+
+		Pattern variables = Pattern.compile(
+				Pattern.quote(VARIABLESTART)+
+						"lang:[a-zA-Z-]+"+            // Language key
+						"(\\|(.*?\\|)+)?"+            // Optional message arguments
+						Pattern.quote(VARIABLEEND)
+		);
+
 		for(int i = 0; i < message.size(); i++) {
 			Matcher matches = variables.matcher(message.get(i));
 			if(matches.find()) {
@@ -273,11 +272,11 @@ public class Message {
 					insert.replacements(arguments);
 				}
 
-				// insert message
-				//List<String> insert = AreaShop.getInstance().getLanguageManager().getRawMessage(variable.substring(6, variable.length()-1));
+				// Insert message
+				int startDiff = message.size()-i;
 				FancyMessageFormat.insertMessage(message, insert.get(), i, matches.start(), matches.end());
-				// Reset to start of the line, redo matching because the line changed and the inserted part might contain language tags again
-				i--;
+				// Skip to end of insert, language tags already replaced
+				i = message.size()-startDiff;
 			}
 		}
 	}

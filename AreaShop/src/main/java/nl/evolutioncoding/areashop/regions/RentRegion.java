@@ -680,7 +680,7 @@ public class RentRegion extends GeneralRegion {
 		removeLastActiveTime();
 
 		// Notify about updates
-		this.notifyAndUpdate(new UnrentedRegionEvent(this, oldRenter));
+		this.notifyAndUpdate(new UnrentedRegionEvent(this, oldRenter, Math.max(0, moneyBack)));
 
 		// Run commands
 		this.runEventCommands(RegionEvent.UNRENTED, false);

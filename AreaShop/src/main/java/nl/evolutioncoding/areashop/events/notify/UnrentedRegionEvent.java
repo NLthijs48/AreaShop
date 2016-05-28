@@ -12,15 +12,17 @@ public class UnrentedRegionEvent extends NotifyAreaShopEvent {
 
 	private RentRegion region;
 	private UUID oldRenter;
+	private double refundedMoney;
 
 	/**
 	 * Constructor
 	 * @param region    The region that has been unrented
 	 * @param oldRenter The player that rented the region before it was unrented
 	 */
-	public UnrentedRegionEvent(RentRegion region, UUID oldRenter) {
+	public UnrentedRegionEvent(RentRegion region, UUID oldRenter, double refundedMoney) {
 		this.region = region;
 		this.oldRenter = oldRenter;
+		this.refundedMoney = refundedMoney;
 	}
 
 	/**
@@ -37,5 +39,13 @@ public class UnrentedRegionEvent extends NotifyAreaShopEvent {
 	 */
 	public UUID getOldRenter() {
 		return oldRenter;
+	}
+
+	/**
+	 * Get the amount that is paid back to the player
+	 * @return The amount of money paid back to the player
+	 */
+	public double getRefundedMoney() {
+		return refundedMoney;
 	}
 }

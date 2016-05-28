@@ -12,15 +12,17 @@ public class SoldRegionEvent extends NotifyAreaShopEvent {
 
 	private BuyRegion region;
 	private UUID oldBuyer;
+	private double refundedMoney;
 
 	/**
 	 * Constructor
 	 * @param region   The region that has been sold
 	 * @param oldBuyer The player for which the region has been sold
 	 */
-	public SoldRegionEvent(BuyRegion region, UUID oldBuyer) {
+	public SoldRegionEvent(BuyRegion region, UUID oldBuyer, double refundedMoney) {
 		this.region = region;
 		this.oldBuyer = oldBuyer;
+		this.refundedMoney = refundedMoney;
 	}
 
 	/**
@@ -37,5 +39,13 @@ public class SoldRegionEvent extends NotifyAreaShopEvent {
 	 */
 	public UUID getOldBuyer() {
 		return oldBuyer;
+	}
+
+	/**
+	 * Get the amount that is paid back to the player
+	 * @return The amount of money paid back to the player
+	 */
+	public double getRefundedMoney() {
+		return refundedMoney;
 	}
 }

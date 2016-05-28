@@ -521,7 +521,7 @@ public class BuyRegion extends GeneralRegion {
 		removeLastActiveTime();
 
 		// Notify about updates
-		this.notifyAndUpdate(new SoldRegionEvent(this, oldBuyer));
+		this.notifyAndUpdate(new SoldRegionEvent(this, oldBuyer, Math.max(moneyBack, 0)));
 
 		// Update everything
 		handleSchematicEvent(RegionEvent.SOLD);

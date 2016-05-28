@@ -18,7 +18,7 @@ public class Message {
 	public static final String VARIABLEEND = "%";
 	public static final String LANGUAGEVARIABLE = "lang:";
 	public static final String CHATLANGUAGEVARIABLE = "prefix";
-	public static final int REPLACEMENTLIMIT = 20;
+	public static final int REPLACEMENTLIMIT = 50;
 
 	private List<String> message;
 	private Object[] replacements;
@@ -75,6 +75,11 @@ public class Message {
 		return message;
 	}
 
+	private List<String> get(Limit limit) {
+		executeReplacements(limit);
+		return message;
+	}
+
 	/**
 	 * Get a plain string for the message (for example for using in the console)
 	 * @return The message as simple string
@@ -120,7 +125,7 @@ public class Message {
 	 * @return this
 	 */
 	public Message send(Object target) {
-		if(message == null || message.size() == 0 || (message.size() == 1 && message.get(0).length() == 0)) {
+		if(message == null || message.size() == 0 || (message.size() == 1 && message.get(0).length() == 0) || target == null) {
 			return this;
 		}
 		executeReplacements();
@@ -187,23 +192,30 @@ public class Message {
 	 * Apply all replacements to the message
 	 */
 	private void executeReplacements() {
+		executeReplacements(new Limit(REPLACEMENTLIMIT, this));
+	}
+
+	private void executeReplacements(Limit limit) {
 		// Replace variables until they are all gone, or when the limit is reached
-		Pattern variable = Pattern.compile(Pattern.quote(VARIABLESTART)+"[^%\\s]+"+Pattern.quote(VARIABLEEND));
-		int round = 0;
+		Pattern variable = Pattern.compile(Pattern.quote(VARIABLESTART)+"[a-zA-Z]+"+Pattern.quote(VARIABLEEND));
 
 		boolean shouldReplace = true;
 		while(shouldReplace) {
 			List<String> original = new ArrayList<>(message);
 
-			replaceArgumentVariables();
-			replaceLanguageVariables();
-
-			shouldReplace = !message.equals(original);
-			round++;
-			if(round > REPLACEMENTLIMIT) {
-				AreaShop.getInstance().getLogger().warning("Reached replacement limit for message "+key+", probably has replacements loops, resulting message: "+message.toString());
+			limit.left--;
+			if(limit.reached()) {
+				if(!limit.notified) {
+					limit.notified = true;
+					AreaShop.getInstance().getLogger().warning("Reached replacement limit, probably has replacements loops, problematic message: "+limit.message.toString());
+				}
 				break;
 			}
+
+			replaceArgumentVariables(limit);
+			replaceLanguageVariables(limit);
+
+			shouldReplace = !message.equals(original);
 		}
 	}
 
@@ -213,7 +225,7 @@ public class Message {
 	 * - If it is a GeneralRegion the replacements of the region will be applied
 	 * - Else the parameter will replace its number surrounded with VARIABLESTART and VARIABLEEND
 	 */
-	private void replaceArgumentVariables() {
+	private void replaceArgumentVariables(Limit limit) {
 		if(message == null || message.size() == 0 || replacements == null) {
 			return;
 		}
@@ -228,7 +240,7 @@ public class Message {
 						Pattern variables = Pattern.compile(Pattern.quote(VARIABLESTART)+number+Pattern.quote(VARIABLEEND));
 						Matcher matches = variables.matcher(message.get(i));
 						if(matches.find()) {
-							FancyMessageFormat.insertMessage(message, ((Message)param).get(), i, matches.start(), matches.end());
+							FancyMessageFormat.insertMessage(message, ((Message)param).get(limit), i, matches.start(), matches.end());
 						}
 						number++;
 					} else {
@@ -243,15 +255,15 @@ public class Message {
 	/**
 	 * Replace all language variables in a message
 	 */
-	private void replaceLanguageVariables() {
+	private void replaceLanguageVariables(Limit limit) {
 		if(message == null || message.size() == 0) {
 			return;
 		}
 
 		Pattern variables = Pattern.compile(
 				Pattern.quote(VARIABLESTART)+
-						"lang:[a-zA-Z-]+"+            // Language key
-						"(\\|(.*?\\|)+)?"+            // Optional message arguments
+						Pattern.quote(LANGUAGEVARIABLE)+"[a-zA-Z-]+"+        // Language key
+						"(\\|(.*?\\|)+)?"+                                    // Optional message arguments
 						Pattern.quote(VARIABLEEND)
 		);
 
@@ -274,7 +286,7 @@ public class Message {
 
 				// Insert message
 				int startDiff = message.size()-i;
-				FancyMessageFormat.insertMessage(message, insert.get(), i, matches.start(), matches.end());
+				FancyMessageFormat.insertMessage(message, insert.get(limit), i, matches.start(), matches.end());
 				// Skip to end of insert, language tags already replaced
 				i = message.size()-startDiff;
 			}
@@ -284,5 +296,32 @@ public class Message {
 	@Override
 	public String toString() {
 		return "Message(key:"+key+", message:"+message+")";
+	}
+
+
+	/**
+	 * Class to store a limit
+	 */
+	private class Limit {
+		public int left = 0;
+		public boolean notified = false;
+		public Message message;
+
+		/**
+		 * Set the initial limit
+		 * @param count The limit to use
+		 */
+		public Limit(int count, Message message) {
+			left = count;
+			this.message = message;
+		}
+
+		/**
+		 * Check if the limit is reached
+		 * @return true if the limit is reached, otherwise false
+		 */
+		public boolean reached() {
+			return left <= 0;
+		}
 	}
 }

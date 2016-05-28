@@ -73,6 +73,10 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 	 * @param target The CommandSender to show the help to
 	 */
 	public void showHelp(CommandSender target) {
+		if(!target.hasPermission("areashop.help")) {
+			plugin.message(target, "help-noPermission");
+			return;
+		}
 		// Add all messages to a list
 		ArrayList<String> messages = new ArrayList<>();
 		plugin.message(target, "help-header");

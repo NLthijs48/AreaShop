@@ -54,6 +54,7 @@ cmd-moreRegionsAtLocation: "More than one region has been found at your location
 cmd-automaticRegionOnlyByPlayer: "Automatically determining the region is only possible for players, specify the region as argument."
 
 help-header: "Help page, commands that you can execute."
+help-noPermission: "You do not have permission to view the help page."
 help-alias: "Command aliases: /areashop, /as."
 help-help: "%lang:helpCommand|/as help|% Shows this help page."
 help-info: "%lang:helpCommand|/as info|% Get info about current regions."

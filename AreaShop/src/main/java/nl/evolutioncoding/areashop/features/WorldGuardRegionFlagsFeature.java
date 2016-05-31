@@ -34,11 +34,27 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 	 */
 	protected boolean updateRegionFlags(GeneralRegion region) {
 		boolean result = true;
-		ConfigurationSection flags = plugin.getConfig().getConfigurationSection("flagProfiles." + region.getStringSetting("general.flagProfile") + "." + region.getState().getValue());
-		if(flags == null) {
-			AreaShop.debug("Flags section is null for region " + region.getName());
-			return false;
+
+		// General region flags
+		ConfigurationSection generalFlags = plugin.getConfig().getConfigurationSection("flagProfiles."+region.getStringSetting("general.flagProfile")+".ALL");
+		if(generalFlags != null) {
+			result = updateRegionFlags(region, generalFlags);
 		}
+
+		// Specific region flags
+		ConfigurationSection specificFlags = plugin.getConfig().getConfigurationSection("flagProfiles."+region.getStringSetting("general.flagProfile")+"."+region.getState().getValue());
+		result = result && specificFlags != null && updateRegionFlags(region, specificFlags);
+
+		return result;
+	}
+	/**
+	 * Set the region flags/options to the values of a ConfigurationSection
+	 * @param flags The flags to apply
+	 * @return true if the flags have been set correctly, otherwise false
+	 */
+	protected boolean updateRegionFlags(GeneralRegion region, ConfigurationSection flags) {
+		boolean result = true;
+
 		Set<String> flagNames = flags.getKeys(false);
 		WorldGuardPlugin worldGuard = plugin.getWorldGuard();
 

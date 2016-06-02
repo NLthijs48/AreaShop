@@ -334,7 +334,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @param player Player to check ownership for
 	 * @return true if the player currently rents or buys this region
 	 */
-	public boolean isOwner(Player player) {
+	public boolean isOwner(OfflinePlayer player) {
 		return isOwner(player.getUniqueId());
 	}
 	

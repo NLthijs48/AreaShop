@@ -64,14 +64,17 @@ public class Utils {
 	 * @return A Message object containing the region list
 	 */
 	public static Message regionListMessage(Collection<? extends GeneralRegion> regions) {
-		List<String> message = new ArrayList<>();
+		Message result = Message.none();
+		boolean first = true;
 		for(GeneralRegion region : regions) {
-			if(!message.isEmpty()) {
-				message.add(", ");
+			if(first) {
+				first = false;
+			} else {
+				result.append(", ");
 			}
-			message.addAll(Message.fromKey("region").replacements(region).get());
+			result.append(Message.fromKey("region").replacements(region));
 		}
-		return Message.fromList(message);
+		return result;
 	}
 
 	/**

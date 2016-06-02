@@ -99,6 +99,12 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 			plugin.message(sender, "general-notReady");
 			return true;
 		}
+		// Redirect `/as info player <player>` to `/as me <player>`
+		if(args.length == 3 && "info".equals(args[0]) && "player".equals(args[1])) {
+			args[0] = "me";
+			args[1] = args[2];
+		}
+		// Execute command
 		boolean executed = false;		
 		for(int i=0; i<commands.size() && !executed; i++) {
 			if(commands.get(i).canExecute(command, args)) {

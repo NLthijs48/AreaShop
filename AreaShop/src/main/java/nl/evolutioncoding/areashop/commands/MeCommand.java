@@ -4,6 +4,8 @@ import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
 import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -34,12 +36,27 @@ public class MeCommand extends CommandAreaShop {
 		if(!sender.hasPermission("areashop.me")) {
 			plugin.message(sender, "me-noPermission");
 			return;
-		}		
+		}
+		OfflinePlayer player = null;
 		if(!(sender instanceof Player)) {
-			plugin.message(sender, "me-notAPlayer");
+			if(args.length <= 1) {
+				plugin.message(sender, "me-notAPlayer");
+				return;
+			}
+		} else {
+			player = (OfflinePlayer)sender;
+		}
+		if(args.length > 1) {
+			player = Bukkit.getOfflinePlayer(args[1]);
+			if(player == null) {
+				plugin.message(sender, "me-noPlayer", args[1]);
+				return;
+			}
+		}
+		if(player == null) {
 			return;
 		}
-		Player player = (Player)sender;
+
 		// Get the regions owned by the player
 		Set<RentRegion> rentRegions = new HashSet<>();
 		for(RentRegion region : plugin.getFileManager().getRents()) {
@@ -53,38 +70,42 @@ public class MeCommand extends CommandAreaShop {
 				buyRegions.add(region);
 			}
 		}
-		// Send messages
-		if(rentRegions.isEmpty()) {
-			plugin.message(player, "me-noRentRegions");
-		} else {
-			plugin.message(player, "me-rentRegions");
-			for(RentRegion region : rentRegions) {
-				plugin.messageNoPrefix(player, "me-rentLine", region);
-			}
-		}
-		if(buyRegions.isEmpty()) {
-			plugin.message(player, "me-noBuyRegions");
-		} else {
-			plugin.message(player, "me-buyRegions");
-			for(BuyRegion region : buyRegions) {
-				plugin.messageNoPrefix(player, "me-buyLine", region);
-			}
-		}
+		// Get the regions the player is added as friend
 		Set<GeneralRegion> friendRegions = new HashSet<>();
 		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
 			if(region.getFriends() != null && region.getFriends().contains(player.getUniqueId())) {
 				friendRegions.add(region);
 			}
 		}
-		if(friendRegions.isEmpty()) {
-			plugin.message(player, "me-noFriendRegions");
-		} else {
-			plugin.message(player, "me-friendRegions");
-			for(GeneralRegion region : friendRegions) {
-				plugin.messageNoPrefix(player, "me-friendLine", region);
+
+		// Send messages
+		boolean foundSome = !rentRegions.isEmpty() || !buyRegions.isEmpty() || !friendRegions.isEmpty();
+		if(foundSome) {
+			plugin.message(sender, "me-header", player.getName());
+		}
+		if(!rentRegions.isEmpty()) {
+			for(RentRegion region : rentRegions) {
+				plugin.messageNoPrefix(sender, "me-rentLine", region);
 			}
 		}
-		
+		if(!buyRegions.isEmpty()) {
+			for(BuyRegion region : buyRegions) {
+				plugin.messageNoPrefix(sender, "me-buyLine", region);
+			}
+		}
+		if(!friendRegions.isEmpty()) {
+			for(GeneralRegion region : friendRegions) {
+				plugin.messageNoPrefix(sender, "me-friendLine", region);
+			}
+		}
+
+		if(!foundSome) {
+			plugin.message(sender, "me-nothing", player.getName());
+		}
+	}
+
+	public static void show() {
+
 	}
 }
 

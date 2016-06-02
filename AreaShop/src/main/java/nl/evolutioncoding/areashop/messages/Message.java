@@ -118,6 +118,34 @@ public class Message {
 		return this;
 	}
 
+	/**
+	 * Append lines to the message
+	 * @param lines The lines to append
+	 * @return this
+	 */
+	public Message append(List<String> lines) {
+		message.addAll(lines);
+		return this;
+	}
+
+	/**
+	 * Append a message to this message
+	 * @param message The message to append
+	 * @return this
+	 */
+	public Message append(Message message) {
+		return append(message.get());
+	}
+
+	/**
+	 * Append lines to the message
+	 * @param line The line to append
+	 * @return this
+	 */
+	public Message append(String line) {
+		message.add(line);
+		return this;
+	}
 
 	/**
 	 * Send the message to a target

@@ -9,7 +9,7 @@
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 command:
-  - "[underline]%0%[/underline]"
+  - "[bold]%0%[/bold]"
   - "  hover: [blue][bold]<use %1%>"
   - "  command: %1%"
 helpCommand:
@@ -18,18 +18,18 @@ helpCommand:
   - "  command: %0%"
 region: "%lang:tRegion|%region%|%"
 tRegion:
-    - "[underline]%0%[/underline]"
+    - "[bold]%0%[/bold]"
     - "  hover: Region %0%"
     - "  hover: [blue][bold]<region information>"
     - "  command: /areashop info region %0%"
 player: "%lang:tPlayer|%player%|%"
 tPlayer:
-  - "[underline]%0%[/underline]"
+  - "[bold]%0%[/bold]"
   - "  hover: Player %0%"
   - "  hover: [blue][bold]<regions of %0%>"
   - "  command: /areashop info player %0%"
 landlord:
-  - "[underline]%landlord%[/underline]"
+  - "[bold]%landlord%[/bold]"
   - "  hover: Landlord %landlord%"
   - "  hover: [blue][bold]<regions of %landlord%>"
   - "  command: /areashop info player %landlord%"
@@ -163,7 +163,6 @@ info-help:
   - "    %lang:command|forrent|/as info forrent|% [group][break]"
   - "    %lang:command|sold|/as info sold|% [group][break]"
   - "    %lang:command|forsale|/as info forsale|% [group][break]"
-  - "    %lang:command|player|/as info player|% <player>[break]"
   - "    %lang:command|region|/as info region|% [region][break]"
   - "    %lang:command|nogroup|/as info nogroup|%"
 info-noPermission: "You don't have permission to get information about regions."
@@ -359,7 +358,7 @@ addsign-couldNotDetect: "Found multiple regions around the sign, specify region 
 addsign-couldNotDetectSign: "Found multiple regions around the sign, specify region on the second line (2 of the regions that were found: %lang:tRegion|%0%|% and %lang:tRegion|%1%|%)."
 addsign-wrongProfile: "The specified profile does not exist, use one of the following (check config): [gray]%0%."
 addsign-profile:
-  - "[underline]%0%[/underline]"
+  - "[bold]%0%[/bold]"
   - "  hover: Signprofile %0%"
   - "  hover: [blue][bold]<use this profile>"
   - "  command: /areashop linksigns %0%"
@@ -374,16 +373,13 @@ delsign-noRegion: "That sign does not belong to an AreaShop region."
 delsign-success: "The sign has been removed from region %lang:region%."
 
 me-noPermission: "You don't have permission to check which regions you have."
+me-header: "Regions of %lang:tPlayer|%0%|%:"
 me-notAPlayer: "You are not a player so you can't have any regions."
-me-noRentRegions: "You have not rented any rent regions."
-me-noBuyRegions: "You have not bought any buy regions."
-me-rentRegions: "You have rented the following regions:"
-me-buyRegions: "You have bought the following regions:"
-me-rentLine: "[darkgreen][bold]►[reset] %lang:region% until %until% [gray](%timeleft% left)."
+me-rentLine: "[darkgreen][bold]►[reset] %lang:region% [gray](until %until%, %timeleft% left)."
 me-buyLine: "[darkgreen][bold]►[reset] %lang:region%."
-me-noFriendRegions: "You have not been added to any regions as friend."
-me-friendRegions: "You are added as a friend to the following regions:"
-me-friendLine: "[darkgreen][bold]►[reset] %lang:region% [gray](owner: %lang:player%)."
+me-friendLine: "[darkgreen][bold]►[reset] %lang:region% [gray](added as friend, owner: %lang:player%)."
+me-nothing: "%lang:tPlayer|%0%|% has not rented or bought regions and is not added as friend to one."
+me-noPlayer: "%0% cannot be found, probably never joined the server."
 
 setowner-help: "/as setowner <player> [region], the region you stand in will be used if not specified."
 setowner-noPermission: "You don't have permission to set the owner of a region."

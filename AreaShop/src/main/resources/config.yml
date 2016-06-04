@@ -126,6 +126,17 @@ limitGroups:
 ## %second%         The current second of the minute.
 ## %millisecond%    The current millisecond of the second.
 ## %epoch%          The number of milliseconds since January 1, 1970 (Unix Epoch).
+## %tpx%            The exact x coordinate of the location that the teleport is set to
+## %tpy%            The exact y coordinate of the location that the teleport is set to
+## %tpz%            The exact z coordinate of the location that the teleport is set to
+## %tpblockx%       The rounded x coordinate of the location that the teleport is set to
+## %tpblocky%       The rounded y coordinate of the location that the teleport is set to
+## %tpblockz%       The rounded z coordinate of the location that the teleport is set to
+## %tppitch%        The exact pitch of the teleport location
+## %tppitchround%   The rounded pitch of the teleport location
+## %tpyaw%          The exact yaw of the teleport location
+## %tpyawround%     The rounded yaw of the teleport location
+## %tpworld%        The world name of the teleport location
 
 ## Determines the layout and functions of the signs linked to regions.
 ## Set 'general.signProfile' in default.yml, groups or individual regions to set the profile.

@@ -533,7 +533,22 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		date = new SimpleDateFormat(plugin.getConfig().getString("timeFormatSign"));
 		dateString = date.format(Calendar.getInstance().getTime());
 		result.put(AreaShop.tagDateTimeShort, dateString);
-		
+		// Teleport location
+		Location tp = getTeleportLocation();
+		if(tp != null) {
+			result.put(AreaShop.tagTeleportBlockX, tp.getBlockX());
+			result.put(AreaShop.tagTeleportBlockY, tp.getBlockY());
+			result.put(AreaShop.tagTeleportBlockZ, tp.getBlockZ());
+			result.put(AreaShop.tagTeleportX, tp.getX());
+			result.put(AreaShop.tagTeleportY, tp.getY());
+			result.put(AreaShop.tagTeleportZ, tp.getZ());
+			result.put(AreaShop.tagTeleportPitch, tp.getPitch());
+			result.put(AreaShop.tagTeleportYaw, tp.getYaw());
+			result.put(AreaShop.tagTeleportPitchRound, Math.round(tp.getPitch()));
+			result.put(AreaShop.tagTeleportYawRound, Math.round(tp.getYaw()));
+			result.put(AreaShop.tagTeleportWorld, tp.getWorld().getName());
+		}
+
 		replacementsCache = result;
 		replacementsCacheTime = Calendar.getInstance().getTimeInMillis();
 		return result;
@@ -1011,7 +1026,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			// Set to block in the middle, y configured in the config
 			Vector middle = Vector.getMidpoint(region.getMaximumPoint(), region.getMinimumPoint());
 			String configSetting = getStringSetting("general.teleportLocationY");
-			AreaShop.debug("teleportLocationY = " + configSetting);
 			if("bottom".equalsIgnoreCase(configSetting)) {
 				middle = middle.setY(region.getMinimumPoint().getBlockY());
 			} else if("top".equalsIgnoreCase(configSetting)) {
@@ -1034,10 +1048,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		} else {
 			insideRegion = getBooleanSetting("general.teleportIntoRegion");
 		}
-		AreaShop.debug("insideRegion = " + insideRegion);
 		int maxTries = plugin.getConfig().getInt("maximumTries");
-		AreaShop.debug("maxTries = " + maxTries);
-		
+
 		// set location in the center of the block
 		startLocation.setX(startLocation.getBlockX() + 0.5);
 		startLocation.setZ(startLocation.getBlockZ() + 0.5);

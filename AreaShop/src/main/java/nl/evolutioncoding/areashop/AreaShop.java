@@ -118,7 +118,18 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public static final String tagSecond = "%second%";
 	public static final String tagMillisecond = "%millisecond%";
 	public static final String tagEpoch = "%epoch%";
-	
+	public static final String tagTeleportX = "%tpx%";
+	public static final String tagTeleportY = "%tpy%";
+	public static final String tagTeleportZ = "%tpz%";
+	public static final String tagTeleportBlockX = "%tpblockx%";
+	public static final String tagTeleportBlockY = "%tpblocky%";
+	public static final String tagTeleportBlockZ = "%tpblockz%";
+	public static final String tagTeleportPitch = "%tppitch%";
+	public static final String tagTeleportYaw = "%tpyaw%";
+	public static final String tagTeleportPitchRound = "%tppitchround%";
+	public static final String tagTeleportYawRound = "%tpyawround%";
+	public static final String tagTeleportWorld = "%tpworld%";
+
 	public static AreaShop getInstance() {
 		return AreaShop.instance;
 	}

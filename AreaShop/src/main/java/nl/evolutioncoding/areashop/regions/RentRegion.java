@@ -561,7 +561,6 @@ public class RentRegion extends GeneralRegion {
 						message(player, "rent-extended");
 					} else {
 						message(player, "rent-rented");
-						message(player, "rent-extend");
 					}
 					if(!extend) {
 						// Run commands

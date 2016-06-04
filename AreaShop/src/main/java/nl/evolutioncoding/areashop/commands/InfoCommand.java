@@ -193,13 +193,9 @@ public class InfoCommand extends CommandAreaShop {
 						if(sender.hasPermission("areashop.teleport") || sender.hasPermission("areashop.teleportall")) {
 							Location teleport = rent.getTeleportLocation();
 							if(teleport == null) {
-								if(rent.isRented()) {
-									plugin.messageNoPrefix(sender, "info-regionNoTeleport", rent, Message.fromKey("info-regionTeleportHint").replacements(rent));
-								} else {
-									plugin.messageNoPrefix(sender, "info-regionNoTeleport", rent, "");
-								}
+								plugin.messageNoPrefix(sender, "info-regionNoTeleport", rent);
 							} else {
-								plugin.messageNoPrefix(sender, "info-regionTeleportAt", rent, teleport.getWorld().getName(), teleport.getBlockX(), teleport.getBlockY(), teleport.getBlockZ(), (int)teleport.getPitch(), (int)teleport.getYaw());
+								plugin.messageNoPrefix(sender, "info-regionTeleport", rent);
 							}
 						}
 						List<String> signLocations = new ArrayList<>();
@@ -252,13 +248,9 @@ public class InfoCommand extends CommandAreaShop {
 						if(sender.hasPermission("areashop.teleport") || sender.hasPermission("areashop.teleportall")) {
 							Location teleport = buy.getTeleportLocation();
 							if(teleport == null) {
-								if(buy.isSold()) {
-									plugin.messageNoPrefix(sender, "info-regionNoTeleport", buy, Message.fromKey("info-regionTeleportHint").replacements(buy));
-								} else {
-									plugin.messageNoPrefix(sender, "info-regionNoTeleport", buy, "");
-								}
+								plugin.messageNoPrefix(sender, "info-regionNoTeleport", buy);
 							} else {
-								plugin.messageNoPrefix(sender, "info-regionTeleportAt", buy, teleport.getWorld().getName(), teleport.getBlockX(), teleport.getBlockY(), teleport.getBlockZ(), (int)teleport.getPitch(), (int)teleport.getYaw());
+								plugin.messageNoPrefix(sender, "info-regionTeleport", buy);
 							}
 						}
 						List<String> signLocations = new ArrayList<>();

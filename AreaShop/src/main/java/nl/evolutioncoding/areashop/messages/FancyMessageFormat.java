@@ -168,7 +168,7 @@ public class FancyMessageFormat {
 		at += insert.size();
 		message.addAll(at, interactives);
 		at += interactives.size();
-		if(end < (lineContent.length()-1)) {
+		if(end < lineContent.length()) {
 			message.add(at, lineContent.substring(end));
 			at++;
 			message.addAll(at, interactives);

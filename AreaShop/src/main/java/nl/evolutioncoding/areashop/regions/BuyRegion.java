@@ -508,11 +508,7 @@ public class BuyRegion extends GeneralRegion {
 			}
 		}
 
-		if(own) {
-			message(executor, "sell-soldYours");
-		} else {
-			message(executor, "sell-sold");
-		}
+		message(executor, "sell-sold");
 
 		// Remove friends and the owner
 		clearFriends();

@@ -2,6 +2,7 @@ package nl.evolutioncoding.areashop.commands;
 
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import nl.evolutioncoding.areashop.regions.RentRegion;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,7 +30,24 @@ public class UnrentCommand extends CommandAreaShop {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * Check if a person can unrent the region
+	 * @param person The person to check
+	 * @param region The region to check for
+	 * @return true if the person can unrent it, otherwise false
+	 */
+	public static boolean canUse(CommandSender person, GeneralRegion region) {
+		if(person.hasPermission("areashop.unrent")) {
+			return true;
+		}
+		if(person instanceof Player) {
+			Player player = (Player)person;
+			return region.isOwner(player) && person.hasPermission("areashop.unrentown");
+		}
+		return false;
+	}
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.unrent") && !sender.hasPermission("areashop.unrentown")) {

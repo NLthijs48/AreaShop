@@ -187,10 +187,10 @@ public class AddCommand extends CommandAreaShop {
 				}
 				if(current >= finalRegions.size()) {
 					if(!regionsSuccess.isEmpty()) {
-						plugin.message(sender, "add-success", args[1], Utils.regionListMessage(regionsSuccess));
+						plugin.message(sender, "add-success", args[1], Utils.combinedMessage(regionsSuccess, "region"));
 					}
 					if(!regionsAlready.isEmpty()) {
-						plugin.message(sender, "add-failed", Utils.regionListMessage(regionsAlready));
+						plugin.message(sender, "add-failed", Utils.combinedMessage(regionsAlready, "region"));
 					}
 					if(!namesBlacklisted.isEmpty()) {
 						plugin.message(sender, "add-blacklisted", Utils.createCommaSeparatedList(namesBlacklisted));

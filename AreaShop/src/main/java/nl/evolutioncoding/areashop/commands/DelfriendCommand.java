@@ -33,6 +33,23 @@ public class DelfriendCommand extends CommandAreaShop {
 		}
 		return null;
 	}
+
+	/**
+	 * Check if a person can remove friends
+	 * @param person The person to check
+	 * @param region The region to check for
+	 * @return true if the person can remove friends, otherwise false
+	 */
+	public static boolean canUse(CommandSender person, GeneralRegion region) {
+		if(person.hasPermission("areashop.delfriendall")) {
+			return true;
+		}
+		if(person instanceof Player) {
+			Player player = (Player)person;
+			return region.isOwner(player) && player.hasPermission("areashop.delfriend");
+		}
+		return false;
+	}
 	
 	@SuppressWarnings("deprecation")
 	@Override

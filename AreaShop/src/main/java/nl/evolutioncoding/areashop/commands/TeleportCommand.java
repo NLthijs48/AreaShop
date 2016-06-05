@@ -29,6 +29,22 @@ public class TeleportCommand extends CommandAreaShop {
 		return null;
 	}
 
+	/**
+	 * Check if a person can teleport to the region (assuming he is not teleporting to a sign)
+	 * @param person The person to check
+	 * @param region The region to check for
+	 * @return true if the person can teleport to it, otherwise false
+	 */
+	public static boolean canUse(CommandSender person, GeneralRegion region) {
+		if(!(person instanceof Player)) {
+			return false;
+		}
+		Player player = (Player)person;
+		return player.hasPermission("areashop.teleportall")
+				|| region.isOwner(player) && player.hasPermission("areashop.teleport")
+				|| region.getFriends().contains(player.getUniqueId()) && player.hasPermission("areashop.teleportfriend");
+	}
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.teleport") && !sender.hasPermission("areashop.teleportall") && !sender.hasPermission("areashop.teleportsign") && !sender.hasPermission("areashop.teleportsignall") && !sender.hasPermission("areashop.teleportfriend") && !sender.hasPermission("teleportfriendsign")) {

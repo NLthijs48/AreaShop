@@ -664,11 +664,7 @@ public class RentRegion extends GeneralRegion {
 		handleSchematicEvent(RegionEvent.UNRENTED);
 
 		// Send messages
-		if(!own) {
-			message(executor, "unrent-other");
-		} else {
-			message(executor, "unrent-unrented");
-		}
+		message(executor, "unrent-unrented");
 
 		// Remove friends, the owner and renteduntil values
 		clearFriends();

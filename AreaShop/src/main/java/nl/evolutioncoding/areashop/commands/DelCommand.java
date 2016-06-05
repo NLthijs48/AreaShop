@@ -88,7 +88,7 @@ public class DelCommand extends CommandAreaShop {
 				plugin.message(sender, "del-success", Utils.createCommaSeparatedList(namesSuccess));
 			}
 			if(namesFailed.size() != 0) {
-				plugin.message(sender, "del-failed", Utils.regionListMessage(namesFailed));
+				plugin.message(sender, "del-failed", Utils.combinedMessage(namesFailed, "region"));
 			}
 		} else {
 			GeneralRegion region = plugin.getFileManager().getRegion(args[1]);

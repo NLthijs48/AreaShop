@@ -21,7 +21,7 @@ region: "%lang:tRegion|%region%|%"
 tRegion:
     - "[bold]%0%[/bold]"
     - "    hover: Region %0%"
-    - "   hover: %lang:action|Region information|%"
+    - "    hover: %lang:action|Region information|%"
     - "    command: /areashop info region %0%"
 player: "%lang:tPlayer|%player%|%"
 tPlayer:
@@ -138,15 +138,13 @@ unrent-noPermission: "You don't have permission to unrent a region."
 unrent-noPermissionOther: "You don't have permission to unrent another region."
 unrent-notRegistered: "The region can't be unrented because it is not registered for renting."
 unrent-notRented: "The region can't be unrented because it is not rented."
-unrent-unrented: "You have unrented %lang:region%."
-unrent-other: "%lang:region% has been unrented for %lang:player%."
+unrent-unrented: "%lang:region% of %lang:player% has been unrented."
 unrent-expired: "Your rent of %lang:region% has expired."
 
 sell-help: "/as sell [region], the region you stand in will be used if not specified."
 sell-notRegistered: "The region can't be sold because it is not registered for buying."
 sell-notBought: "The region can't be sold because it is not someone's property."
-sell-sold: "%lang:region% has been sold for %lang:player%."
-sell-soldYours: "You have sold %lang:region%."
+sell-sold: "%lang:region% of %lang:player% has been sold."
 sell-noPermission: "You don't have permission to sell a region."
 sell-noPermissionOther: "You don't have permission to sell another region."
 
@@ -217,8 +215,17 @@ info-regionCanBeBought:
   - "    command: /areashop buy %region%"
   - ": [gray]%price%."
 info-regionReselPrice: "[darkgreen][bold]►[reset] Resell price: [gray]%resellprice% (you can buy it from %lang:player%)."
-info-regionFriends: "[darkgreen][bold]►[reset] Added friends: [gray]%friends%."
+info-regionFriends: "[darkgreen][bold]►[reset] Added friends: [gray]%0%."
+info-friend: "%lang:tPlayer|%0%|%"
+info-friendRemove:
+  - "%lang:info-friend|%0%|%"
+  - "[red]✕[gray]"
+  - "    hover: Region %region%"
+  - "    hover: %lang:action|Remove %0% as friend|%"
+  - "    command: /areashop delfriend %0% %region%"
 info-regionMoneyBackBuy:
+  - "[darkgreen][bold]►[reset] Selling payback: [gray]%moneyback% (%moneybackpercent%% of the price)."
+info-regionMoneyBackBuyClick:
   - "[darkgreen][bold]►[reset] "
   - "[bold]Selling payback[/bold]"
   - "    hover: Sell %region% and get back %moneyback%"
@@ -226,6 +233,8 @@ info-regionMoneyBackBuy:
   - "    command: /areashop sell %region%"
   - ": [gray]%moneyback% (%moneybackpercent%% of the price)."
 info-regionMoneyBackRent:
+  - "[darkgreen][bold]►[reset] Unrenting payback: [gray]%moneyback% (%moneybackpercent%% of the remaining time)."
+info-regionMoneyBackRentClick:
   - "[darkgreen][bold]►[reset] "
   - "[bold]Unrenting payback[/bold]"
   - "    hover: Unrent %region% and get back %moneyback%"
@@ -236,25 +245,16 @@ info-regionMaxExtends: "[darkgreen][bold]►[reset] Maximum number of extensions
 info-regionNoExtending: "[darkgreen][bold]►[reset] Rent cannot be extended."
 info-regionExtendsLeft: "[darkgreen][bold]►[reset] Extensions left: [gray]%extendsleft% time(s) out of %maxextends%."
 info-regionMaxRentTime: "[darkgreen][bold]►[reset] In advance renting: [gray]%maxrenttime% at maximum."
-info-regionNoTeleport:
-  - "[darkgreen][bold]►[reset] "
-  - "[bold]Go to the region[/bold]"
-  - "    hover: %lang:action|Teleport to %region%|%"
-  - "    command: /areashop tp %region%"
-  - "%lang:info-setTeleport%"
+info-prefix: "[darkgreen][bold]►[reset] "
 info-regionTeleport:
-  - "[darkgreen][bold]►[reset] "
   - "[bold]Go to the region[/bold]"
   - "    hover: %lang:action|Teleport to %region%|%"
   - "    command: /areashop tp %region%"
-  - "%lang:info-setTeleport%"
-info-setTeleport:
-  - ", "
+info-setRegionTeleport:
   - "[bold]set teleport location[/bold]"
   - "    hover: %region%"
   - "    hover: %lang:action|Set teleport location|%"
   - "    command: /areashop settp %region%"
-  - "."
 info-regionSigns: "[darkgreen][bold]►[reset] Connected signs: [gray]%0%."
 info-regionSignLocation: "[gray](%0%, %1%, %2%, %3%)[reset]"
 info-regionGroups: "[darkgreen][bold]►[reset] Assigned groups: [gray]%0%."

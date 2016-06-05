@@ -59,20 +59,30 @@ public class Utils {
 	}
 
 	/**
-	 * Create a message with a list of regions
-	 * @param regions The region to use
-	 * @return A Message object containing the region list
+	 * Create a message with a list of parts
+	 * @param replacements The parts to use
+	 * @return A Message object containing the parts combined into one message
 	 */
-	public static Message regionListMessage(Collection<? extends GeneralRegion> regions) {
+	public static Message combinedMessage(Collection<?> replacements, String messagePart) {
+		return combinedMessage(replacements, messagePart, ", ");
+	}
+
+	/**
+	 * Create a message with a list of parts
+	 * @param replacements The parts to use
+	 * @param combiner     The string to use as combiner
+	 * @return A Message object containing the parts combined into one message
+	 */
+	public static Message combinedMessage(Collection<?> replacements, String messagePart, String combiner) {
 		Message result = Message.none();
 		boolean first = true;
-		for(GeneralRegion region : regions) {
+		for(Object part : replacements) {
 			if(first) {
 				first = false;
 			} else {
-				result.append(", ");
+				result.append(combiner);
 			}
-			result.append(Message.fromKey("region").replacements(region));
+			result.append(Message.fromKey(messagePart).replacements(part));
 		}
 		return result;
 	}

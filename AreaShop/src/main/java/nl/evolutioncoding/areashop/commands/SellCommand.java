@@ -3,6 +3,7 @@ package nl.evolutioncoding.areashop.commands;
 import nl.evolutioncoding.areashop.AreaShop;
 import nl.evolutioncoding.areashop.Utils;
 import nl.evolutioncoding.areashop.regions.BuyRegion;
+import nl.evolutioncoding.areashop.regions.GeneralRegion;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -28,6 +29,23 @@ public class SellCommand extends CommandAreaShop {
 			return "help-sellOwn";
 		}
 		return null;
+	}
+
+	/**
+	 * Check if a person can sell the region
+	 * @param person The person to check
+	 * @param region The region to check for
+	 * @return true if the person can sell it, otherwise false
+	 */
+	public static boolean canUse(CommandSender person, GeneralRegion region) {
+		if(person.hasPermission("areashop.sell")) {
+			return true;
+		}
+		if(person instanceof Player) {
+			Player player = (Player)person;
+			return region.isOwner(player) && person.hasPermission("areashop.sellown");
+		}
+		return false;
 	}
 	
 	@Override

@@ -53,7 +53,7 @@ public class InfoCommand extends CommandAreaShop {
 		if(regions.isEmpty()) {
 			plugin.message(sender, keyNoneFound);
 		} else {
-			plugin.message(sender, keySomeFound, Utils.regionListMessage(regions));
+			plugin.message(sender, keySomeFound, Utils.combinedMessage(regions, "region"));
 		}
 	}
 	
@@ -165,9 +165,19 @@ public class InfoCommand extends CommandAreaShop {
 						if(rent.isRented()) {
 							plugin.messageNoPrefix(sender, "info-regionRented", rent);
 							plugin.messageNoPrefix(sender, "info-regionExtending", rent);
-							plugin.messageNoPrefix(sender, "info-regionMoneyBackRent", rent);
+							// Money back
+							if(UnrentCommand.canUse(sender, buy)) {
+								plugin.messageNoPrefix(sender, "info-regionMoneyBackRentClick", rent);
+							} else {
+								plugin.messageNoPrefix(sender, "info-regionMoneyBackRent", rent);
+							}
+							// Friends
 							if(!rent.getFriendNames().isEmpty()) {
-								plugin.messageNoPrefix(sender, "info-regionFriends", rent);
+								String messagePart = "info-friend";
+								if(DelfriendCommand.canUse(sender, rent)) {
+									messagePart = "info-friendRemove";
+								}
+								plugin.messageNoPrefix(sender, "info-regionFriends", rent, Utils.combinedMessage(rent.getFriendNames(), messagePart));
 							}
 						} else {
 							plugin.messageNoPrefix(sender, "info-regionCanBeRented", rent);
@@ -175,6 +185,7 @@ public class InfoCommand extends CommandAreaShop {
 						if(rent.getLandlordName() != null) {
 							plugin.messageNoPrefix(sender, "info-regionLandlord", rent);
 						}
+						// Maximum extends
 						if(rent.getMaxExtends() != -1) {
 							if(rent.getMaxExtends() == 0) {
 								plugin.messageNoPrefix(sender, "info-regionNoExtending", rent);
@@ -190,14 +201,25 @@ public class InfoCommand extends CommandAreaShop {
 						if(rent.getInactiveTimeUntilUnrent() != -1) {
 							plugin.messageNoPrefix(sender, "info-regionInactiveUnrent", rent);			
 						}
-						if(sender.hasPermission("areashop.teleport") || sender.hasPermission("areashop.teleportall")) {
-							Location teleport = rent.getTeleportLocation();
-							if(teleport == null) {
-								plugin.messageNoPrefix(sender, "info-regionNoTeleport", rent);
-							} else {
-								plugin.messageNoPrefix(sender, "info-regionTeleport", rent);
-							}
+						// Teleport
+						Message tp = Message.fromKey("info-prefix");
+						boolean foundSomething = false;
+						if(TeleportCommand.canUse(sender, rent)) {
+							foundSomething = true;
+							tp.append(Message.fromKey("info-regionTeleport").replacements(rent));
 						}
+						if(SetteleportCommand.canUse(sender, rent)) {
+							if(foundSomething) {
+								tp.append(", ");
+							}
+							foundSomething = true;
+							tp.append(Message.fromKey("info-setRegionTeleport").replacements(rent));
+						}
+						if(foundSomething) {
+							tp.append(".");
+							tp.send(sender);
+						}
+						// Signs
 						List<String> signLocations = new ArrayList<>();
 						for(Location location : rent.getSignLocations()) {
 							signLocations.add(Message.fromKey("info-regionSignLocation").replacements(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()).getPlain());
@@ -205,9 +227,11 @@ public class InfoCommand extends CommandAreaShop {
 						if(!signLocations.isEmpty()) {
 							plugin.messageNoPrefix(sender, "info-regionSigns", signLocations.toArray());
 						}
+						// Groups
 						if(sender.hasPermission("areashop.groupinfo") && !rent.getGroupNames().isEmpty()) {
 							plugin.messageNoPrefix(sender, "info-regionGroups", Utils.createCommaSeparatedList(rent.getGroupNames()));
 						}
+						// Restoring
 						if(rent.isRestoreEnabled()) {
 							if(sender.hasPermission("areashop.setrestore")) {
 								plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent, Message.fromKey("info-regionRestoringProfile").replacements(rent.getRestoreProfile()));
@@ -215,6 +239,7 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent, "");
 							}
 						}
+						// Restrictions
 						if(!rent.isRented()) {
 							if(rent.restrictedToRegion()) {
 								plugin.messageNoPrefix(sender, "info-regionRestrictedRegionRent", rent);
@@ -232,9 +257,19 @@ public class InfoCommand extends CommandAreaShop {
 							} else {
 								plugin.messageNoPrefix(sender, "info-regionBought", buy);
 							}
-							plugin.messageNoPrefix(sender, "info-regionMoneyBackBuy", buy);
+							// Money back
+							if(SellCommand.canUse(sender, buy)) {
+								plugin.messageNoPrefix(sender, "info-regionMoneyBackBuyClick", buy);
+							} else {
+								plugin.messageNoPrefix(sender, "info-regionMoneyBackBuy", buy);
+							}
+							// Friends
 							if(!buy.getFriendNames().isEmpty()) {
-								plugin.messageNoPrefix(sender, "info-regionFriends", buy);
+								String messagePart = "info-friend";
+								if(DelfriendCommand.canUse(sender, buy)) {
+									messagePart = "info-friendRemove";
+								}
+								plugin.messageNoPrefix(sender, "info-regionFriends", buy, Utils.combinedMessage(buy.getFriendNames(), messagePart));
 							}
 						} else {
 							plugin.messageNoPrefix(sender, "info-regionCanBeBought", buy);
@@ -245,14 +280,25 @@ public class InfoCommand extends CommandAreaShop {
 						if(buy.getInactiveTimeUntilSell() != -1) {
 							plugin.messageNoPrefix(sender, "info-regionInactiveSell", buy);			
 						}
-						if(sender.hasPermission("areashop.teleport") || sender.hasPermission("areashop.teleportall")) {
-							Location teleport = buy.getTeleportLocation();
-							if(teleport == null) {
-								plugin.messageNoPrefix(sender, "info-regionNoTeleport", buy);
-							} else {
-								plugin.messageNoPrefix(sender, "info-regionTeleport", buy);
-							}
+						// Teleport
+						Message tp = Message.fromKey("info-prefix");
+						boolean foundSomething = false;
+						if(TeleportCommand.canUse(sender, buy)) {
+							foundSomething = true;
+							tp.append(Message.fromKey("info-regionTeleport").replacements(buy));
 						}
+						if(SetteleportCommand.canUse(sender, buy)) {
+							if(foundSomething) {
+								tp.append(", ");
+							}
+							foundSomething = true;
+							tp.append(Message.fromKey("info-setRegionTeleport").replacements(buy));
+						}
+						if(foundSomething) {
+							tp.append(".");
+							tp.send(sender);
+						}
+						// Signs
 						List<String> signLocations = new ArrayList<>();
 						for(Location location : buy.getSignLocations()) {
 							signLocations.add(Message.fromKey("info-regionSignLocation").replacements(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()).getPlain());
@@ -260,9 +306,11 @@ public class InfoCommand extends CommandAreaShop {
 						if(!signLocations.isEmpty()) {
 							plugin.messageNoPrefix(sender, "info-regionSigns", signLocations.toArray());
 						}
+						// Groups
 						if(sender.hasPermission("areashop.groupinfo") && !buy.getGroupNames().isEmpty()) {
 							plugin.messageNoPrefix(sender, "info-regionGroups", Utils.createCommaSeparatedList(buy.getGroupNames()));
 						}
+						// Restoring
 						if(buy.isRestoreEnabled()) {
 							if(sender.hasPermission("areashop.setrestore")) {
 								plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy, Message.fromKey("info-regionRestoringProfile").replacements(buy.getRestoreProfile()));
@@ -270,6 +318,7 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy, "");
 							}
 						}
+						// Restrictions
 						if(!buy.isSold()) {
 							if(buy.restrictedToRegion()) {
 								plugin.messageNoPrefix(sender, "info-regionRestrictedRegionBuy", buy);
@@ -293,7 +342,7 @@ public class InfoCommand extends CommandAreaShop {
 				if(regions.isEmpty()) {
 					plugin.message(sender, "info-nogroupNone");
 				} else {
-					plugin.message(sender, "info-nogroupRegions", Utils.regionListMessage(regions));
+					plugin.message(sender, "info-nogroupRegions", Utils.combinedMessage(regions, "region"));
 				}
 			} else {
 				plugin.message(sender, "info-help");

@@ -33,6 +33,21 @@ public class SetteleportCommand extends CommandAreaShop {
 		return null;
 	}
 
+	/**
+	 * Check if a person can set the teleport location of the region
+	 * @param person The person to check
+	 * @param region The region to check for
+	 * @return true if the person can set the teleport location, otherwise false
+	 */
+	public static boolean canUse(CommandSender person, GeneralRegion region) {
+		if(!(person instanceof Player)) {
+			return false;
+		}
+		Player player = (Player)person;
+		return player.hasPermission("areashop.setteleportall")
+				|| region.isOwner(player) && player.hasPermission("areashop.setteleport");
+	}
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.setteleport") && !sender.hasPermission("areashop.setteleportall")) {

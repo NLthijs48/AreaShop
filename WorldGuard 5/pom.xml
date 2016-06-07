@@ -11,7 +11,7 @@
   </properties>
 
   <parent>
-    <groupId>nl.evolutioncoding</groupId>
+    <groupId>me.wiefferink</groupId>
     <artifactId>areashop-parent</artifactId>
     <version>parent</version>
   </parent>
@@ -25,7 +25,7 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>nl.evolutioncoding</groupId>
+      <groupId>me.wiefferink</groupId>
       <artifactId>areashop-interface</artifactId>
       <version>AreaShopInterface</version>
       <type>jar</type>

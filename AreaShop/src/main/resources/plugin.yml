@@ -1,5 +1,5 @@
 name: AreaShop
-main: nl.evolutioncoding.areashop.AreaShop
+main: me.wiefferink.areashop.AreaShop
 version: ${project.version}
 description: "Selling and renting WorldGuard regions to your players, highly configurable."
 depend: [Vault, WorldGuard, WorldEdit]

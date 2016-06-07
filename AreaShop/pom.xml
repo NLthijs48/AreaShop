@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>nl.evolutioncoding</groupId>
+  <groupId>me.wiefferink</groupId>
   <artifactId>areashop</artifactId>
   <packaging>jar</packaging>
   <name>AreaShop</name>
@@ -36,7 +36,7 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>nl.evolutioncoding</groupId>
+      <groupId>me.wiefferink</groupId>
       <artifactId>areashop-worldguard-5</artifactId>
       <version>WorldGuard-5</version>
       <type>jar</type>
@@ -44,7 +44,7 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>nl.evolutioncoding</groupId>
+      <groupId>me.wiefferink</groupId>
       <artifactId>areashop-worldguard-6</artifactId>
       <version>WorldGuard-6</version>
       <type>jar</type>
@@ -52,7 +52,7 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>nl.evolutioncoding</groupId>
+      <groupId>me.wiefferink</groupId>
       <artifactId>areashop-interface</artifactId>
       <version>AreaShopInterface</version>
       <type>jar</type>
@@ -60,7 +60,7 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>nl.evolutioncoding</groupId>
+      <groupId>me.wiefferink</groupId>
       <artifactId>areashop-worldedit-5</artifactId>
       <version>WorldEdit-5</version>
       <type>jar</type>
@@ -68,7 +68,7 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>nl.evolutioncoding</groupId>
+      <groupId>me.wiefferink</groupId>
       <artifactId>areashop-worldedit-6</artifactId>
       <version>WorldEdit-6</version>
       <type>jar</type>

@@ -26,9 +26,7 @@ public class DelfriendCommand extends CommandAreaShop {
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.delfriendall")) {
-			return "help-delFriendAll";
-		} else if(target.hasPermission("areashop.delfriend")) {
+		if(target.hasPermission("areashop.delfriendall") || target.hasPermission("areashop.delfriend")) {
 			return "help-delFriend";
 		}
 		return null;

@@ -26,9 +26,7 @@ public class AddfriendCommand extends CommandAreaShop {
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.addfriendall")) {
-			return "help-addFriendAll";
-		} else if(target.hasPermission("areashop.addfriend")) {
+		if(target.hasPermission("areashop.addfriendall") || target.hasPermission("areashop.addfriend")) {
 			return "help-addFriend";
 		}
 		return null;

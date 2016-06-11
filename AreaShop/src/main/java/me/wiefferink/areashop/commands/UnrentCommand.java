@@ -23,10 +23,8 @@ public class UnrentCommand extends CommandAreaShop {
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.unrent")) {
+		if(target.hasPermission("areashop.unrent") || target.hasPermission("areashop.unrentown")) {
 			return "help-unrent";
-		} else if(target.hasPermission("areashop.unrentown")) {
-			return "help-unrentOwn";
 		}
 		return null;
 	}

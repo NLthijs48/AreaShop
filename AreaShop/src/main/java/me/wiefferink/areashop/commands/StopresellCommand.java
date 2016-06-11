@@ -22,9 +22,7 @@ public class StopresellCommand extends CommandAreaShop {
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.stopresellall")) {
-			return "help-stopResellAll";
-		} else if(target.hasPermission("areashop.stopresell")) {
+		if(target.hasPermission("areashop.stopresellall") || target.hasPermission("areashop.stopresell")) {
 			return "help-stopResell";
 		}
 		return null;

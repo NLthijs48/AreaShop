@@ -21,9 +21,7 @@ public class TeleportCommand extends CommandAreaShop {
 	
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.teleportall")) {
-			return "help-teleportAll";
-		} else if(target.hasPermission("areashop.teleport")) {
+		if(target.hasPermission("areashop.teleportall") || target.hasPermission("areashop.teleport")) {
 			return "help-teleport";
 		}
 		return null;

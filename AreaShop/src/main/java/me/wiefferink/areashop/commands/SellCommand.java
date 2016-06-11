@@ -23,10 +23,8 @@ public class SellCommand extends CommandAreaShop {
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.sell")) {
+		if(target.hasPermission("areashop.sell") || target.hasPermission("areashop.sellown")) {
 			return "help-sell";
-		} else if(target.hasPermission("areashop.sellown")) {
-			return "help-sellOwn";
 		}
 		return null;
 	}

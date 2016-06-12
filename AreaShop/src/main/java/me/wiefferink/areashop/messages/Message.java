@@ -19,6 +19,7 @@ public class Message {
 	public static final String LANGUAGEVARIABLE = "lang:";
 	public static final String CHATLANGUAGEVARIABLE = "prefix";
 	public static final int REPLACEMENTLIMIT = 50;
+	private static boolean fancyWorks = true;
 
 	private List<String> message;
 	private Object[] replacements;
@@ -158,9 +159,18 @@ public class Message {
 		}
 		executeReplacements();
 		if(target instanceof Player) {
-			if(AreaShop.getInstance().getConfig().getBoolean("useFancyMessages")) {
-				FancyMessageSender.sendJSON((Player)target, FancyMessageFormat.convertToJSON(message));
-			} else {
+			boolean sendPlain = true;
+			if(AreaShop.getInstance().getConfig().getBoolean("useFancyMessages") && fancyWorks) {
+				try {
+					boolean result = FancyMessageSender.sendJSON((Player)target, FancyMessageFormat.convertToJSON(message));
+					sendPlain = !result;
+					fancyWorks = result;
+				} catch(Exception e) {
+					fancyWorks = false;
+					AreaShop.getInstance().getLogger().warning("Sending fancy message did not work, falling back to plain messages. Message key: "+key);
+				}
+			}
+			if(sendPlain) { // Fancy messages disabled or broken
 				((Player)target).sendMessage(FancyMessageFormat.convertToConsole(message));
 			}
 		} else {

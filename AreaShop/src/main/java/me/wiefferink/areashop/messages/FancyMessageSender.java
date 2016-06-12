@@ -47,10 +47,19 @@ public class FancyMessageSender {
 			Class<?> chatSerializerClazz;
 
 			String version = Reflection.getVersion();
-			double majorVersion = Double.parseDouble(version.replace('_', '.').substring(1, 4));
-			int lesserVersion = Integer.parseInt(version.substring(6, 7));
+			if(version == null || version.length() < 2) {
+				throw new RuntimeException("Could not get NMS version, found: "+version);
+			}
+			version = version.substring(1, version.length()-1); // Strip v and the . at the end
+			String[] parts = version.split("_");
+			if(parts.length < 3) {
+				throw new RuntimeException("Not enough parts in the version, found: "+version);
+			}
+			int majorVersion = Integer.parseInt(parts[0]);
+			int minorVersion = Integer.parseInt(parts[1]);
+			int revision = Integer.parseInt(parts[2].substring(1));
 
-			if(majorVersion < 1.8 || (majorVersion == 1.8 && lesserVersion == 1)) {
+			if((majorVersion <= 1 && minorVersion < 8) || (majorVersion == 1 && minorVersion == 8 && revision == 1)) {
 				chatSerializerClazz = Reflection.getNMSClass("ChatSerializer");
 			} else {
 				chatSerializerClazz = Reflection.getNMSClass("IChatBaseComponent$ChatSerializer");

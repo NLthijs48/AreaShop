@@ -153,6 +153,7 @@ signProfiles:
       line4: '%price%'
       rightClickPlayer:
       - 'areashop rent %region%'
+      #- 'areashop message %clicker% %lang:confirm-rent|%region%|%' # Use this instead of the above one to confirm first
       leftClickPlayer:
       - 'areashop info region %region%'
     rented:
@@ -162,10 +163,11 @@ signProfiles:
       line4: '%untilshort%'
       rightClickPlayer:
       - 'areashop rent %region%'
+      #- 'areashop message %clicker% %lang:confirm-extend|%region%|%' # Use this instead of the above one to confirm first
       leftClickPlayer:
       - 'areashop info region %region%'
       shiftRightClickPlayer:
-      - 'areashop unrent %region%'
+      - 'areashop message %clicker% %lang:confirm-unrent|%region%|%'
     forsale:
       line1: '&2&l[For Sale]'
       line2: '%region%'
@@ -173,6 +175,7 @@ signProfiles:
       line4:
       rightClickPlayer:
       - 'areashop buy %region%'
+      #- 'areashop message %clicker% %lang:confirm-buy|%region%|%' # Use this instead of the above one to confirm first
       leftClickPlayer:
       - 'areashop info region %region%'
     resell:
@@ -182,6 +185,7 @@ signProfiles:
       line4: '&8%player%'
       rightClickPlayer:
       - 'areashop buy %region%'
+      #- 'areashop message %clicker% %lang:confirm-buy|%region%|%' # Use this instead of the above one to confirm first
       leftClickPlayer:
       - 'areashop info region %region%'
       shiftRightClickPlayer:
@@ -196,7 +200,7 @@ signProfiles:
       leftClickPlayer:
       - 'areashop info region %region%'
       shiftRightClickPlayer:
-      - 'areashop sell %region%'
+      - 'areashop message %clicker% %lang:confirm-sell|%region%|%'
 ## Option to run certain commands when a region event happens.
 ## Commands at a 'before' section will execute before the region details are changed in the AreaShop system
 ## and before any other actions occurred (setting the owner, saving/loading schematics, etc.),

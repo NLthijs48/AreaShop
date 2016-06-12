@@ -9,6 +9,7 @@
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 action: "[blue][bold]<%0%>[/bold]"
+button: "[bold]<%0%>[/bold]"
 command:
   - "[bold]%0%[/bold]"
   - "    hover: %lang:action|Use %1%|%"
@@ -499,6 +500,36 @@ setlandlord-help: "/as setlandlord <player> [region], the region you stand in wi
 setlandlord-noPermission: "You don't have permission to set the landlord for a region."
 setlandlord-noRegion: "The specified region is not registered: %0%."
 setlandlord-success: "%lang:landlord% has successfully been set as landlord of %lang:region%."
+
+message-help: "/as message <player> <message...>"
+message-noPermission: "You do not have permission to send AreaShop messages."
+message-notOnline: "%0% is not online."
+
+confirm-rent:
+  - "%lang:prefix%Are you sure you want to rent %lang:tRegion|%0%|%?[break]"
+  - "[darkgreen][bold]►[reset] %lang:button|Click to rent %0%|%"
+  - "    hover: %lang:action|Rent %0%|%"
+  - "    command: /areashop rent %0%"
+confirm-extend:
+  - "%lang:prefix%Are you sure you want to extend %lang:tRegion|%0%|%?[break]"
+  - "[darkgreen][bold]►[reset] %lang:button|Click to extend %0%|%"
+  - "    hover: %lang:action|Extend %0%|%"
+  - "    command: /areashop rent %0%"
+confirm-unrent:
+  - "%lang:prefix%Are you sure you want to stop renting %lang:tRegion|%0%|%?[break]"
+  - "[darkgreen][bold]►[reset] %lang:button|Click to stop renting %0%|%"
+  - "    hover: %lang:action|Stop renting %0%|%"
+  - "    command: /areashop unrent %0%"
+confirm-buy:
+  - "%lang:prefix%Are you sure you want to buy %lang:tRegion|%0%|%?[break]"
+  - "[darkgreen][bold]►[reset] %lang:button|Click to buy %0%|%"
+  - "    hover: %lang:action|Buy %0%|%"
+  - "    command: /areashop buy %0%"
+confirm-sell:
+  - "%lang:prefix%Are you sure you want to sell %lang:tRegion|%0%|%?[break]"
+  - "[darkgreen][bold]►[reset] %lang:button|Click to sell %0%|%"
+  - "    hover: %lang:action|Sell %0%|%"
+  - "    command: /areashop sell %0%"
 
 timeleft-years: "%0% years"
 timeleft-months: "%0% months"

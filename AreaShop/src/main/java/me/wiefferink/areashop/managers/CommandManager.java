@@ -54,6 +54,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		commands.add(new LinksignsCommand(plugin));
 		commands.add(new StackCommand(plugin));
 		commands.add(new SetlandlordCommand(plugin));
+		commands.add(new MessageCommand(plugin));
 
 		// Register commands in bukkit
 		plugin.getCommand("AreaShop").setExecutor(this);	
@@ -133,7 +134,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 		}
 		int toCompleteNumber = args.length;
 		String toCompletePrefix = args[args.length-1].toLowerCase();
-		AreaShop.debug("toCompleteNumber=" + toCompleteNumber + ", toCompletePrefix=" + toCompletePrefix + ", length=" + toCompletePrefix.length());
+		//AreaShop.debug("toCompleteNumber=" + toCompleteNumber + ", toCompletePrefix=" + toCompletePrefix + ", length=" + toCompletePrefix.length());
 		if(toCompleteNumber == 1) {
 			for(CommandAreaShop c : commands) {
 				String begin = c.getCommandStart();
@@ -162,7 +163,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 			result.clear();
 			result.addAll(set);
 		}
-		AreaShop.debug("Tabcomplete #" + toCompleteNumber + ", prefix="+ toCompletePrefix + ", result=" + result.toString());
+		//AreaShop.debug("Tabcomplete #" + toCompleteNumber + ", prefix="+ toCompletePrefix + ", result=" + result.toString());
 		return result;
 	}
 }

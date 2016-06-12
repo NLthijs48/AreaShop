@@ -151,10 +151,8 @@ public class FancyMessageFormat {
 		}
 		// Find interactive lines meant for this message
 		List<String> interactives = new ArrayList<>();
-		int index = line;
-		while(index < message.size() && isTaggedInteractive(message.get(index))) {
-			interactives.add(message.get(index));
-			index++;
+		while(line < message.size() && isTaggedInteractive(message.get(line))) {
+			interactives.add(message.remove(line));
 		}
 		// Split the line and add the parts
 		int at = line;

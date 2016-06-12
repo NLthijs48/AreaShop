@@ -120,8 +120,8 @@ buy-successResale: "You successfully bought %lang:region% from %lang:tPlayer|%0%
 buy-successSeller: "Your region %lang:region% has been sold to %lang:player% for %0%."
 buy-lowMoney: "You don't have enough money to buy this region (you have %0% and you need %price%)."
 buy-lowMoneyResell: "You don't have enough money to buy this region (you have %0% and you need %resellprice%)."
-buy-yours: "You already own %region%."
-buy-someoneElse: "Someone else already bought %region%."
+buy-yours: "You already own %lang:region%."
+buy-someoneElse: "Someone else already bought %lang:region%."
 buy-restrictedToWorld: "You need to be in the '%world%' world to buy this region (you are in '%0%')."
 buy-restrictedToRegion: "You need to be inside %lang:region% to buy it."
 
@@ -305,8 +305,8 @@ setup-noPermission: "You cannot add the region '%0%', you are not an owner/membe
 
 destroy-noPermissionRent: "You don't have permission for deregistering a rental region."
 destroy-noPermissionBuy: "You don't have permission for deregistering a buy region."
-destroy-successRent: "%region% successfully deregistered as rental region."
-destroy-successBuy: "%region% successfully deregistered as buy region."
+destroy-successRent: "%lang:region% successfully deregistered as rental region."
+destroy-successBuy: "%lang:region% successfully deregistered as buy region."
 
 teleport-help: "/as tp <region> [sign]."
 teleport-noRentOrBuy: "The specified region is not registered: %0%."

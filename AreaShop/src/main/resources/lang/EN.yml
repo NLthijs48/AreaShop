@@ -299,7 +299,7 @@ setup-rentSuccess: "Renting of region %lang:region% is setup correctly."
 setup-buySuccess: "Buying of region %lang:region% is setup correctly."
 setup-noPermissionRent: "You don't have permission for setting up rental regions."
 setup-noPermissionBuy: "You don't have permission for setting up buy regions."
-setup-couldNotDetect: "Found multiple regions with the same priority and/or parent/child relation, specify one on the second line (2 of the regions that were found: %lang:tRegion|%0%% and %lang:tRegion|%1%%)."
+setup-couldNotDetect: "Found multiple regions with the same priority and/or parent/child relation, specify one on the second line (2 of the regions that were found: %lang:tRegion|%0%|% and %lang:tRegion|%1%|%)."
 setup-blacklisted: "%0% is on the blacklist and cannot be added to AreaShop."
 setup-noPermission: "You cannot add the region '%0%', you are not an owner/member or don't have the permission for it."
 

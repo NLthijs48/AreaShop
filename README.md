@@ -19,7 +19,9 @@
 **Development:**
 [►Changelog](https://github.com/NLthijs48/AreaShop/wiki/Changelog)&nbsp;&nbsp;
 [►Compiling](https://github.com/NLthijs48/AreaShop/wiki/Compiling-AreaShop)&nbsp;&nbsp;
-[►Modules, packages and classes overview](https://github.com/NLthijs48/AreaShop/wiki/Modules,-packages-and-classes-overview)<br/>
+[►Modules/classes overview](https://github.com/NLthijs48/AreaShop/wiki/Modules,-packages-and-classes-overview)
+[►Javadocs](https://wiefferink.me/AreaShop/javadocs/)
+[►Development builds](http://jenkins.wiefferink.me)<br/>
 **Connections:**
 [►AreaShop in Spigot Resources](http://www.spigotmc.org/resources/areashop.2991/)&nbsp;&nbsp;
 [►AreaShop on BukkitDev](http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/)&nbsp;&nbsp;

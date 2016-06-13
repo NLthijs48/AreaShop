@@ -68,8 +68,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public static final String schematicExtension = ".schematic";	
 	public static final String regionsFolder = "regions";
 	public static final String groupsFile = "groups.yml";
-	public static final String defaultFile = "default.yml";	
-	public static final String configFile = "config.yml";	
+	public static final String defaultFile = "default.yml";
+	public static final String configFile = "config.yml";
+	public static final String configFileHidden = "hiddenConfig.yml";
 	public static final String versionFile = "versions";
 	
 	// Euro tag for in the config

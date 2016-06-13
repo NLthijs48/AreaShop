@@ -361,30 +361,28 @@ public class RentRegion extends GeneralRegion {
 			return;
 		}
 		Player player = Bukkit.getPlayer(getRenter());
-		if(player != null) {
-			long sendUntil = Calendar.getInstance().getTimeInMillis() + (plugin.getConfig().getInt("expireWarning.delay") * 60 * 1000);
-			// loop through warning defined in the config for the profile that is set for this region
-			String configPath = "expirationWarningProfiles." + getStringSetting("rent.expirationWarningProfile");
-			ConfigurationSection section = plugin.getConfig().getConfigurationSection(configPath);
-			if(section == null) {
+		long sendUntil = Calendar.getInstance().getTimeInMillis()+(plugin.getConfig().getInt("expireWarning.delay")*60*1000);
+		// loop through warning defined in the config for the profile that is set for this region
+		String configPath = "expirationWarningProfiles."+getStringSetting("rent.expirationWarningProfile");
+		ConfigurationSection section = plugin.getConfig().getConfigurationSection(configPath);
+		if(section == null) {
+			return;
+		}
+		for(String timeBefore : section.getKeys(false)) {
+			long timeBeforeParsed = Utils.durationStringToLong(timeBefore);
+			if(timeBeforeParsed <= 0) {
 				return;
 			}
-			for(String timeBefore : section.getKeys(false)) {
-				long timeBeforeParsed = Utils.durationStringToLong(timeBefore);
-				if(timeBeforeParsed <= 0) {
-					return;
+			long checkTime = getRentedUntil()-timeBeforeParsed;
+
+			if(checkTime > warningsDoneUntil && checkTime <= sendUntil) {
+				if(plugin.getConfig().getBoolean(configPath+"."+timeBefore+".warnPlayer") && player != null) {
+					message(player, "rent-expireWarning");
 				}
-				long checkTime = getRentedUntil() - timeBeforeParsed;
-				
-				if(checkTime > warningsDoneUntil && checkTime <= sendUntil) {
-					if(plugin.getConfig().getBoolean(configPath + "." + timeBefore + ".warnPlayer")) {
-						message(player, "rent-expireWarning");
-					}
-					this.runCommands(Bukkit.getConsoleSender(), plugin.getConfig().getStringList(configPath + "." + timeBefore + ".commands"));					
-				}		
+				this.runCommands(Bukkit.getConsoleSender(), plugin.getConfig().getStringList(configPath+"."+timeBefore+".commands"));
 			}
-			warningsDoneUntil = sendUntil;
-		}		
+		}
+		warningsDoneUntil = sendUntil;
 	}
 	
 	/**

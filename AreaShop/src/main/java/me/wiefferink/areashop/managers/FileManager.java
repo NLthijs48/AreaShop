@@ -809,7 +809,8 @@ public class FileManager {
 		// Load config.yml from the plugin folder
 		try(
 				InputStreamReader custom = new InputStreamReader(new FileInputStream(configFile), Charsets.UTF_8);
-				InputStreamReader normal = new InputStreamReader(plugin.getResource(AreaShop.configFile), Charsets.UTF_8)
+				InputStreamReader normal = new InputStreamReader(plugin.getResource(AreaShop.configFile), Charsets.UTF_8);
+				InputStreamReader hidden = new InputStreamReader(plugin.getResource(AreaShop.configFileHidden), Charsets.UTF_8)
 		) {
 			config = YamlConfiguration.loadConfiguration(custom);
 			if(config.getKeys(false).size() == 0) {
@@ -817,6 +818,9 @@ public class FileManager {
 				result = false;
 			} else {
 				config.addDefaults(YamlConfiguration.loadConfiguration(normal));
+				plugin.getLogger().info("defaults keys after normal: "+config.getDefaults().getKeys(true));
+				config.addDefaults(YamlConfiguration.loadConfiguration(hidden));
+				plugin.getLogger().info("defaults keys after hidden: "+config.getDefaults().getKeys(true));
 				// Set the debug and chatprefix variables
 				plugin.setDebug(this.getConfig().getBoolean("debug"));
 				if(getConfig().isList("chatPrefix")) {

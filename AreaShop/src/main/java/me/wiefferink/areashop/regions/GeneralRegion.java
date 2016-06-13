@@ -1723,7 +1723,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return;
 		}
 		
-		boolean postCommandErrors = plugin.getConfig().getBoolean("postCommandErrors");
 		for(String command : commands) {
 			if(command == null || command.length() == 0) {
 				continue;
@@ -1741,7 +1740,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				stacktrace = ExceptionUtils.getStackTrace(e);
 			}
 			boolean printed = false;
-			if(!result && postCommandErrors) {
+			if(!result) {
 				printed = true;
 				if(error != null) {
 					plugin.getLogger().warning("Command execution failed, command=" + command + ", error=" + error + ", stacktrace:");

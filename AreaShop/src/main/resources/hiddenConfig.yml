@@ -1,0 +1,50 @@
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ hiddenConfig.yml file of the AreaShop plugin created by NLThijs48.                                                         ║
+# ║ Options in this file are available in config.yml, but are not shown by default there.                                      ║
+# ║ The options in these file are either very advanced, or not useful for the majority of users.                               ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ TIMERS: Settings to define how often scheduled tasks run.                                                                  │
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+## Setting the 'delay' setting to 0 or lower will prevent the taks from runnning.
+## The 'delay' settings are specified using a number followed by one of the identifiers as defined in config.yml.
+## The 'regionsPerTick' settings are to configure how fast something goes, lower value is less lag, but slower updates.
+## There are 20 ticks in 1 second, so if you set 'regionPerTick' to 5, then 5*20=100 regions per second will be updated.
+
+## Timings for saving files that need saving.
+saving:
+  delay: '10 minutes'
+  regionsPerTick: 1
+## Timings for rent expiration checking.
+expiration:
+  delay: '59 seconds'
+  regionsPerTick: 5
+## Timings for expiration warning to online players.
+expireWarning:
+  delay: '5 minutes'
+  regionsPerTick: 5
+## Timings for updating signs and region flags ('/as reload' or after '/as groupadd' or '/as groupdel').
+update:
+  regionsPerTick: 5
+## Time between checking if any regions need to be unrented because the player was not online for the specified time period.
+inactive:
+  delay: '15 minutes'
+  regionsPerTick: 5
+## Timings for the periodic updating of signs (for timeleft tags etc).
+signs:
+  delay: '60 seconds'
+  regionsPerTick: 3
+## Number of regions per tick to check when a player joins to see if his name changed for regions he owned (updates the regions when changed).
+nameupdate:
+  regionsPerTick: 10
+## Timings for adding regions to AreaShop ('/as stack').
+adding:
+  regionsPerTick: 2
+
+
+# ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ OTHER: All other settings.                                                                                                 │
+# └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+## Allow or disallow extending a rental region when the player is above his limits enforced by the 'limitGroups' section below.
+## false will ensure a player will eventually lose his region when he has no access anymore.
+allowRegionExtendsWhenAboveLimits: false

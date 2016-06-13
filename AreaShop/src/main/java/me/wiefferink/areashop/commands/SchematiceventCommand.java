@@ -41,7 +41,7 @@ public class SchematiceventCommand extends CommandAreaShop {
 		}		
 		GeneralRegion region = plugin.getFileManager().getRegion(args[1]);
 		if(region == null) {
-			plugin.message(sender, "schemevent-noRegion", args[1]);
+			plugin.message(sender, "cmd-notRegistered", args[1]);
 			return;
 		}
 		if(region.getRegion() == null) {

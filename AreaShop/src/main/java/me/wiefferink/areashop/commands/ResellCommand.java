@@ -72,7 +72,7 @@ public class ResellCommand extends CommandAreaShop {
 			}
 		}
 		if(buy == null) {
-			plugin.message(sender, "resell-noRegionFound");
+			plugin.message(sender, "cmd-noRegionsAtLocation");
 			return;
 		}
 		if(!buy.isSold()) {

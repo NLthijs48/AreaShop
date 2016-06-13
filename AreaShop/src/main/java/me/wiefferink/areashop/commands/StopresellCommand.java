@@ -61,7 +61,7 @@ public class StopresellCommand extends CommandAreaShop {
 			}
 		}
 		if(buy == null) {
-			plugin.message(sender, "stopresell-noRegionFound");
+			plugin.message(sender, "cmd-noRegionsAtLocation");
 			return;
 		}
 		if(!buy.isInResellingMode()) {

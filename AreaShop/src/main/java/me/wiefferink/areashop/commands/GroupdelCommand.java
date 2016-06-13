@@ -83,7 +83,7 @@ public class GroupdelCommand extends CommandAreaShop {
 		} else {
 			GeneralRegion region = plugin.getFileManager().getRegion(args[2]);
 			if(region == null) {
-				plugin.message(sender, "groupdel-noRegion", args[2]);
+				plugin.message(sender, "cmd-notRegistered", args[2]);
 				return;
 			}	
 			if(group.removeMember(region)) {

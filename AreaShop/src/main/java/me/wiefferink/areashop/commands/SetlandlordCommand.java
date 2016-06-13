@@ -64,7 +64,7 @@ public class SetlandlordCommand extends CommandAreaShop {
 			region = plugin.getFileManager().getRegion(args[2]);
 		}	
 		if(region == null) {
-			plugin.message(sender, "setlandlord-noRegion", args[2]);
+			plugin.message(sender, "cmd-notRegistered", args[2]);
 			return;
 		}		
 		String playerName = player.getName();

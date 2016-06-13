@@ -65,7 +65,7 @@ public class AddsignCommand extends CommandAreaShop {
 			// Get region by argument
 			region = plugin.getFileManager().getRegion(args[1]);
 			if(region == null) {
-				plugin.message(sender, "addsign-noRegion", args[1]);
+				plugin.message(sender, "cmd-notRegistered", args[1]);
 				return;
 			}			
 		} else {

@@ -91,7 +91,7 @@ public class BuyRegion extends GeneralRegion {
 	
 	/**
 	 * Get the name of the player that owns this region
-	 * @return The name of the player that owns this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return <UNKNOWN>
+	 * @return The name of the player that owns this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return &lt;UNKNOWN&gt;
 	 */
 	public String getPlayerName() {
 		String result = Utils.toName(getBuyer());
@@ -436,6 +436,7 @@ public class BuyRegion extends GeneralRegion {
 	 * Sell a buyed region, get part of the money back
 	 * @param giveMoneyBack true if the player should be given money back, otherwise false
 	 * @param executor CommandSender to receive a message when the sell fails, or null
+	 * @return true if the region has been sold, otherwise false
 	 */
 	@SuppressWarnings("deprecation")
 	public boolean sell(boolean giveMoneyBack, CommandSender executor) {

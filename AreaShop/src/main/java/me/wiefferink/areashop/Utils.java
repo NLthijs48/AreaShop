@@ -60,6 +60,7 @@ public class Utils {
 	/**
 	 * Create a message with a list of parts
 	 * @param replacements The parts to use
+	 * @param messagePart The message to use for the parts
 	 * @return A Message object containing the parts combined into one message
 	 */
 	public static Message combinedMessage(Collection<?> replacements, String messagePart) {
@@ -69,6 +70,7 @@ public class Utils {
 	/**
 	 * Create a message with a list of parts
 	 * @param replacements The parts to use
+	 * @param messagePart The message to use for the parts
 	 * @param combiner     The string to use as combiner
 	 * @return A Message object containing the parts combined into one message
 	 */
@@ -109,6 +111,7 @@ public class Utils {
 	/**
 	 * Create a map from a location, to save it in the config
 	 * @param location The location to transform
+	 * @param setPitchYaw true to save the pitch and yaw, otherwise false
 	 * @return The map with the location values
 	 */
 	public static ConfigurationSection locationToConfig(Location location, boolean setPitchYaw) {
@@ -126,6 +129,12 @@ public class Utils {
 		}
 		return result;
 	}
+
+	/**
+	 * Create a map from a location, to save it in the config (without pitch and yaw)
+	 * @param location The location to transform
+	 * @return The map with the location values
+	 */
 	public static ConfigurationSection locationToConfig(Location location) {
 		return locationToConfig(location, false);
 	}

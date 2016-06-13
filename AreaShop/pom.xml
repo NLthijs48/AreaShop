@@ -97,10 +97,102 @@
     </dependency>
   </dependencies>
 
+  <profiles>
+    <!-- Copy the jar file to a test server, activate by using -DcopyResult="/path/to/test/server" -->
+    <profile>
+      <id>test-locally</id>
+      <activation>
+        <property>
+          <name>copyResult</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <configuration>
+              <tasks>
+                <copy file="./target/${project.build.finalName}.jar" tofile="${copyResult}\${project.build.finalName}.jar"/>
+              </tasks>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Package the source files in a jar, activate by using -Dsources -->
+    <profile>
+      <id>package-sources</id>
+      <activation>
+        <property>
+          <name>sources</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Produce javadoc files, activate by using -Djavadoc -->
+    <profile>
+      <id>generate-javadoc</id>
+      <activation>
+        <property>
+          <name>javadoc</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.10.4</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <excludePackageNames>me.wiefferink.areashop.lib</excludePackageNames>
+              <destDir>${javadoc}</destDir>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <build>
     <directory>target</directory>
     <finalName>AreaShop</finalName>
-    <!-- Include all required resources -->
     <resources>
       <resource>
         <targetPath>.</targetPath>
@@ -137,23 +229,6 @@
           <source>1.7</source>
           <target>1.7</target>
         </configuration>
-      </plugin>
-      <!-- Copy resulting file to local server, change to your own path -->
-      <plugin>
-	    <artifactId>maven-antrun-plugin</artifactId>
-	    <configuration>
-	      <tasks>
-	        <copy file="./target/${project.build.finalName}.jar" tofile="C:\Games\Minecraft\Spigot\plugins\${project.build.finalName}.jar"/>
-	      </tasks>
-	    </configuration>
-	    <executions>
-	      <execution>
-	        <phase>package</phase>
-	        <goals>
-	          <goal>run</goal>
-	        </goals>
-	      </execution>
-	    </executions>
       </plugin>
     </plugins>
   </build>

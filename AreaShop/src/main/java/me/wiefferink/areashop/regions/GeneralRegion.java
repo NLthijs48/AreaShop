@@ -377,7 +377,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	
 	/**
 	 * Get the name of the landlord
-	 * @return The name of the landlord, if unavailable by UUID it will return the old cached name, if that is unavailable it will return <UNKNOWN>
+	 * @return The name of the landlord, if unavailable by UUID it will return the old cached name, if that is unavailable it will return &lt;UNKNOWN&gt;
 	 */
 	public String getLandlordName() {
 		String result = Utils.toName(getLandlord());
@@ -951,7 +951,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	/**
 	 * Teleport a player to the region
 	 * @param player Player that should be teleported
+	 * @param toSign true to teleport to the first sign of the region, false for teleporting to the region itself
 	 * @param checkPermissions Set to true if teleport permissions should be checked, false otherwise
+	 * @return true if the teleport succeeded, otherwise false
 	 */
 	public boolean teleportPlayer(Player player, boolean toSign, boolean checkPermissions) {
 		int checked = 1;
@@ -1646,7 +1648,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	}
 	
 	/**
-	 * Get the amount of regions a player has matching a certain limits group (config.yml > limitGroups)
+	 * Get the amount of regions a player has matching a certain limits group (config.yml -- limitGroups)
 	 * @param player The player to check the amount for
 	 * @param limitGroup The group to check
 	 * @param regions All the regions a player has bought or rented
@@ -1791,6 +1793,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @param signName The name of the sign
 	 * @param clicker The player that clicked the sign
 	 * @param clickType The type of clicking
+	 * @return true if the commands ran successfully, false if any of them failed
 	 */
 	public boolean runSignCommands(String signName, Player clicker, ClickType clickType) {
 		// Get the profile set in the config

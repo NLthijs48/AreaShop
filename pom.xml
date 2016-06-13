@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
   <version>parent</version>
   <name>AreaShop Parent</name>
-  <url>http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/</url>
+  <url>https://github.com/NLthijs48/AreaShop</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

@@ -294,6 +294,7 @@ public class FileManager {
 	 * Remove a rent from the list
 	 * @param rent The region to remove
 	 * @param giveMoneyBack use true to give money back to the player if someone is currently renting this region, otherwise false
+	 * @return true if the rent has been removed, false otherwise
 	 */
 	public boolean removeRent(RentRegion rent, boolean giveMoneyBack) {
 		boolean result = false;
@@ -360,6 +361,7 @@ public class FileManager {
 	 * Remove a buy from the list
 	 * @param buy The BuyRegion to remove
 	 * @param giveMoneyBack true if money should be given back to the player, otherwise false
+	 * @return true if the buy has been removed, false otherwise
 	 */
 	public boolean removeBuy(BuyRegion buy, boolean giveMoneyBack) {
 		boolean result = false;
@@ -472,6 +474,7 @@ public class FileManager {
 	/**
 	 * Update regions in a task to minimize lag
 	 * @param regions Regions to update
+	 * @param confirmationReceiver The CommandSender that should be notified at completion
 	 */
 	public void updateRegions(final List<GeneralRegion> regions, final CommandSender confirmationReceiver) {
 		final int regionsPerTick = plugin.getConfig().getInt("update.regionsPerTick");
@@ -610,7 +613,7 @@ public class FileManager {
 	
 	/**
 	 * Get the folder the region files are located in
-	 * @return The folder where the <region>.yml files are in
+	 * @return The folder where the region.yml files are in
 	 */
 	public String getRegionFolder() {
 		return regionsPath;
@@ -841,6 +844,7 @@ public class FileManager {
 	
 	/**
 	 * Load the groups.yml file from disk
+	 * @return true if succeeded, otherwise false
 	 */
 	public boolean loadGroupsFile() {
 		boolean result = true;

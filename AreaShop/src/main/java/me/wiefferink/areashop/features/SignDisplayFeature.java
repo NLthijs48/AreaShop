@@ -28,6 +28,7 @@ public class SignDisplayFeature extends Feature implements Listener {
 
 	/**
 	 * Update the signs connected to this region
+	 * @param region The region to update the signs for
 	 * @return true if the update was successful, otherwise false
 	 */
 	public boolean updateSigns(GeneralRegion region) {

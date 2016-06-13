@@ -171,7 +171,7 @@ public class RentRegion extends GeneralRegion {
 	
 	/**
 	 * Get the name of the player renting this region
-	 * @return Name of the player renting this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return <UNKNOWN>
+	 * @return Name of the player renting this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return &lt;UNKNOWN&gt;
 	 */
 	public String getPlayerName() {
 		String result = Utils.toName(getRenter());
@@ -229,7 +229,7 @@ public class RentRegion extends GeneralRegion {
 	}
 	
 	/**
-	 * Get the duration string, includes number<space>indentifier
+	 * Get the duration string, includes 'number indentifier'
 	 * @return The duration string
 	 */
 	public String getDurationString() {
@@ -353,7 +353,7 @@ public class RentRegion extends GeneralRegion {
 	
 	/**
 	 * Send the expiration warnings from the selected profile which is specified in the config
-	 * Sends all warnings since previous call until now+<normal delay>, delay can be found in the config as well
+	 * Sends all warnings since previous call until (now + normal delay), delay can be found in the config as well
 	 */
 	public void sendExpirationWarnings() {
 		// send from warningsDoneUntil to current+delay
@@ -589,6 +589,7 @@ public class RentRegion extends GeneralRegion {
 	 * Unrent a region, reset to unrented
 	 * @param giveMoneyBack true if money should be given back to the player, false otherwise
 	 * @param executor The CommandSender that should get the cancelled message if there is any, or null
+	 * @return true if unrenting succeeded, othwerwise false
 	 */
 	@SuppressWarnings("deprecation")
 	public boolean unRent(boolean giveMoneyBack, CommandSender executor) {

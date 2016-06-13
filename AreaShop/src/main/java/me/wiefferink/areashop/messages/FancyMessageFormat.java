@@ -70,6 +70,8 @@ public class FancyMessageFormat {
 	/**
 	 * Parses the given FancyMessageFormat message to a JSON array that can be
 	 * used with the tellraw command and the like.
+	 * @param message The mesage to convert to JSON
+	 * @return JSON string that can be send to a player
 	 */
 	public static String convertToJSON(final String message) {
 		return convertToJSON(Collections.singleton(message));
@@ -79,6 +81,7 @@ public class FancyMessageFormat {
 	 * Parses the given FancyMessageFormat message to a JSON array that can be
 	 * used with the tellraw command and the like.
 	 * @param inputLines Input message split at line breaks.
+	 * @return JSON string that can be send to a player
 	 */
 	public static String convertToJSON(final Iterable<String> inputLines) {
 		ArrayList<String> lines = cleanInputString(inputLines);
@@ -108,6 +111,7 @@ public class FancyMessageFormat {
 	 * The returned message will only contain colors, bold, italic, underlining and 'magic'
 	 * characters. Hovers and other advanced tellraw tags will be skipped.
 	 * @param message Input message split at line breaks.
+	 * @return Plain message that can be send
 	 */
 	public static String convertToConsole(final String message) {
 		return convertToConsole(Collections.singleton(message));
@@ -120,6 +124,8 @@ public class FancyMessageFormat {
 	 * <p>
 	 * The returned message will only contain colors, bold, italic, underlining and 'magic'
 	 * characters. Hovers and other advanced tellraw tags will be skipped.
+	 * @param inputLines The raw message lines to process
+	 * @return Plain message that can be send
 	 */
 	public static String convertToConsole(final Iterable<String> inputLines) {
 		if(inputLines == null) {

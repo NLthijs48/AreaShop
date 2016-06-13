@@ -77,6 +77,7 @@ public final class ArrayWrapper<E> {
 	 * The iteration order of the specified object will be used as the array element order.
 	 * @param list The iterable of objects which will be converted to an array.
 	 * @param c    The type of the elements of the array.
+	 * @param <T> The type
 	 * @return An array of elements in the specified iterable.
 	 */
 	@SuppressWarnings("unchecked")

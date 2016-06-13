@@ -347,7 +347,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	
 	/**
 	 * Set the chatprefix to use in the chat (loaded from config normally)
-	 * @param chatprefix The string to use in front of chat messages (supports formatting codes like &1)
+	 * @param chatprefix The string to use in front of chat messages (supports formatting codes)
 	 */
 	public void setChatprefix(List<String> chatprefix) {
 		this.chatprefix = chatprefix;
@@ -623,6 +623,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	/**
 	 * Reload all files of the plugin and update all regions
 	 * confirmationReceiver The CommandSender that should receive confirmation messages, null for nobody
+	 * @param confirmationReceiver The CommandSender which should be notified when complete
 	 */
 	public void reload(final CommandSender confirmationReceiver) {
 		setReady(false);

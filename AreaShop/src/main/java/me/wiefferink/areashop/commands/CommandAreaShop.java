@@ -36,6 +36,7 @@ public abstract class CommandAreaShop {
 	 * Get a list of string to complete a command with (raw list, not matching ones not filtered out)
 	 * @param toComplete The number of the argument that has to be completed
 	 * @param start The already given start of the command
+	 * @param sender The CommandSender that wants to tab complete
 	 * @return A collection with all the possibilities for argument to complete
 	 */
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {

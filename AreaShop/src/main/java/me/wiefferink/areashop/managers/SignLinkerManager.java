@@ -67,10 +67,13 @@ public class SignLinkerManager implements Listener {
 	public boolean isInSignLinkMode(Player player) {
 		return signLinkers.containsKey(player.getUniqueId());
 	}
-	
+
+	/**
+	 * On player interactions
+	 * @param event The PlayerInteractEvent
+	 */
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		AreaShop.debug("PlayerInteractEvent of " + event.getPlayer().getName() + ", " + signLinkers.size() + " signlinkers");
 		if(isInSignLinkMode(event.getPlayer())) {
 			event.setCancelled(true);
 			Player player = event.getPlayer();
@@ -123,10 +126,10 @@ public class SignLinkerManager implements Listener {
 	
 	/**
 	 * Handle disconnection players
+	 * @param event The PlayerQuitEvent
 	 */
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLeave(PlayerQuitEvent event) {
-		AreaShop.debug("PlayerQuitEvent of " + event.getPlayer().getName() + ", " + signLinkers.size() + " signlinkers");
 		signLinkers.remove(event.getPlayer().getUniqueId());
 	}
 	

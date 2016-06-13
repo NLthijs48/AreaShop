@@ -49,6 +49,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 	}
 	/**
 	 * Set the region flags/options to the values of a ConfigurationSection
+	 * @param region The region to update the flags for
 	 * @param flags The flags to apply
 	 * @return true if the flags have been set correctly, otherwise false
 	 */
@@ -170,6 +171,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 	 * @param region The WorldGuard region to set
 	 * @param flag   The flag to set
 	 * @param value  The value to set the flag to
+	 * @param <V> They type of flag to set
 	 * @throws InvalidFlagFormat When the value of the flag is wrong
 	 */
 	protected static <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value) throws InvalidFlagFormat {

@@ -78,6 +78,7 @@ public class LanguageManager {
 	/**
 	 * Loads the specified language
 	 * @param key The language to load
+	 * @return Map with the messages loaded from the file
 	 */
 	public Map<String, List<String>> loadLanguage(String key) {
 		Map<String, List<String>> result = new HashMap<>();

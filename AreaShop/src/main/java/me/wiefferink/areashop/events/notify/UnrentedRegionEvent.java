@@ -18,6 +18,7 @@ public class UnrentedRegionEvent extends NotifyAreaShopEvent {
 	 * Constructor
 	 * @param region    The region that has been unrented
 	 * @param oldRenter The player that rented the region before it was unrented
+	 * @param refundedMoney The amount of money that has been refunded
 	 */
 	public UnrentedRegionEvent(RentRegion region, UUID oldRenter, double refundedMoney) {
 		this.region = region;

@@ -1,30 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>me.wiefferink</groupId>
   <artifactId>areashop</artifactId>
   <packaging>jar</packaging>
   <name>AreaShop</name>
   <version>2.2.2</version> <!-- Main plugin version -->
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
-  <repositories>
-    <repository>
-      <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public</url>
-    </repository>
-    <repository>
-      <id>sk89q-repo-wg</id>
-      <url>http://maven.sk89q.com/artifactory/repo/</url>
-    </repository>
-    <repository>
-      <id>vault-repo</id>
-      <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
-    </repository>
-  </repositories>
+  <parent>
+    <groupId>me.wiefferink</groupId>
+    <artifactId>areashop-parent</artifactId>
+    <version>parent</version>
+  </parent>
 
   <dependencies>
     <dependency>
@@ -47,6 +33,14 @@
       <groupId>me.wiefferink</groupId>
       <artifactId>areashop-worldguard-6</artifactId>
       <version>WorldGuard-6</version>
+      <type>jar</type>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>me.wiefferink</groupId>
+      <artifactId>areashop-worldguard-6_1_3</artifactId>
+      <version>WorldGuard-6_1_3</version>
       <type>jar</type>
       <scope>compile</scope>
       <optional>true</optional>
@@ -225,10 +219,6 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.5.1</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
       </plugin>
     </plugins>
   </build>

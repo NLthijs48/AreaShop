@@ -5,10 +5,6 @@
   <packaging>jar</packaging>
   <name>AreaShop WorldEdit 6</name>
   <version>WorldEdit-6</version>
-  
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 
   <parent>
     <groupId>me.wiefferink</groupId>

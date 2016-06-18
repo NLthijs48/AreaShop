@@ -1,7 +1,6 @@
 package me.wiefferink.areashop.features;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
@@ -107,7 +106,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 				String flagSetting = null;
 				com.sk89q.worldguard.protection.flags.RegionGroup groupValue = null;
 
-				Flag<?> foundFlag = DefaultFlag.fuzzyMatchFlag(flagName);
+				Flag<?> foundFlag = plugin.getWorldGuardHandler().fuzzyMatchFlag(flagName);
 				if(foundFlag == null) {
 					plugin.getLogger().warning("Found wrong flag in flagProfiles section: " + flagName + ", check if that is the correct WorldGuard flag");
 					continue;
@@ -127,7 +126,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 							if(part.startsWith("g:")) {
 								if(part.length() > 2) {
 									try {
-										groupValue = groupFlag.parseInput(worldGuard, null, part.substring(2));
+										groupValue = plugin.getWorldGuardHandler().parseFlagGroupInput(groupFlag, part.substring(2));
 									} catch(InvalidFlagFormat e) {
 										plugin.getLogger().warning("Found wrong group value for flag " + flagName);
 									}
@@ -174,8 +173,8 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 	 * @param <V> They type of flag to set
 	 * @throws InvalidFlagFormat When the value of the flag is wrong
 	 */
-	protected static <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value) throws InvalidFlagFormat {
-		region.setFlag(flag, flag.parseInput(WorldGuardPlugin.inst(), null, value));
+	private <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value) throws InvalidFlagFormat {
+		region.setFlag(flag, plugin.getWorldGuardHandler().parseFlagInput(flag, value));
 	}
 
 	/**

@@ -42,12 +42,13 @@ import java.util.Set;
 
 /**
  * Main class for the AreaShop plugin
- * @author NLThijs48
+ * Contains methods to get parts of the plugins functionality and definitions for constants
  */
 public final class AreaShop extends JavaPlugin implements AreaShopInterface {
-	// General variables
+	// Statically available instance
 	private static AreaShop instance = null;
-	
+
+	// General variables
 	private WorldGuardPlugin worldGuard = null;
 	private WorldGuardInterface worldGuardInterface = null;
 	private WorldEditPlugin worldEdit = null;
@@ -146,26 +147,48 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		String wgVersion = null;
 		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
 	    if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
-	    	this.getLogger().severe("WorldGuard plugin is not present or has not loaded correctly");
-	    	error = true;
+			getLogger().severe("WorldGuard plugin is not present or has not loaded correctly");
+			error = true;
 	    } else {
 		    worldGuard = (WorldGuardPlugin)plugin;
 		    // Get correct WorldGuardInterface (handles things that changed version to version)
-	        if(worldGuard.getDescription().getVersion().startsWith("5.")) {
-	        	wgVersion = "5";
+			String rawVersion = worldGuard.getDescription().getVersion();
+			Integer build = null;
+			if(rawVersion.contains("-SNAPSHOT;")) {
+				String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;")+10, rawVersion.length());
+				if(rawVersion.contains("-")) {
+					buildNumber = buildNumber.substring(0, buildNumber.indexOf("-"));
+				}
+				try {
+					build = Integer.parseInt(buildNumber);
+				} catch(NumberFormatException e) {
+					getLogger().warning("Could not correctly parse the build of WorldGuard, raw version: "+rawVersion+", buildNumber: "+buildNumber);
+				}
+			}
+			// Detect correct WorldGuard implementation to use
+			if(build != null && build >= 1672) {
+				if(build > 1672) {
+					wgVersion = "6_1_3"; // Flag name to flag object method changed
+				} else {
+					// Build 1672 is broken, flags changed but no FlagContext added yet
+					error = true;
+					getLogger().severe("Build 1672 of WorldGuard is broken, update to a later build or a stable version!");
+				}
+			} else if(worldGuard.getDescription().getVersion().startsWith("5.")) {
+				wgVersion = "5";
 	        } else {
-		        wgVersion = "6";
-	        }
+				wgVersion = "6"; // Schematic methods changed
+			}
 	        try {
 				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldGuardHandler"+wgVersion);
 				// Check if we have a NMSHandler class at that location.
 				if (WorldGuardInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldGuardInterface
-	                this.worldGuardInterface = (WorldGuardInterface) clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
-	            }
+					worldGuardInterface = (WorldGuardInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
+				}
 	        } catch (final Exception e) {
 	            e.printStackTrace();
-	            this.getLogger().severe("Could not load the handler for WorldGuard (tried to load " + wgVersion + "), report this problem to the author.");
-	            error = true;
+				getLogger().severe("Could not load the handler for WorldGuard (tried to load "+wgVersion+"), report this problem to the author.");
+				error = true;
 	            wgVersion = null;
 	        }
 	    }
@@ -174,8 +197,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		String weVersion = null;
 		plugin = getServer().getPluginManager().getPlugin("WorldEdit");
 	    if (plugin == null || !(plugin instanceof WorldEditPlugin)) {
-	    	this.getLogger().severe("WorldEdit plugin is not present or has not loaded correctly");
-	    	error = true;
+			getLogger().severe("WorldEdit plugin is not present or has not loaded correctly");
+			error = true;
 	    } else {
 		    worldEdit = (WorldEditPlugin)plugin;
 		    // Get correct WorldEditInterface (handles things that changed version to version)
@@ -188,20 +211,20 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldEditHandler"+weVersion);
 				// Check if we have a NMSHandler class at that location.
 				if (WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
-	                this.worldEditInterface = (WorldEditInterface) clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
-	            }
+					worldEditInterface = (WorldEditInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
+				}
 	        } catch (final Exception e) {
 	            e.printStackTrace();
-	            this.getLogger().severe("Could not load the handler for WorldEdit (tried to load " + weVersion + "), report this problem to the author.");
-	            error = true;
+				getLogger().severe("Could not load the handler for WorldEdit (tried to load "+weVersion+"), report this problem to the author.");
+				error = true;
 	            weVersion = null;
 	        }
 	    }
 
 	    // Check if Vault is present
 	    if(getServer().getPluginManager().getPlugin("Vault") == null) {
-	    	this.getLogger().severe("Vault plugin is not present or has not loaded correctly");
-        	error = true;
+			getLogger().severe("Vault plugin is not present or has not loaded correctly");
+			error = true;
 	    }
         
 		// Load all data from files and check versions
@@ -220,13 +243,13 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	    languageManager = new LanguageManager(this);
 	    
 		if(error) {
-			this.getLogger().severe("The plugin has not started, fix the errors listed above");
+			getLogger().severe("The plugin has not started, fix the errors listed above");
 		} else {
 			// Register the event listeners
-			this.getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
-			this.getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
-			this.getServer().getPluginManager().registerEvents(new SignClickListener(this), this);
-			this.getServer().getPluginManager().registerEvents(new PlayerLoginLogoutListener(this), this);
+			getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
+			getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
+			getServer().getPluginManager().registerEvents(new SignClickListener(this), this);
+			getServer().getPluginManager().registerEvents(new PlayerLoginLogoutListener(this), this);
 
 			setupFeatures();
 			setupTasks();
@@ -238,16 +261,16 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	        signLinkerManager = new SignLinkerManager(this);
 			
 	        // Enable Metrics if config allows it
-			if(this.getConfig().getBoolean("sendStats")) {
-				this.startMetrics();
+			if(getConfig().getBoolean("sendStats")) {
+				startMetrics();
 			}
 			
 			// Register dynamic permission (things declared in config)
 			registerDynamicPermissions();
 			
 			// Dont initialize the updatechecker if disabled in the config
-			if(this.getConfig().getBoolean("checkForUpdates")) {
-		        new BukkitRunnable() {
+			if(getConfig().getBoolean("checkForUpdates")) {
+				new BukkitRunnable() {
 					@Override
 					public void run() {
 						try {
@@ -316,7 +339,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Register as listener when necessary
 		for(Feature feature : features) {
 			if(feature instanceof Listener) {
-				this.getServer().getPluginManager().registerEvents((Listener)feature, this);
+				getServer().getPluginManager().registerEvents((Listener)feature, this);
 			}
 		}
 	}
@@ -412,8 +435,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public Economy getEconomy() {
 		RegisteredServiceProvider<Economy> economy = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
         if (economy == null || economy.getProvider() == null) {
-        	this.getLogger().severe("There is no economy provider to support Vault, make sure you installed an economy plugin");
-        	return null;
+			getLogger().severe("There is no economy provider to support Vault, make sure you installed an economy plugin");
+			return null;
         }		
 	    return economy.getProvider();
 	}	
@@ -465,7 +488,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				try {
 					Bukkit.getPluginManager().addPermission(perm);
 				} catch(IllegalArgumentException e) {
-					this.getLogger().warning("Could not add the following permission to be used as limit: " + perm.getName());
+					getLogger().warning("Could not add the following permission to be used as limit: "+perm.getName());
 				}
 			}
 		}	

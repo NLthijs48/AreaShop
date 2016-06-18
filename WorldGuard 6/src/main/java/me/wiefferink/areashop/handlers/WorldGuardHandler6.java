@@ -1,7 +1,9 @@
 package me.wiefferink.areashop.handlers;
 
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
@@ -89,7 +91,7 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 	
 	@Override
 	public Set<ProtectedRegion> getApplicableRegionsSet(Location location) {
-		Set<ProtectedRegion> result = new HashSet<ProtectedRegion>();
+		Set<ProtectedRegion> result = new HashSet<>();
 		Vector vector = new Vector(location.getX(), location.getY(), location.getZ());
 		for(ProtectedRegion region : pluginInterface.getWorldGuard().getRegionManager(location.getWorld()).getRegions().values()) {
 			if(region.contains(vector)) {
@@ -108,5 +110,19 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 	public boolean containsOwner(ProtectedRegion region, UUID player) {
 		return region.getOwners().contains(player);
 	}
-	
+
+	@Override
+	public Flag<?> fuzzyMatchFlag(String flagName) {
+		return DefaultFlag.fuzzyMatchFlag(flagName);
+	}
+
+	@Override
+	public <V> V parseFlagInput(Flag<V> flag, String input) throws InvalidFlagFormat {
+		return flag.parseInput(WorldGuardPlugin.inst(), null, input);
+	}
+
+	@Override
+	public RegionGroup parseFlagGroupInput(RegionGroupFlag flag, String input) throws InvalidFlagFormat {
+		return flag.parseInput(WorldGuardPlugin.inst(), null, input);
+	}
 }

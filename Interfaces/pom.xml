@@ -6,10 +6,6 @@
   <name>AreaShop Interface</name>
   <version>AreaShopInterface</version>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
   <parent>
     <groupId>me.wiefferink</groupId>
     <artifactId>areashop-parent</artifactId>

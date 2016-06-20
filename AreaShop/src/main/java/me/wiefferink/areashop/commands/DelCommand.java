@@ -3,11 +3,9 @@ package me.wiefferink.areashop.commands;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
-import me.wiefferink.areashop.events.notify.RemovedRegionEvent;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -81,7 +79,6 @@ public class DelCommand extends CommandAreaShop {
 						namesSuccess.add(region.getName());
 					}
 				}
-				Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(region));
 			}
 			// send messages
 			if(namesSuccess.size() != 0) {
@@ -114,7 +111,6 @@ public class DelCommand extends CommandAreaShop {
 					plugin.message(sender, "destroy-noPermissionBuy", region);
 				}
 			}
-			Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(region));
 		}
 	}
 	

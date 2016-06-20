@@ -67,4 +67,14 @@ public class DebugFeature extends Feature implements Listener {
 	public void regionUpdate(RegionUpdateEvent event) {
 		//AreaShop.debug("RegionUpdateEvent: " + event.getRegion().getName() + " updated");
 	}
+
+	@EventHandler
+	public void addedRegion(AddedRegionEvent event) {
+		AreaShop.debug("AddedRegionEvent: "+event.getRegion().getName());
+	}
+
+	@EventHandler
+	public void removedRegion(RemovedRegionEvent event) {
+		AreaShop.debug("RemovedRegionEvent: "+event.getRegion().getName());
+	}
 }

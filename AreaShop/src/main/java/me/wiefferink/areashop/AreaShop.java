@@ -332,9 +332,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public void setupFeatures() {
 		Set<Feature> features = new HashSet<>();
 
-		features.add(new DebugFeature(this));
-		features.add(new SignDisplayFeature(this));
-		features.add(new WorldGuardRegionFlagsFeature(this));
+		features.add(new DebugFeature());
+		features.add(new SignDisplayFeature());
+		features.add(new WorldGuardRegionFlagsFeature());
 
 		// Register as listener when necessary
 		for(Feature feature : features) {

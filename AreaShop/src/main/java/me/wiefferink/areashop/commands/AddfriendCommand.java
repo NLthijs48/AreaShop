@@ -81,7 +81,7 @@ public class AddfriendCommand extends CommandAreaShop {
 				plugin.message(sender, "addfriend-notVisited", args[1], region);
 				return;
 			}
-			if(region.getFriends().contains(friend.getUniqueId())) {
+			if(region.getFriendsFeature().getFriends().contains(friend.getUniqueId())) {
 				plugin.message(sender, "addfriend-alreadyAdded", friend.getName(), region);
 				return;
 			}
@@ -89,7 +89,7 @@ public class AddfriendCommand extends CommandAreaShop {
 				plugin.message(sender, "addfriend-self", friend.getName(), region);
 				return;
 			}
-			if(region.addFriend(friend.getUniqueId(), sender)) {
+			if(region.getFriendsFeature().addFriend(friend.getUniqueId(), sender)) {
 				region.update();
 				plugin.message(sender, "addfriend-successOther", friend.getName(), region);
 			}
@@ -101,7 +101,7 @@ public class AddfriendCommand extends CommandAreaShop {
 						plugin.message(sender, "addfriend-notVisited", args[1], region);
 						return;
 					}
-					if(region.getFriends().contains(friend.getUniqueId())) {
+					if(region.getFriendsFeature().getFriends().contains(friend.getUniqueId())) {
 						plugin.message(sender, "addfriend-alreadyAdded", friend.getName(), region);
 						return;
 					}
@@ -110,7 +110,7 @@ public class AddfriendCommand extends CommandAreaShop {
 						return;
 					}
 
-					if(region.addFriend(friend.getUniqueId(), sender)) {
+					if(region.getFriendsFeature().addFriend(friend.getUniqueId(), sender)) {
 						region.update();
 						plugin.message(sender, "addfriend-success", friend.getName(), region);
 					}

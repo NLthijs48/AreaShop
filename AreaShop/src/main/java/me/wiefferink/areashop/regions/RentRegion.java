@@ -666,7 +666,7 @@ public class RentRegion extends GeneralRegion {
 		message(executor, "unrent-unrented");
 
 		// Remove friends, the owner and renteduntil values
-		clearFriends();
+		getFriendsFeature().clearFriends();
 		UUID oldRenter = getRenter();
 		setRenter(null);
 		setRentedUntil(null);

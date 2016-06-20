@@ -73,7 +73,7 @@ public class MeCommand extends CommandAreaShop {
 		// Get the regions the player is added as friend
 		Set<GeneralRegion> friendRegions = new HashSet<>();
 		for(GeneralRegion region : plugin.getFileManager().getRegions()) {
-			if(region.getFriends() != null && region.getFriends().contains(player.getUniqueId())) {
+			if(region.getFriendsFeature().getFriends() != null && region.getFriendsFeature().getFriends().contains(player.getUniqueId())) {
 				friendRegions.add(region);
 			}
 		}

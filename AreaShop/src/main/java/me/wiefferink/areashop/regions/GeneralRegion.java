@@ -6,9 +6,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.NotifyAreaShopEvent;
-import me.wiefferink.areashop.events.askandnotify.AddFriendEvent;
-import me.wiefferink.areashop.events.askandnotify.DeleteFriendEvent;
 import me.wiefferink.areashop.events.notify.RegionUpdateEvent;
+import me.wiefferink.areashop.features.FriendsFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.messages.Message;
@@ -38,6 +37,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	
 	private HashMap<String, Object> replacementsCache = null;
 	private long replacementsCacheTime = 0;
+
+	// Features
+	private FriendsFeature friendsFeature;
 
 	// Enum for region types
 	public enum RegionType {		
@@ -130,6 +132,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	GeneralRegion(AreaShop plugin, YamlConfiguration config) {
 		this.plugin = plugin;
 		this.config = config;
+		setupFeatures();
 	}
 
 	GeneralRegion(AreaShop plugin, String name, World world) {
@@ -139,6 +142,20 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		setSetting("general.name", name);
 		setSetting("general.world", world.getName());
 		setSetting("general.type", getType().getValue().toLowerCase());
+		setupFeatures();
+	}
+
+	// Create instance of the features
+	public void setupFeatures() {
+		friendsFeature = new FriendsFeature(this);
+	}
+
+	/**
+	 * Get the friends feature to query and manipulate friends of this region
+	 * @return The FriendsFeature of this region
+	 */
+	public FriendsFeature getFriendsFeature() {
+		return friendsFeature;
 	}
 		
 	// ABSTRACT
@@ -514,8 +531,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		result.put(AreaShop.tagWidth, getWidth());
 		result.put(AreaShop.tagDepth, getDepth());
 		result.put(AreaShop.tagHeight, getHeight());
-		result.put(AreaShop.tagFriends, Utils.createCommaSeparatedList(getFriendNames()));
-		result.put(AreaShop.tagFriendsUUID, Utils.createCommaSeparatedList(getFriends()));
+		result.put(AreaShop.tagFriends, Utils.createCommaSeparatedList(getFriendsFeature().getFriendNames()));
+		result.put(AreaShop.tagFriendsUUID, Utils.createCommaSeparatedList(getFriendsFeature().getFriends()));
 		result.put(AreaShop.tagLandlord, getLandlordName());
 		result.put(AreaShop.tagLandlordUUID, getLandlord());
 		// Date/time stuff
@@ -614,94 +631,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public boolean restrictedToWorld() {
 		return getBooleanSetting("general.restrictedToWorld") || restrictedToRegion();
-	}
-
-
-	/**
-	 * Add a friend to the region
-	 * @param player The UUID of the player to add
-	 * @param by The CommandSender that is adding the friend, or null
-	 * @return true if the friend has been added, false if adding a friend was cancelled by another plugin
-	 */
-	public boolean addFriend(UUID player, CommandSender by) {
-		// Fire and check event
-		AddFriendEvent event = new AddFriendEvent(this, Bukkit.getOfflinePlayer(player), by);
-		Bukkit.getPluginManager().callEvent(event);
-		if(event.isCancelled()) {
-			plugin.message(by, "general-cancelled", event.getReason(), this);
-			return false;
-		}
-
-		Set<String> friends = new HashSet<>(config.getStringList("general.friends"));
-		friends.add(player.toString());
-		List<String> list = new ArrayList<>(friends);
-		setSetting("general.friends", list);
-		return true;
-	}
-
-	/**
-	 * Delete a friend from the region
-	 * @param player The UUID of the player to delete
-	 * @param by The CommandSender that is adding the friend, or null
-	 * @return true if the friend has been added, false if adding a friend was cancelled by another plugin
-	 */
-	public boolean deleteFriend(UUID player, CommandSender by) {
-		// Fire and check event
-		DeleteFriendEvent event = new DeleteFriendEvent(this, Bukkit.getOfflinePlayer(player), by);
-		Bukkit.getPluginManager().callEvent(event);
-		if(event.isCancelled()) {
-			plugin.message(by, "general-cancelled", event.getReason(), this);
-			return false;
-		}
-
-		Set<String> friends = new HashSet<>(config.getStringList("general.friends"));
-		friends.remove(player.toString());
-		List<String> list = new ArrayList<>(friends);
-		if(list.isEmpty()) {
-			setSetting("general.friends", null);
-		} else {
-			setSetting("general.friends", list);
-		}
-		return true;
-	}
-	
-	/**
-	 * Get the list of friends added to this region
-	 * @return Friends added to this region
-	 */
-	public Set<UUID> getFriends() {
-		HashSet<UUID> result = new HashSet<>();
-		for(String friend : config.getStringList("general.friends")) {
-			try {
-				UUID id = UUID.fromString(friend);
-				result.add(id);
-			} catch(IllegalArgumentException e) {
-				// Don't add it
-			}
-		}
-		return result;
-	}
-	
-	/**
-	 * Get the list of friends added to this region
-	 * @return Friends added to this region
-	 */
-	public Set<String> getFriendNames() {
-		HashSet<String> result = new HashSet<>();
-		for(UUID friend : getFriends()) {
-			OfflinePlayer player = Bukkit.getOfflinePlayer(friend);
-			if(player != null) {
-				result.add(player.getName());
-			}
-		}
-		return result;
-	}
-	
-	/**
-	 * Remove all friends that are added to this region
-	 */
-	public void clearFriends() {
-		setSetting("general.friends", null);
 	}
 	
 	/**
@@ -983,7 +912,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public boolean teleportPlayer(Player player, boolean toSign, boolean checkPermissions) {
 		int checked = 1;
 		boolean owner;
-		boolean friend = getFriends().contains(player.getUniqueId());
+		boolean friend = getFriendsFeature().getFriends().contains(player.getUniqueId());
 		Location startLocation = null;
 		ProtectedRegion region = getRegion();
 		if(getWorld() == null) {

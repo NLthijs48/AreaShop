@@ -318,7 +318,7 @@ public class BuyRegion extends GeneralRegion {
 							return false;
 						}
 
-						clearFriends();
+						getFriendsFeature().clearFriends();
 						double resellPrice = getResellPrice();
 						// Transfer the money to the previous owner
 						EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getWorldName(), getResellPrice());
@@ -512,7 +512,7 @@ public class BuyRegion extends GeneralRegion {
 		message(executor, "sell-sold");
 
 		// Remove friends and the owner
-		clearFriends();
+		getFriendsFeature().clearFriends();
 		UUID oldBuyer = getBuyer();
 		setBuyer(null);
 		removeLastActiveTime();

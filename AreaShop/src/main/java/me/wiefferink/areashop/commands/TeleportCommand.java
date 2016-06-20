@@ -40,7 +40,7 @@ public class TeleportCommand extends CommandAreaShop {
 		Player player = (Player)person;
 		return player.hasPermission("areashop.teleportall")
 				|| region.isOwner(player) && player.hasPermission("areashop.teleport")
-				|| region.getFriends().contains(player.getUniqueId()) && player.hasPermission("areashop.teleportfriend");
+				|| region.getFriendsFeature().getFriends().contains(player.getUniqueId()) && player.hasPermission("areashop.teleportfriend");
 	}
 
 	@Override

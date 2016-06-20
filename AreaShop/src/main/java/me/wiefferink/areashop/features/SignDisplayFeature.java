@@ -17,9 +17,6 @@ import java.util.Set;
 
 public class SignDisplayFeature extends Feature implements Listener {
 
-	public SignDisplayFeature(AreaShop plugin) {
-		super(plugin);
-	}
 
 	@EventHandler
 	public void regionUpdate(RegionUpdateEvent event) {

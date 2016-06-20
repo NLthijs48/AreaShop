@@ -17,9 +17,6 @@ import java.util.Set;
 
 public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 
-	public WorldGuardRegionFlagsFeature(AreaShop plugin) {
-		super(plugin);
-	}
 
 	@EventHandler
 	public void regionUpdate(RegionUpdateEvent event) {

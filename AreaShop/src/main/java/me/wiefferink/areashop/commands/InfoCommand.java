@@ -172,12 +172,12 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionMoneyBackRent", rent);
 							}
 							// Friends
-							if(!rent.getFriendNames().isEmpty()) {
+							if(!rent.getFriendsFeature().getFriendNames().isEmpty()) {
 								String messagePart = "info-friend";
 								if(DelfriendCommand.canUse(sender, rent)) {
 									messagePart = "info-friendRemove";
 								}
-								plugin.messageNoPrefix(sender, "info-regionFriends", rent, Utils.combinedMessage(rent.getFriendNames(), messagePart));
+								plugin.messageNoPrefix(sender, "info-regionFriends", rent, Utils.combinedMessage(rent.getFriendsFeature().getFriendNames(), messagePart));
 							}
 						} else {
 							plugin.messageNoPrefix(sender, "info-regionCanBeRented", rent);
@@ -264,12 +264,12 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionMoneyBackBuy", buy);
 							}
 							// Friends
-							if(!buy.getFriendNames().isEmpty()) {
+							if(!buy.getFriendsFeature().getFriendNames().isEmpty()) {
 								String messagePart = "info-friend";
 								if(DelfriendCommand.canUse(sender, buy)) {
 									messagePart = "info-friendRemove";
 								}
-								plugin.messageNoPrefix(sender, "info-regionFriends", buy, Utils.combinedMessage(buy.getFriendNames(), messagePart));
+								plugin.messageNoPrefix(sender, "info-regionFriends", buy, Utils.combinedMessage(buy.getFriendsFeature().getFriendNames(), messagePart));
 							}
 						} else {
 							plugin.messageNoPrefix(sender, "info-regionCanBeBought", buy);

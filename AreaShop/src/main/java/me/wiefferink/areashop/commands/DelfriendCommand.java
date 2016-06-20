@@ -92,11 +92,11 @@ public class DelfriendCommand extends CommandAreaShop {
 				return;
 			}		
 			OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
-			if(!region.getFriends().contains(friend.getUniqueId())) {
+			if(!region.getFriendsFeature().getFriends().contains(friend.getUniqueId())) {
 				plugin.message(sender, "delfriend-notAdded", friend.getName(), region);
 				return;
 			}
-			if(region.deleteFriend(friend.getUniqueId(), sender)) {
+			if(region.getFriendsFeature().deleteFriend(friend.getUniqueId(), sender)) {
 				region.update();
 				plugin.message(sender, "delfriend-successOther", friend.getName(), region);
 			}
@@ -104,11 +104,11 @@ public class DelfriendCommand extends CommandAreaShop {
 			if(sender.hasPermission("areashop.delfriend") && sender instanceof Player) {
 				if(region.isOwner((Player)sender)) {
 					OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
-					if(!region.getFriends().contains(friend.getUniqueId())) {
+					if(!region.getFriendsFeature().getFriends().contains(friend.getUniqueId())) {
 						plugin.message(sender, "delfriend-notAdded", friend.getName(), region);
 						return;
 					}
-					if(region.deleteFriend(friend.getUniqueId(), sender)) {
+					if(region.getFriendsFeature().deleteFriend(friend.getUniqueId(), sender)) {
 						region.update();
 						plugin.message(sender, "delfriend-success", friend.getName(), region);
 					}

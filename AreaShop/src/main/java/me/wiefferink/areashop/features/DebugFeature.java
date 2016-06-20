@@ -11,10 +11,6 @@ import org.bukkit.event.Listener;
 
 public class DebugFeature extends Feature implements Listener {
 
-	public DebugFeature(AreaShop plugin) {
-		super(plugin);
-	}
-
 	@EventHandler
 	public void buyingRegion(BuyingRegionEvent event) {
 		AreaShop.debug("BuyingRegionEvent: " + event.getPlayer().getName() + " is trying to buy " + event.getRegion().getName());

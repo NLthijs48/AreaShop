@@ -6,6 +6,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.NotifyAreaShopEvent;
+import me.wiefferink.areashop.events.askandnotify.AddFriendEvent;
+import me.wiefferink.areashop.events.askandnotify.DeleteFriendEvent;
 import me.wiefferink.areashop.events.notify.RegionUpdateEvent;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.managers.FileManager;
@@ -612,24 +614,46 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public boolean restrictedToWorld() {
 		return getBooleanSetting("general.restrictedToWorld") || restrictedToRegion();
-	}	
-	
+	}
+
+
 	/**
 	 * Add a friend to the region
 	 * @param player The UUID of the player to add
+	 * @param by The CommandSender that is adding the friend, or null
+	 * @return true if the friend has been added, false if adding a friend was cancelled by another plugin
 	 */
-	public void addFriend(UUID player) {
+	public boolean addFriend(UUID player, CommandSender by) {
+		// Fire and check event
+		AddFriendEvent event = new AddFriendEvent(this, Bukkit.getOfflinePlayer(player), by);
+		Bukkit.getPluginManager().callEvent(event);
+		if(event.isCancelled()) {
+			plugin.message(by, "general-cancelled", event.getReason(), this);
+			return false;
+		}
+
 		Set<String> friends = new HashSet<>(config.getStringList("general.friends"));
 		friends.add(player.toString());
 		List<String> list = new ArrayList<>(friends);
 		setSetting("general.friends", list);
+		return true;
 	}
-	
+
 	/**
 	 * Delete a friend from the region
 	 * @param player The UUID of the player to delete
+	 * @param by The CommandSender that is adding the friend, or null
+	 * @return true if the friend has been added, false if adding a friend was cancelled by another plugin
 	 */
-	public void deleteFriend(UUID player) {
+	public boolean deleteFriend(UUID player, CommandSender by) {
+		// Fire and check event
+		DeleteFriendEvent event = new DeleteFriendEvent(this, Bukkit.getOfflinePlayer(player), by);
+		Bukkit.getPluginManager().callEvent(event);
+		if(event.isCancelled()) {
+			plugin.message(by, "general-cancelled", event.getReason(), this);
+			return false;
+		}
+
 		Set<String> friends = new HashSet<>(config.getStringList("general.friends"));
 		friends.remove(player.toString());
 		List<String> list = new ArrayList<>(friends);
@@ -638,6 +662,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		} else {
 			setSetting("general.friends", list);
 		}
+		return true;
 	}
 	
 	/**

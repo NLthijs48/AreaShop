@@ -148,7 +148,7 @@ public final class SignChangeListener implements Listener {
 					rent.setDuration(thirdLine);
 				}
 				Sign sign = (Sign)event.getBlock().getState().getData();
-				rent.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				rent.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
 
 				// Run commands
 				rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
@@ -256,7 +256,7 @@ public final class SignChangeListener implements Listener {
 					buy.setPrice(price);
 				}
 				Sign sign = (Sign)event.getBlock().getState().getData();
-				buy.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
 				// Run commands
 				buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
 				
@@ -307,10 +307,10 @@ public final class SignChangeListener implements Listener {
 			}
 			Sign sign = (Sign)event.getBlock().getState().getData();
 			if(thirdLine == null || thirdLine.length() == 0) {
-				region.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
 				plugin.message(player, "addsign-success", region);
 			} else {
-				region.addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
+				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
 				plugin.message(player, "addsign-successProfile", thirdLine, region);
 			}
 

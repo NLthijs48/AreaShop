@@ -8,6 +8,7 @@ import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.NotifyAreaShopEvent;
 import me.wiefferink.areashop.events.notify.RegionUpdateEvent;
 import me.wiefferink.areashop.features.FriendsFeature;
+import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.messages.Message;
@@ -40,6 +41,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 
 	// Features
 	private FriendsFeature friendsFeature;
+	private SignsFeature signsFeature;
 
 	// Enum for region types
 	public enum RegionType {		
@@ -148,6 +150,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	// Create instance of the features
 	public void setupFeatures() {
 		friendsFeature = new FriendsFeature(this);
+		signsFeature = new SignsFeature(this);
 	}
 
 	/**
@@ -156,6 +159,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public FriendsFeature getFriendsFeature() {
 		return friendsFeature;
+	}
+
+	/**
+	 * Get the signs feature to manipulate and update signs
+	 * @return The SignsFeature of this region
+	 */
+	public SignsFeature getSignsFeature() {
+		return signsFeature;
 	}
 		
 	// ABSTRACT
@@ -225,21 +236,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public abstract RegionState getState();
 	
 	// GETTERS
-	/**
-	 * Get a list with all sign locations
-	 * @return A List with all sign locations
-	 */
-	public List<Location> getSignLocations() {
-		List<Location> result = new ArrayList<>();
-		if(config.getConfigurationSection("general.signs") == null) {
-			return result;
-		}
-		for(String signName : config.getConfigurationSection("general.signs").getKeys(false)) {
-			result.add(Utils.configToLocation(config.getConfigurationSection("general.signs." + signName + ".location")));
-		}
-		return result;
-	}
-	
 	/**
 	 * Get the teleportlocation set for this region
 	 * @return The teleport location, or null if not set
@@ -638,87 +634,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return true if the region has been unrented/sold, otherwise false
 	 */
 	public abstract boolean checkInactive();
-	
-	/**
-	 * Add a sign to this region
-	 * @param location The location of the sign
-	 * @param signType The type of the sign (WALL_SIGN or SIGN_POST)
-	 * @param facing The orientation of the sign
-	 * @param profile The profile to use with this sign (null for default)
-	 */
-	public void addSign(Location location, Material signType, BlockFace facing, String profile) {
-		int i = 0;
-		while(config.isSet("general.signs." + i)) {
-			i++;
-		}
-		String signPath = "general.signs." + i + ".";
-		setSetting(signPath + "location", Utils.locationToConfig(location));
-		setSetting(signPath + "facing", facing.name());
-		setSetting(signPath + "signType", signType.name());
-		if(profile != null && profile.length() != 0) {
-			setSetting(signPath + "profile", profile);
-		}
-	}
-	
-	/**
-	 * Get the name of the sign at the specified location
-	 * @param location The location to check
-	 * @return The name of the sign if found, otherwise null
-	 */
-	public String getSignName(Location location) {
-		String result = null;
-		if(config.getConfigurationSection("general.signs") == null) {
-			return null;
-		}
-		for(String signName : config.getConfigurationSection("general.signs").getKeys(false)) {
-			if(location.equals(Utils.configToLocation(config.getConfigurationSection("general.signs." + signName + ".location")))) {
-				result = signName;
-			}
-		}
-		return result;
-	}
-	
-	/**
-	 * Remove a sign
-	 * @param name Name of the sign to be removed
-	 */
-	public void removeSign(String name) {
-		setSetting("general.signs." + name, null);
-	}
-	public void removeSign(Location location) {
-		if(location == null) {
-			return;
-		}
-		String name = getSignName(location);
-		location.getBlock().setType(Material.AIR);
-		if(name != null) {
-			removeSign(name);
-		}
-	}
-	
-	/**
-	 * Checks if there is a sign from this region at the specified location
-	 * @param location Location to check
-	 * @return true if this region has a sign at the location, otherwise false
-	 */
-	public boolean isSignOfRegion(Location location) {
-		Set<String> signs;
-		if(config.getConfigurationSection("general.signs") == null) {
-			return false;
-		}
-		signs = config.getConfigurationSection("general.signs").getKeys(false);
-		for(String sign : signs) {
-			Location signLocation = Utils.configToLocation(config.getConfigurationSection("general.signs." + sign + ".location"));
-			if(signLocation != null
-					&& signLocation.getWorld().equals(location.getWorld())
-					&& signLocation.getBlockX() == location.getBlockX()
-					&& signLocation.getBlockY() == location.getBlockY()
-					&& signLocation.getBlockZ() == location.getBlockZ()) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * Method to send a message to a CommandSender, using chatprefix if it is a player
@@ -747,32 +662,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Check if a sign needs periodic updating
 	 * @return true if the signs of this region need periodic updating, otherwise false
 	 */
-	public boolean needsPeriodicUpdating() {
-		if(isDeleted() || !isRentRegion()) {
-			return false;
-		}
-		Set<String> signs = new HashSet<>();
-		if(config.getConfigurationSection("general.signs") != null) {
-			signs = config.getConfigurationSection("general.signs").getKeys(false);
-		}
-		for(String sign : signs) {
-			// Get the profile set in the config
-			String profile = config.getString("general.signs." + sign + ".profile");
-			if(profile == null || profile.length() == 0) {
-				profile = getStringSetting("general.signProfile");
-			}			
-			// Get the prefix
-			String prefix = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + ".line";
-			String line;
-			// Get the lines
-			for(int i=1; i<5; i++) {
-				line = plugin.getConfig().getString(prefix + i);
-				if(line != null && line.length() != 0 && line.contains(AreaShop.tagTimeLeft)) {
-					return true;
-				}
-			}	
-		}
-		return false;
+	public boolean needsPeriodicUpdate() {
+		return !(isDeleted() || !isRentRegion()) && getSignsFeature().needsPeriodicUpdate();
 	}
 	
 	/**
@@ -958,8 +849,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				return false;
 			}
 		}
-	
-		List<Location> signs = getSignLocations();
+
+		List<Location> signs = getSignsFeature().getSignLocations();
 		boolean signAvailable = !signs.isEmpty();
 		if(toSign) {
 			if(signAvailable) {
@@ -1740,41 +1631,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return;
 		}		
 		runCommands(Bukkit.getConsoleSender(), commands);
-	}
-	
-	/**
-	 * Run commands when a player clicks a sign
-	 * @param signName The name of the sign
-	 * @param clicker The player that clicked the sign
-	 * @param clickType The type of clicking
-	 * @return true if the commands ran successfully, false if any of them failed
-	 */
-	public boolean runSignCommands(String signName, Player clicker, ClickType clickType) {
-		// Get the profile set in the config
-		String profile = config.getString("general.signs." + signName + ".profile");
-		if(profile == null || profile.length() == 0) {
-			profile = getStringSetting("general.signProfile");
-		}
-
-		// Get paths (state may change after running them)
-		String playerPath = "signProfiles." + profile + "." + getState().getValue().toLowerCase() + "." + clickType.getValue() + "Player";
-		String consolePath = "signProfiles."+profile+"."+getState().getValue().toLowerCase()+"."+clickType.getValue()+"Console";
-
-		// Run player commands if specified
-		List<String> playerCommands = new ArrayList<>();
-		for(String command : plugin.getConfig().getStringList(playerPath)) {
-			playerCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));
-		}
-		runCommands(clicker, playerCommands);
-
-		// Run console commands if specified
-		List<String> consoleCommands = new ArrayList<>();
-		for(String command : plugin.getConfig().getStringList(consolePath)) {
-			consoleCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));
-		}
-		runCommands(Bukkit.getConsoleSender(), consoleCommands);		
-		
-		return !playerCommands.isEmpty() || !consoleCommands.isEmpty();
 	}
 }
 

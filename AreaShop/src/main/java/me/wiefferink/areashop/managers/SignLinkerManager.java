@@ -2,6 +2,7 @@ package me.wiefferink.areashop.managers;
 
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
+import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -113,9 +114,9 @@ public class SignLinkerManager implements Listener {
 					return;
 				}
 
-				GeneralRegion signRegion = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
-				if(signRegion != null) {
-					plugin.message(player, "linksigns-alreadyRegistered", signRegion);
+				SignsFeature.RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
+				if(regionSign != null) {
+					plugin.message(player, "linksigns-alreadyRegistered", regionSign.getRegion());
 					return;
 				}
 				Sign sign = (Sign)block.getState().getData();
@@ -176,7 +177,7 @@ public class SignLinkerManager implements Listener {
 
 		public void finish() {
 			if(isComplete()) {
-				region.addSign(location, type, facing, profile);
+				region.getSignsFeature().addSign(location, type, facing, profile);
 				if(profile == null) {
 					plugin.message(linker, "addsign-success", region);
 				} else {

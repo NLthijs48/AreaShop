@@ -309,7 +309,7 @@ public class FileManager {
 
 			// Delete the signs and the variable
 			if(rent.getWorld() != null) {
-				for(Location sign : rent.getSignLocations()) {
+				for(Location sign : rent.getSignsFeature().getSignLocations()) {
 					sign.getBlock().setType(Material.AIR);
 					AreaShop.debug("Removed sign at: " + sign.toString());
 				}
@@ -344,20 +344,6 @@ public class FileManager {
 	}
 	
 	/**
-	 * Get a region by providing a location of the sign
-	 * @param location The locatin of the sign
-	 * @return The generalRegion that has a sign at this location
- 	 */
-	public GeneralRegion getRegionBySignLocation(Location location) {
-		for(GeneralRegion region : getRegions()) {
-			if(region.isSignOfRegion(location)) {
-				return region;
-			}
-		}
-		return null;
-	}
-	
-	/**
 	 * Remove a buy from the list
 	 * @param buy The BuyRegion to remove
 	 * @param giveMoneyBack true if money should be given back to the player, otherwise false
@@ -376,7 +362,7 @@ public class FileManager {
 			
 			// Delete the sign and the variable
 			if(buy.getWorld() != null) {
-				for(Location sign : buy.getSignLocations()) {
+				for(Location sign : buy.getSignsFeature().getSignLocations()) {
 					sign.getBlock().setType(Material.AIR);
 				}
 			}
@@ -435,7 +421,7 @@ public class FileManager {
 			public void run() {
 				for(int i=0; i<plugin.getConfig().getInt("signs.regionsPerTick"); i++) {
 					if(current < regions.size()) {
-						if(regions.get(current).needsPeriodicUpdating()) {
+						if(regions.get(current).needsPeriodicUpdate()) {
 							regions.get(current).update();
 						}
 						current++;

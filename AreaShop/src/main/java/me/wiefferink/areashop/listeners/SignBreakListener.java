@@ -1,7 +1,7 @@
 package me.wiefferink.areashop.listeners;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.regions.GeneralRegion;
+import me.wiefferink.areashop.features.SignsFeature;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -40,17 +40,17 @@ public final class SignBreakListener implements Listener {
 		// Check if it is a sign
 		if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
 			// Check if the rent sign is really the same as a saved rent
-			GeneralRegion region = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
-			if(region == null) {
+			SignsFeature.RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
+			if(regionSign == null) {
 				return;
 			}
 			// Remove the sign of the rental region if the player has permission
 			if(event.getPlayer().hasPermission("areashop.delsign")) {
-				region.removeSign(block.getLocation());
-				plugin.message(event.getPlayer(), "delsign-success", region);
+				regionSign.remove();
+				plugin.message(event.getPlayer(), "delsign-success", regionSign.getRegion());
 			} else { // Cancel the breaking of the sign
 				event.setCancelled(true);
-				plugin.message(event.getPlayer(), "delsign-noPermission", region);
+				plugin.message(event.getPlayer(), "delsign-noPermission", regionSign.getRegion());
 			}
 		}
 	}
@@ -70,11 +70,10 @@ public final class SignBreakListener implements Listener {
             Block attachedTo = block.getRelative(((org.bukkit.material.Sign)sign.getData()).getAttachedFace());
             if(attachedTo.getType() == Material.AIR){
 				// Check if the rent sign is really the same as a saved rent
-				final GeneralRegion region = plugin.getFileManager().getRegionBySignLocation(block.getLocation());
-				if(region == null) {
-					return;
+				SignsFeature.RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
+				if(regionSign != null) {
+					event.setCancelled(true); // Cancel the sign breaking, will create a floating sign but at least it is not disconnected/gone
 				}
-				event.setCancelled(true); // Cancel the sign breaking, will create a floating sign but at least it is not disconnected/gone
             }
         }
     }

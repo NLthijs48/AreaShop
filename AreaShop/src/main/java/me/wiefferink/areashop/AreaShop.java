@@ -4,7 +4,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.wiefferink.areashop.features.DebugFeature;
 import me.wiefferink.areashop.features.Feature;
-import me.wiefferink.areashop.features.SignDisplayFeature;
+import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.features.WorldGuardRegionFlagsFeature;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
@@ -333,7 +333,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		Set<Feature> features = new HashSet<>();
 
 		features.add(new DebugFeature());
-		features.add(new SignDisplayFeature());
+		features.add(new SignsFeature());
 		features.add(new WorldGuardRegionFlagsFeature());
 
 		// Register as listener when necessary

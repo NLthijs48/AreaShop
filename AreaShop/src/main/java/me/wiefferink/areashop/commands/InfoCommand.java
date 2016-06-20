@@ -221,7 +221,7 @@ public class InfoCommand extends CommandAreaShop {
 						}
 						// Signs
 						List<String> signLocations = new ArrayList<>();
-						for(Location location : rent.getSignLocations()) {
+						for(Location location : rent.getSignsFeature().getSignLocations()) {
 							signLocations.add(Message.fromKey("info-regionSignLocation").replacements(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()).getPlain());
 						}
 						if(!signLocations.isEmpty()) {
@@ -300,7 +300,7 @@ public class InfoCommand extends CommandAreaShop {
 						}
 						// Signs
 						List<String> signLocations = new ArrayList<>();
-						for(Location location : buy.getSignLocations()) {
+						for(Location location : buy.getSignsFeature().getSignLocations()) {
 							signLocations.add(Message.fromKey("info-regionSignLocation").replacements(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()).getPlain());
 						}
 						if(!signLocations.isEmpty()) {

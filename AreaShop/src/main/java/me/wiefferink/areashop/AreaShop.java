@@ -39,6 +39,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Main class for the AreaShop plugin
@@ -145,6 +147,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		
 		// Check if WorldGuard is present
 		String wgVersion = null;
+		String rawVersion = null;
+		int major = 0, minor = 0, fixes = 0;
+		Integer build = null;
 		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
 	    if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
 			getLogger().severe("WorldGuard plugin is not present or has not loaded correctly");
@@ -152,8 +157,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	    } else {
 		    worldGuard = (WorldGuardPlugin)plugin;
 		    // Get correct WorldGuardInterface (handles things that changed version to version)
-			String rawVersion = worldGuard.getDescription().getVersion();
-			Integer build = null;
+			rawVersion = worldGuard.getDescription().getVersion();
 			if(rawVersion.contains("-SNAPSHOT;")) {
 				String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;")+10, rawVersion.length());
 				if(rawVersion.contains("-")) {
@@ -165,8 +169,33 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					getLogger().warning("Could not correctly parse the build of WorldGuard, raw version: "+rawVersion+", buildNumber: "+buildNumber);
 				}
 			}
-			// Detect correct WorldGuard implementation to use
-			if(build != null && build >= 1672) {
+			// Clear stuff from the version string that is not a number
+			String[] versionParts = rawVersion.split("\\.");
+			for(int i = 0; i < versionParts.length; i++) {
+				Pattern pattern = Pattern.compile("^\\d+");
+				Matcher matcher = pattern.matcher(versionParts[i]);
+				if(matcher.find()) {
+					versionParts[i] = matcher.group();
+				}
+			}
+			// Find major, minor and fix numbers
+			try {
+				if(versionParts.length > 0) {
+					major = Integer.parseInt(versionParts[0]);
+				}
+				if(versionParts.length > 1) {
+					minor = Integer.parseInt(versionParts[1]);
+				}
+				if(versionParts.length > 2) {
+					fixes = Integer.parseInt(versionParts[2]);
+				}
+			} catch(NumberFormatException e) {
+				getLogger().warning("Something went wrong while parsing WorldGuard version number: "+rawVersion);
+			}
+			// Determine correct implementation to use
+			if(major >= 6 && minor >= 1 && fixes > 3) {
+				wgVersion = "6_1_3";
+			} else if(build != null && build >= 1672) {
 				if(build > 1672) {
 					wgVersion = "6_1_3"; // Flag name to flag object method changed
 				} else {
@@ -179,7 +208,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	        } else {
 				wgVersion = "6"; // Schematic methods changed
 			}
-	        try {
+			// Load chosen implementation
+			try {
 				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldGuardHandler"+wgVersion);
 				// Check if we have a NMSHandler class at that location.
 				if (WorldGuardInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldGuardInterface
@@ -233,8 +263,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	    
 	    // Print loaded version of WG and WE in debug
 	    if(wgVersion != null) {
-	    	AreaShop.debug("Loaded WorldGuardHandler" + wgVersion);
-	    }
+			AreaShop.debug("Loaded WorldGuardHandler"+wgVersion+" (raw version: "+rawVersion+", major:"+major+", minor:"+minor+", fixes:"+fixes+", build:"+build+")");
+		}
 	    if(weVersion != null) {
 	    	AreaShop.debug("Loaded WorldEditHandler" + weVersion);
 	    }

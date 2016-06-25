@@ -106,9 +106,9 @@
             <artifactId>maven-antrun-plugin</artifactId>
             <version>1.8</version>
             <configuration>
-              <tasks>
+              <target>
                 <copy file="./target/${project.build.finalName}.jar" tofile="${copyResult}\${project.build.finalName}.jar"/>
-              </tasks>
+              </target>
             </configuration>
             <executions>
               <execution>

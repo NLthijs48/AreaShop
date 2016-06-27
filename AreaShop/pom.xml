@@ -177,6 +177,11 @@
             <configuration>
               <excludePackageNames>me.wiefferink.areashop.lib</excludePackageNames>
               <destDir>${javadoc}</destDir>
+              <links>
+                <link>https://hub.spigotmc.org/javadocs/bukkit/</link>
+                <link>http://docs.sk89q.com/worldedit/apidocs/</link>
+                <link>http://docs.sk89q.com/worldguard/apidocs/</link>
+              </links>
             </configuration>
           </plugin>
         </plugins>

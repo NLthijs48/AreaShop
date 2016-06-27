@@ -344,8 +344,13 @@ public class Utils {
 		}
 		return result;
 	}
-	
-	// Methods to get the most important AreaShop regions at a certain location
+
+	/**
+	 * Get the most important rental AreaShop regions
+	 * - Returns highest priority, child instead of parent regions
+	 * @param location The location to check for regions
+	 * @return empty list if no regions found, 1 member if 1 region is a priority, more if regions with the same priority
+	 */
 	public static List<RentRegion> getApplicableRentRegions(Location location) {
 		List<RentRegion> result = new ArrayList<>();
 		for(GeneralRegion region : getApplicableASRegions(location, GeneralRegion.RegionType.RENT)) {
@@ -353,6 +358,13 @@ public class Utils {
 		}
 		return result;
 	}
+
+	/**
+	 * Get the most important buy AreaShop regions
+	 * - Returns highest priority, child instead of parent regions
+	 * @param location The location to check for regions
+	 * @return empty list if no regions found, 1 member if 1 region is a priority, more if regions with the same priority
+	 */
 	public static List<BuyRegion> getApplicableBuyRegions(Location location) {
 		List<BuyRegion> result = new ArrayList<>();
 		for(GeneralRegion region : getApplicableASRegions(location, GeneralRegion.RegionType.BUY)) {
@@ -360,10 +372,24 @@ public class Utils {
 		}
 		return result;
 	}
+
+	/**
+	 * Get the most important AreaShop regions
+	 * - Returns highest priority, child instead of parent regions
+	 * @param location The location to check for regions
+	 * @return empty list if no regions found, 1 member if 1 region is a priority, more if regions with the same priority
+	 */
 	public static List<GeneralRegion> getAllApplicableRegions(Location location) {
 		return getApplicableASRegions(location, null);
 	}
 
+	/**
+	 * Get the most important AreaShop regions
+	 *  - Returns highest priority, child instead of parent regions
+	 * @param location The location to check for regions
+	 * @param type The type of regions to look for, null for all
+	 * @return empty list if no regions found, 1 member if 1 region is a priority, more if regions with the same priority
+	 */
 	public static List<GeneralRegion> getApplicableASRegions(Location location, GeneralRegion.RegionType type) {
 		List<GeneralRegion> result = new ArrayList<>();
 		Set<ProtectedRegion> regions = AreaShop.getInstance().getWorldGuardHandler().getApplicableRegionsSet(location);

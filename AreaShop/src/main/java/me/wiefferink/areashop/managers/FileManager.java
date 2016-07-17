@@ -838,10 +838,6 @@ public class FileManager {
 					InputStreamReader reader = new InputStreamReader(new FileInputStream(groupFile), Charsets.UTF_8)
 			) {
 				groupsConfig = YamlConfiguration.loadConfiguration(reader);
-				if(config.getKeys(false).size() == 0) {
-					plugin.getLogger().warning("File 'groups.yml' is empty, check for errors in the log.");
-					result = false;
-				}
 			} catch(IOException e) {
 				plugin.getLogger().warning("Could not load groups.yml file: " + groupFile.getAbsolutePath());
 			}

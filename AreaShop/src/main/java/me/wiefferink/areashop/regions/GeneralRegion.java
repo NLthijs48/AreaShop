@@ -1370,6 +1370,13 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		while(!groups.isEmpty()) {
 			String group = groups.get(0);
 			if(player.hasPermission("areashop.limits." + group) && this.matchesLimitGroup(group)) {
+				String pathPrefix = "limitGroups."+group+".";
+				if(!plugin.getConfig().isInt(pathPrefix+"total")) {
+					plugin.getLogger().warning("Limit group "+group+" in the config.yml file does not correctly specify the number of total regions (should be specified as total: <number>)");
+				}
+				if(!plugin.getConfig().isInt(pathPrefix+typePath)) {
+					plugin.getLogger().warning("Limit group "+group+" in the config.yml file does not correctly specify the number of "+typePath+" regions (should be specified as "+typePath+": <number>)");
+				}
 				int totalLimit = plugin.getConfig().getInt("limitGroups." + group + ".total");
 				int typeLimit = plugin.getConfig().getInt("limitGroups." + group + "."+typePath);
 				//AreaShop.debug("typeLimitOther="+typeLimit+", typePath="+typePath);

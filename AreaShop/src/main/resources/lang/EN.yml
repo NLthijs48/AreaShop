@@ -176,7 +176,7 @@ info-entryForrent: "[darkgreen][bold]►[reset] %lang:region%: For rent for %pri
 info-entryRented: "[darkgreen][bold]►[reset] %lang:region%: Rented to %lang:player%."
 info-entryForsale: "[darkgreen][bold]►[reset] %lang:region%: For sale for %price%."
 info-entrySold: "[darkgreen][bold]►[reset] %lang:region%: Sold to %lang:player%."
-info-entryReselling: "[darkgreen][bold]►[reset] %lang:region%: Sold to %lang:player%."
+info-entryReselling: "[darkgreen][bold]►[reset] %lang:region%: Sold to %lang:player% (reselling)."
 info-pageStatus:
   - "[gray]Page %0%/%1%"
 info-pagePrevious:

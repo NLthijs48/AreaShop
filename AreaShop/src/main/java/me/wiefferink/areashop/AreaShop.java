@@ -24,6 +24,7 @@ import me.wiefferink.areashop.messages.LanguageManager;
 import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import net.milkbowl.vault.economy.Economy;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -651,9 +652,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Sends an debug message to the console
 	 * @param message The message that should be printed to the console
 	 */
-	public static void debug(String message) {
+	public static void debug(Object... message) {
 		if(AreaShop.getInstance().debug) {
-			AreaShop.getInstance().getLogger().info("Debug: " + message);
+			AreaShop.getInstance().getLogger().info("Debug: "+StringUtils.join(message, " "));
 		}
 	}
 	/**

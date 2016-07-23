@@ -648,6 +648,20 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Check if an input is numeric
+	 * @param input The input to check
+	 * @return true if the input is numeric, otherwise false
+	 */
+	public static boolean isNumeric(String input) {
+		try {
+			Integer.parseInt(input);
+			return true;
+		} catch(NumberFormatException ignored) {
+			return false;
+		}
+	}
+
 	// NAME <-> UUID CONVERSION
 
 	/**

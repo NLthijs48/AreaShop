@@ -31,29 +31,128 @@ public class InfoCommand extends CommandAreaShop {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Filter group of regions, join their names and printout the correct message
-	 * @param sender The CommandSender to receive the message
-	 * @param regions The regions
-	 * @param filterGroup The group to filter to the regions with
-	 * @param keySomeFound The key of the message to display when some regions are found
-	 * @param keyNoneFound The key of the message to display when no regions are found
+	 * Display a page of a list of regions
+	 * @param sender The CommandSender to send the messages to
+	 * @param regions The regions to display
+	 * @param filterGroup The group to filter the regions by
+	 * @param keyHeader The header to print above the page
+	 * @param pageInput The page number, if any
+	 * @param baseCommand The command to execute for next/previous page
 	 */
-	private void displayMessage(CommandSender sender, Set<? extends GeneralRegion> regions, RegionGroup filterGroup, String keySomeFound, String keyNoneFound) {
+	private void showSortedPagedList(CommandSender sender, List<? extends GeneralRegion> regions, RegionGroup filterGroup, String keyHeader, String pageInput, String baseCommand) {
+		int ITEMS_PER_PAGE = 18;
+		int page = 1;
+		if(pageInput != null && Utils.isNumeric(pageInput)) {
+			try {
+				page = Integer.parseInt(pageInput);
+			} catch(NumberFormatException e) {
+				plugin.message(sender, "info-wrongPage", pageInput);
+				return;
+			}
+		}
 		if(filterGroup != null) {
-			Iterator<? extends GeneralRegion> it = regions.iterator();
-			while(it.hasNext()) {
-				GeneralRegion region = it.next();
-				if(!filterGroup.isMember(region)) {
+			for(Iterator<? extends GeneralRegion> it = regions.iterator(); it.hasNext(); ) {
+				if(!filterGroup.isMember(it.next())) {
 					it.remove();
 				}
 			}
 		}
 		if(regions.isEmpty()) {
-			plugin.message(sender, keyNoneFound);
+			plugin.message(sender, "info-noRegions");
 		} else {
-			plugin.message(sender, keySomeFound, Utils.combinedMessage(regions, "region"));
+			long start = Calendar.getInstance().getTimeInMillis();
+			// First sort by type, then by name
+			Collections.sort(regions, new Comparator<GeneralRegion>() {
+				@Override
+				public int compare(GeneralRegion one, GeneralRegion two) {
+					int typeCompare = getTypeOrder(two).compareTo(getTypeOrder(one));
+					if(typeCompare != 0) {
+						return typeCompare;
+					} else {
+						return one.getName().compareTo(two.getName());
+					}
+				}
+			});
+			// Header
+			Message limitedToGroup = Message.none();
+			if(filterGroup != null) {
+				limitedToGroup = Message.fromKey("info-limitedToGroup").replacements(filterGroup.getName());
+			}
+			plugin.message(sender, keyHeader, limitedToGroup);
+			// Page entries
+			int totalPages = (int)Math.ceil(regions.size()/(double)ITEMS_PER_PAGE); // Clip page to correct boundaries, not much need to tell the user
+			if(regions.size() == ITEMS_PER_PAGE+1) { // 19 total items is mapped to 1 page of 19
+				ITEMS_PER_PAGE++;
+				totalPages = 1;
+			}
+			page = Math.max(1, Math.min(totalPages, page));
+			for(int i = (page-1)*ITEMS_PER_PAGE; i < page*ITEMS_PER_PAGE && i < regions.size(); i++) {
+				String state;
+				GeneralRegion region = regions.get(i);
+				if(region.getType() == GeneralRegion.RegionType.RENT) {
+					if(region.getOwner() == null) {
+						state = "Forrent";
+					} else {
+						state = "Rented";
+					}
+				} else {
+					if(region.getOwner() == null) {
+						state = "Forsale";
+					} else if(!((BuyRegion)region).isInResellingMode()) {
+						state = "Sold";
+					} else {
+						state = "Reselling";
+					}
+				}
+				plugin.messageNoPrefix(sender, "info-entry"+state, region);
+			}
+			Message footer = Message.none();
+			// Previous button
+			if(page > 1) {
+				footer.append(Message.fromKey("info-pagePrevious").replacements(baseCommand+" "+(page-1)));
+			} else {
+				footer.append(Message.fromKey("info-pageNoPrevious"));
+			}
+			// Page status
+			if(totalPages > 1) {
+				String pageString = ""+page;
+				for(int i = pageString.length(); i < (totalPages+"").length(); i++) {
+					pageString = "0"+pageString;
+				}
+				footer.append(Message.fromKey("info-pageStatus").replacements(page, totalPages));
+				if(page < totalPages) {
+					footer.append(Message.fromKey("info-pageNext").replacements(baseCommand+" "+(page+1)));
+				} else {
+					footer.append(Message.fromKey("info-pageNoNext"));
+				}
+				footer.send(sender);
+				long end = Calendar.getInstance().getTimeInMillis();
+			}
+		}
+	}
+
+	/**
+	 * Get an integer to order by type, usable for Comparators
+	 * @param region The region to get the order for
+	 * @return An integer for sorting by type
+	 */
+	private Integer getTypeOrder(GeneralRegion region) {
+		if(region.getType() == GeneralRegion.RegionType.RENT) {
+			if(region.getOwner() == null) {
+				return 1;
+			} else {
+				return 2;
+			}
+		} else {
+			if(region.getOwner() == null) {
+				return 3;
+			} else if(!((BuyRegion)region).isInResellingMode()) {
+				return 4;
+			} else {
+				return 5;
+			}
 		}
 	}
 	
@@ -66,64 +165,90 @@ public class InfoCommand extends CommandAreaShop {
 		if(args.length > 1 && args[1] != null) {
 			// Get filter group (only used by some commands)
 			RegionGroup filterGroup = null;
-			Set<String> groupFilters = new HashSet<>(Arrays.asList("all", "rented", "forrent", "sold", "forsale"));
-			if(groupFilters.contains(args[0].toLowerCase())) {
-				filterGroup = plugin.getFileManager().getGroup(args[2]);
-				if(filterGroup == null) {
-					plugin.message(sender, "info-noFiltergroup", args[2]);
-					return;
+			Set<String> groupFilters = new HashSet<>(Arrays.asList("all", "rented", "forrent", "sold", "forsale", "reselling"));
+			if(groupFilters.contains(args[1].toLowerCase()) && args.length > 2) {
+				if(!Utils.isNumeric(args[2])) {
+					filterGroup = plugin.getFileManager().getGroup(args[2]);
+					if(filterGroup == null) {
+						plugin.message(sender, "info-noFiltergroup", args[2]);
+						return;
+					}
+					// Pass page number to args[2] if available
+					if(args.length > 3) {
+						args[2] = args[3];
+					}
 				}
 			}
 			
 			// All regions
 			if(args[1].equalsIgnoreCase("all")) {
-				Set<GeneralRegion> regions = new TreeSet<GeneralRegion>(plugin.getFileManager().getRents());
-				displayMessage(sender, regions, filterGroup, "info-all-rents", "info-all-noRents");
-
-				regions = new TreeSet<GeneralRegion>(plugin.getFileManager().getBuys());
-				displayMessage(sender, regions, filterGroup, "info-all-buys", "info-all-noBuys");
+				showSortedPagedList(sender, plugin.getFileManager().getRegions(), filterGroup, "info-allHeader", (args.length > 2 ? args[2] : null), "/areashop info all");
 			}
 			
 			// Rented regions
 			else if(args[1].equalsIgnoreCase("rented")) {
-				Set<GeneralRegion> regions = new TreeSet<>();
-				for(RentRegion region : plugin.getFileManager().getRents()) {
-					if(region.isRented()) {
-						regions.add(region);
+				List<RentRegion> regions = plugin.getFileManager().getRents();
+				for(Iterator<RentRegion> it = regions.iterator(); it.hasNext(); ) {
+					if(!it.next().isRented()) {
+						it.remove();
 					}
 				}
-				displayMessage(sender, regions, filterGroup, "info-rented", "info-noRented");							
-			} 
+				showSortedPagedList(sender, regions, filterGroup, "info-rentedHeader", (args.length > 2 ? args[2] : null), "/areashop info rented");
+			}
 			// Forrent regions
 			else if(args[1].equalsIgnoreCase("forrent")) {
-				Set<GeneralRegion> regions = new TreeSet<>();
-				for(RentRegion region : plugin.getFileManager().getRents()) {
-					if(!region.isRented()) {
-						regions.add(region);
+				List<RentRegion> regions = plugin.getFileManager().getRents();
+				for(Iterator<RentRegion> it = regions.iterator(); it.hasNext(); ) {
+					if(it.next().isRented()) {
+						it.remove();
 					}
 				}
-				displayMessage(sender, regions, filterGroup, "info-unrented", "info-noUnrented");	
-			} 
+				showSortedPagedList(sender, regions, filterGroup, "info-forrentHeader", (args.length > 2 ? args[2] : null), "/areashop info forrent");
+			}
 			// Sold regions
 			else if(args[1].equalsIgnoreCase("sold")) {
-				Set<GeneralRegion> regions = new TreeSet<>();
-				for(BuyRegion region : plugin.getFileManager().getBuys()) {
-					if(region.isSold()) {
-						regions.add(region);
+				List<BuyRegion> regions = plugin.getFileManager().getBuys();
+				for(Iterator<BuyRegion> it = regions.iterator(); it.hasNext(); ) {
+					if(!it.next().isSold()) {
+						it.remove();
 					}
 				}
-				displayMessage(sender, regions, filterGroup, "info-sold", "info-noSold");							
-			} 
+				showSortedPagedList(sender, regions, filterGroup, "info-soldHeader", (args.length > 2 ? args[2] : null), "/areashop info sold");
+			}
 			// Forsale regions
 			else if(args[1].equalsIgnoreCase("forsale")) {
-				Set<GeneralRegion> regions = new TreeSet<>();
-				for(BuyRegion region : plugin.getFileManager().getBuys()) {
-					if(!region.isSold()) {
-						regions.add(region);
+				List<BuyRegion> regions = plugin.getFileManager().getBuys();
+				for(Iterator<BuyRegion> it = regions.iterator(); it.hasNext(); ) {
+					if(it.next().isSold()) {
+						it.remove();
 					}
 				}
-				displayMessage(sender, regions, filterGroup, "info-forsale", "info-noForsale");
+				showSortedPagedList(sender, regions, filterGroup, "info-forsaleHeader", (args.length > 2 ? args[2] : null), "/areashop info forsale");
 			}
+			// Reselling regions
+			else if(args[1].equalsIgnoreCase("reselling")) {
+				List<BuyRegion> regions = plugin.getFileManager().getBuys();
+				for(Iterator<BuyRegion> it = regions.iterator(); it.hasNext(); ) {
+					if(!it.next().isInResellingMode()) {
+						it.remove();
+					}
+				}
+				showSortedPagedList(sender, regions, filterGroup, "info-resellingHeader", (args.length > 2 ? args[2] : null), "/areashop info reselling");
+			}
+
+			// List of regions without a group
+			else if(args[1].equalsIgnoreCase("nogroup")) {
+				List<GeneralRegion> regions = plugin.getFileManager().getRegions();
+				for(RegionGroup group : plugin.getFileManager().getGroups()) {
+					regions.removeAll(group.getMemberRegions());
+				}
+				if(regions.isEmpty()) {
+					plugin.message(sender, "info-nogroupNone");
+				} else {
+					showSortedPagedList(sender, regions, filterGroup, "info-nogroupHeader", (args.length > 2 ? args[2] : null), "/areashop info nogroup");
+				}
+			}
+
 			// Region info
 			else if(args[1].equalsIgnoreCase("region")) {
 				if(args.length > 1) {
@@ -331,19 +456,6 @@ public class InfoCommand extends CommandAreaShop {
 				} else {
 					plugin.message(sender, "info-regionHelp");
 				}
-			}
-
-			// List of regions without a group
-			else if(args[1].equalsIgnoreCase("nogroup")) {
-				Set<GeneralRegion> regions = new TreeSet<>(plugin.getFileManager().getRegions());
-				for(RegionGroup group : plugin.getFileManager().getGroups()) {
-					regions.removeAll(group.getMemberRegions());
-				}
-				if(regions.isEmpty()) {
-					plugin.message(sender, "info-nogroupNone");
-				} else {
-					plugin.message(sender, "info-nogroupRegions", Utils.combinedMessage(regions, "region"));
-				}
 			} else {
 				plugin.message(sender, "info-help");
 			}
@@ -376,7 +488,7 @@ public class InfoCommand extends CommandAreaShop {
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
-			result.addAll(Arrays.asList("all", "rented", "forrent", "sold", "forsale", "player", "region", "nogroup"));
+			result.addAll(Arrays.asList("all", "rented", "forrent", "sold", "forsale", "player", "region", "nogroup", "reselling"));
 		} else if(toComplete == 3) {
 			if(start[2].equalsIgnoreCase("player")) {
 				for(Player player : Utils.getOnlinePlayers()) {

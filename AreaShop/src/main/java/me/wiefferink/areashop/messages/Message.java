@@ -1,6 +1,7 @@
 package me.wiefferink.areashop.messages;
 
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -18,7 +19,8 @@ public class Message {
 	public static final String VARIABLEEND = "%";
 	public static final String LANGUAGEVARIABLE = "lang:";
 	public static final String CHATLANGUAGEVARIABLE = "prefix";
-	public static final int REPLACEMENTLIMIT = 50;
+	public static final int REPLACEMENTLIMIT = 50; // Maximum number of replacement rounds (the replaced value can have variables again)
+	public static final int MAXIMUMJSONLENGTH = 30000; // Limit of the client is 32767 for the complete message
 	private static boolean fancyWorks = true;
 
 	private List<String> message;
@@ -76,8 +78,21 @@ public class Message {
 		return message;
 	}
 
+	/**
+	 * Get the message with all replacements done
+	 * @param limit the limit to hold to
+	 * @return Message as a list
+	 */
 	private List<String> get(Limit limit) {
 		executeReplacements(limit);
+		return message;
+	}
+
+	/**
+	 * Get the raw message without replacing anything
+	 * @return The message
+	 */
+	public List<String> getRaw() {
 		return message;
 	}
 
@@ -162,7 +177,12 @@ public class Message {
 			boolean sendPlain = true;
 			if(AreaShop.getInstance().getConfig().getBoolean("useFancyMessages") && fancyWorks) {
 				try {
-					boolean result = FancyMessageSender.sendJSON((Player)target, FancyMessageFormat.convertToJSON(message));
+					String jsonString = FancyMessageFormat.convertToJSON(message);
+					if(jsonString.length() > MAXIMUMJSONLENGTH) {
+						AreaShop.getInstance().getLogger().severe("Message with key "+key+" could not be send, results in a JSON string that is too big to send to the client, start of the message: "+Utils.getMessageStart(this, 100));
+						return this;
+					}
+					boolean result = FancyMessageSender.sendJSON((Player)target, jsonString);
 					sendPlain = !result;
 					fancyWorks = result;
 				} catch(Exception e) {
@@ -237,23 +257,28 @@ public class Message {
 		// Replace variables until they are all gone, or when the limit is reached
 		Pattern variable = Pattern.compile(Pattern.quote(VARIABLESTART)+"[a-zA-Z]+"+Pattern.quote(VARIABLEEND));
 
-		boolean shouldReplace = true;
-		while(shouldReplace) {
-			List<String> original = new ArrayList<>(message);
+		try {
+			boolean shouldReplace = true;
+			while(shouldReplace) {
+				List<String> original = new ArrayList<>(message);
 
-			limit.left--;
-			if(limit.reached()) {
-				if(!limit.notified) {
-					limit.notified = true;
-					AreaShop.getInstance().getLogger().warning("Reached replacement limit, probably has replacements loops, problematic message: "+limit.message.toString());
+				limit.left--;
+				if(limit.reached()) {
+					if(!limit.notified) {
+						limit.notified = true;
+						AreaShop.getInstance().getLogger().severe("Reached replacement limit, probably has replacements loops, problematic message key: "+limit.message.key+", first characters of the message: "+Utils.getMessageStart(limit.message, 100));
+					}
+					break;
 				}
-				break;
+				replaceArgumentVariables(limit);
+				replaceLanguageVariables(limit);
+
+				shouldReplace = !message.equals(original);
 			}
-
-			replaceArgumentVariables(limit);
-			replaceLanguageVariables(limit);
-
-			shouldReplace = !message.equals(original);
+		} catch(StackOverflowError e) {
+			limit.left = 0;
+			limit.notified = true;
+			AreaShop.getInstance().getLogger().severe("Too many recursive replacements for message with key: "+limit.message.key+" (probably includes itself as replacement), start of the message: "+Utils.getMessageStart(limit.message, 100));
 		}
 	}
 

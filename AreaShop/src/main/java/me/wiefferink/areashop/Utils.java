@@ -631,6 +631,20 @@ public class Utils {
 	}
 
 	/**
+	 * Get a start of the message with a maximum length
+	 * @param message       The message
+	 * @param maximumLength The maximum length to return
+	 * @return The start of the message with at most maximumLength characters
+	 */
+	public static String getMessageStart(Message message, int maximumLength) {
+		String messageStart = "";
+		for(int i = 0; i < message.getRaw().size() && messageStart.length() < maximumLength; i++) {
+			messageStart += message.getRaw().get(i).substring(0, Math.min(maximumLength, message.getRaw().get(i).length()));
+		}
+		return messageStart.substring(0, Math.min(maximumLength, messageStart.length()));
+	}
+
+	/**
 	 * Parse a time setting that could be seconds or a duration string
 	 * @param input The string to parse
 	 * @return seconds that the string indicates

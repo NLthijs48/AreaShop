@@ -32,15 +32,18 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 		boolean result = true;
 
 		// General region flags
-		ConfigurationSection generalFlags = plugin.getConfig().getConfigurationSection("flagProfiles."+region.getStringSetting("general.flagProfile")+".ALL");
-		if(generalFlags != null) {
+		String allPath = "flagProfiles."+region.getStringSetting("general.flagProfile")+".ALL";
+		ConfigurationSection generalFlags = plugin.getConfig().getConfigurationSection(allPath);
+		if(plugin.getConfig().isSet(allPath) && generalFlags != null) { // Explicitely check if it is set, so don't apply if only in the default config
 			result = updateRegionFlags(region, generalFlags);
 		}
 
 		// Specific region flags
-		ConfigurationSection specificFlags = plugin.getConfig().getConfigurationSection("flagProfiles."+region.getStringSetting("general.flagProfile")+"."+region.getState().getValue());
-		result = result && specificFlags != null && updateRegionFlags(region, specificFlags);
-
+		String specificPath = "flagProfiles."+region.getStringSetting("general.flagProfile")+"."+region.getState().getValue();
+		if(plugin.getConfig().isSet(specificPath)) { // Do no apply default flags if they are removed from the active config
+			ConfigurationSection specificFlags = plugin.getConfig().getConfigurationSection(specificPath);
+			result = result && specificFlags != null && updateRegionFlags(region, specificFlags);
+		}
 		return result;
 	}
 	/**

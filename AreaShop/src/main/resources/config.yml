@@ -161,10 +161,7 @@ flagProfiles:
     ALL: # Flags to apply for all states
       priority: 10
       members: ''
-      interact: 'deny g:non_members' # Only allow region members/owners to use things in the region (chests, crafting bench, etc)
-      build: 'deny g:non_members' # Only allow region members/owners to build (change to 'deny' to disallow building)
-      block-break: 'deny g:non_members'
-      block-place: 'deny g:non_members'
+      interact: 'deny g:non_members' # Only allow region members/owners to use things in the region (chests, furnace, animals, etc.)
     forrent:
       greeting: '%lang:prefix%%lang:greeting-forrent%'
     rented:

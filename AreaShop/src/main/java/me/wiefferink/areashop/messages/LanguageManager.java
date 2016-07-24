@@ -10,7 +10,7 @@ import java.util.*;
 
 public class LanguageManager {
 	private AreaShop plugin = null;
-	private String languages[] = {"EN", "NL", "DE", "CS", "FR", "FI", "PL"};
+	private String languages[] = {"EN", "NL"};
 	private Map<String, List<String>> currentLanguage, defaultLanguage;
 
 	/**

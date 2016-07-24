@@ -1,6 +1,6 @@
-# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: English, Version: V2.2.2, Percentage translated: 100% (source), author: NLThijs48                                ║
+# ║ Language: English, Version: V2.3.0, Percentage translated: 100% (source), author: NLThijs48                                ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -9,28 +9,41 @@
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 action: "[blue][bold]<%0%>[/bold]"
+
 button: "[bold]<%0%>[/bold]"
+
 command:
+
   - "[bold]%0%[/bold]"
   - "    hover: %lang:action|Use %1%|%"
   - "    command: %1%"
+
 helpCommand:
+
   - "[gold]%0% [gray]-[reset]"
   - "    hover: %lang:action|Use %0%|%"
   - "    command: %0%"
+
 region: "%lang:tRegion|%region%|%"
+
 tRegion:
+
     - "[bold]%0%[/bold]"
     - "    hover: Region %0%"
     - "    hover: %lang:action|Region information|%"
     - "    command: /areashop info region %0%"
+
 player: "%lang:tPlayer|%player%|%"
+
 tPlayer:
+
   - "[bold]%0%[/bold]"
   - "    hover: Player %0%"
   - "    hover: %lang:action|Regions of %0%|%"
   - "    command: /areashop info player %0%"
+
 landlord:
+
   - "[bold]%landlord%[/bold]"
   - "    hover: Landlord %landlord%"
   - "    hover: %lang:action|Regions of %landlord%|%"
@@ -148,6 +161,7 @@ reload-noPermission: "You don't have permission to reload the config files."
 reload-updateCommandChanged: "'/as updaterents' and '/as updatebuys' have been removed, '/as reload' will also update the regions now so use that command instead."
 
 info-help:
+
   - "/as info[break]"
   - "    %lang:command|all|/as info all|%[break]"
   - "    %lang:command|rented|/as info rented|% [group] [page][break]"
@@ -157,8 +171,8 @@ info-help:
   - "    %lang:command|reselling|/as info reselling|% [group] [page][break]"
   - "    %lang:command|nogroup|/as info nogroup [page]|%"
   - "    %lang:command|region|/as info region|% [region][break]"
-info-noPermission: "You don't have permission to get information about regions."
 
+info-noPermission: "You don't have permission to get information about regions."
 info-allHeader: "All regions%0%:"
 info-rentedHeader: "Rented regions%0%:"
 info-forrentHeader: "For rent regions%0%:"
@@ -167,7 +181,6 @@ info-soldHeader: "Sold regions%0%:"
 info-resellingHeader: "Reselling regions%0%:"
 info-nogroupHeader: "Regions without group%0%:"
 info-limitedToGroup: " (limited to group %0%)"
-
 info-nogroupNone: "There are no regions without a group."
 info-noFiltergroup: "Group '%0%' does not exist and therefore cannot be used to limit the results."
 info-noRegions: "No regions have been found."
@@ -178,19 +191,28 @@ info-entryForsale: "[darkgreen][bold]►[reset] %lang:region%: For sale for %pri
 info-entrySold: "[darkgreen][bold]►[reset] %lang:region%: Sold to %lang:player%."
 info-entryReselling: "[darkgreen][bold]►[reset] %lang:region%: Sold to %lang:player% (reselling)."
 info-pageStatus:
+
   - "[gray]Page %0%/%1%"
+
 info-pagePrevious:
+
   - "    [gray][bold]◄Previous[/bold]    "
   - "    hover: %lang:action|Show previous page|%"
   - "    command: %0%"
+
 info-pageNoPrevious:
+
   - "    [darkgray][bold]◄Previous[/bold]    "
   - "    hover: This is already the first page"
+
 info-pageNext:
+
   - "    [gray][bold]Next►[/bold]"
   - "    hover: %lang:action|Show next page|%"
   - "    command: %0%"
+
 info-pageNoNext:
+
   - "    [darkgray][bold]Next►[/bold]"
   - "    hover: This is already the last page"
 
@@ -208,6 +230,7 @@ info-regionRented: "[darkgreen][bold]►[reset] Rented by %lang:player% until: [
 info-regionBought: "[darkgreen][bold]►[reset] Bought by %lang:player%."
 info-regionReselling: "[darkgreen][bold]►[reset] Bought by %lang:player%, currently reselling."
 info-regionExtending:
+
   - "[darkgreen][bold]►[reset] "
   - "[bold]Extend for[/bold]"
   - "    hover: Extend rent of %region%"
@@ -215,61 +238,80 @@ info-regionExtending:
   - "    hover: %lang:action|Extend rent of %region%|%"
   - "    command: /areashop rent %region%"
   - ": [gray]%price% per %duration%."
+
 info-regionCanBeRented:
+
   - "[darkgreen][bold]►[reset] "
   - "[bold]Rent for[/bold]"
   - "    hover: Rent %region% for %price% per %duration%"
   - "    hover: %lang:action|Rent %region%|%"
   - "    command: /areashop rent %region%"
   - ": [gray]%price% per %duration%."
+
 info-regionCanBeBought:
+
   - "[darkgreen][bold]►[reset] "
   - "[bold]Buy for[/bold]"
   - "    hover: Buy %region% for %price%"
   - "    hover: %lang:action|Buy %region%|%"
   - "    command: /areashop buy %region%"
   - ": [gray]%price%."
+
 info-regionReselPrice: "[darkgreen][bold]►[reset] Resell price: [gray]%resellprice% (you can buy it from %lang:player%)."
 info-regionFriends: "[darkgreen][bold]►[reset] Added friends: [gray]%0%."
 info-friend: "%lang:tPlayer|%0%|%"
 info-friendRemove:
+
   - "%lang:info-friend|%0%|%"
   - "[red]✕[gray]"
   - "    hover: Region %region%"
   - "    hover: %lang:action|Remove %0% as friend|%"
   - "    command: /areashop delfriend %0% %region%"
+
 info-regionMoneyBackBuy:
+
   - "[darkgreen][bold]►[reset] Selling payback: [gray]%moneyback% (%moneybackpercent%% of the price)."
+
 info-regionMoneyBackBuyClick:
+
   - "[darkgreen][bold]►[reset] "
   - "[bold]Selling payback[/bold]"
   - "    hover: Sell %region% and get back %moneyback%"
   - "    hover: %lang:action|Sell %region%|%"
   - "    command: /areashop sell %region%"
   - ": [gray]%moneyback% (%moneybackpercent%% of the price)."
+
 info-regionMoneyBackRent:
+
   - "[darkgreen][bold]►[reset] Unrenting payback: [gray]%moneyback% (%moneybackpercent%% of the remaining time)."
+
 info-regionMoneyBackRentClick:
+
   - "[darkgreen][bold]►[reset] "
   - "[bold]Unrenting payback[/bold]"
   - "    hover: Unrent %region% and get back %moneyback%"
   - "    hover: %lang:action|Unrent %region%|%"
   - "    command: /areashop unrent %region%"
   - ": [gray]%moneyback% (%moneybackpercent%% of the remaining time)."
+
 info-regionMaxExtends: "[darkgreen][bold]►[reset] Maximum number of extensions: [gray]%maxextends% time(s)."
 info-regionNoExtending: "[darkgreen][bold]►[reset] Rent cannot be extended."
 info-regionExtendsLeft: "[darkgreen][bold]►[reset] Extensions left: [gray]%extendsleft% time(s) out of %maxextends%."
 info-regionMaxRentTime: "[darkgreen][bold]►[reset] In advance renting: [gray]%maxrenttime% at maximum."
 info-prefix: "[darkgreen][bold]►[reset] "
 info-regionTeleport:
+
   - "[bold]Go to the region[/bold]"
   - "    hover: %lang:action|Teleport to %region%|%"
   - "    command: /areashop tp %region%"
+
 info-setRegionTeleport:
+
   - "[bold]set teleport location[/bold]"
   - "    hover: %region%"
   - "    hover: %lang:action|Set teleport location|%"
   - "    command: /areashop settp %region%"
+
 info-regionSigns: "[darkgreen][bold]►[reset] Connected signs: [gray]%0%."
 info-regionSignLocation: "[gray](%0%, %1%, %2%, %3%)[reset]"
 info-regionGroups: "[darkgreen][bold]►[reset] Assigned groups: [gray]%0%."
@@ -414,10 +456,12 @@ addsign-couldNotDetect: "Found multiple regions around the sign, specify region 
 addsign-couldNotDetectSign: "Found multiple regions around the sign, specify region on the second line (2 of the regions that were found: %lang:tRegion|%0%|% and %lang:tRegion|%1%|%)."
 addsign-wrongProfile: "The specified profile does not exist, use one of the following (check config): [gray]%0%."
 addsign-profile:
+
   - "[bold]%0%[/bold]"
   - "    hover: Signprofile %0%"
   - "    hover: %lang:action|Use this profile|%"
   - "    command: /areashop linksigns %0%"
+
 addsign-success: "The sign has been added to %lang:region%."
 addsign-successProfile: "The sign has been added to %lang:region% with profile %0%."
 addsign-alreadyRegistered: "That sign is already registered for region %lang:region%."
@@ -493,6 +537,7 @@ linksigns-noPermission: "You don't have permission to enter bulk sign linking mo
 linksigns-stopped: "Exited sign linking mode."
 
 stack-help:
+
   - "/as stack <amount> <gap> <name> <rent|buy> [group].[break]"
   - "    [gray]<amount> Number of regions that will be created.[break]"
   - "    [gray]<gap> Blocks distance between the regions.[break]"
@@ -500,6 +545,7 @@ stack-help:
   - "    [gray]<rent|buy> Make then rent or buy regions.[break]"
   - "    [gray][group] A group to add the created regions to.[break]"
   - "    [gray]The regions will be created in the direction you are facing."
+
 stack-accepted: "Starting to create %0% %1% regions with %2% blocks in between, names start with %3% and have a number behind them.%4%"
 stack-addToGroup: " Created regions will be added to the group '%0%'."
 stack-noPermission: "You don't have permission to create and add regions to AreaShop in bulk."
@@ -519,26 +565,35 @@ message-noPermission: "You do not have permission to send AreaShop messages."
 message-notOnline: "%0% is not online."
 
 confirm-rent:
+
   - "%lang:prefix%Are you sure you want to rent %lang:tRegion|%0%|%?[break]"
   - "[darkgreen][bold]►[reset] %lang:button|Click to rent %0%|%"
   - "    hover: %lang:action|Rent %0%|%"
   - "    command: /areashop rent %0%"
+
 confirm-extend:
+
   - "%lang:prefix%Are you sure you want to extend %lang:tRegion|%0%|%?[break]"
   - "[darkgreen][bold]►[reset] %lang:button|Click to extend %0%|%"
   - "    hover: %lang:action|Extend %0%|%"
   - "    command: /areashop rent %0%"
+
 confirm-unrent:
+
   - "%lang:prefix%Are you sure you want to stop renting %lang:tRegion|%0%|%?[break]"
   - "[darkgreen][bold]►[reset] %lang:button|Click to stop renting %0%|%"
   - "    hover: %lang:action|Stop renting %0%|%"
   - "    command: /areashop unrent %0%"
+
 confirm-buy:
+
   - "%lang:prefix%Are you sure you want to buy %lang:tRegion|%0%|%?[break]"
   - "[darkgreen][bold]►[reset] %lang:button|Click to buy %0%|%"
   - "    hover: %lang:action|Buy %0%|%"
   - "    command: /areashop buy %0%"
+
 confirm-sell:
+
   - "%lang:prefix%Are you sure you want to sell %lang:tRegion|%0%|%?[break]"
   - "[darkgreen][bold]►[reset] %lang:button|Click to sell %0%|%"
   - "    hover: %lang:action|Sell %0%|%"

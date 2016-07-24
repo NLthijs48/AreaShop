@@ -556,8 +556,11 @@ public class Updater {
     private boolean versionCheck() {
         final String title = this.versionName;
         if (this.type != UpdateType.NO_VERSION_CHECK) {
-            final String localVersion = this.plugin.getDescription().getVersion();
-            if (title.split(DELIMETER).length == 2) {
+			String localVersion = this.plugin.getDescription().getVersion();
+			if(localVersion.contains("#")) { // Strip build number
+				localVersion = localVersion.substring(0, localVersion.indexOf("#"));
+			}
+			if (title.split(DELIMETER).length == 2) {
                 // Get the newest file's version number
                 final String remoteVersion = title.split(DELIMETER)[1].split(" ")[0];
 

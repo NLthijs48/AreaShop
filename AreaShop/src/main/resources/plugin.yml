@@ -1,6 +1,6 @@
 name: AreaShop
 main: me.wiefferink.areashop.AreaShop
-version: ${project.version}
+version: "${project.version}${build.number}"
 description: "Selling and renting WorldGuard regions to your players, highly configurable."
 depend: [Vault, WorldGuard, WorldEdit]
 softdepend: [Multiverse-Core]

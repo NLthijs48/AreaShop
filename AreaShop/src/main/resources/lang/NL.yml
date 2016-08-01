@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Dutch, Version: V2.3.0, Percentage translated: 100%                                                              ║
+# ║ Language: Dutch, Version: V2.3.1, Percentage translated: 100%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -206,8 +206,6 @@ info-playerNoBuys: "%lang:tPlayer|%0%|% heeft geen gebieden gekocht."
 info-regionHelp: "/as info region <naam>."
 info-regionHeaderRent: "[darkgreen]Informatie over %lang:region%:"
 info-regionHeaderBuy: "[darkgreen]Informatie over %lang:region%:"
-info-regionFooterRent: ""
-info-regionFooterBuy: ""
 info-regionRented: "[darkgreen][bold]►[reset] Gehuurd door %lang:player% tot: [gray]%until%."
 info-regionBought: "[darkgreen][bold]►[reset] Gekocht door %lang:player%."
 info-regionReselling: "[darkgreen][bold]►[reset] Gekocht door %lang:player%, aan het doorverkopen."

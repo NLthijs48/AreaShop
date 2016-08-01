@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: English, Version: V2.3.0, Percentage translated: 100% (source), author: NLThijs48                                ║
+# ║ Language: English, Version: V2.3.1, Percentage translated: 100% (source), author: NLThijs48                                ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -9,29 +9,35 @@
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 action: "[blue][bold]<%0%>[/bold]"
+
 button: "[bold]<%0%>[/bold]"
+
 command:
   - "[bold]%0%[/bold]"
   - "    hover: %lang:action|Use %1%|%"
   - "    command: %1%"
-helpCommand:
 
+helpCommand:
   - "[gold]%0% [gray]-[reset]"
   - "    hover: %lang:action|Use %0%|%"
   - "    command: %0%"
 
 region: "%lang:tRegion|%region%|%"
+
 tRegion:
     - "[bold]%0%[/bold]"
     - "    hover: Region %0%"
     - "    hover: %lang:action|Region information|%"
     - "    command: /areashop info region %0%"
+
 player: "%lang:tPlayer|%player%|%"
+
 tPlayer:
   - "[bold]%0%[/bold]"
   - "    hover: Player %0%"
   - "    hover: %lang:action|Regions of %0%|%"
   - "    command: /areashop info player %0%"
+
 landlord:
   - "[bold]%landlord%[/bold]"
   - "    hover: Landlord %landlord%"
@@ -159,7 +165,6 @@ info-help:
   - "    %lang:command|reselling|/as info reselling|% [group] [page][break]"
   - "    %lang:command|nogroup|/as info nogroup [page]|%"
   - "    %lang:command|region|/as info region|% [region][break]"
-
 info-noPermission: "You don't have permission to get information about regions."
 info-allHeader: "All regions%0%:"
 info-rentedHeader: "Rented regions%0%:"
@@ -187,7 +192,6 @@ info-pagePrevious:
 info-pageNoPrevious:
   - "    [darkgray][bold]◄Previous[/bold]    "
   - "    hover: This is already the first page"
-
 info-pageNext:
   - "    [gray][bold]Next►[/bold]"
   - "    hover: %lang:action|Show next page|%"

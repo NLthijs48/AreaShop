@@ -42,7 +42,8 @@ public class InfoCommand extends CommandAreaShop {
 	 * @param baseCommand The command to execute for next/previous page
 	 */
 	private void showSortedPagedList(CommandSender sender, List<? extends GeneralRegion> regions, RegionGroup filterGroup, String keyHeader, String pageInput, String baseCommand) {
-		int ITEMS_PER_PAGE = 18;
+		int MAX_ITEMS = 20;
+		int ITEMS_PER_PAGE = MAX_ITEMS-2;
 		int page = 1;
 		if(pageInput != null && Utils.isNumeric(pageInput)) {
 			try {
@@ -88,6 +89,7 @@ public class InfoCommand extends CommandAreaShop {
 				totalPages = 1;
 			}
 			page = Math.max(1, Math.min(totalPages, page));
+			int linesPrinted = 1; // header
 			for(int i = (page-1)*ITEMS_PER_PAGE; i < page*ITEMS_PER_PAGE && i < regions.size(); i++) {
 				String state;
 				GeneralRegion region = regions.get(i);
@@ -107,6 +109,7 @@ public class InfoCommand extends CommandAreaShop {
 					}
 				}
 				plugin.messageNoPrefix(sender, "info-entry"+state, region);
+				linesPrinted++;
 			}
 			Message footer = Message.none();
 			// Previous button
@@ -126,6 +129,10 @@ public class InfoCommand extends CommandAreaShop {
 					footer.append(Message.fromKey("info-pageNext").replacements(baseCommand+" "+(page+1)));
 				} else {
 					footer.append(Message.fromKey("info-pageNoNext"));
+				}
+				// Fill up space if the page is not full (aligns header nicely)
+				for(int i = linesPrinted; i < MAX_ITEMS-1; i++) {
+					sender.sendMessage(" ");
 				}
 				footer.send(sender);
 				long end = Calendar.getInstance().getTimeInMillis();

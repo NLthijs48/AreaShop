@@ -794,7 +794,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	
 	
 	/**
-	 * Teleport a player to the region
+	 * Teleport a player to the region or sign
 	 * @param player Player that should be teleported
 	 * @param toSign true to teleport to the first sign of the region, false for teleporting to the region itself
 	 * @param checkPermissions Set to true if teleport permissions should be checked, false otherwise
@@ -1123,9 +1123,22 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return false;
 		}	
 	}
+
+	/**
+	 * Teleport a player to the region or sign when he has permissions for it
+	 * @param player Player that should be teleported
+	 * @param toSign true to teleport to the first sign of the region, false for teleporting to the region itself
+	 * @return true if the teleport succeeded, otherwise false
+	 */
 	public boolean teleportPlayer(Player player, boolean toSign) {
 		return teleportPlayer(player, toSign, true);
 	}
+
+	/**
+	 * Teleport a player to the region when he has permissions for it
+	 * @param player           Player that should be teleported
+	 * @return true if the teleport succeeded, otherwise false
+	 */
 	public boolean teleportPlayer(Player player) {
 		return teleportPlayer(player, false, true);
 	}
@@ -1195,7 +1208,16 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	
 	
 	// CONFIG
-	public boolean getBooleanSetting(String path) { // Handles strings as booleans
+
+	/**
+	 * Get a boolean setting for this region, defined as follows
+	 * - If the region has the setting in its own file (/regions/regionName.yml), use that
+	 * - If the region has groups, use the setting defined by the most important group, if any
+	 * - Otherwise fallback to the default.yml file setting
+	 * @param path The path to get the setting of
+	 * @return The value of the setting (strings are handled as booleans)
+	 */
+	public boolean getBooleanSetting(String path) {
 		if(config.isSet(path)) {
 			if(config.isString(path)) {
 				return config.getString(path).equalsIgnoreCase("true");
@@ -1225,7 +1247,15 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		return this.getFileManager().getDefaultSettings().getBoolean(path);
 	}
-	
+
+	/**
+	 * Get a boolean setting for this region, defined as follows
+	 * - If the region has the setting in its own file (/regions/regionName.yml), use that
+	 * - If the region has groups, use the setting defined by the most important group, if any
+	 * - Otherwise fallback to the default.yml file setting
+	 * @param path The path to get the setting of
+	 * @return The value of the setting (strings are handled as booleans)
+	 */
 	public int getIntegerSetting(String path) {
 		if(config.isSet(path)) {
 			return config.getInt(path);
@@ -1245,7 +1275,15 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		return this.getFileManager().getDefaultSettings().getInt(path);
 	}
-	
+
+	/**
+	 * Get a double setting for this region, defined as follows
+	 * - If the region has the setting in its own file (/regions/regionName.yml), use that
+	 * - If the region has groups, use the setting defined by the most important group, if any
+	 * - Otherwise fallback to the default.yml file setting
+	 * @param path The path to get the setting of
+	 * @return The value of the setting
+	 */
 	public double getDoubleSetting(String path) {
 		if(config.isSet(path)) {
 			return config.getDouble(path);
@@ -1265,7 +1303,15 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		return this.getFileManager().getDefaultSettings().getDouble(path);
 	}
-	
+
+	/**
+	 * Get a long setting for this region, defined as follows
+	 * - If the region has the setting in its own file (/regions/regionName.yml), use that
+	 * - If the region has groups, use the setting defined by the most important group, if any
+	 * - Otherwise fallback to the default.yml file setting
+	 * @param path The path to get the setting of
+	 * @return The value of the setting
+	 */
 	public long getLongSetting(String path) {
 		if(config.isSet(path)) {
 			return config.getLong(path);
@@ -1285,7 +1331,15 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		return this.getFileManager().getDefaultSettings().getLong(path);
 	}
-	
+
+	/**
+	 * Get a string setting for this region, defined as follows
+	 * - If the region has the setting in its own file (/regions/regionName.yml), use that
+	 * - If the region has groups, use the setting defined by the most important group, if any
+	 * - Otherwise fallback to the default.yml file setting
+	 * @param path The path to get the setting of
+	 * @return The value of the setting
+	 */
 	public String getStringSetting(String path) {
 		if(config.isSet(path)) {
 			return config.getString(path);
@@ -1305,7 +1359,15 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		return this.getFileManager().getDefaultSettings().getString(path);
 	}
-	
+
+	/**
+	 * Get a string list setting for this region, defined as follows
+	 * - If the region has the setting in its own file (/regions/regionName.yml), use that
+	 * - If the region has groups, use the setting defined by the most important group, if any
+	 * - Otherwise fallback to the default.yml file setting
+	 * @param path The path to get the setting of
+	 * @return The value of the setting
+	 */
 	public List<String> getStringListSetting(String path) {
 		if(config.isSet(path)) {
 			return config.getStringList(path);
@@ -1325,7 +1387,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		return this.getFileManager().getDefaultSettings().getStringList(path);
 	}
-	
+
+	/**
+	 * Set a setting in the file of the region itself
+	 * @param path The path to set
+	 * @param value The value to set it to, null to remove the setting
+	 */
 	public void setSetting(String path, Object value) {
 		config.set(path, value);
 		this.saveRequired();
@@ -1460,18 +1527,43 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			this.current = current;
 			this.limitingGroup = limitingGroup;
 		}
+
+		/**
+		 * Check if the action is allowed
+		 * @return true if the actions is allowed, otherwise false
+		 */
 		public boolean actionAllowed() {
 			return actionAllowed;
-		}		
+		}
+
+		/**
+		 * Get the type of the factor that is limiting the action, assuming actionAllowed() is false
+		 * @return The type of the limiting factor
+		 */
 		public LimitType getLimitingFactor() {
 			return limitingFactor;
 		}
+
+		/**
+		 * Get the maximum number of the group that is the limiting factor, assuming actionAllowed() is false
+		 * @return The maximum
+		 */
 		public int getMaximum() {
 			return maximum;
 		}
+
+		/**
+		 * Get the current number of regions in the group that is the limiting factor, assuming actionAllowed() is false
+		 * @return The current number of regions the player has
+		 */
 		public int getCurrent() {
 			return current;
 		}
+
+		/**
+		 * Get the name of the group that is limiting the action, assuming actionAllowed() is false
+		 * @return The name of the group
+		 */
 		public String getLimitingGroup() {
 			return limitingGroup;
 		}

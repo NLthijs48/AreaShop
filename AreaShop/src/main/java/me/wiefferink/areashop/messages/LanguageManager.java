@@ -47,9 +47,7 @@ public class LanguageManager {
 		}
 
 		// Create the language files, overwrites if a file already exists
-		// Overriding is necessary because otherwise with an update the new lang
-		// files would not be used, when translating your own use another
-		// file name as the default
+		// Overriding is necessary because otherwise with an update the new lang files would not be used
 		File langFile;
 		for(String language : languages) {
 			langFile = new File(plugin.getDataFolder()+File.separator+AreaShop.languageFolder+File.separator+language+".yml");
@@ -81,27 +79,57 @@ public class LanguageManager {
 	 * @return Map with the messages loaded from the file
 	 */
 	public Map<String, List<String>> loadLanguage(String key) {
+		return loadLanguage(key, true);
+	}
+
+	/**
+	 * Loads the specified language
+	 * @param key     The language to load
+	 * @param convert try conversion or not
+	 * @return Map with the messages loaded from the file
+	 */
+	private Map<String, List<String>> loadLanguage(String key, boolean convert) {
 		Map<String, List<String>> result = new HashMap<>();
 
 		// Load the strings
+		boolean isTransifexFile = false;
 		File file = new File(plugin.getDataFolder()+File.separator+AreaShop.languageFolder+File.separator+key+".yml");
 		try(
 				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8)
 		) {
 			YamlConfiguration ymlFile = YamlConfiguration.loadConfiguration(reader);
+			// Detect empty language files, happens when the YAML parser prints an exception (it does return an empty YamlConfiguration though)
 			if(ymlFile.getKeys(false).isEmpty()) {
 				AreaShop.warn("Language file "+key+".yml has zero messages.");
 				return result;
 			}
-			for(String messageKey : ymlFile.getKeys(false)) {
-				if(ymlFile.isList(messageKey)) {
-					result.put(messageKey, new ArrayList<>(ymlFile.getStringList(messageKey)));
-				} else {
-					result.put(messageKey, new ArrayList<>(Collections.singletonList(ymlFile.getString(messageKey))));
+			// Detect language files downloaded from Transifex and convert them
+			if(ymlFile.getKeys(false).size() == 1) {
+				for(String languageKey : ymlFile.getKeys(false)) {
+					if(ymlFile.isConfigurationSection(languageKey)) {
+						isTransifexFile = convert;
+					}
+				}
+			}
+			// Retrieve the messages from the YAML file and create the result
+			if(!isTransifexFile) {
+				for(String messageKey : ymlFile.getKeys(false)) {
+					if(ymlFile.isList(messageKey)) {
+						result.put(messageKey, new ArrayList<>(ymlFile.getStringList(messageKey)));
+					} else {
+						result.put(messageKey, new ArrayList<>(Collections.singletonList(ymlFile.getString(messageKey))));
+					}
 				}
 			}
 		} catch(IOException e) {
 			AreaShop.warn("Could not load set language file: "+file.getAbsolutePath());
+		}
+
+		if(isTransifexFile) {
+			if(!Transifex.convertFrom(file)) {
+				AreaShop.warn("Failed to convert "+file.getName()+" from the Transifex layout to the AreaShop layout, check the errors above");
+			}
+			return loadLanguage(key, false);
 		}
 		return result;
 	}

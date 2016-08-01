@@ -39,7 +39,7 @@ public class SignsFeature extends Feature implements Listener {
 				RegionSign sign = new RegionSign(region, this, signKey);
 				Location location = sign.getLocation();
 				if(location == null) {
-					plugin.getLogger().warning("Sign with key "+signKey+" of region "+region.getName()+" does not have a proper location");
+					AreaShop.warn("Sign with key "+signKey+" of region "+region.getName()+" does not have a proper location");
 					continue;
 				}
 				signs.put(sign.getStringLocation(), sign);

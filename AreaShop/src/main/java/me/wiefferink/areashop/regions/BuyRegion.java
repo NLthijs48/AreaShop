@@ -337,7 +337,7 @@ public class BuyRegion extends GeneralRegion {
 							r = plugin.getEconomy().depositPlayer(oldOwnerName, getWorldName(), getResellPrice());
 						}
 						if(r == null || !r.transactionSuccess()) {
-							plugin.getLogger().warning("Something went wrong with paying '" + oldOwnerName + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + player.getName());
+							AreaShop.warn("Something went wrong with paying '"+oldOwnerName+"' "+getFormattedPrice()+" for his resell of region "+getName()+" to "+player.getName());
 						}
 						// Resell is done, disable that now
 						disableReselling();
@@ -389,7 +389,7 @@ public class BuyRegion extends GeneralRegion {
 								r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), getPrice());
 							}
 							if(r != null && !r.transactionSuccess()) {
-								plugin.getLogger().warning("Something went wrong with paying '" + landlordName + "' " + getFormattedPrice() + " for his sell of region " + getName() + " to " + player.getName());
+								AreaShop.warn("Something went wrong with paying '"+landlordName+"' "+getFormattedPrice()+" for his sell of region "+getName()+" to "+player.getName());
 							}
 						}
 
@@ -504,7 +504,7 @@ public class BuyRegion extends GeneralRegion {
 					error = true;
 				}
 				if(error || response == null || !response.transactionSuccess()) {
-					plugin.getLogger().warning("Something went wrong with paying back money to " + getPlayerName() + " while selling region " + getName());
+					AreaShop.warn("Something went wrong with paying back money to "+getPlayerName()+" while selling region "+getName());
 				}	
 			}
 		}
@@ -541,7 +541,7 @@ public class BuyRegion extends GeneralRegion {
 		long lastPlayed = getLastActiveTime();
 		//AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
 		if(Calendar.getInstance().getTimeInMillis() > (lastPlayed + inactiveSetting)) {
-			plugin.getLogger().info("Region " + getName() + " unrented because of inactivity for player " + getPlayerName());
+			AreaShop.info("Region "+getName()+" unrented because of inactivity for player "+getPlayerName());
 			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
 			return this.sell(true, null);
 		}

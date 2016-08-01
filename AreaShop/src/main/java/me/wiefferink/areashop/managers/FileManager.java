@@ -80,7 +80,7 @@ public class FileManager {
 		worldRegionsRequireSaving = new HashSet<>();
 		File schemFile = new File(schemFolder);
 		if(!schemFile.exists() & !schemFile.mkdirs()) {
-			plugin.getLogger().warning("Could not create schematic files directory: " + schemFile.getAbsolutePath());
+			AreaShop.warn("Could not create schematic files directory: "+schemFile.getAbsolutePath());
 		}
 		loadVersions();
 	}
@@ -329,7 +329,7 @@ public class FileManager {
 					deleted = false;
 				}
 				if(!deleted) {
-					plugin.getLogger().warning("File could not be deleted: " + file.toString());
+					AreaShop.warn("File could not be deleted: "+file.toString());
 				}
 			}
 			result = true;
@@ -384,7 +384,7 @@ public class FileManager {
 					deleted = false;
 				}
 				if(!deleted) {
-					plugin.getLogger().warning("File could not be deleted: " + file.toString());
+					AreaShop.warn("File could not be deleted: "+file.toString());
 				}
 			}
 			
@@ -516,7 +516,7 @@ public class FileManager {
 		try {
 			groupsConfig.save(groupsPath);
 		} catch (IOException e) {
-			plugin.getLogger().warning("Groups file could not be saved: " + groupsPath);
+			AreaShop.warn("Groups file could not be saved: "+groupsPath);
 		}
 	}
 	
@@ -590,7 +590,7 @@ public class FileManager {
 							manager.saveChanges();
 						}
 					} catch(Exception e) {
-						plugin.getLogger().warning("WorldGuard regions in world " + world + " could not be saved");
+						AreaShop.warn("WorldGuard regions in world "+world+" could not be saved");
 					}
 				}
 			}
@@ -681,7 +681,7 @@ public class FileManager {
 				versions = (HashMap<String,Integer>)input.readObject();
 				input.close();
 			} catch (IOException | ClassNotFoundException | ClassCastException e) {
-				plugin.getLogger().warning("Something went wrong reading file: " + versionPath);
+				AreaShop.warn("Something went wrong reading file: "+versionPath);
 				versions = null;
 			}
 		}
@@ -697,14 +697,14 @@ public class FileManager {
 	 */
 	public void saveVersions() {
 		if(!(new File(versionPath).exists())) {
-			plugin.getLogger().info("versions file created, this should happen only after installing or upgrading the plugin");
+			AreaShop.info("versions file created, this should happen only after installing or upgrading the plugin");
 		}
 		try {
 			ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(versionPath));
 			output.writeObject(versions);
 			output.close();
 		} catch (IOException e) {
-			plugin.getLogger().warning("File could not be saved: " + versionPath);
+			AreaShop.warn("File could not be saved: "+versionPath);
 		}
 	}
 
@@ -749,9 +749,9 @@ public class FileManager {
 				} 
 				input.close();
 				output.close();
-				plugin.getLogger().info("File with default region settings has been saved, should only happen on first startup");
+				AreaShop.info("File with default region settings has been saved, should only happen on first startup");
 			} catch(IOException e) {
-				plugin.getLogger().warning("Something went wrong saving the default region settings: " + defaultFile.getAbsolutePath());
+				AreaShop.warn("Something went wrong saving the default region settings: "+defaultFile.getAbsolutePath());
 			}
 		}
 		// Load default.yml from the plugin folder, and as backup the default one
@@ -761,7 +761,7 @@ public class FileManager {
 		) {
 			defaultConfig = YamlConfiguration.loadConfiguration(custom);
 			if(defaultConfig.getKeys(false).size() == 0) {
-				plugin.getLogger().warning("File 'default.yml' is empty, check for errors in the log.");
+				AreaShop.warn("File 'default.yml' is empty, check for errors in the log.");
 				result = false;
 			} else {
 				defaultConfig.addDefaults(YamlConfiguration.loadConfiguration(normal));
@@ -790,9 +790,9 @@ public class FileManager {
 				while ((read = input.read(bytes)) != -1) {
 					output.write(bytes, 0, read);
 				}
-				plugin.getLogger().info("Default config file has been saved, should only happen on first startup");
+				AreaShop.info("Default config file has been saved, should only happen on first startup");
 			} catch(IOException e) {
-				plugin.getLogger().warning("Something went wrong saving the config file: " + configFile.getAbsolutePath());
+				AreaShop.warn("Something went wrong saving the config file: "+configFile.getAbsolutePath());
 			}
 		}
 		// Load config.yml from the plugin folder
@@ -803,7 +803,7 @@ public class FileManager {
 		) {
 			config = YamlConfiguration.loadConfiguration(custom);
 			if(config.getKeys(false).size() == 0) {
-				plugin.getLogger().warning("File 'config.yml' is empty, check for errors in the log.");
+				AreaShop.warn("File 'config.yml' is empty, check for errors in the log.");
 				result = false;
 			} else {
 				config.addDefaults(YamlConfiguration.loadConfiguration(normal));
@@ -819,7 +819,7 @@ public class FileManager {
 				}
 			}
 		} catch(IOException e) {
-			plugin.getLogger().warning("Something went wrong while reading the config.yml file: " + configFile.getAbsolutePath());
+			AreaShop.warn("Something went wrong while reading the config.yml file: "+configFile.getAbsolutePath());
 			result = false;
 		}
 		Utils.initialize(config);
@@ -839,7 +839,7 @@ public class FileManager {
 			) {
 				groupsConfig = YamlConfiguration.loadConfiguration(reader);
 			} catch(IOException e) {
-				plugin.getLogger().warning("Could not load groups.yml file: " + groupFile.getAbsolutePath());
+				AreaShop.warn("Could not load groups.yml file: "+groupFile.getAbsolutePath());
 			}
 		}
 		if(groupsConfig == null) {
@@ -860,7 +860,7 @@ public class FileManager {
 		File file = new File(regionsPath);
 		if(!file.exists()) {
 			if(!file.mkdirs()) {
-				plugin.getLogger().warning("Could not create region files directory: " + file.getAbsolutePath());
+				AreaShop.warn("Could not create region files directory: "+file.getAbsolutePath());
 				return;
 			}
 			plugin.setReady(true);
@@ -878,10 +878,10 @@ public class FileManager {
 					) {
 						config = YamlConfiguration.loadConfiguration(reader);
 						if(config.getKeys(false).size() == 0) {
-							plugin.getLogger().warning("Region file '"+regionFile.getName()+"' is empty, check for errors in the log.");
+							AreaShop.warn("Region file '"+regionFile.getName()+"' is empty, check for errors in the log.");
 						}
 					} catch(IOException e) {
-						plugin.getLogger().warning("Something went wrong reading region file: " + regionFile.getAbsolutePath());
+						AreaShop.warn("Something went wrong reading region file: "+regionFile.getAbsolutePath());
 						continue;
 					}
 					// Construct the correct type of region
@@ -921,8 +921,8 @@ public class FileManager {
 						for(GeneralRegion region : noRegion) {
 							noRegionNames.add(region.getName());
 						}
-						plugin.getLogger().warning("AreaShop regions that are missing their WorldGuard region: " + Utils.createCommaSeparatedList(noRegionNames));
-						plugin.getLogger().warning("Remove these regions from AreaShop with '/as del' or recreate their regions in WorldGuard.");
+						AreaShop.warn("AreaShop regions that are missing their WorldGuard region: "+Utils.createCommaSeparatedList(noRegionNames));
+						AreaShop.warn("Remove these regions from AreaShop with '/as del' or recreate their regions in WorldGuard.");
 					}
 					boolean noWorldRegions = !noWorld.isEmpty();
 					while(!noWorld.isEmpty()) {
@@ -938,18 +938,18 @@ public class FileManager {
 						for(GeneralRegion region : noRegion) {
 							noWorldNames.add(region.getName());
 						}
-						plugin.getLogger().warning("World " + missingWorld + " is not loaded, the following AreaShop regions are not functional now: " + Utils.createCommaSeparatedList(noWorldNames));
+						AreaShop.warn("World "+missingWorld+" is not loaded, the following AreaShop regions are not functional now: "+Utils.createCommaSeparatedList(noWorldNames));
 						noWorld.removeAll(toDisplay);
 					}
 					if(noWorldRegions) {
-						plugin.getLogger().warning("Remove these regions from AreaShop with '/as del' or load the world(s) on the server again.");
+						AreaShop.warn("Remove these regions from AreaShop with '/as del' or load the world(s) on the server again.");
 					}
 					if(!incorrectDuration.isEmpty()) {
 						List<String> incorrectDurationNames = new ArrayList<>();
 						for(GeneralRegion region : incorrectDuration) {
 							incorrectDurationNames.add(region.getName());
 						}
-						plugin.getLogger().warning("The following regions have an incorrect time format as duration: "+Utils.createCommaSeparatedList(incorrectDurationNames));
+						AreaShop.warn("The following regions have an incorrect time format as duration: "+Utils.createCommaSeparatedList(incorrectDurationNames));
 					}
 				}
 			}.runTask(plugin);
@@ -969,7 +969,7 @@ public class FileManager {
 		if(fileStatus != null && fileStatus == AreaShop.versionFilesCurrent) {
 			return;
 		}
-		plugin.getLogger().info("Updating AreaShop data to the latest format:");
+		AreaShop.info("Updating AreaShop data to the latest format:");
 		
 		// Update to YAML based format
 		if(fileStatus == null || fileStatus < 2) {
@@ -984,7 +984,7 @@ public class FileManager {
 			if(rentFile.exists()) {
 				rentFileFound = true;
 				if(!oldFolderFile.exists() & !oldFolderFile.mkdirs()) {
-					plugin.getLogger().warning("Could not create directory: " + oldFolderFile.getAbsolutePath());
+					AreaShop.warn("Could not create directory: "+oldFolderFile.getAbsolutePath());
 				}
 				
 				if(versions.get("rents") == null) {
@@ -997,23 +997,23 @@ public class FileManager {
 			    	rents = (HashMap<String,HashMap<String,String>>)input.readObject();
 					input.close();
 				} catch (IOException | ClassNotFoundException | ClassCastException e) {
-					plugin.getLogger().warning("  Error: Something went wrong reading file: " + rentPath);
+					AreaShop.warn("  Error: Something went wrong reading file: "+rentPath);
 				}
 				// Delete the file if it is totally wrong
 				if(rents == null) {
 					try {
 						if(!rentFile.delete()) {
-							plugin.getLogger().warning("Could not delete file: " + rentFile.getAbsolutePath());
+							AreaShop.warn("Could not delete file: "+rentFile.getAbsolutePath());
 						}
 					} catch(Exception e) {
-						plugin.getLogger().warning("Could not delete file: " + rentFile.getAbsolutePath());
+						AreaShop.warn("Could not delete file: "+rentFile.getAbsolutePath());
 					}
 				} else {
 					// Move old file
 					try {
 						Files.move(new File(rentPath), new File(oldFolderPath + "rents"));
 					} catch (Exception e) {
-						plugin.getLogger().warning("  Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
+						AreaShop.warn("  Could not create a backup of '"+rentPath+"', check the file permissions (conversion to next version continues)");
 					}
 					// Check if conversion is needed
 					if(versions.get("rents") < 1) {
@@ -1038,7 +1038,7 @@ public class FileManager {
 								// Change to version 0
 								versions.put("rents", 0);
 							}
-							plugin.getLogger().info("  Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
+							AreaShop.info("  Updated version of '"+buyPath+"' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
 						}
 						if(versions.get("rents") < 1) {
 							for(String rentName : rents.keySet()) {
@@ -1052,13 +1052,13 @@ public class FileManager {
 								// Change version to 1
 								versions.put("rents", 1);
 							}
-							plugin.getLogger().info("  Updated version of '" + rentPath + "' from 0 to 1 (switch to UUID's for player identification)");
+							AreaShop.info("  Updated version of '"+rentPath+"' from 0 to 1 (switch to UUID's for player identification)");
 						}				
 					}		
 					// Save rents to new format
 					File regionsFile = new File(regionsPath);
 					if(!regionsFile.exists() & !regionsFile.mkdirs()) {
-						plugin.getLogger().warning("Could not create directory: " + regionsFile.getAbsolutePath());
+						AreaShop.warn("Could not create directory: "+regionsFile.getAbsolutePath());
 						return;
 					}
 					for(HashMap<String, String> rent : rents.values()) {
@@ -1094,10 +1094,10 @@ public class FileManager {
 						try {
 							config.save(new File(regionsPath + File.separator + rent.get("name").toLowerCase() + ".yml"));
 						} catch (IOException e) {
-							plugin.getLogger().warning("  Error: Could not save region file while converting: " + regionsPath + File.separator + rent.get("name").toLowerCase() + ".yml");
+							AreaShop.warn("  Error: Could not save region file while converting: "+regionsPath+File.separator+rent.get("name").toLowerCase()+".yml");
 						}
 					}
-					plugin.getLogger().info("  Updated rent regions to new .yml format (check the /regions folder)");
+					AreaShop.info("  Updated rent regions to new .yml format (check the /regions folder)");
 				}
 				
 				// Change version number
@@ -1108,7 +1108,7 @@ public class FileManager {
 			if(buyFile.exists()) {
 				buyFileFound = true;
 				if(!oldFolderFile.exists() & !oldFolderFile.mkdirs()) {
-					plugin.getLogger().warning("Could not create directory: " + oldFolderFile.getAbsolutePath());
+					AreaShop.warn("Could not create directory: "+oldFolderFile.getAbsolutePath());
 					return;
 				}
 				
@@ -1122,23 +1122,23 @@ public class FileManager {
 			    	buys = (HashMap<String,HashMap<String,String>>)input.readObject();
 					input.close();
 				} catch (IOException | ClassNotFoundException | ClassCastException e) {
-					plugin.getLogger().warning("  Something went wrong reading file: " + buyPath);
+					AreaShop.warn("  Something went wrong reading file: "+buyPath);
 				}
 				// Delete the file if it is totally wrong
 				if(buys == null) {
 					try {
 						if(!buyFile.delete()) {
-							plugin.getLogger().warning("Could not delete file: " + buyFile.getAbsolutePath());
+							AreaShop.warn("Could not delete file: "+buyFile.getAbsolutePath());
 						}
 					} catch(Exception e) {
-						plugin.getLogger().warning("Could not delete file: " + buyFile.getAbsolutePath());
+						AreaShop.warn("Could not delete file: "+buyFile.getAbsolutePath());
 					}
 				} else {
 					// Backup current file
 					try {
 						Files.move(new File(buyPath), new File(oldFolderPath + "buys"));
 					} catch (Exception e) {
-						plugin.getLogger().warning("  Could not create a backup of '" + buyPath + "', check the file permissions (conversion to next version continues)");
+						AreaShop.warn("  Could not create a backup of '"+buyPath+"', check the file permissions (conversion to next version continues)");
 					}
 					// Check if conversion is needed
 					if(versions.get("buys") < 1) {
@@ -1163,7 +1163,7 @@ public class FileManager {
 								// Change to version 0
 								versions.put("buys", 0);
 							}
-							plugin.getLogger().info("  Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
+							AreaShop.info("  Updated version of '"+buyPath+"' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
 						}
 						if(versions.get("buys") < 1) {
 							for(String buyName : buys.keySet()) {
@@ -1177,14 +1177,14 @@ public class FileManager {
 								// Change version to 1
 								versions.put("buys", 1);
 							}
-							plugin.getLogger().info("  Updated version of '" + buyPath + "' from 0 to 1 (switch to UUID's for player identification)");
+							AreaShop.info("  Updated version of '"+buyPath+"' from 0 to 1 (switch to UUID's for player identification)");
 						}				
 					}		
 				
 					// Save buys to new format
 					File regionsFile = new File(regionsPath);
 					if(!regionsFile.exists() & !regionsFile.mkdirs()) {
-						plugin.getLogger().warning("Could not create directory: " + regionsFile.getAbsolutePath());
+						AreaShop.warn("Could not create directory: "+regionsFile.getAbsolutePath());
 					}
 					for(HashMap<String, String> buy : buys.values()) {
 						YamlConfiguration config = new YamlConfiguration();
@@ -1217,10 +1217,10 @@ public class FileManager {
 						try {
 							config.save(new File(regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml"));
 						} catch (IOException e) {
-							plugin.getLogger().warning("  Error: Could not save region file while converting: " + regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml");
+							AreaShop.warn("  Error: Could not save region file while converting: "+regionsPath+File.separator+buy.get("name").toLowerCase()+".yml");
 						}
 					}
-					plugin.getLogger().info("  Updated buy regions to new .yml format (check the /regions folder)");
+					AreaShop.info("  Updated buy regions to new .yml format (check the /regions folder)");
 				}
 	
 				// Change version number
@@ -1248,7 +1248,7 @@ public class FileManager {
 			// Update versions file to 2
 			versions.put(AreaShop.versionFiles, 2);			
 			saveVersions();
-			plugin.getLogger().info("  Updated to YAML based storage (v1 to v2)");
+			AreaShop.info("  Updated to YAML based storage (v1 to v2)");
 		}
 	}
 	
@@ -1272,7 +1272,7 @@ public class FileManager {
 			// Update versions file to 3
 			versions.put(AreaShop.versionFiles, 3);			
 			saveVersions();
-			plugin.getLogger().info("  Added last active time to regions (v2 to v3)");
+			AreaShop.info("  Added last active time to regions (v2 to v3)");
 		}
 	}
 	

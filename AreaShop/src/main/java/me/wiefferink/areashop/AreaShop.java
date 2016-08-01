@@ -25,6 +25,7 @@ import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -217,8 +218,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					worldGuardInterface = (WorldGuardInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
 				}
 	        } catch (final Exception e) {
-	            e.printStackTrace();
-				getLogger().severe("Could not load the handler for WorldGuard (tried to load "+wgVersion+"), report this problem to the author.");
+				getLogger().severe("Could not load the handler for WorldGuard (tried to load "+wgVersion+"), report this problem to the author:"+ExceptionUtils.getStackTrace(e));
 				error = true;
 	            wgVersion = null;
 	        }
@@ -245,8 +245,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					worldEditInterface = (WorldEditInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
 				}
 	        } catch (final Exception e) {
-	            e.printStackTrace();
-				getLogger().severe("Could not load the handler for WorldEdit (tried to load "+weVersion+"), report this problem to the author.");
+				getLogger().severe("Could not load the handler for WorldEdit (tried to load "+weVersion+"), report this problem to the author: "+ExceptionUtils.getStackTrace(e));
 				error = true;
 	            weVersion = null;
 	        }
@@ -662,6 +661,22 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public void debugI(String message) {
 		AreaShop.debug(message);
+	}
+
+	/**
+	 * Print a warning to the console
+	 * @param message The message to print
+	 */
+	public static void warn(String... message) {
+		AreaShop.getInstance().getLogger().warning(StringUtils.join(message, " "));
+	}
+
+	/**
+	 * Print an information message to the console
+	 * @param message The message to print
+	 */
+	public static void info(String... message) {
+		AreaShop.getInstance().getLogger().info(StringUtils.join(message, " "));
 	}
 
 	/**

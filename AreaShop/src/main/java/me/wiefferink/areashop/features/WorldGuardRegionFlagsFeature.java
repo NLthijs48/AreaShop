@@ -83,7 +83,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 					wRegion.setPriority(priority);
 					//AreaShop.debug("  Flag " + flagName + " set: " + value);
 				} catch(NumberFormatException e) {
-					plugin.getLogger().warning("The value of flag " + flagName + " is not a number");
+					AreaShop.warn("The value of flag "+flagName+" is not a number");
 					result = false;
 				}
 			} else if(flagName.equalsIgnoreCase("parent")) {
@@ -96,10 +96,10 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 						wRegion.setParent(parentRegion);
 						//AreaShop.debug("  Flag " + flagName + " set: " + value);
 					} catch(ProtectedRegion.CircularInheritanceException e) {
-						plugin.getLogger().warning("The parent set in the config is not correct (circular inheritance)");
+						AreaShop.warn("The parent set in the config is not correct (circular inheritance)");
 					}
 				} else {
-					plugin.getLogger().warning("The parent set in the config is not correct (region does not exist)");
+					AreaShop.warn("The parent set in the config is not correct (region does not exist)");
 				}
 			} else {
 				// Parse all other normal flags (groups are also handled)
@@ -108,7 +108,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 
 				Flag<?> foundFlag = plugin.getWorldGuardHandler().fuzzyMatchFlag(flagName);
 				if(foundFlag == null) {
-					plugin.getLogger().warning("Found wrong flag in flagProfiles section: " + flagName + ", check if that is the correct WorldGuard flag");
+					AreaShop.warn("Found wrong flag in flagProfiles section: "+flagName+", check if that is the correct WorldGuard flag");
 					continue;
 				}
 				RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
@@ -128,7 +128,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 									try {
 										groupValue = plugin.getWorldGuardHandler().parseFlagGroupInput(groupFlag, part.substring(2));
 									} catch(InvalidFlagFormat e) {
-										plugin.getLogger().warning("Found wrong group value for flag " + flagName);
+										AreaShop.warn("Found wrong group value for flag "+flagName);
 									}
 								}
 							} else {
@@ -145,7 +145,7 @@ public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
 							setFlag(wRegion, foundFlag, flagSetting);
 							//AreaShop.debug("  Flag " + flagName + " set: " + flagSetting);
 						} catch(InvalidFlagFormat e) {
-							plugin.getLogger().warning("Found wrong value for flag " + flagName);
+							AreaShop.warn("Found wrong value for flag "+flagName);
 						}
 					}
 					if(groupValue != null) {

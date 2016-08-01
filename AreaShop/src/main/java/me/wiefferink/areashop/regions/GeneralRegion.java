@@ -700,8 +700,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
         File parent = saveFile.getParentFile();
         if (parent != null && !parent.exists()) {
             if (!parent.mkdirs()) {
-            	plugin.getLogger().warning("Did not save region " + getName() + ", schematic directory could not be created: " + saveFile);
-                return false;
+				AreaShop.warn("Did not save region "+getName()+", schematic directory could not be created: "+saveFile);
+				return false;
             }
         }		
 		boolean result = plugin.getWorldEditHandler().saveRegionBlocks(saveFile, this);
@@ -724,7 +724,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		// The path to save the schematic
 		File restoreFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
 		if(!restoreFile.exists() || !restoreFile.isFile()) {
-			plugin.getLogger().info("Did not restore region " + getName() + ", schematic file does not exist: " + restoreFile);
+			AreaShop.info("Did not restore region "+getName()+", schematic file does not exist: "+restoreFile);
 			return false;
 		}
 		boolean result = plugin.getWorldEditHandler().restoreRegionBlocks(restoreFile, this);
@@ -884,7 +884,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 					int vertical = Integer.parseInt(configSetting);
 					middle = middle.setY(vertical);
 				} catch(NumberFormatException e) {
-					plugin.getLogger().warning("Could not parse general.teleportLocationY: '"+configSetting+"'");
+					AreaShop.warn("Could not parse general.teleportLocationY: '"+configSetting+"'");
 				}
 			}
 			startLocation = new Location(getWorld(), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
@@ -1372,10 +1372,10 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			if(player.hasPermission("areashop.limits." + group) && this.matchesLimitGroup(group)) {
 				String pathPrefix = "limitGroups."+group+".";
 				if(!plugin.getConfig().isInt(pathPrefix+"total")) {
-					plugin.getLogger().warning("Limit group "+group+" in the config.yml file does not correctly specify the number of total regions (should be specified as total: <number>)");
+					AreaShop.warn("Limit group "+group+" in the config.yml file does not correctly specify the number of total regions (should be specified as total: <number>)");
 				}
 				if(!plugin.getConfig().isInt(pathPrefix+typePath)) {
-					plugin.getLogger().warning("Limit group "+group+" in the config.yml file does not correctly specify the number of "+typePath+" regions (should be specified as "+typePath+": <number>)");
+					AreaShop.warn("Limit group "+group+" in the config.yml file does not correctly specify the number of "+typePath+" regions (should be specified as "+typePath+": <number>)");
 				}
 				int totalLimit = plugin.getConfig().getInt("limitGroups." + group + ".total");
 				int typeLimit = plugin.getConfig().getInt("limitGroups." + group + "."+typePath);
@@ -1597,11 +1597,11 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			if(!result) {
 				printed = true;
 				if(error != null) {
-					plugin.getLogger().warning("Command execution failed, command=" + command + ", error=" + error + ", stacktrace:");
-					plugin.getLogger().warning(stacktrace);
-					plugin.getLogger().warning("--- End of stacktrace ---");
+					AreaShop.warn("Command execution failed, command="+command+", error="+error+", stacktrace:");
+					AreaShop.warn(stacktrace);
+					AreaShop.warn("--- End of stacktrace ---");
 				} else {
-					plugin.getLogger().warning("Command execution failed, command=" + command);
+					AreaShop.warn("Command execution failed, command="+command);
 				}
 			}
 			if(!printed) {

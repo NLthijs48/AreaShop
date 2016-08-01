@@ -41,7 +41,7 @@ public class LanguageManager {
 		langFolder = new File(plugin.getDataFolder()+File.separator+AreaShop.languageFolder);
 		if(!langFolder.exists()) {
 			if(!langFolder.mkdirs()) {
-				plugin.getLogger().warning("Could not create language directory: "+langFolder.getAbsolutePath());
+				AreaShop.warn("Could not create language directory: "+langFolder.getAbsolutePath());
 				return;
 			}
 		}
@@ -58,7 +58,7 @@ public class LanguageManager {
 					OutputStream output = new FileOutputStream(langFile)
 			) {
 				if(input == null) {
-					plugin.getLogger().warning("Could not save default language to the '"+AreaShop.languageFolder+"' folder: "+language+".yml");
+					AreaShop.warn("Could not save default language to the '"+AreaShop.languageFolder+"' folder: "+language+".yml");
 					continue;
 				}
 				int read;
@@ -69,7 +69,7 @@ public class LanguageManager {
 				input.close();
 				output.close();
 			} catch(IOException e) {
-				plugin.getLogger().warning("Something went wrong saving a default language file: "+langFile.getPath());
+				AreaShop.warn("Something went wrong saving a default language file: "+langFile.getPath());
 			}
 		}
 
@@ -90,7 +90,7 @@ public class LanguageManager {
 		) {
 			YamlConfiguration ymlFile = YamlConfiguration.loadConfiguration(reader);
 			if(ymlFile.getKeys(false).isEmpty()) {
-				plugin.getLogger().warning("Language file "+key+".yml has zero messages.");
+				AreaShop.warn("Language file "+key+".yml has zero messages.");
 				return result;
 			}
 			for(String messageKey : ymlFile.getKeys(false)) {
@@ -101,7 +101,7 @@ public class LanguageManager {
 				}
 			}
 		} catch(IOException e) {
-			plugin.getLogger().warning("Could not load set language file: "+file.getAbsolutePath());
+			AreaShop.warn("Could not load set language file: "+file.getAbsolutePath());
 		}
 		return result;
 	}

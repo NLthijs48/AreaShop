@@ -664,8 +664,8 @@ public class Updater {
 
             return true;
         } catch (final IOException e) {
-            if (e.getMessage().contains("HTTP response code: 403")) {
-                this.plugin.getLogger().severe("dev.bukkit.org rejected the API key provided in plugins/Updater/config.yml");
+			if(e.getMessage() != null && e.getMessage().contains("HTTP response code: 403")) {
+				this.plugin.getLogger().severe("dev.bukkit.org rejected the API key provided in plugins/Updater/config.yml");
                 this.plugin.getLogger().severe("Please double-check your configuration to ensure it is correct.");
                 this.result = UpdateResult.FAIL_APIKEY;
             } else {

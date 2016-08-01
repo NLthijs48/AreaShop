@@ -3,6 +3,8 @@ package me.wiefferink.areashop.messages;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.regions.GeneralRegion;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -182,12 +184,13 @@ public class Message {
 						AreaShop.getInstance().getLogger().severe("Message with key "+key+" could not be send, results in a JSON string that is too big to send to the client, start of the message: "+Utils.getMessageStart(this, 100));
 						return this;
 					}
-					boolean result = FancyMessageSender.sendJSON((Player)target, jsonString);
+					boolean result = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw "+((Player)target).getName()+" "+jsonString);
 					sendPlain = !result;
 					fancyWorks = result;
 				} catch(Exception e) {
 					fancyWorks = false;
 					AreaShop.getInstance().getLogger().warning("Sending fancy message did not work, falling back to plain messages. Message key: "+key);
+					AreaShop.debug(ExceptionUtils.getStackTrace(e));
 				}
 			}
 			if(sendPlain) { // Fancy messages disabled or broken

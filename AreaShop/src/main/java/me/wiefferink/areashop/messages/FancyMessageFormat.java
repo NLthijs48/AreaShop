@@ -88,10 +88,11 @@ public class FancyMessageFormat {
 
 		LinkedList<InteractiveMessagePart> message = parse(lines);
 		StringBuilder sb = new StringBuilder();
+		sb.append("[");
 		if(message.size() == 1) {
 			sb.append(message.getFirst().toJSON());
 		} else if(message.size() > 0) {
-			sb.append("{text=\"\",extra:[");
+			sb.append("{\"text\":\"\",\"extra\":[");
 			for(InteractiveMessagePart messagePart : message) {
 				sb.append(messagePart.toJSON());
 				sb.append(',');
@@ -99,6 +100,7 @@ public class FancyMessageFormat {
 			sb.deleteCharAt(sb.length()-1);
 			sb.append("]}");
 		}
+		sb.append("]");
 		return sb.toString();
 	}
 
@@ -556,13 +558,13 @@ public class FancyMessageFormat {
 		String toJSON() {
 			StringBuilder sb = new StringBuilder();
 			sb.append('{');
-			sb.append("text:").append(quoteStringJson(text));
+			sb.append("\"text\":").append(quoteStringJson(text));
 			if(color != null && color != Color.WHITE) {
-				sb.append(",color:").append(color.jsonValue);
+				sb.append(",\"color\":\"").append(color.jsonValue).append("\"");
 			}
 			for(FormatType formatting : formatTypes) {
-				sb.append(',');
-				sb.append(formatting.jsonKey).append(':');
+				sb.append(",\"");
+				sb.append(formatting.jsonKey).append("\":");
 				sb.append("true");
 			}
 			sb.append('}');
@@ -619,7 +621,7 @@ public class FancyMessageFormat {
 				sb.deleteCharAt(sb.length()-1);
 			} else {
 				sb.append('{');
-				sb.append("text=\"\",extra:[");
+				sb.append("\"text\":\"\",\"extra\":[");
 				for(TextMessagePart textPart : content) {
 					sb.append(textPart.toJSON());
 					sb.append(',');
@@ -629,16 +631,16 @@ public class FancyMessageFormat {
 			}
 			if(clickType != null) {
 				sb.append(',');
-				sb.append("clickEvent:{");
-				sb.append("action:").append(clickType.getJsonKey()).append(',');
-				sb.append("value:").append(quoteStringJson(clickContent));
+				sb.append("\"clickEvent\":{");
+				sb.append("\"action\":\"").append(clickType.getJsonKey()).append("\",");
+				sb.append("\"value\":").append(quoteStringJson(clickContent));
 				sb.append('}');
 			}
 			if(hoverType != null) {
 				sb.append(',');
-				sb.append("hoverEvent:{");
-				sb.append("action:").append(hoverType.getJsonKey()).append(',');
-				sb.append("value:");
+				sb.append("\"hoverEvent\":{");
+				sb.append("\"action\":\"").append(hoverType.getJsonKey()).append("\",");
+				sb.append("\"value\":");
 				if(hoverContent.size() == 1) {
 					TextMessagePart hoverPart = hoverContent.getFirst();
 					if(hoverPart.hasFormatting()) {

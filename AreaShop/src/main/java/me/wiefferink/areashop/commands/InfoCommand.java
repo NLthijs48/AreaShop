@@ -298,7 +298,7 @@ public class InfoCommand extends CommandAreaShop {
 							plugin.messageNoPrefix(sender, "info-regionRented", rent);
 							plugin.messageNoPrefix(sender, "info-regionExtending", rent);
 							// Money back
-							if(UnrentCommand.canUse(sender, buy)) {
+							if(UnrentCommand.canUse(sender, rent)) {
 								plugin.messageNoPrefix(sender, "info-regionMoneyBackRentClick", rent);
 							} else {
 								plugin.messageNoPrefix(sender, "info-regionMoneyBackRent", rent);

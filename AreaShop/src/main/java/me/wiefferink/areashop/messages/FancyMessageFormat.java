@@ -151,7 +151,13 @@ public class FancyMessageFormat {
 	 * @param end     The end of the variable to replace
 	 */
 	public static void insertMessage(List<String> message, List<String> insert, int line, int start, int end) {
+		if(insert == null || line < 0 || line >= message.size() || start < 0 || end < 0) {
+			return;
+		}
 		String lineContent = message.remove(line);
+		if(start > lineContent.length() || end > lineContent.length()) {
+			return;
+		}
 		if(isTaggedInteractive(lineContent)) {
 			lineContent = lineContent.replace("", "");
 			message.add(line, lineContent.substring(0, start)+convertToConsole(insert)+lineContent.substring(end));

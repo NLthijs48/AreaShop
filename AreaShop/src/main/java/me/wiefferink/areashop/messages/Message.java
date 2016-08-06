@@ -86,6 +86,9 @@ public class Message {
 	 * @return Message as a list
 	 */
 	private List<String> get(Limit limit) {
+		if(limit.reached()) {
+			return new ArrayList<>();
+		}
 		executeReplacements(limit);
 		return message;
 	}
@@ -292,7 +295,7 @@ public class Message {
 	 * - Else the parameter will replace its number surrounded with VARIABLESTART and VARIABLEEND
 	 */
 	private void replaceArgumentVariables(Limit limit) {
-		if(message == null || message.size() == 0 || replacements == null) {
+		if(message == null || message.size() == 0 || replacements == null || limit.reached()) {
 			return;
 		}
 		boolean result = false;
@@ -305,8 +308,15 @@ public class Message {
 					} else if(param instanceof Message) {
 						Pattern variables = Pattern.compile(Pattern.quote(VARIABLESTART)+number+Pattern.quote(VARIABLEEND));
 						Matcher matches = variables.matcher(message.get(i));
-						if(matches.find()) {
-							FancyMessageFormat.insertMessage(message, ((Message)param).get(limit), i, matches.start(), matches.end());
+						if(matches.find()) { // Only replaces one occurance of the variable, others will be done next round
+							int startDiff = message.size()-i;
+							List<String> insertMessage = ((Message)param).get(limit);
+							if(limit.reached()) {
+								return;
+							}
+							FancyMessageFormat.insertMessage(message, insertMessage, i, matches.start(), matches.end());
+							// Skip to end of insert
+							i = message.size()-startDiff;
 						}
 						number++;
 					} else {
@@ -322,7 +332,7 @@ public class Message {
 	 * Replace all language variables in a message
 	 */
 	private void replaceLanguageVariables(Limit limit) {
-		if(message == null || message.size() == 0) {
+		if(message == null || message.size() == 0 || limit.reached()) {
 			return;
 		}
 
@@ -352,8 +362,12 @@ public class Message {
 
 				// Insert message
 				int startDiff = message.size()-i;
-				FancyMessageFormat.insertMessage(message, insert.get(limit), i, matches.start(), matches.end());
-				// Skip to end of insert, language tags already replaced
+				List<String> insertMessage = insert.get(limit);
+				if(limit.reached()) {
+					return;
+				}
+				FancyMessageFormat.insertMessage(message, insertMessage, i, matches.start(), matches.end());
+				// Skip to end of insert
 				i = message.size()-startDiff;
 			}
 		}

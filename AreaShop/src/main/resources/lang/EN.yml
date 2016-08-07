@@ -8,7 +8,7 @@
 # ║ 4: Change the strings in the new file to your liking and save the file                                                     ║
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-action: "[blue][bold]<%0%>[/bold]"
+action: "[gold][bold]<%0%>[/bold]"
 
 button: "[bold]<%0%>[/bold]"
 
@@ -178,22 +178,22 @@ info-nogroupNone: "There are no regions without a group."
 info-noFiltergroup: "Group '%0%' does not exist and therefore cannot be used to limit the results."
 info-noRegions: "No regions have been found."
 info-wrongPage: "%0% is not a correct page number."
-info-entryForrent: "[darkgreen][bold]►[reset] %lang:region%: For rent for %price% per %duration%."
-info-entryRented: "[darkgreen][bold]►[reset] %lang:region%: Rented to %lang:player%."
-info-entryForsale: "[darkgreen][bold]►[reset] %lang:region%: For sale for %price%."
-info-entrySold: "[darkgreen][bold]►[reset] %lang:region%: Sold to %lang:player%."
-info-entryReselling: "[darkgreen][bold]►[reset] %lang:region%: Sold to %lang:player% (reselling)."
+info-entryForrent: "[darkgreen][bold]►[reset] %lang:region%: [gray]For rent for %price% per %duration%."
+info-entryRented: "[darkgreen][bold]►[reset] %lang:region%: [gray]Rented to %lang:player%."
+info-entryForsale: "[darkgreen][bold]►[reset] %lang:region%: [gray]For sale for %price%."
+info-entrySold: "[darkgreen][bold]►[reset] %lang:region%: [gray]Sold to %lang:player%."
+info-entryReselling: "[darkgreen][bold]►[reset] %lang:region%: [gray]Sold to %lang:player% (reselling)."
 info-pageStatus:
-  - "[gray]Page %0%/%1%"
+  - "[gold]Page %0%/%1%"
 info-pagePrevious:
-  - "    [gray][bold]◄Previous[/bold]    "
+  - "    [gold][bold]◄Previous[/bold]    "
   - "    hover: %lang:action|Show previous page|%"
   - "    command: %0%"
 info-pageNoPrevious:
   - "    [darkgray][bold]◄Previous[/bold]    "
   - "    hover: This is already the first page"
 info-pageNext:
-  - "    [gray][bold]Next►[/bold]"
+  - "    [gold][bold]Next►[/bold]"
   - "    hover: %lang:action|Show next page|%"
   - "    command: %0%"
 info-pageNoNext:
@@ -442,9 +442,14 @@ me-rentLine:
   - "    hover: until %until%"
   - ")."
 me-buyLine: "[darkgreen][bold]►[reset] %lang:region%."
-me-friendLine: "[darkgreen][bold]►[reset] %lang:region% [gray](added as friend, owner: %lang:player%)."
+me-friendLine:
+  - "[darkgreen][bold]►[reset] %lang:region% [gray]("
+  - "owned by %lang:player%"
+  - "    hover: You are added as friend"
+  - ")."
 me-nothing: "%lang:tPlayer|%0%|% has not rented or bought regions and is not added as friend to one."
 me-noPlayer: "%0% cannot be found, probably never joined the server."
+me-clickHint: "[gray][italic]Click a region name to see details."
 
 setowner-help: "/as setowner <player> [region], the region you stand in will be used if not specified."
 setowner-noPermission: "You don't have permission to set the owner of a region."

@@ -101,6 +101,8 @@ public class MeCommand extends CommandAreaShop {
 
 		if(!foundSome) {
 			plugin.message(sender, "me-nothing", player.getName());
+		} else {
+			plugin.messageNoPrefix(sender, "me-clickHint");
 		}
 	}
 

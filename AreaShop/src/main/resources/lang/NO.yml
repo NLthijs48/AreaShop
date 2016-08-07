@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Norwegian, Version: V2.3.1, Percentage translated: 100%                                                          ║
+# ║ Language: Norwegian, Version: V2.3.2, Percentage translated: 96%                                                           ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -8,8 +8,6 @@
 # ║ 4: Change the strings in the new file to your liking and save the file                                                     ║
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-action: "[blue][bold]<%0%>[/bold]"
-
 button: "[bold]<%0%>[/bold]"
 
 command:
@@ -178,23 +176,9 @@ info-nogroupNone: "Det er ingen regioner uten en gruppe."
 info-noFiltergroup: "Gruppe '%0%' eksiterer ikke og kan derfor ikke bli brukt til å begrense resultatene."
 info-noRegions: "Ingen regioner har blitt funnet."
 info-wrongPage: "%0% er ikke et riktig side nummer."
-info-entryForrent: "[darkgreen][bold]►[reset] %lang:region%: Til leie for %price% per %duration%."
-info-entryRented: "[darkgreen][bold]►[reset] %lang:region%: Utleid til %lang:player%."
-info-entryForsale: "[darkgreen][bold]►[reset] %lang:region%: Til salgs for %price%."
-info-entrySold: "[darkgreen][bold]►[reset] %lang:region%: Solgt til %lang:player%."
-info-entryReselling: "[darkgreen][bold]►[reset] %lang:region%: Solgt til %lang:player% (videresalg)."
-info-pageStatus: "[gray]Side %0%/%1%"
-info-pagePrevious:
-  - "    [gray][bold]◄Forrige[/bold]    "
-  - "    hover: %lang:action|Vis forrige side|%"
-  - "    kommando: %0%"
 info-pageNoPrevious:
   - "    [darkgray][bold]◄Forrige[/bold]    "
   - "    hover: Dette er første side"
-info-pageNext:
-  - "    [gray][bold]Neste►[/bold]"
-  - "    hover: %lang:action|Vis neste side|%"
-  - "    kommando: %0%"
 info-pageNoNext:
   - "    [darkgray][bold]Neste►[/bold]"
   - "    hover: Dette er siste side"
@@ -431,9 +415,7 @@ delsign-success: "Skiltet har blitt fjernet fra region %land:region%."
 me-noPermission: "Du har ikke rettigheter til å sjekke hvilken regioner du har."
 me-header: "Regioner til %lang:tPlayer|%0%|%:"
 me-notAPlayer: "Du er ikke en spiller så du kan ikke ha noen regioner."
-me-rentLine: "[darkgreen][bold]►[reset] %lang:region% [gray](frem til %until%, %timeleft% igjen)."
 me-buyLine: "[darkgreen][bold]►[reset] %lang:region%."
-me-friendLine: "[darkgreen][bold]►[reset] %lang:region% [gray](lagt til som venn, eier: %lang:player%)."
 me-nothing: "%lang:tPlayer|%0%|% har ikke leid eller kjøpt regioner og er ikke lagt til som venn på noen."
 me-noPlayer: "%0% kan ikke bli funnet, mest sannsynlig aldri vært på serveren."
 
@@ -477,7 +459,6 @@ delfriend-noPermissionOther: "Du har ikke rettigheter til å fjerne venner fra r
 delfriend-noPermission: "Du har ikke rettigheter til å fjerne venner fra din region."
 delfriend-successOther: "%lang:tPlayer|%0%|% har blitt fjernet som venn fra region %lang:region%."
 delfriend-success: "%lang:tPlayer|%0%|% har blitt fjernet som venn fra din region %lang:region%."
-delfriend-notAdded: "%lang:tPlayer|%0%|% er ikke lagt til som venn i %lang:region."
 delfriend-noOwner: "Du kan ikke fjerne venner fra en region uten eier."
 
 linksigns-multipleRegions: "Fant flere regioner: [gray]%0%."

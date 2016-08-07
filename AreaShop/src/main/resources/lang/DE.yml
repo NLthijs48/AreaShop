@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: German, Version: V2.3.1, Percentage translated: 100%                                                             ║
+# ║ Language: German, Version: V2.3.2, Percentage translated: 96%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -8,8 +8,6 @@
 # ║ 4: Change the strings in the new file to your liking and save the file                                                     ║
 # ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
 # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-action: "[blue][bold]<%0%>[/bold]"
-
 button: "[bold]<%0%>[/bold]"
 
 command:
@@ -178,23 +176,9 @@ info-nogroupNone: "Es gibt keine Regionen ohne Gruppe."
 info-noFiltergroup: "Gruppe '%0%' existiert nicht und kann deshalb nicht genutzt werden um die Ergebnisse zu limitieren."
 info-noRegions: "Es wurden keine Regionen gefunden."
 info-wrongPage: "%0% ist keine korrekte Seitenzahl."
-info-entryForrent: "[darkgreen][bold]►[reset] %lang:region% kann gemietet werden für %price% je %duration%."
-info-entryRented: "[darkgreen][bold]►[reset] %lang:region% wurde an %lang:player% verkauft."
-info-entryForsale: "[darkgreen][bold]►[reset] %lang:region% kann gekauft werden für %price%."
-info-entrySold: "[darkgreen][bold]►[reset] %lang:region% wurde an %lang:player% verkauft."
-info-entryReselling: "[darkgreen][bold]►[reset] %lang:region% wurde an %lang:player% weiterverkauft."
-info-pageStatus: "[gray]Seite %0%/%1%"
-info-pagePrevious:
-  - "    [gray][bold]◄Vorherige[/bold]    "
-  - "    hover: %lang:action|Zeige Vorherige Seite|%"
-  - "    command: %0%"
 info-pageNoPrevious:
   - "    [darkgray][bold]◄Vorherige[/bold]    "
   - "    hover: Das ist bereits die erste Seite."
-info-pageNext:
-  - "    [gray][bold]Nächste►[/bold]"
-  - "    hover: %lang:action|Zeige nächste Seite.|%"
-  - "    command: %0%"
 info-pageNoNext:
   - "    [darkgray][bold]Nächste►[/bold]"
   - "    hover: Das ist bereits die letzte Seite."
@@ -431,9 +415,7 @@ delsign-success: "Das Schild wurde von der Region %lang:region% entfernt."
 me-noPermission: "Dir fehlt die Berechtigung einzusehen, welche Regionen du besitzt."
 me-header: "Regionen von %lang:tPlayer|%0%|%:"
 me-notAPlayer: "Du bist kein Spieler, darum können dir keine Regionen gehören."
-me-rentLine: "[darkgreen][bold]►[reset] %lang:region% [gray](nach %until%, %timeleft% verbleibend)."
 me-buyLine: "[darkgreen][bold]►[reset] %lang:region%."
-me-friendLine: "[darkgreen][bold]►[reset] %lang:region% [gray](als Freund hinzugefügt, Besitzer: %lang:player%)."
 me-nothing: "%lang:tPlayer|%0%|% hat keine gemieteten oder gekaufen Regionen und wurde nicht als Freund zu einem hinzugefügt."
 me-noPlayer: "%0% konnte nicht gefunden werden, möglicherweise war er nie auf diesem Server."
 
@@ -477,7 +459,6 @@ delfriend-noPermissionOther: "Du hast keine Berechtigung, Freunde von Regionen z
 delfriend-noPermission: "Du hast keine Berechtigung, Freunde von deinen Regionen zu entfernen."
 delfriend-successOther: "%lang:tPlayer|%0%|% wurde als Freund der Region %lang:region% entfernt."
 delfriend-success: "%lang:tPlayer|%0%|% wurde als Freund Deiner Region %lang:region% entfernt."
-delfriend-notAdded: "%lang:tPlayer|%0%|% ist nicht als Freund der Region %lang:region% eingetragen."
 delfriend-noOwner: "Du kannst keine Freunde von einer Region ohne Besitzer entfernen."
 
 linksigns-multipleRegions: "Mehrere Regionen gefunden: [gray]%0%."

@@ -184,7 +184,7 @@ public class Message {
 				try {
 					String jsonString = FancyMessageFormat.convertToJSON(message);
 					if(jsonString.length() > MAXIMUMJSONLENGTH) {
-						AreaShop.getInstance().getLogger().severe("Message with key "+key+" could not be send, results in a JSON string that is too big to send to the client, start of the message: "+Utils.getMessageStart(this, 100));
+						AreaShop.error("Message with key "+key+" could not be send, results in a JSON string that is too big to send to the client, start of the message: "+Utils.getMessageStart(this, 100));
 						return this;
 					}
 					boolean result = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw "+((Player)target).getName()+" "+jsonString);
@@ -192,7 +192,7 @@ public class Message {
 					fancyWorks = result;
 				} catch(Exception e) {
 					fancyWorks = false;
-					AreaShop.getInstance().getLogger().warning("Sending fancy message did not work, falling back to plain messages. Message key: "+key);
+					AreaShop.warn("Sending fancy message did not work, falling back to plain messages. Message key: "+key);
 					AreaShop.debug(ExceptionUtils.getStackTrace(e));
 				}
 			}
@@ -209,7 +209,7 @@ public class Message {
 			} else if(target instanceof Logger) {
 				((Logger)target).info(plainMessage);
 			} else {
-				AreaShop.getInstance().getLogger().warning("Could not send message, target is wrong: "+plainMessage);
+				AreaShop.warn("Could not send message, target is wrong: "+plainMessage);
 			}
 		}
 		return this;
@@ -272,7 +272,7 @@ public class Message {
 				if(limit.reached()) {
 					if(!limit.notified) {
 						limit.notified = true;
-						AreaShop.getInstance().getLogger().severe("Reached replacement limit, probably has replacements loops, problematic message key: "+limit.message.key+", first characters of the message: "+Utils.getMessageStart(limit.message, 100));
+						AreaShop.error("Reached replacement limit, probably has replacements loops, problematic message key: "+limit.message.key+", first characters of the message: "+Utils.getMessageStart(limit.message, 100));
 					}
 					break;
 				}
@@ -284,7 +284,7 @@ public class Message {
 		} catch(StackOverflowError e) {
 			limit.left = 0;
 			limit.notified = true;
-			AreaShop.getInstance().getLogger().severe("Too many recursive replacements for message with key: "+limit.message.key+" (probably includes itself as replacement), start of the message: "+Utils.getMessageStart(limit.message, 100));
+			AreaShop.error("Too many recursive replacements for message with key: "+limit.message.key+" (probably includes itself as replacement), start of the message: "+Utils.getMessageStart(limit.message, 100));
 		}
 	}
 

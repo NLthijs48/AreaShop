@@ -19,14 +19,6 @@ public class LanguageManager {
 	 */
 	public LanguageManager(AreaShop plugin) {
 		this.plugin = plugin;
-		startup();
-
-	}
-
-	/**
-	 * Save the default language files and open the current and backup language file
-	 */
-	public void startup() {
 		this.saveDefaults();
 		currentLanguage = loadLanguage(plugin.getConfig().getString("language"));
 		defaultLanguage = loadLanguage(languages[0]);

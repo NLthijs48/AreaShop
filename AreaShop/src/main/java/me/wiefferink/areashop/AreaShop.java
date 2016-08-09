@@ -159,56 +159,60 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	    } else {
 		    worldGuard = (WorldGuardPlugin)plugin;
 		    // Get correct WorldGuardInterface (handles things that changed version to version)
-			rawVersion = worldGuard.getDescription().getVersion();
-			if(rawVersion.contains("-SNAPSHOT;")) {
-				String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;")+10, rawVersion.length());
-				if(rawVersion.contains("-")) {
-					buildNumber = buildNumber.substring(0, buildNumber.indexOf("-"));
-				}
-				try {
-					build = Integer.parseInt(buildNumber);
-				} catch(NumberFormatException e) {
-					warn("Could not correctly parse the build of WorldGuard, raw version: "+rawVersion+", buildNumber: "+buildNumber);
-				}
-			}
-			// Clear stuff from the version string that is not a number
-			String[] versionParts = rawVersion.split("\\.");
-			for(int i = 0; i < versionParts.length; i++) {
-				Pattern pattern = Pattern.compile("^\\d+");
-				Matcher matcher = pattern.matcher(versionParts[i]);
-				if(matcher.find()) {
-					versionParts[i] = matcher.group();
-				}
-			}
-			// Find major, minor and fix numbers
 			try {
-				if(versionParts.length > 0) {
-					major = Integer.parseInt(versionParts[0]);
+				rawVersion = worldGuard.getDescription().getVersion();
+				if(rawVersion.contains("-SNAPSHOT;")) {
+					String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;")+10, rawVersion.length());
+					if(buildNumber.contains("-")) {
+						buildNumber = buildNumber.substring(0, buildNumber.indexOf("-"));
+					}
+					try {
+						build = Integer.parseInt(buildNumber);
+					} catch(NumberFormatException e) {
+						warn("Could not correctly parse the build of WorldGuard, raw version: "+rawVersion+", buildNumber: "+buildNumber);
+					}
 				}
-				if(versionParts.length > 1) {
-					minor = Integer.parseInt(versionParts[1]);
+				// Clear stuff from the version string that is not a number
+				String[] versionParts = rawVersion.split("\\.");
+				for(int i = 0; i < versionParts.length; i++) {
+					Pattern pattern = Pattern.compile("^\\d+");
+					Matcher matcher = pattern.matcher(versionParts[i]);
+					if(matcher.find()) {
+						versionParts[i] = matcher.group();
+					}
 				}
-				if(versionParts.length > 2) {
-					fixes = Integer.parseInt(versionParts[2]);
+				// Find major, minor and fix numbers
+				try {
+					if(versionParts.length > 0) {
+						major = Integer.parseInt(versionParts[0]);
+					}
+					if(versionParts.length > 1) {
+						minor = Integer.parseInt(versionParts[1]);
+					}
+					if(versionParts.length > 2) {
+						fixes = Integer.parseInt(versionParts[2]);
+					}
+				} catch(NumberFormatException e) {
+					warn("Something went wrong while parsing WorldGuard version number: "+rawVersion);
 				}
-			} catch(NumberFormatException e) {
-				warn("Something went wrong while parsing WorldGuard version number: "+rawVersion);
-			}
-			// Determine correct implementation to use
-			if(major >= 6 && minor >= 1 && fixes > 3) {
-				wgVersion = "6_1_3";
-			} else if(build != null && build >= 1672) {
-				if(build > 1672) {
-					wgVersion = "6_1_3"; // Flag name to flag object method changed
+				// Determine correct implementation to use
+				if(major >= 6 && minor >= 1 && fixes > 3) {
+					wgVersion = "6_1_3";
+				} else if(build != null && build >= 1672) {
+					if(build > 1672) {
+						wgVersion = "6_1_3"; // Flag name to flag object method changed
+					} else {
+						// Build 1672 is broken, flags changed but no FlagContext added yet
+						error = true;
+						error("Build 1672 of WorldGuard is broken, update to a later build or a stable version!");
+					}
+				} else if(worldGuard.getDescription().getVersion().startsWith("5.")) {
+					wgVersion = "5";
 				} else {
-					// Build 1672 is broken, flags changed but no FlagContext added yet
-					error = true;
-					error("Build 1672 of WorldGuard is broken, update to a later build or a stable version!");
+					wgVersion = "6"; // Schematic methods changed
 				}
-			} else if(worldGuard.getDescription().getVersion().startsWith("5.")) {
-				wgVersion = "5";
-	        } else {
-				wgVersion = "6"; // Schematic methods changed
+			} catch(Exception e) { // If version detection fails, at least try to load the latest version
+				wgVersion = "6_1_3";
 			}
 			// Load chosen implementation
 			try {
@@ -718,7 +722,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		setReady(false);
 		fileManager.saveRequiredFilesAtOnce();
 		fileManager.loadFiles();
-		languageManager.startup();
+		languageManager = new LanguageManager(this);
 		message(confirmationReceiver, "reload-reloading");
 		fileManager.checkRents();
 		fileManager.updateAllRegions(confirmationReceiver);

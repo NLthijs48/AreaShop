@@ -165,11 +165,11 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;")+10, rawVersion.length());
 					if(buildNumber.contains("-")) {
 						buildNumber = buildNumber.substring(0, buildNumber.indexOf("-"));
-					}
-					try {
-						build = Integer.parseInt(buildNumber);
-					} catch(NumberFormatException e) {
-						warn("Could not correctly parse the build of WorldGuard, raw version: "+rawVersion+", buildNumber: "+buildNumber);
+						try {
+							build = Integer.parseInt(buildNumber);
+						} catch(NumberFormatException e) {
+							warn("Could not correctly parse the build of WorldGuard, raw version: "+rawVersion+", buildNumber: "+buildNumber);
+						}
 					}
 				}
 				// Clear stuff from the version string that is not a number

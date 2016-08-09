@@ -196,20 +196,19 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					warn("Something went wrong while parsing WorldGuard version number: "+rawVersion);
 				}
 				// Determine correct implementation to use
-				if(major >= 6 && minor >= 1 && fixes > 3) {
-					wgVersion = "6_1_3";
-				} else if(build != null && build >= 1672) {
-					if(build > 1672) {
-						wgVersion = "6_1_3"; // Flag name to flag object method changed
-					} else {
-						// Build 1672 is broken, flags changed but no FlagContext added yet
+				if(worldGuard.getDescription().getVersion().startsWith("5.")) {
+					wgVersion = "5";
+				} else if(major == 6 && minor == 1 && fixes < 3) {
+					wgVersion = "6";
+				} else {
+					if(build != null && build == 1672) {
 						error = true;
 						error("Build 1672 of WorldGuard is broken, update to a later build or a stable version!");
+					} else if(build != null && build < 1672) {
+						wgVersion = "6";
+					} else {
+						wgVersion = "6_1_3";
 					}
-				} else if(worldGuard.getDescription().getVersion().startsWith("5.")) {
-					wgVersion = "5";
-				} else {
-					wgVersion = "6"; // Schematic methods changed
 				}
 			} catch(Exception e) { // If version detection fails, at least try to load the latest version
 				wgVersion = "6_1_3";

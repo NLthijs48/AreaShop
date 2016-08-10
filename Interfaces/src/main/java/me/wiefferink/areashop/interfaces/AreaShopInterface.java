@@ -7,7 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.util.logging.Logger;
 
 public interface AreaShopInterface {
-	void debugI(String message);
+	void debugI(Object... message);
 	YamlConfiguration getConfig();
 	WorldGuardPlugin getWorldGuard();
 	WorldEditPlugin getWorldEdit();

@@ -674,15 +674,15 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	/**
 	 * Non-static debug to use as implementation of the interface
 	 */
-	public void debugI(String message) {
-		AreaShop.debug(message);
+	public void debugI(Object... message) {
+		AreaShop.debug(StringUtils.join(message, " "));
 	}
 
 	/**
 	 * Print an information message to the console
 	 * @param message The message to print
 	 */
-	public static void info(String... message) {
+	public static void info(Object... message) {
 		AreaShop.getInstance().getLogger().info(StringUtils.join(message, " "));
 	}
 
@@ -690,7 +690,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Print a warning to the console
 	 * @param message The message to print
 	 */
-	public static void warn(String... message) {
+	public static void warn(Object... message) {
 		AreaShop.getInstance().getLogger().warning(StringUtils.join(message, " "));
 	}
 
@@ -698,7 +698,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Print an error to the console
 	 * @param message The messagfe to print
 	 */
-	public static void error(String... message) {
+	public static void error(Object... message) {
 		AreaShop.getInstance().getLogger().severe(StringUtils.join(message, " "));
 	}
 
@@ -706,9 +706,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Print debug message for periodic task
 	 * @param message The message to print
 	 */
-	public static void debugTask(String message) {
+	public static void debugTask(Object... message) {
 		if(AreaShop.getInstance().getConfig().getBoolean("debugTask")) {
-			AreaShop.debug(message);
+			AreaShop.debug(StringUtils.join(message, " "));
 		}
 	}
 

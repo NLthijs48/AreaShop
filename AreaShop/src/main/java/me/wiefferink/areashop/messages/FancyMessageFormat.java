@@ -318,6 +318,7 @@ public class FancyMessageFormat {
 							if(!targetList.isEmpty()) {
 								targetList.getLast().text += '\n';
 							}
+							currentLineFormatting.clear();
 							continue lineLoop;
 						} else if(tag == ControlTag.RESET) {
 							currentLineFormatting.clear();

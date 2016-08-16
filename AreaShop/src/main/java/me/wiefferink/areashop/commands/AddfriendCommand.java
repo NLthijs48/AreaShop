@@ -77,7 +77,7 @@ public class AddfriendCommand extends CommandAreaShop {
 				return;
 			}	
 			OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
-			if(friend.getLastPlayed() == 0 && !plugin.getConfig().getBoolean("addFriendNotExistingPlayers")) {
+			if(friend.getLastPlayed() == 0 && !friend.isOnline() && !plugin.getConfig().getBoolean("addFriendNotExistingPlayers")) {
 				plugin.message(sender, "addfriend-notVisited", args[1], region);
 				return;
 			}

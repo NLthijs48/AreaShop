@@ -25,10 +25,10 @@ helpCommand:
 region: "%lang:tRegion|%region%|%"
 
 tRegion:
-    - "[bold]%0%[/bold]"
-    - "    hover: Region %0%"
-    - "    hover: %lang:action|Region information|%"
-    - "    command: /areashop info region %0%"
+  - "[bold]%0%[/bold]"
+  - "    hover: Region %0%"
+  - "    hover: %lang:action|Region information|%"
+  - "    command: /areashop info region %0%"
 
 player: "%lang:tPlayer|%player%|%"
 

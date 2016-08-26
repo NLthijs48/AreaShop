@@ -73,7 +73,7 @@ Old video for AreaShop v1.0: [Tutorial by VariationVault](https://www.youtube.co
 
 ### Extension plugins
 Do you know a plugin that is nice to use with AreaShop? Let me know.
-* [Shop - a simple, intuitive shop plugin (Paid)](https://www.spigotmc.org/resources/shop-a-simple-intuitive-shop-plugin.9628/updates) : Let players buy and sell items from other players in or outside an AreaShop region, if restoring from schematic is enabled in AreaShop Shops will removed correctly.
+* [[Premium]Shop - a simple, intuitive shop plugin](https://www.spigotmc.org/resources/shop-a-simple-intuitive-shop-plugin.9628/updates) : Let players buy and sell items from other players in or outside an AreaShop region, if restoring from schematic is enabled in AreaShop Shops will removed correctly.
 
 ### Metrics
 This plugin utilizes Hidendra's plugin metrics system, which means that the following information is collected and sent to mcstats.org:

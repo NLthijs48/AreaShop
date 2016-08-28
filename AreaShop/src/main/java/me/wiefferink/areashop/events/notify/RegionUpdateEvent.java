@@ -1,29 +1,19 @@
 package me.wiefferink.areashop.events.notify;
 
-import me.wiefferink.areashop.events.NotifyAreaShopEvent;
+import me.wiefferink.areashop.events.NotifyRegionEvent;
 import me.wiefferink.areashop.regions.GeneralRegion;
 
 /**
  * Broadcasted when the data of a region changes.
  * Should be used for updating displays that use region data.
  */
-public class RegionUpdateEvent extends NotifyAreaShopEvent {
-
-	private GeneralRegion region;
+public class RegionUpdateEvent extends NotifyRegionEvent<GeneralRegion> {
 
 	/**
 	 * Contructor
 	 * @param region The region that has been updated
 	 */
 	public RegionUpdateEvent(GeneralRegion region) {
-		this.region = region;
-	}
-
-	/**
-	 * The region that has been updated
-	 * @return The GeneralRegion that has been updated
-	 */
-	public GeneralRegion getRegion() {
-		return region;
+		super(region);
 	}
 }

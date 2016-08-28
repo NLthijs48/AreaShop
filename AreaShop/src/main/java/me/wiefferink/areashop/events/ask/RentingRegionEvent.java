@@ -1,15 +1,14 @@
 package me.wiefferink.areashop.events.ask;
 
-import me.wiefferink.areashop.events.CancellableAreaShopEvent;
+import me.wiefferink.areashop.events.CancellableRegionEvent;
 import me.wiefferink.areashop.regions.RentRegion;
 import org.bukkit.entity.Player;
 
 /**
  * Broadcasted when a player tries to rent a region
  */
-public class RentingRegionEvent extends CancellableAreaShopEvent {
+public class RentingRegionEvent extends CancellableRegionEvent<RentRegion> {
 
-	private RentRegion region;
 	private Player player;
 	private boolean extending;
 
@@ -20,17 +19,9 @@ public class RentingRegionEvent extends CancellableAreaShopEvent {
 	 * @param extending true if the player is extending the rental of the region, otherwise false
 	 */
 	public RentingRegionEvent(RentRegion region, Player player, boolean extending) {
-		this.region = region;
+		super(region);
 		this.player = player;
 		this.extending = extending;
-	}
-
-	/**
-	 * Get the region that is about to be rented
-	 * @return the region that is about to be rented
-	 */
-	public RentRegion getRegion() {
-		return region;
 	}
 
 	/**

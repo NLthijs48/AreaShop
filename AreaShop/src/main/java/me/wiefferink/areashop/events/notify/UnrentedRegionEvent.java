@@ -1,6 +1,6 @@
 package me.wiefferink.areashop.events.notify;
 
-import me.wiefferink.areashop.events.NotifyAreaShopEvent;
+import me.wiefferink.areashop.events.NotifyRegionEvent;
 import me.wiefferink.areashop.regions.RentRegion;
 
 import java.util.UUID;
@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Broadcasted when a region has been unrented
  */
-public class UnrentedRegionEvent extends NotifyAreaShopEvent {
+public class UnrentedRegionEvent extends NotifyRegionEvent<RentRegion> {
 
 	private RentRegion region;
 	private UUID oldRenter;
@@ -21,17 +21,9 @@ public class UnrentedRegionEvent extends NotifyAreaShopEvent {
 	 * @param refundedMoney The amount of money that has been refunded
 	 */
 	public UnrentedRegionEvent(RentRegion region, UUID oldRenter, double refundedMoney) {
-		this.region = region;
+		super(region);
 		this.oldRenter = oldRenter;
 		this.refundedMoney = refundedMoney;
-	}
-
-	/**
-	 * Get the region that has been unrented
-	 * @return the region that has been unrented
-	 */
-	public RentRegion getRegion() {
-		return region;
 	}
 
 	/**

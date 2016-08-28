@@ -3,7 +3,7 @@ package me.wiefferink.areashop.events;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class CancellableAreaShopEvent extends Event {
+public class CancellableEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 	private boolean cancelled;

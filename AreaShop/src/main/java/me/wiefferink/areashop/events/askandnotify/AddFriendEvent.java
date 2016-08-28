@@ -1,6 +1,6 @@
 package me.wiefferink.areashop.events.askandnotify;
 
-import me.wiefferink.areashop.events.CancellableAreaShopEvent;
+import me.wiefferink.areashop.events.CancellableRegionEvent;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -8,9 +8,8 @@ import org.bukkit.command.CommandSender;
 /**
  * Broadcasted when a friend is being added to a region
  */
-public class AddFriendEvent extends CancellableAreaShopEvent {
+public class AddFriendEvent extends CancellableRegionEvent<GeneralRegion> {
 
-	private GeneralRegion region;
 	private OfflinePlayer friend;
 	private CommandSender by;
 
@@ -21,17 +20,9 @@ public class AddFriendEvent extends CancellableAreaShopEvent {
 	 * @param by     The CommandSender that is adding the friend, or null if none
 	 */
 	public AddFriendEvent(GeneralRegion region, OfflinePlayer friend, CommandSender by) {
-		this.region = region;
+		super(region);
 		this.friend = friend;
 		this.by = by;
-	}
-
-	/**
-	 * Get the region where the friend is getting added to
-	 * @return the region
-	 */
-	public GeneralRegion getRegion() {
-		return region;
 	}
 
 	/**

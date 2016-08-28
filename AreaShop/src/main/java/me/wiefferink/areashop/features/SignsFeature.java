@@ -14,11 +14,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
 import java.util.*;
 
-public class SignsFeature extends Feature implements Listener {
+public class SignsFeature extends Feature {
 
 	private static Map<String, RegionSign> allSigns = new HashMap<>();
 

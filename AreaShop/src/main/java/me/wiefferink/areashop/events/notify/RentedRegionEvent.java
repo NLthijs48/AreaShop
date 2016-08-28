@@ -1,14 +1,13 @@
 package me.wiefferink.areashop.events.notify;
 
-import me.wiefferink.areashop.events.NotifyAreaShopEvent;
+import me.wiefferink.areashop.events.NotifyRegionEvent;
 import me.wiefferink.areashop.regions.RentRegion;
 
 /**
  * Broadcasted when a region has been rented
  */
-public class RentedRegionEvent extends NotifyAreaShopEvent {
+public class RentedRegionEvent extends NotifyRegionEvent<RentRegion> {
 
-	private RentRegion region;
 	private boolean extended;
 
 	/**
@@ -17,16 +16,9 @@ public class RentedRegionEvent extends NotifyAreaShopEvent {
 	 * @param extended true if the region has been extended, false if this is the first time buying the region
 	 */
 	public RentedRegionEvent(RentRegion region, boolean extended) {
+		super(region);
 		this.region = region;
 		this.extended = extended;
-	}
-
-	/**
-	 * Get the region that has been rented
-	 * @return the region that has been rented
-	 */
-	public RentRegion getRegion() {
-		return region;
 	}
 
 	/**

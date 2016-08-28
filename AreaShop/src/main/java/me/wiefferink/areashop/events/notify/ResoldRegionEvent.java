@@ -1,6 +1,6 @@
 package me.wiefferink.areashop.events.notify;
 
-import me.wiefferink.areashop.events.NotifyAreaShopEvent;
+import me.wiefferink.areashop.events.NotifyRegionEvent;
 import me.wiefferink.areashop.regions.BuyRegion;
 
 import java.util.UUID;
@@ -8,9 +8,8 @@ import java.util.UUID;
 /**
  * Broadcasted when a region has been resold
  */
-public class ResoldRegionEvent extends NotifyAreaShopEvent {
+public class ResoldRegionEvent extends NotifyRegionEvent<BuyRegion> {
 
-	private BuyRegion region;
 	private UUID from;
 
 	/**
@@ -19,16 +18,8 @@ public class ResoldRegionEvent extends NotifyAreaShopEvent {
 	 * @param from   The player from who the region has been resold to the current owner
 	 */
 	public ResoldRegionEvent(BuyRegion region, UUID from) {
-		this.region = region;
+		super(region);
 		this.from = from;
-	}
-
-	/**
-	 * Get the region that has been bought
-	 * @return the region that has been bought
-	 */
-	public BuyRegion getRegion() {
-		return region;
 	}
 
 	/**

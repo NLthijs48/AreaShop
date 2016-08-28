@@ -11,11 +11,10 @@ import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
 import java.util.Set;
 
-public class WorldGuardRegionFlagsFeature extends Feature implements Listener {
+public class WorldGuardRegionFlagsFeature extends Feature {
 
 
 	@EventHandler

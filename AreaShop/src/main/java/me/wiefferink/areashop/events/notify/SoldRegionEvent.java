@@ -1,6 +1,6 @@
 package me.wiefferink.areashop.events.notify;
 
-import me.wiefferink.areashop.events.NotifyAreaShopEvent;
+import me.wiefferink.areashop.events.NotifyRegionEvent;
 import me.wiefferink.areashop.regions.BuyRegion;
 
 import java.util.UUID;
@@ -8,9 +8,8 @@ import java.util.UUID;
 /**
  * Broadcasted when a region is sold
  */
-public class SoldRegionEvent extends NotifyAreaShopEvent {
+public class SoldRegionEvent extends NotifyRegionEvent<BuyRegion> {
 
-	private BuyRegion region;
 	private UUID oldBuyer;
 	private double refundedMoney;
 
@@ -21,17 +20,9 @@ public class SoldRegionEvent extends NotifyAreaShopEvent {
 	 * @param refundedMoney The amount of money that has been refunded
 	 */
 	public SoldRegionEvent(BuyRegion region, UUID oldBuyer, double refundedMoney) {
-		this.region = region;
+		super(region);
 		this.oldBuyer = oldBuyer;
 		this.refundedMoney = refundedMoney;
-	}
-
-	/**
-	 * Get the region that has been sold
-	 * @return the region that has been sold
-	 */
-	public BuyRegion getRegion() {
-		return region;
 	}
 
 	/**

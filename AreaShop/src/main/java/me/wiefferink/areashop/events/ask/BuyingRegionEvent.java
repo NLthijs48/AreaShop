@@ -1,15 +1,14 @@
 package me.wiefferink.areashop.events.ask;
 
-import me.wiefferink.areashop.events.CancellableAreaShopEvent;
+import me.wiefferink.areashop.events.CancellableRegionEvent;
 import me.wiefferink.areashop.regions.BuyRegion;
 import org.bukkit.entity.Player;
 
 /**
  * Broadcasted when a player tries to buy a region.
  */
-public class BuyingRegionEvent extends CancellableAreaShopEvent {
+public class BuyingRegionEvent extends CancellableRegionEvent<BuyRegion> {
 
-	private BuyRegion region;
 	private Player player;
 
 	/**
@@ -18,16 +17,8 @@ public class BuyingRegionEvent extends CancellableAreaShopEvent {
 	 * @param player The player that tries to buy the region
 	 */
 	public BuyingRegionEvent(BuyRegion region, Player player) {
-		this.region = region;
+		super(region);
 		this.player = player;
-	}
-
-	/**
-	 * Get the region that is about to be bought
-	 * @return the region that is about to be bought
-	 */
-	public BuyRegion getRegion() {
-		return region;
 	}
 
 	/**

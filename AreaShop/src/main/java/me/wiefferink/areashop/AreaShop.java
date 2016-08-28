@@ -31,7 +31,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -345,7 +344,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				region.updateLastActiveTime();
 			}
 		}
-		fileManager.saveRequiredFilesAtOnce();		
+		fileManager.saveRequiredFilesAtOnce();
 		Bukkit.getServer().getScheduler().cancelTasks(this);
 		
 		worldGuard = null;
@@ -371,9 +370,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Register as listener when necessary
 		for(Feature feature : features) {
-			if(feature instanceof Listener) {
-				getServer().getPluginManager().registerEvents((Listener)feature, this);
-			}
+			feature.listen();
 		}
 	}
 	

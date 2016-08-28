@@ -5,7 +5,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
-import me.wiefferink.areashop.events.NotifyAreaShopEvent;
+import me.wiefferink.areashop.events.NotifyEvent;
 import me.wiefferink.areashop.events.notify.RegionUpdateEvent;
 import me.wiefferink.areashop.features.FriendsFeature;
 import me.wiefferink.areashop.features.SignsFeature;
@@ -218,7 +218,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Broadcast the given event and update the region status
 	 * @param event The update event that should be broadcasted
 	 */
-	public void notifyAndUpdate(NotifyAreaShopEvent event) {
+	public void notifyAndUpdate(NotifyEvent event) {
 		Bukkit.getPluginManager().callEvent(event);
 		update();
 	}

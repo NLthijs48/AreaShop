@@ -7,9 +7,8 @@ import me.wiefferink.areashop.events.askandnotify.AddFriendEvent;
 import me.wiefferink.areashop.events.askandnotify.DeleteFriendEvent;
 import me.wiefferink.areashop.events.notify.*;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
-public class DebugFeature extends Feature implements Listener {
+public class DebugFeature extends Feature {
 
 	@EventHandler
 	public void buyingRegion(BuyingRegionEvent event) {

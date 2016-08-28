@@ -2,7 +2,7 @@ package me.wiefferink.areashop.features;
 
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
-import me.wiefferink.areashop.events.notify.RegionUpdateEvent;
+import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -66,7 +66,7 @@ public class SignsFeature extends Feature {
 	}
 
 	@EventHandler
-	public void regionUpdate(RegionUpdateEvent event) {
+	public void regionUpdate(UpdateRegionEvent event) {
 		event.getRegion().getSignsFeature().update();
 	}
 

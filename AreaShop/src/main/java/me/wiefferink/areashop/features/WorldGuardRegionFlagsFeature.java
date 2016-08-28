@@ -6,7 +6,7 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.events.notify.RegionUpdateEvent;
+import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
 import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.configuration.ConfigurationSection;
@@ -18,7 +18,7 @@ public class WorldGuardRegionFlagsFeature extends Feature {
 
 
 	@EventHandler
-	public void regionUpdate(RegionUpdateEvent event) {
+	public void regionUpdate(UpdateRegionEvent event) {
 		updateRegionFlags(event.getRegion());
 	}
 

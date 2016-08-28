@@ -6,7 +6,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.NotifyEvent;
-import me.wiefferink.areashop.events.notify.RegionUpdateEvent;
+import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
 import me.wiefferink.areashop.features.FriendsFeature;
 import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
@@ -211,7 +211,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * This will update region flags, signs, etc.
 	 */
 	public void update() {
-		Bukkit.getServer().getPluginManager().callEvent(new RegionUpdateEvent(this));
+		Bukkit.getServer().getPluginManager().callEvent(new UpdateRegionEvent(this));
 	}
 
 	/**

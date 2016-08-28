@@ -7,7 +7,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.notify.AddedRegionEvent;
-import me.wiefferink.areashop.events.notify.RemovedRegionEvent;
+import me.wiefferink.areashop.events.notify.DeletedRegionEvent;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.GeneralRegion.RegionEvent;
@@ -335,7 +335,7 @@ public class FileManager {
 			result = true;
 
 			// Broadcast event
-			Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(rent));
+			Bukkit.getPluginManager().callEvent(new DeletedRegionEvent(rent));
 
 			// Run commands
 			rent.runEventCommands(RegionEvent.DELETED, false);
@@ -391,7 +391,7 @@ public class FileManager {
 			result = true;
 
 			// Broadcast event
-			Bukkit.getPluginManager().callEvent(new RemovedRegionEvent(buy));
+			Bukkit.getPluginManager().callEvent(new DeletedRegionEvent(buy));
 
 			// Run commands
 			buy.runEventCommands(RegionEvent.DELETED, false);

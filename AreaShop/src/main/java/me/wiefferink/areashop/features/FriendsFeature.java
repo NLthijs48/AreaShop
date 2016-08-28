@@ -1,7 +1,7 @@
 package me.wiefferink.areashop.features;
 
-import me.wiefferink.areashop.events.askandnotify.AddFriendEvent;
-import me.wiefferink.areashop.events.askandnotify.DeleteFriendEvent;
+import me.wiefferink.areashop.events.askandnotify.AddedFriendEvent;
+import me.wiefferink.areashop.events.askandnotify.DeletedFriendEvent;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -25,7 +25,7 @@ public class FriendsFeature extends Feature {
 	 */
 	public boolean addFriend(UUID player, CommandSender by) {
 		// Fire and check event
-		AddFriendEvent event = new AddFriendEvent(region, Bukkit.getOfflinePlayer(player), by);
+		AddedFriendEvent event = new AddedFriendEvent(region, Bukkit.getOfflinePlayer(player), by);
 		Bukkit.getPluginManager().callEvent(event);
 		if(event.isCancelled()) {
 			plugin.message(by, "general-cancelled", event.getReason(), this);
@@ -47,7 +47,7 @@ public class FriendsFeature extends Feature {
 	 */
 	public boolean deleteFriend(UUID player, CommandSender by) {
 		// Fire and check event
-		DeleteFriendEvent event = new DeleteFriendEvent(region, Bukkit.getOfflinePlayer(player), by);
+		DeletedFriendEvent event = new DeletedFriendEvent(region, Bukkit.getOfflinePlayer(player), by);
 		Bukkit.getPluginManager().callEvent(event);
 		if(event.isCancelled()) {
 			plugin.message(by, "general-cancelled", event.getReason(), this);

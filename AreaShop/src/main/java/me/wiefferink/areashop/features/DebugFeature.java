@@ -3,8 +3,8 @@ package me.wiefferink.areashop.features;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.ask.*;
-import me.wiefferink.areashop.events.askandnotify.AddFriendEvent;
-import me.wiefferink.areashop.events.askandnotify.DeleteFriendEvent;
+import me.wiefferink.areashop.events.askandnotify.AddedFriendEvent;
+import me.wiefferink.areashop.events.askandnotify.DeletedFriendEvent;
 import me.wiefferink.areashop.events.notify.*;
 import org.bukkit.event.EventHandler;
 
@@ -71,17 +71,17 @@ public class DebugFeature extends Feature {
 	}
 
 	@EventHandler
-	public void removedRegion(RemovedRegionEvent event) {
-		AreaShop.debug("RemovedRegionEvent: "+event.getRegion().getName());
+	public void removedRegion(DeletedRegionEvent event) {
+		AreaShop.debug("DeletedRegionEvent: "+event.getRegion().getName());
 	}
 
 	@EventHandler
-	public void addedFriend(AddFriendEvent event) {
-		AreaShop.debug("AddFriendEvent: region "+event.getRegion().getName()+", "+event.getFriend().getName()+" by "+(event.getBy() == null ? "<nobody>" : event.getBy().getName()));
+	public void addedFriend(AddedFriendEvent event) {
+		AreaShop.debug("AddedFriendEvent: region "+event.getRegion().getName()+", "+event.getFriend().getName()+" by "+(event.getBy() == null ? "<nobody>" : event.getBy().getName()));
 	}
 
 	@EventHandler
-	public void deleteFriend(DeleteFriendEvent event) {
-		AreaShop.debug("DeleteFriendEvent: region "+event.getRegion().getName()+", "+event.getFriend().getName()+" by "+(event.getBy() == null ? "<nobody>" : event.getBy().getName()));
+	public void deleteFriend(DeletedFriendEvent event) {
+		AreaShop.debug("DeletedFriendEvent: region "+event.getRegion().getName()+", "+event.getFriend().getName()+" by "+(event.getBy() == null ? "<nobody>" : event.getBy().getName()));
 	}
 }

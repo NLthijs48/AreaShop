@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 /**
  * Broadcasted when a friend is being added to a region
  */
-public class AddFriendEvent extends CancellableRegionEvent<GeneralRegion> {
+public class AddedFriendEvent extends CancellableRegionEvent<GeneralRegion> {
 
 	private OfflinePlayer friend;
 	private CommandSender by;
@@ -19,7 +19,7 @@ public class AddFriendEvent extends CancellableRegionEvent<GeneralRegion> {
 	 * @param friend The friend that is about to be added
 	 * @param by     The CommandSender that is adding the friend, or null if none
 	 */
-	public AddFriendEvent(GeneralRegion region, OfflinePlayer friend, CommandSender by) {
+	public AddedFriendEvent(GeneralRegion region, OfflinePlayer friend, CommandSender by) {
 		super(region);
 		this.friend = friend;
 		this.by = by;

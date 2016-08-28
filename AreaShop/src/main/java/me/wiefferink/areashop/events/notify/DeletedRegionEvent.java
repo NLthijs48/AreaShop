@@ -6,13 +6,13 @@ import me.wiefferink.areashop.regions.GeneralRegion;
 /**
  * Broadcasted when a region has been removed from AreaShop
  */
-public class RemovedRegionEvent extends NotifyRegionEvent<GeneralRegion> {
+public class DeletedRegionEvent extends NotifyRegionEvent<GeneralRegion> {
 
 	/**
 	 * Constructor
 	 * @param region The region that has been removed
 	 */
-	public RemovedRegionEvent(GeneralRegion region) {
+	public DeletedRegionEvent(GeneralRegion region) {
 		super(region);
 	}
 }

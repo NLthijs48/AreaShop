@@ -20,7 +20,7 @@ public class FancyMessageFormat {
 	/**
 	 * The special character that prefixes all basic chat formatting codes.
 	 */
-	private static final char SIMPLE_FORMAT_PREFIX_CHAR = '\u00A7';
+	private static final char SIMPLE_FORMAT_PREFIX_CHAR = '§';
 
 	/**
 	 * Resets all previous chat colors or formats.
@@ -346,12 +346,12 @@ public class FancyMessageFormat {
 	 * Null if nothing is found.
 	 */
 	private static TaggedContent getNextTag(String line, boolean parseBreak) {
-		Pattern pattern = Pattern.compile("\\[[/a-zA-Z1-9]+\\]|&[1-9abcdeflonskr]");
+		Pattern pattern = Pattern.compile("\\[[/a-zA-Z1-9]+\\]|[&"+SIMPLE_FORMAT_PREFIX_CHAR+"][1-9abcdeflonskr]");
 		Matcher matcher = pattern.matcher(line);
 		// TODO Fix for escape things, and something with parseBreak?
 		while(matcher.find()) {
 			Tag tag = null;
-			if(matcher.group().startsWith("&")) {
+			if(matcher.group().startsWith("&") || matcher.group().startsWith(SIMPLE_FORMAT_PREFIX_CHAR+"")) {
 				for(Color color : Color.class.getEnumConstants()) {
 					if(color.getNativeFormattingCode() == matcher.group().charAt(1)) {
 						tag = color;

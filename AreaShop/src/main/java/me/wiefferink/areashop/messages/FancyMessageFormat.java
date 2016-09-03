@@ -71,9 +71,9 @@ public class FancyMessageFormat {
 	 * Parses the given FancyMessageFormat message to a JSON array that can be
 	 * used with the tellraw command and the like.
 	 * @param message The mesage to convert to JSON
-	 * @return JSON string that can be send to a player
+	 * @return JSON strings that can be send to a player (multiple means line breaks have been used)
 	 */
-	public static String convertToJSON(final String message) {
+	public static List<String> convertToJSON(final String message) {
 		return convertToJSON(Collections.singleton(message));
 	}
 
@@ -81,27 +81,38 @@ public class FancyMessageFormat {
 	 * Parses the given FancyMessageFormat message to a JSON array that can be
 	 * used with the tellraw command and the like.
 	 * @param inputLines Input message split at line breaks.
-	 * @return JSON string that can be send to a player
+	 * @return JSON string that can be send to a player (multiple means line breaks have been used)
 	 */
-	public static String convertToJSON(final Iterable<String> inputLines) {
+	public static List<String> convertToJSON(final Iterable<String> inputLines) {
 		ArrayList<String> lines = cleanInputString(inputLines);
-
 		LinkedList<InteractiveMessagePart> message = parse(lines);
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		if(message.size() == 1) {
-			sb.append(message.getFirst().toJSON());
-		} else if(message.size() > 0) {
-			sb.append("{\"text\":\"\",\"extra\":[");
-			for(InteractiveMessagePart messagePart : message) {
-				sb.append(messagePart.toJSON());
-				sb.append(',');
+
+		List<String> result = new ArrayList<>();
+		List<InteractiveMessagePart> combine = new ArrayList<>(); // Part that are combined to a line
+		while(!message.isEmpty()) {
+			InteractiveMessagePart part = message.removeFirst();
+			combine.add(part);
+			if(part.newline || message.isEmpty()) {
+				if(combine.size() == 1) {
+					StringBuilder nextLine = new StringBuilder("[");
+					combine.get(0).toJSON(nextLine);
+					nextLine.append("]");
+					result.add(nextLine.toString());
+				} else {
+					StringBuilder nextLine = new StringBuilder("[{\"text\":\"\",\"extra\":[");
+					for(int i = 0; i < combine.size(); i++) {
+						if(i != 0) {
+							nextLine.append(",");
+						}
+						combine.get(i).toJSON(nextLine);
+					}
+					nextLine.append("]}]");
+					result.add(nextLine.toString());
+				}
+				combine.clear();
 			}
-			sb.deleteCharAt(sb.length()-1);
-			sb.append("]}");
 		}
-		sb.append("]");
-		return sb.toString();
+		return result;
 	}
 
 
@@ -136,7 +147,7 @@ public class FancyMessageFormat {
 		LinkedList<InteractiveMessagePart> parts = parse(inputLines, false);
 		StringBuilder result = new StringBuilder();
 		for(InteractiveMessagePart part : parts) {
-			result.append(part.toSimpleString());
+			part.toSimpleString(result);
 		}
 		return result.toString();
 	}
@@ -263,7 +274,6 @@ public class FancyMessageFormat {
 
 			if(isTextLine || isHoverLine) {
 				// Parse inline tags
-
 				Color currentLineColor = currentColor;
 				Set<FormatType> currentLineFormatting = currentFormatting;
 				LinkedList<TextMessagePart> targetList = messagePart.content;
@@ -315,9 +325,7 @@ public class FancyMessageFormat {
 						} else if(tag instanceof FormatCloseTag) {
 							currentLineFormatting.remove(((FormatCloseTag)tag).closes);
 						} else if(tag == ControlTag.BREAK) {
-							if(!targetList.isEmpty()) {
-								targetList.getLast().text += '\n';
-							}
+							messagePart.newline = true;
 							currentLineFormatting.clear();
 							continue lineLoop;
 						} else if(tag == ControlTag.RESET) {
@@ -451,21 +459,21 @@ public class FancyMessageFormat {
 	 * Produce a string in double quotes with backslash sequences in all the
 	 * right places.
 	 * @param string A String
+	 * @param sb The StringBuilder to add the quoted string to
 	 * @return A String correctly formatted for insertion in a JSON text.
 	 */
 	/*
 	 * Copyright (c) 2002 JSON.org
 	 * Licensed under the Apache License, Version 2.0
 	 */
-	private static String quoteStringJson(String string) {
+	private static StringBuilder quoteStringJson(String string, StringBuilder sb) {
 		if(string == null || string.length() == 0) {
-			return "\"\"";
+			return new StringBuilder("\"\"");
 		}
 
 		char c;
 		int i;
 		int len = string.length();
-		StringBuilder sb = new StringBuilder(len+4);
 		String t;
 
 		sb.append('"');
@@ -507,7 +515,7 @@ public class FancyMessageFormat {
 			}
 		}
 		sb.append('"');
-		return sb.toString();
+		return sb;
 	}
 
 
@@ -539,10 +547,10 @@ public class FancyMessageFormat {
 
 		/**
 		 * Get a simple colored/formatted string
-		 * @return String with formatting
+		 * @param sb The StringBuilder to append the result to
+		 * @return StringBuilder with the message appended
 		 */
-		String toSimpleString() {
-			StringBuilder sb = new StringBuilder();
+		StringBuilder toSimpleString(StringBuilder sb) {
 			// Color
 			if(color != null) {
 				sb.append(SIMPLE_FORMAT_PREFIX_CHAR);
@@ -555,17 +563,18 @@ public class FancyMessageFormat {
 			}
 			// Text
 			sb.append(text);
-			return sb.toString();
+			return sb;
 		}
 
 		/**
 		 * Get a JSON component for this message part
+		 * @param sb The StringBuilder to append the result to
 		 * @return This part formatted in JSON
 		 */
-		String toJSON() {
-			StringBuilder sb = new StringBuilder();
+		StringBuilder toJSON(StringBuilder sb) {
 			sb.append('{');
-			sb.append("\"text\":").append(quoteStringJson(text));
+			sb.append("\"text\":");
+			quoteStringJson(text, sb);
 			if(color != null && color != Color.WHITE) {
 				sb.append(",\"color\":\"").append(color.jsonValue).append("\"");
 			}
@@ -575,7 +584,7 @@ public class FancyMessageFormat {
 				sb.append("true");
 			}
 			sb.append('}');
-			return sb.toString();
+			return sb;
 		}
 
 		boolean hasFormatting() {
@@ -595,6 +604,7 @@ public class FancyMessageFormat {
 	private static class InteractiveMessagePart {
 
 		LinkedList<TextMessagePart> content = new LinkedList<>();
+		boolean newline = false;
 
 		// Click
 		ClickType clickType = null;
@@ -605,32 +615,31 @@ public class FancyMessageFormat {
 		LinkedList<TextMessagePart> hoverContent = null;
 
 		/**
-		 * Get a simple colored/formatted string
-		 * @return String with formatting
+		 * Append the message content to the StringBuilder
+		 * @param sb The StringBuilder to append the message to
 		 */
-		String toSimpleString() {
-			StringBuilder sb = new StringBuilder();
+		StringBuilder toSimpleString(StringBuilder sb) {
 			for(TextMessagePart part : content) {
-				sb.append(part.toSimpleString());
+				part.toSimpleString(sb);
 			}
-			return sb.toString();
+			return sb;
 		}
 
 		/**
 		 * Get a JSON component for this message part
+		 * @param sb The StringBuilder to append the result to
 		 * @return This part formatted in JSON
 		 */
-		String toJSON() {
-			StringBuilder sb = new StringBuilder();
+		StringBuilder toJSON(StringBuilder sb) {
 			if(content.size() == 1) {
 				// Add attributes to TextMessagePart object
-				sb.append(content.getFirst().toJSON());
+				content.getFirst().toJSON(sb);
 				sb.deleteCharAt(sb.length()-1);
 			} else {
 				sb.append('{');
 				sb.append("\"text\":\"\",\"extra\":[");
 				for(TextMessagePart textPart : content) {
-					sb.append(textPart.toJSON());
+					textPart.toJSON(sb);
 					sb.append(',');
 				}
 				sb.deleteCharAt(sb.length()-1);
@@ -640,7 +649,8 @@ public class FancyMessageFormat {
 				sb.append(',');
 				sb.append("\"clickEvent\":{");
 				sb.append("\"action\":\"").append(clickType.getJsonKey()).append("\",");
-				sb.append("\"value\":").append(quoteStringJson(clickContent));
+				sb.append("\"value\":");
+				quoteStringJson(clickContent, sb);
 				sb.append('}');
 			}
 			if(hoverType != null) {
@@ -651,14 +661,14 @@ public class FancyMessageFormat {
 				if(hoverContent.size() == 1) {
 					TextMessagePart hoverPart = hoverContent.getFirst();
 					if(hoverPart.hasFormatting()) {
-						sb.append(hoverPart.toJSON());
+						hoverPart.toJSON(sb);
 					} else {
-						sb.append(quoteStringJson(hoverPart.text));
+						quoteStringJson(hoverPart.text, sb);
 					}
 				} else {
 					sb.append('[');
 					for(TextMessagePart hoverPart : hoverContent) {
-						sb.append(hoverPart.toJSON());
+						hoverPart.toJSON(sb);
 						sb.append(',');
 					}
 					sb.deleteCharAt(sb.length()-1);
@@ -667,12 +677,12 @@ public class FancyMessageFormat {
 				sb.append('}');
 			}
 			sb.append('}');
-			return sb.toString();
+			return sb;
 		}
 
 		@Override
 		public String toString() {
-			return "InteractiveMessagePart(textMessageParts:"+content+", clickType:"+clickType+", clickContent:"+clickContent+", hoverType:"+hoverType+", hoverContent:"+hoverContent+")";
+			return "InteractiveMessagePart(textMessageParts:"+content+", clickType:"+clickType+", clickContent:"+clickContent+", hoverType:"+hoverType+", hoverContent:"+hoverContent+", newline:"+newline+")";
 		}
 	}
 

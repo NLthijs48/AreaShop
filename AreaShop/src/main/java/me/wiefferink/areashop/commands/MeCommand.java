@@ -1,6 +1,7 @@
 package me.wiefferink.areashop.commands;
 
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
@@ -9,7 +10,9 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class MeCommand extends CommandAreaShop {
@@ -106,8 +109,15 @@ public class MeCommand extends CommandAreaShop {
 		}
 	}
 
-	public static void show() {
-
+	@Override
+	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
+		ArrayList<String> result = new ArrayList<>();
+		if(toComplete == 2) {
+			for(Player player : Utils.getOnlinePlayers()) {
+				result.add(player.getName());
+			}
+		}
+		return result;
 	}
 }
 

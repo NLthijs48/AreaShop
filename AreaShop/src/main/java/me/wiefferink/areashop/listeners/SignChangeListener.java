@@ -105,7 +105,7 @@ public final class SignChangeListener implements Listener {
 			}
 			ProtectedRegion region = regionManager.getRegion(secondLine);
 			if(region == null) {
-				plugin.message(player, "cmd-notRegistered", secondLine);
+				plugin.message(player, "cmd-noRegion", secondLine);
 				return;
 			}
 
@@ -219,7 +219,7 @@ public final class SignChangeListener implements Listener {
 			}
 			ProtectedRegion region = regionManager.getRegion(secondLine);
 			if(region == null) {
-				plugin.message(player, "add-noRegion", secondLine);
+				plugin.message(player, "cmd-noRegion", secondLine);
 				return;
 			}
 			FileManager.AddResult addResult = plugin.getFileManager().checkRegionAdd(player, region, GeneralRegion.RegionType.BUY);
@@ -290,7 +290,7 @@ public final class SignChangeListener implements Listener {
 				// Get region by secondLine of the sign
 				region = plugin.getFileManager().getRegion(secondLine);
 				if(region == null) {
-					plugin.message(player, "add-noRegion", secondLine);
+					plugin.message(player, "cmd-noRegion", secondLine);
 					return;
 				}			
 			} else {

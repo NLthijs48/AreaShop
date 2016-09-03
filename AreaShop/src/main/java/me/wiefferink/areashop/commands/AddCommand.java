@@ -101,7 +101,7 @@ public class AddCommand extends CommandAreaShop {
 			}
 			ProtectedRegion region = plugin.getWorldGuard().getRegionManager(world).getRegion(args[2]);
 			if(region == null) {
-				plugin.message(sender, "add-noRegion", args[2]);
+				plugin.message(sender, "cmd-noRegion", args[2]);
 				return;
 			}
 			regions.add(region);

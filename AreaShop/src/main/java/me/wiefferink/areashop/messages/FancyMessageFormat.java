@@ -98,13 +98,16 @@ public class FancyMessageFormat {
 					combine.get(0).toJSON(nextLine);
 					nextLine.append("]");
 					result.add(nextLine.toString());
-				} else {
+				} else if(combine.size() > 1) {
 					StringBuilder nextLine = new StringBuilder("[{\"text\":\"\",\"extra\":[");
 					for(int i = 0; i < combine.size(); i++) {
-						if(i != 0) {
-							nextLine.append(",");
+						// Skip possibly last empty InteractiveMessagePart which has newline set
+						if(!combine.get(i).content.isEmpty()) {
+							if(i != 0) {
+								nextLine.append(",");
+							}
+							combine.get(i).toJSON(nextLine);
 						}
-						combine.get(i).toJSON(nextLine);
 					}
 					nextLine.append("]}]");
 					result.add(nextLine.toString());
@@ -306,7 +309,7 @@ public class FancyMessageFormat {
 					}
 
 					// Add a text part with the correct formatting
-					if((tagged && nextTag.tag == ControlTag.BREAK) || !textToAdd.isEmpty()) {
+					if(!textToAdd.isEmpty()) {
 						TextMessagePart part = new TextMessagePart();
 						part.text = textToAdd;
 						part.formatTypes = new HashSet<>(currentLineFormatting);
@@ -338,7 +341,8 @@ public class FancyMessageFormat {
 				if(!isHoverLine) {
 					// Adapt global attributes
 					currentColor = currentLineColor;
-					if(messagePart.content.size() == 0) { // Prevent interactive parts without content
+					// Prevent interactive parts without content
+					if(messagePart.content.size() == 0 && !messagePart.newline) {
 						message.removeLast();
 					}
 				}
@@ -631,6 +635,12 @@ public class FancyMessageFormat {
 		 * @return This part formatted in JSON
 		 */
 		StringBuilder toJSON(StringBuilder sb) {
+			// Error case, should never happen, print something as safeguard
+			if(content.size() == 0) {
+				sb.append("{\"text\":\"\"}");
+				return sb;
+			}
+
 			if(content.size() == 1) {
 				// Add attributes to TextMessagePart object
 				content.getFirst().toJSON(sb);

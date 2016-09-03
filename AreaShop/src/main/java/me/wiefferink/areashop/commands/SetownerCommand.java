@@ -98,28 +98,21 @@ public class SetownerCommand extends CommandAreaShop {
 				calendar.setTimeInMillis(rent.getRentedUntil() + rent.getDuration());
 				rent.setRentedUntil(calendar.getTimeInMillis());
 				rent.setRenter(uuid);
-				rent.update();
 				plugin.message(sender, "setowner-succesRentExtend", region);
 			} else {
 				// change
-				Calendar calendar = Calendar.getInstance();
-				long current = calendar.getTimeInMillis();
-				if(rent.isRented()) {
-					current = rent.getRentedUntil();
-				}
-				calendar.setTimeInMillis(current + rent.getDuration());
-				rent.setRentedUntil(calendar.getTimeInMillis());
 				rent.setRenter(uuid);
-				rent.update();
 				plugin.message(sender, "setowner-succesRent", region);
 			}
 		}
 		if(region.isBuyRegion()) {
 			BuyRegion buy = (BuyRegion)region;
 			buy.setBuyer(uuid);
-			buy.update();
 			plugin.message(sender, "setowner-succesBuy", region);
 		}
+		region.getFriendsFeature().deleteFriend(region.getOwner(), null);
+		region.update();
+		region.saveRequired();
 	}
 	
 	@Override

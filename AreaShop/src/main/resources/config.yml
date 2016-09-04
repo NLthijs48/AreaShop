@@ -99,7 +99,8 @@ signProfiles:
       line4: '%price%'
       rightClickPlayer:
       - 'areashop rent %region%'
-      #- 'areashop message %clicker% %lang:confirm-rent|%region%|%' # Alternative to first ask for confirmation
+      rightClickConsole:
+      #- 'areashop message %clicker% %lang:confirm-rent|%region%|%' # Alternative to first ask for confirmation (remove rightClickPlayer section)
       leftClickPlayer:
       - 'areashop info region %region%'
     rented:
@@ -109,10 +110,11 @@ signProfiles:
       line4: '%untilshort%'
       rightClickPlayer:
       - 'areashop rent %region%'
-      #- 'areashop message %clicker% %lang:confirm-extend|%region%|%' # Alternative to first ask for confirmation
+      rightClickConsole:
+      #- 'areashop message %clicker% %lang:confirm-extend|%region%|%' # Alternative to first ask for confirmation (remove rightClickPlayer section)
       leftClickPlayer:
       - 'areashop info region %region%'
-      shiftRightClickPlayer:
+      shiftRightClickConsole:
       - 'areashop message %clicker% %lang:confirm-unrent|%region%|%'
     forsale:
       line1: '&2&l[For Sale]'
@@ -121,7 +123,8 @@ signProfiles:
       line4:
       rightClickPlayer:
       - 'areashop buy %region%'
-      #- 'areashop message %clicker% %lang:confirm-buy|%region%|%' # Alternative to first ask for confirmation
+      rightClickConsole:
+      #- 'areashop message %clicker% %lang:confirm-buy|%region%|%' # Alternative to first ask for confirmation (remove rightClickPlayer section)
       leftClickPlayer:
       - 'areashop info region %region%'
     resell:
@@ -131,7 +134,8 @@ signProfiles:
       line4: '&8%player%'
       rightClickPlayer:
       - 'areashop buy %region%'
-      #- 'areashop message %clicker% %lang:confirm-buy|%region%|%' # Alternative to first ask for confirmation
+      rightClickConsole:
+      #- 'areashop message %clicker% %lang:confirm-buy|%region%|%' # Alternative to first ask for confirmation (remove rightClickPlayer section)
       leftClickPlayer:
       - 'areashop info region %region%'
       shiftRightClickPlayer:
@@ -145,7 +149,7 @@ signProfiles:
       - 'areashop buy %region%'
       leftClickPlayer:
       - 'areashop info region %region%'
-      shiftRightClickPlayer:
+      shiftRightClickConsole:
       - 'areashop message %clicker% %lang:confirm-sell|%region%|%'
 
 ## Flag profiles specify which flags to set on the WorldGuard regions depending on their state.

@@ -341,11 +341,16 @@ public class FancyMessageFormat {
 				if(!isHoverLine) {
 					// Adapt global attributes
 					currentColor = currentLineColor;
-					// Prevent interactive parts without content
-					if(messagePart.content.size() == 0 && !messagePart.newline) {
-						message.removeLast();
-					}
 				}
+			}
+		}
+
+		// Cleanup empty parts (some parts only affected the formatting of next parts, but do not have actual content)
+		Iterator<InteractiveMessagePart> it = message.iterator();
+		while(it.hasNext()) {
+			InteractiveMessagePart check = it.next();
+			if(check.content.size() == 0 && !check.newline) {
+				it.remove();
 			}
 		}
 		return message;

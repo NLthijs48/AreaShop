@@ -1,6 +1,7 @@
 package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -11,7 +12,6 @@ import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.regions.RentRegion;
-import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -98,12 +98,17 @@ public class StackCommand extends CommandAreaShop {
 		}
 		// Get facing of the player (must be clearly one of the four directions to make sure it is no mistake)
 		BlockFace facing = Utils.yawToFacing(player.getLocation().getYaw());
-		if(!(facing == BlockFace.NORTH || facing == BlockFace.EAST || facing == BlockFace.SOUTH || facing == BlockFace.WEST)) {
-			plugin.message(player, "stack-unclearDirection", facing.toString().toLowerCase().replace('_', '-'));
+        if (player.getLocation().getPitch() > 45) {
+            facing = BlockFace.DOWN;
+        } else if (player.getLocation().getPitch() < -45) {
+            facing = BlockFace.UP;
+        }
+        if (!(facing == BlockFace.NORTH || facing == BlockFace.EAST || facing == BlockFace.SOUTH || facing == BlockFace.WEST || facing == BlockFace.UP || facing == BlockFace.DOWN)) {
+            plugin.message(player, "stack-unclearDirection", facing.toString().toLowerCase().replace('_', '-'));
 			return;
 		}
-		final Location shift = new Location(selection.getWorld(), 0, 0, 0);
-		if(facing == BlockFace.SOUTH) {
+        final Vector shift = new BlockVector(0, 0, 0);
+        if(facing == BlockFace.SOUTH) {
 			shift.setZ(-selection.getLength() - gap);
 		} else if(facing == BlockFace.WEST) {
 			shift.setX(selection.getWidth() + gap);
@@ -111,7 +116,11 @@ public class StackCommand extends CommandAreaShop {
 			shift.setZ(selection.getLength() + gap);
 		} else if(facing == BlockFace.EAST) {
 			shift.setX(-selection.getWidth() - gap);
-		}
+        } else if (facing == BlockFace.DOWN) {
+            shift.setY(-selection.getHeight() - gap);
+        } else if (facing == BlockFace.UP) {
+            shift.setY(selection.getHeight() + gap);
+        }
 		AreaShop.debug("  calculated shift vector: " + shift + ", with facing=" + facing);
 		// Create regions and add them to AreaShop
 		final String namePrefix = args[3];
@@ -132,13 +141,17 @@ public class StackCommand extends CommandAreaShop {
 		plugin.message(player, "stack-accepted", amount, type, gap, namePrefix, groupsMessage);
 		plugin.message(player, "stack-addStart", amount, regionsPerTick*20);
 		new BukkitRunnable() {
-			private int current = 0;
-			private RegionManager manager = AreaShop.getInstance().getWorldGuard().getRegionManager(selection.getWorld());
+            private int current = -1;
+            private RegionManager manager = AreaShop.getInstance().getWorldGuard().getRegionManager(selection.getWorld());
 			private int counter = 1;
-			@Override
+            private int tooLow = 0;
+            private int tooHigh = 0;
+
+            @Override
 			public void run() {
 				for(int i=0; i<regionsPerTick; i++) {
-					if(current < amount) {
+                    current++;
+                    if(current < amount) {
 						// Create the region name
 						String counterName = counter+"";
 						int minimumLength = plugin.getConfig().getInt("stackRegionNumberLength");
@@ -156,19 +169,18 @@ public class StackCommand extends CommandAreaShop {
 							regionName = namePrefix + counterName;
 						}
 						// Add the region to WorldGuard (at startposition shifted by the number of this region times the blocks it should shift)
-						ProtectedCuboidRegion region = new ProtectedCuboidRegion(regionName, 
-								new BlockVector(
-										selection.getMinimumPoint().getBlockX() + shift.getBlockX()*current, 
-										selection.getMinimumPoint().getBlockY() + shift.getBlockY()*current, 
-										selection.getMinimumPoint().getBlockZ() + shift.getBlockZ()*current
-								), 
-								new BlockVector(
-										selection.getMaximumPoint().getBlockX() + shift.getBlockX()*current, 
-										selection.getMaximumPoint().getBlockY() + shift.getBlockY()*current, 
-										selection.getMaximumPoint().getBlockZ() + shift.getBlockZ()*current
-								)
-						);
-						manager.addRegion(region);
+                        BlockVector minimum = new BlockVector(selection.getNativeMinimumPoint().add(shift.multiply(current)));
+                        BlockVector maximum = new BlockVector(selection.getNativeMaximumPoint().add(shift.multiply(current)));
+                        // Check for out of bounds
+                        if (minimum.getBlockY() < 0) {
+                            tooLow++;
+                            continue;
+                        } else if (maximum.getBlockY() > 256) {
+                            tooHigh++;
+                            continue;
+                        }
+                        ProtectedCuboidRegion region = new ProtectedCuboidRegion(regionName, minimum, maximum);
+                        manager.addRegion(region);
 						// Add the region to AreaShop
 						if(rentRegions) {
 							RentRegion rent = new RentRegion(plugin, region.getId(), selection.getWorld());
@@ -191,13 +203,20 @@ public class StackCommand extends CommandAreaShop {
 							buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 							buy.update();
 						}
-						current++;
-					} 
-				}
+                    }
+                }
 				if(current >= amount) {
 					if(player.isOnline()) {
-						plugin.message(player, "stack-addComplete");
-					}
+                        int added = amount - tooLow - tooHigh;
+                        Message wrong = Message.none();
+                        if (tooHigh > 0) {
+                            wrong.append(Message.fromKey("stack-tooHigh").replacements(tooHigh));
+                        }
+                        if (tooLow > 0) {
+                            wrong.append(Message.fromKey("stack-tooLow").replacements(tooLow));
+                        }
+                        plugin.message(player, "stack-addComplete", added, wrong);
+                    }
 					this.cancel();
 				}
 			}

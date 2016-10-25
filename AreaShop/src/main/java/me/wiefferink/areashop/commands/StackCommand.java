@@ -134,7 +134,7 @@ public class StackCommand extends CommandAreaShop {
 		} else {
 			type = "buy";
 		}
-		Message groupsMessage = Message.none();
+		Message groupsMessage = Message.empty();
 		if(group != null) {
 			groupsMessage = Message.fromKey("stack-addToGroup").replacements(group.getName());
 		}		
@@ -208,9 +208,9 @@ public class StackCommand extends CommandAreaShop {
 				if(current >= amount) {
 					if(player.isOnline()) {
                         int added = amount - tooLow - tooHigh;
-                        Message wrong = Message.none();
-                        if (tooHigh > 0) {
-                            wrong.append(Message.fromKey("stack-tooHigh").replacements(tooHigh));
+						Message wrong = Message.empty();
+						if(tooHigh > 0) {
+							wrong.append(Message.fromKey("stack-tooHigh").replacements(tooHigh));
                         }
                         if (tooLow > 0) {
                             wrong.append(Message.fromKey("stack-tooLow").replacements(tooLow));

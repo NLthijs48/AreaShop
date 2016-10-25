@@ -75,7 +75,7 @@ public class Utils {
 	 * @return A Message object containing the parts combined into one message
 	 */
 	public static Message combinedMessage(Collection<?> replacements, String messagePart, String combiner) {
-		Message result = Message.none();
+		Message result = Message.empty();
 		boolean first = true;
 		for(Object part : replacements) {
 			if(first) {

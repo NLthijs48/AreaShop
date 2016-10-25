@@ -85,7 +85,7 @@ public class FindCommand extends CommandAreaShop {
 			if(!results.isEmpty()) {
 				// Draw a random one
 				BuyRegion region = results.get(new Random().nextInt(results.size()));
-				Message onlyInGroup = Message.none();
+				Message onlyInGroup = Message.empty();
 				if(group != null) {
 					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}
@@ -96,7 +96,7 @@ public class FindCommand extends CommandAreaShop {
 				}
 				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {
-				Message onlyInGroup = Message.none();
+				Message onlyInGroup = Message.empty();
 				if(group != null) {
 					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}
@@ -119,7 +119,7 @@ public class FindCommand extends CommandAreaShop {
 			if(!results.isEmpty()) {
 				// Draw a random one
 				RentRegion region = results.get(new Random().nextInt(results.size()));
-				Message onlyInGroup = Message.none();
+				Message onlyInGroup = Message.empty();
 				if(group != null) {
 					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}
@@ -130,7 +130,7 @@ public class FindCommand extends CommandAreaShop {
 				}
 				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
 			} else {
-				Message onlyInGroup = Message.none();
+				Message onlyInGroup = Message.empty();
 				if(group != null) {
 					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}

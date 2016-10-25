@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion> {
+public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion>, Message.ReplacementProvider {
 	YamlConfiguration config;
 	private static ArrayList<Material> canSpawnIn = new ArrayList<>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
 	private static ArrayList<Material> cannotSpawnOn = new ArrayList<>(Arrays.asList(Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.CACTUS, Material.IRON_FENCE, Material.FENCE_GATE, Material.THIN_GLASS, Material.NETHER_FENCE, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE, Material.STAINED_GLASS_PANE));
@@ -36,9 +36,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	private boolean saveRequired = false;
 	private boolean deleted = false;
 	
-	private HashMap<String, Object> replacementsCache = null;
-	private long replacementsCacheTime = 0;
-
 	// Features
 	private FriendsFeature friendsFeature;
 	private SignsFeature signsFeature;
@@ -222,13 +219,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		Bukkit.getPluginManager().callEvent(event);
 		update();
 	}
-	
-	/**
-	 * Get the tag replacements, used in commands or signs
-	 * @return A map with strings like '%region%' linking to the value to replace it with
-	 */
-	public abstract HashMap<String, Object> getSpecificReplacements();
-	
+
 	/**
 	 * Get the state of a region
 	 * @return The RegionState of the region
@@ -508,85 +499,88 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		return result;
 	}
-	
-	/**
-	 * Get all the replacements for this region
-	 * @return Map with the keys that need to be replaced with the value of the object
-	 */
-	public HashMap<String, Object> getAllReplacements() {
-		// Reply with cache if we have one
-		if(replacementsCache != null && (Calendar.getInstance().getTimeInMillis() - replacementsCacheTime) < 1000) {
-			return replacementsCache;
-		}
-		
-		HashMap<String, Object> result = getSpecificReplacements();
-		
-		result.put(AreaShop.tagRegionName, getName());
-		result.put(AreaShop.tagRegionType, getType().getValue().toLowerCase());
-		result.put(AreaShop.tagWorldName, getWorldName());
-		result.put(AreaShop.tagWidth, getWidth());
-		result.put(AreaShop.tagDepth, getDepth());
-		result.put(AreaShop.tagHeight, getHeight());
-		result.put(AreaShop.tagFriends, Utils.createCommaSeparatedList(getFriendsFeature().getFriendNames()));
-		result.put(AreaShop.tagFriendsUUID, Utils.createCommaSeparatedList(getFriendsFeature().getFriends()));
-		result.put(AreaShop.tagLandlord, getLandlordName());
-		result.put(AreaShop.tagLandlordUUID, getLandlord());
-		// Date/time stuff
-		Calendar calendar = Calendar.getInstance();
-		result.put(AreaShop.tagEpoch, calendar.getTimeInMillis());
-		result.put(AreaShop.tagMillisecond, calendar.get(Calendar.MILLISECOND));
-		result.put(AreaShop.tagSecond, calendar.get(Calendar.SECOND));
-		result.put(AreaShop.tagMinute, calendar.get(Calendar.MINUTE));
-		result.put(AreaShop.tagHour, calendar.get(Calendar.HOUR_OF_DAY));
-		result.put(AreaShop.tagDay, calendar.get(Calendar.DAY_OF_MONTH));
-		result.put(AreaShop.tagMonth, calendar.get(Calendar.MONTH));
-		result.put(AreaShop.tagYear, calendar.get(Calendar.YEAR));
-		// In specified format
-		SimpleDateFormat date = new SimpleDateFormat(plugin.getConfig().getString("timeFormatChat"));
-		String dateString = date.format(Calendar.getInstance().getTime());
-		result.put(AreaShop.tagDateTime, dateString);
-		date = new SimpleDateFormat(plugin.getConfig().getString("timeFormatSign"));
-		dateString = date.format(Calendar.getInstance().getTime());
-		result.put(AreaShop.tagDateTimeShort, dateString);
-		// Teleport location
-		Location tp = getTeleportLocation();
-		if(tp != null) {
-			result.put(AreaShop.tagTeleportBlockX, tp.getBlockX());
-			result.put(AreaShop.tagTeleportBlockY, tp.getBlockY());
-			result.put(AreaShop.tagTeleportBlockZ, tp.getBlockZ());
-			result.put(AreaShop.tagTeleportX, tp.getX());
-			result.put(AreaShop.tagTeleportY, tp.getY());
-			result.put(AreaShop.tagTeleportZ, tp.getZ());
-			result.put(AreaShop.tagTeleportPitch, tp.getPitch());
-			result.put(AreaShop.tagTeleportYaw, tp.getYaw());
-			result.put(AreaShop.tagTeleportPitchRound, Math.round(tp.getPitch()));
-			result.put(AreaShop.tagTeleportYawRound, Math.round(tp.getYaw()));
-			result.put(AreaShop.tagTeleportWorld, tp.getWorld().getName());
-		}
 
-		replacementsCache = result;
-		replacementsCacheTime = Calendar.getInstance().getTimeInMillis();
-		return result;
-	}
-	
-	/**
-	 * Applies all replacements to the given string
-	 * @param source The source string to replace things in
-	 * @return The result string with all the replacements applied
-	 */
-	public String applyAllReplacements(String source) {
-		if(source == null || source.length() == 0) {
-			return "";
+	@Override
+	public Object provideReplacement(String variable) {
+		switch(variable) {
+
+			// Basics
+			case AreaShop.tagRegionName:
+				return getName();
+			case AreaShop.tagRegionType:
+				return getType().getValue().toLowerCase();
+			case AreaShop.tagWorldName:
+				return getWorldName();
+			case AreaShop.tagWidth:
+				return getWidth();
+			case AreaShop.tagDepth:
+				return getDepth();
+			case AreaShop.tagHeight:
+				return getHeight();
+			case AreaShop.tagFriends:
+				return Utils.createCommaSeparatedList(getFriendsFeature().getFriendNames());
+			case AreaShop.tagFriendsUUID:
+				return Utils.createCommaSeparatedList(getFriendsFeature().getFriends());
+			case AreaShop.tagLandlord:
+				return getLandlordName();
+			case AreaShop.tagLandlordUUID:
+				return getLandlord();
+
+			// Date/time
+			case AreaShop.tagEpoch:
+				return Calendar.getInstance().getTimeInMillis();
+			case AreaShop.tagMillisecond:
+				return Calendar.getInstance().get(Calendar.MILLISECOND);
+			case AreaShop.tagSecond:
+				return Calendar.getInstance().get(Calendar.SECOND);
+			case AreaShop.tagMinute:
+				return Calendar.getInstance().get(Calendar.MINUTE);
+			case AreaShop.tagHour:
+				return Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+			case AreaShop.tagDay:
+				return Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+			case AreaShop.tagMonth:
+				return Calendar.getInstance().get(Calendar.MONTH);
+			case AreaShop.tagYear:
+				return Calendar.getInstance().get(Calendar.YEAR);
+			case AreaShop.tagDateTime:
+				return new SimpleDateFormat(plugin.getConfig().getString("timeFormatChat")).format(Calendar.getInstance().getTime());
+			case AreaShop.tagDateTimeShort:
+				return new SimpleDateFormat(plugin.getConfig().getString("timeFormatSign")).format(Calendar.getInstance().getTime());
+
+			// Teleport locations
+			default:
+				Location tp = getTeleportLocation();
+				if(tp == null) {
+					return null;
+				}
+				switch(variable) {
+					case AreaShop.tagTeleportBlockX:
+						return tp.getBlockX();
+					case AreaShop.tagTeleportBlockY:
+						return tp.getBlockY();
+					case AreaShop.tagTeleportBlockZ:
+						return tp.getBlockZ();
+					case AreaShop.tagTeleportX:
+						return tp.getX();
+					case AreaShop.tagTeleportY:
+						return tp.getY();
+					case AreaShop.tagTeleportZ:
+						return tp.getZ();
+					case AreaShop.tagTeleportPitch:
+						return tp.getPitch();
+					case AreaShop.tagTeleportYaw:
+						return tp.getYaw();
+					case AreaShop.tagTeleportPitchRound:
+						return Math.round(tp.getPitch());
+					case AreaShop.tagTeleportYawRound:
+						return Math.round(tp.getYaw());
+					case AreaShop.tagTeleportWorld:
+						return tp.getWorld().getName();
+					default:
+						return null;
+				}
 		}
-		// Apply static replacements
-		HashMap<String, Object> replacements = getAllReplacements();
-		for(String tag : replacements.keySet()) {
-			Object replacement = replacements.get(tag);
-			if(replacement != null) {
-				source = source.replace(tag, replacement.toString());
-			}
-		}
-		return source;		
 	}
 	
 	/**
@@ -749,7 +743,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Indicate this region needs to be saved, saving will happen by a repeating task
 	 */
 	public void saveRequired() {
-		replacementsCache = null; // Remove cache
 		saveRequired = true;
 	}
 	
@@ -1648,13 +1641,13 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		String restore = plugin.getConfig().getString("schematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".restore");
 		// Save the region if needed
 		if(save != null && save.length() != 0) {
-			save = applyAllReplacements(save);
-			this.saveRegionBlocks(save);			
+			save = Message.applyReplacements(save, this);
+			this.saveRegionBlocks(save);
 		}
 		// Restore the region if needed
 		if(restore != null && restore.length() != 0) {
-			restore = applyAllReplacements(restore);
-			this.restoreRegionBlocks(restore);		
+			restore = Message.applyReplacements(restore, this);
+			this.restoreRegionBlocks(restore);
 		}
 	}
 	
@@ -1672,8 +1665,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		for(String command : commands) {
 			if(command == null || command.length() == 0) {
 				continue;
-			}			
-			command = applyAllReplacements(command);
+			}
+			command = Message.applyReplacements(command, this);
 
 			boolean result;
 			String error = null;

@@ -77,7 +77,7 @@ public class InfoCommand extends CommandAreaShop {
 				}
 			});
 			// Header
-			Message limitedToGroup = Message.none();
+			Message limitedToGroup = Message.empty();
 			if(filterGroup != null) {
 				limitedToGroup = Message.fromKey("info-limitedToGroup").replacements(filterGroup.getName());
 			}
@@ -111,7 +111,7 @@ public class InfoCommand extends CommandAreaShop {
 				plugin.messageNoPrefix(sender, "info-entry"+state, region);
 				linesPrinted++;
 			}
-			Message footer = Message.none();
+			Message footer = Message.empty();
 			// Previous button
 			if(page > 1) {
 				footer.append(Message.fromKey("info-pagePrevious").replacements(baseCommand+" "+(page-1)));

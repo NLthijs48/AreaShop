@@ -17,7 +17,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class BuyRegion extends GeneralRegion {
@@ -207,27 +206,34 @@ public class BuyRegion extends GeneralRegion {
 	public String getFormattedMoneyBackAmount() {
 		return Utils.formatCurrency(getMoneyBackAmount());
 	}
-	
+
 	@Override
-	public HashMap<String, Object> getSpecificReplacements() {
-		// Fill the replacements map with things specific to a BuyRegion
-		HashMap<String, Object> result = new HashMap<>();
-		result.put(AreaShop.tagPrice, getFormattedPrice());
-		result.put(AreaShop.tagRawPrice, getPrice());
-		result.put(AreaShop.tagPlayerName, getPlayerName());
-		result.put(AreaShop.tagPlayerUUID, getBuyer());
-		result.put(AreaShop.tagResellPrice, getFormattedResellPrice());
-		result.put(AreaShop.tagRawResellPrice, getResellPrice());
-		result.put(AreaShop.tagMoneyBackAmount, getFormattedMoneyBackAmount());
-		result.put(AreaShop.tagRawMoneyBackAmount, getMoneyBackAmount());
-		double moneyBackPercent = getMoneyBackPercentage();
-		if((moneyBackPercent%1.0) == 0.0) {
-			result.put(AreaShop.tagMoneyBackPercentage, (int)moneyBackPercent);
-		} else {
-			result.put(AreaShop.tagMoneyBackPercentage, moneyBackPercent);
+	public Object provideReplacement(String variable) {
+		switch(variable) {
+			case AreaShop.tagPrice:
+				return getFormattedPrice();
+			case AreaShop.tagRawPrice:
+				return getPrice();
+			case AreaShop.tagPlayerName:
+				return getPlayerName();
+			case AreaShop.tagPlayerUUID:
+				return getBuyer();
+			case AreaShop.tagResellPrice:
+				return getFormattedResellPrice();
+			case AreaShop.tagRawResellPrice:
+				return getResellPrice();
+			case AreaShop.tagMoneyBackAmount:
+				return getFormattedMoneyBackAmount();
+			case AreaShop.tagRawMoneyBackAmount:
+				return getMoneyBackAmount();
+			case AreaShop.tagMoneyBackPercentage:
+				return getMoneyBackPercentage()%1.0 == 0.0 ? (int)getMoneyBackPercentage() : getMoneyBackPercentage();
+			case AreaShop.tagMaxInactiveTime:
+				return this.getFormattedInactiveTimeUntilSell();
+
+			default:
+				return super.provideReplacement(variable);
 		}
-		result.put(AreaShop.tagMaxInactiveTime, this.getFormattedInactiveTimeUntilSell());
-		return result;
 	}
 	
 	/**

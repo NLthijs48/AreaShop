@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.UUID;
 
 import static me.wiefferink.areashop.Utils.millisToHumanFormat;
@@ -129,36 +128,44 @@ public class RentRegion extends GeneralRegion {
 			setSetting("rent.timesExtended", times);
 		}
 	}
-	
+
 	@Override
-	public HashMap<String, Object> getSpecificReplacements() {
-		// Fill the replacements map with things specific to a RentRegion
-		HashMap<String, Object> result = new HashMap<>();
-		result.put(AreaShop.tagPrice, getFormattedPrice());
-		result.put(AreaShop.tagRawPrice, getPrice());
-		result.put(AreaShop.tagDuration, getDurationString());
-		result.put(AreaShop.tagPlayerName, getPlayerName());
-		result.put(AreaShop.tagPlayerUUID, getRenter());
-			SimpleDateFormat date = new SimpleDateFormat(plugin.getConfig().getString("timeFormatChat"));
-			String dateString = date.format(new Date(getRentedUntil()));	
-		result.put(AreaShop.tagRentedUntil, dateString);
-			date = new SimpleDateFormat(plugin.getConfig().getString("timeFormatSign"));
-			dateString = date.format(new Date(getRentedUntil()));	
-		result.put(AreaShop.tagRentedUntilShort, dateString);
-		result.put(AreaShop.tagTimeLeft, getTimeLeftString());
-		result.put(AreaShop.tagMoneyBackAmount, getFormattedMoneyBackAmount());
-		result.put(AreaShop.tagRawMoneyBackAmount, getMoneyBackAmount());
-		double moneyBackPercent = getMoneyBackPercentage();
-		if((moneyBackPercent%1.0) == 0.0) {
-			result.put(AreaShop.tagMoneyBackPercentage, (int)moneyBackPercent);
-		} else {
-			result.put(AreaShop.tagMoneyBackPercentage, moneyBackPercent);
+	public Object provideReplacement(String variable) {
+		switch(variable) {
+			case AreaShop.tagPrice:
+				return getFormattedPrice();
+			case AreaShop.tagRawPrice:
+				return getPrice();
+			case AreaShop.tagDuration:
+				return getDurationString();
+			case AreaShop.tagPlayerName:
+				return getPlayerName();
+			case AreaShop.tagPlayerUUID:
+				return getRenter();
+			case AreaShop.tagRentedUntil:
+				return new SimpleDateFormat(plugin.getConfig().getString("timeFormatChat")).format(new Date(getRentedUntil()));
+			case AreaShop.tagRentedUntilShort:
+				return new SimpleDateFormat(plugin.getConfig().getString("timeFormatSign")).format(new Date(getRentedUntil()));
+			case AreaShop.tagTimeLeft:
+				return getTimeLeftString();
+			case AreaShop.tagMoneyBackAmount:
+				return getFormattedMoneyBackAmount();
+			case AreaShop.tagRawMoneyBackAmount:
+				return getMoneyBackAmount();
+			case AreaShop.tagMoneyBackPercentage:
+				return getMoneyBackPercentage()%1.0 == 0.0 ? (int)getMoneyBackPercentage() : getMoneyBackPercentage();
+			case AreaShop.tagMaxExtends:
+				return this.getMaxExtends();
+			case AreaShop.tagExtendsLeft:
+				return getMaxExtends()-getTimesExtended();
+			case AreaShop.tagMaxRentTime:
+				return millisToHumanFormat(getMaxRentTime());
+			case AreaShop.tagMaxInactiveTime:
+				return this.getFormattedInactiveTimeUntilUnrent();
+
+			default:
+				return super.provideReplacement(variable);
 		}
-		result.put(AreaShop.tagMaxExtends, this.getMaxExtends());
-		result.put(AreaShop.tagExtendsLeft, getMaxExtends() - getTimesExtended());
-		result.put(AreaShop.tagMaxRentTime, millisToHumanFormat(getMaxRentTime()));
-		result.put(AreaShop.tagMaxInactiveTime, this.getFormattedInactiveTimeUntilUnrent());
-		return result;
 	}
 	
 	/**

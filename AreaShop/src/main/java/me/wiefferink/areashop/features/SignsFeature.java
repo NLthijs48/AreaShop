@@ -3,6 +3,7 @@ package me.wiefferink.areashop.features;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
+import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -281,7 +282,7 @@ public class SignsFeature extends Feature {
 						signState.setLine(i, "");
 						continue;
 					}
-					signLines[i] = region.applyAllReplacements(signLines[i]);
+					signLines[i] = Message.applyReplacements(signLines[i], region);
 					signLines[i] = Utils.applyColors(signLines[i]);
 					signState.setLine(i, signLines[i]);
 				}

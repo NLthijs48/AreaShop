@@ -2,7 +2,7 @@ package me.wiefferink.areashop.messages;
 
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
-import me.wiefferink.areashop.regions.GeneralRegion;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,7 +40,7 @@ public class Message {
 	 * Empty message object
 	 * @return this
 	 */
-	public static Message none() {
+	public static Message empty() {
 		return new Message();
 	}
 
@@ -72,11 +72,21 @@ public class Message {
 	}
 
 	/**
+	 * Apply replacements to a string
+	 * @param message The string to apply replacements to
+	 * @param replacements The replacements to apply
+	 * @return The message with the replacements applied
+	 */
+	public static String applyReplacements(String message, Object... replacements) {
+		return Message.fromString(message).replacements(replacements).doReplacements().getSingleRaw();
+	}
+
+	/**
 	 * Get the message with all replacements done
 	 * @return Message as a list
 	 */
 	public List<String> get() {
-		executeReplacements();
+		doReplacements();
 		return message;
 	}
 
@@ -89,7 +99,7 @@ public class Message {
 		if(limit.reached()) {
 			return new ArrayList<>();
 		}
-		executeReplacements(limit);
+		doReplacements(limit);
 		return message;
 	}
 
@@ -102,11 +112,19 @@ public class Message {
 	}
 
 	/**
+	 * Get raw message as string
+	 * @return The raw message
+	 */
+	public String getSingleRaw() {
+		return StringUtils.join(message, "");
+	}
+
+	/**
 	 * Get a plain string for the message (for example for using in the console)
 	 * @return The message as simple string
 	 */
 	public String getPlain() {
-		executeReplacements();
+		doReplacements();
 		return FancyMessageFormat.convertToConsole(message);
 	}
 
@@ -177,7 +195,7 @@ public class Message {
 		if(message == null || message.size() == 0 || (message.size() == 1 && message.get(0).length() == 0) || target == null) {
 			return this;
 		}
-		executeReplacements();
+		doReplacements();
 		if(target instanceof Player) {
 			boolean sendPlain = true;
 			if(AreaShop.getInstance().getConfig().getBoolean("useFancyMessages") && fancyWorks) {
@@ -257,12 +275,13 @@ public class Message {
 
 	/**
 	 * Apply all replacements to the message
+	 * @return this
 	 */
-	private void executeReplacements() {
-		executeReplacements(new Limit(REPLACEMENTLIMIT, this));
+	public Message doReplacements() {
+		return doReplacements(new Limit(REPLACEMENTLIMIT, this));
 	}
 
-	private void executeReplacements(Limit limit) {
+	private Message doReplacements(Limit limit) {
 		// Replace variables until they are all gone, or when the limit is reached
 		Pattern variable = Pattern.compile(Pattern.quote(VARIABLESTART)+"[a-zA-Z]+"+Pattern.quote(VARIABLEEND));
 
@@ -289,6 +308,7 @@ public class Message {
 			limit.notified = true;
 			AreaShop.error("Too many recursive replacements for message with key: "+limit.message.key+" (probably includes itself as replacement), start of the message: "+Utils.getMessageStart(limit.message, 100));
 		}
+		return this;
 	}
 
 	/**
@@ -301,23 +321,38 @@ public class Message {
 		if(message == null || message.size() == 0 || replacements == null || limit.reached()) {
 			return;
 		}
-		boolean result = false;
+		Pattern variablePattern = Pattern.compile(Pattern.quote(VARIABLESTART)+"[a-zA-Z]+"+Pattern.quote(VARIABLEEND));
 		for(int i = 0; i < message.size(); i++) {
 			int number = 0;
+			String line = message.get(i);
 			for(Object param : replacements) {
 				if(param != null) {
-					if(param instanceof GeneralRegion) {
-						message.set(i, ((GeneralRegion)param).applyAllReplacements(message.get(i)));
+					if(param instanceof ReplacementProvider) {
+						Matcher matcher = variablePattern.matcher(line);
+						if(matcher.find()) {
+							Object replacement = ((ReplacementProvider)param).provideReplacement(matcher.group().substring(1, matcher.group().length()-1));
+							if(replacement != null) {
+								String result = "";
+								if(matcher.start() > 0) {
+									result += line.substring(0, matcher.start());
+								}
+								result += replacement.toString();
+								if(matcher.end() < line.length()) {
+									result += line.substring(matcher.end());
+								}
+								message.set(i, result);
+							}
+						}
 					} else if(param instanceof Message) {
-						Pattern variables = Pattern.compile(Pattern.quote(VARIABLESTART)+number+Pattern.quote(VARIABLEEND));
-						Matcher matches = variables.matcher(message.get(i));
-						if(matches.find()) { // Only replaces one occurance of the variable, others will be done next round
+						Pattern indexPattern = Pattern.compile(Pattern.quote(VARIABLESTART)+number+Pattern.quote(VARIABLEEND));
+						Matcher matcher = indexPattern.matcher(line);
+						if(matcher.find()) { // Only replaces one occurance of the variable, others will be done next round
 							int startDiff = message.size()-i;
 							List<String> insertMessage = ((Message)param).get(limit);
 							if(limit.reached()) {
 								return;
 							}
-							FancyMessageFormat.insertMessage(message, insertMessage, i, matches.start(), matches.end());
+							FancyMessageFormat.insertMessage(message, insertMessage, i, matcher.start(), matcher.end());
 							// Skip to end of insert
 							i = message.size()-startDiff;
 						}
@@ -353,10 +388,10 @@ public class Message {
 				String key;
 				Object[] arguments = null;
 				if(variable.contains("|")) {
-					key = variable.substring(6, variable.indexOf("|"));
-					arguments = variable.substring(variable.indexOf("|")+1, variable.length()-1).split("\\|");
+					key = variable.substring(VARIABLESTART.length()+LANGUAGEVARIABLE.length(), variable.indexOf("|"));
+					arguments = variable.substring(variable.indexOf("|")+1, variable.length()-VARIABLEEND.length()).split("\\|");
 				} else {
-					key = variable.substring(6, variable.length()-1);
+					key = variable.substring(VARIABLESTART.length()+LANGUAGEVARIABLE.length(), variable.length()-VARIABLEEND.length());
 				}
 				Message insert = Message.fromKey(key);
 				if(arguments != null) {
@@ -406,5 +441,17 @@ public class Message {
 		public boolean reached() {
 			return left <= 0;
 		}
+	}
+
+	/**
+	 * Provide custom replacement for variables
+	 */
+	public interface ReplacementProvider {
+		/**
+		 * Get the replacement for a variable
+		 * @param variable The variable to replace
+		 * @return The replacement for the variable, or null if empty
+		 */
+		Object provideReplacement(String variable);
 	}
 }

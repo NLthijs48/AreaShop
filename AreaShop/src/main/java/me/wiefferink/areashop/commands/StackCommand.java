@@ -107,20 +107,20 @@ public class StackCommand extends CommandAreaShop {
             plugin.message(player, "stack-unclearDirection", facing.toString().toLowerCase().replace('_', '-'));
 			return;
 		}
-        final Vector shift = new BlockVector(0, 0, 0);
-        if(facing == BlockFace.SOUTH) {
-			shift.setZ(-selection.getLength() - gap);
+		Vector shift = new BlockVector(0, 0, 0);
+		if(facing == BlockFace.SOUTH) {
+			shift = shift.setZ(-selection.getLength()-gap);
 		} else if(facing == BlockFace.WEST) {
-			shift.setX(selection.getWidth() + gap);
+			shift = shift.setX(selection.getWidth()+gap);
 		} else if(facing == BlockFace.NORTH) {
-			shift.setZ(selection.getLength() + gap);
+			shift = shift.setZ(selection.getLength()+gap);
 		} else if(facing == BlockFace.EAST) {
-			shift.setX(-selection.getWidth() - gap);
-        } else if (facing == BlockFace.DOWN) {
-            shift.setY(-selection.getHeight() - gap);
-        } else if (facing == BlockFace.UP) {
-            shift.setY(selection.getHeight() + gap);
-        }
+			shift = shift.setX(-selection.getWidth()-gap);
+		} else if (facing == BlockFace.DOWN) {
+			shift = shift.setY(-selection.getHeight()-gap);
+		} else if (facing == BlockFace.UP) {
+			shift = shift.setY(selection.getHeight()+gap);
+		}
 		AreaShop.debug("  calculated shift vector: " + shift + ", with facing=" + facing);
 		// Create regions and add them to AreaShop
 		final String namePrefix = args[3];
@@ -128,6 +128,7 @@ public class StackCommand extends CommandAreaShop {
 		final boolean rentRegions = "rent".equalsIgnoreCase(args[4]);
 		final int amount = tempAmount;
 		final RegionGroup finalGroup = group;
+		final Vector finalShift = shift;
 		String type;
 		if(rentRegions) {
 			type = "rent";
@@ -169,9 +170,9 @@ public class StackCommand extends CommandAreaShop {
 							regionName = namePrefix + counterName;
 						}
 						// Add the region to WorldGuard (at startposition shifted by the number of this region times the blocks it should shift)
-                        BlockVector minimum = new BlockVector(selection.getNativeMinimumPoint().add(shift.multiply(current)));
-                        BlockVector maximum = new BlockVector(selection.getNativeMaximumPoint().add(shift.multiply(current)));
-                        // Check for out of bounds
+						BlockVector minimum = new BlockVector(selection.getNativeMinimumPoint().add(finalShift.multiply(current)));
+						BlockVector maximum = new BlockVector(selection.getNativeMaximumPoint().add(finalShift.multiply(current)));
+						// Check for out of bounds
                         if (minimum.getBlockY() < 0) {
                             tooLow++;
                             continue;

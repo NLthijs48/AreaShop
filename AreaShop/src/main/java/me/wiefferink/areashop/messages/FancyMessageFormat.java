@@ -170,6 +170,7 @@ public class FancyMessageFormat {
 		}
 		String lineContent = message.remove(line);
 		if(start > lineContent.length() || end > lineContent.length()) {
+			message.add(line, lineContent); // Repair damage
 			return;
 		}
 		if(isTaggedInteractive(lineContent)) {

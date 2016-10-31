@@ -523,7 +523,7 @@ stack-noSelection: "You don't have a selection that indicates where the first re
 stack-addStart: "[gray]Adding %0% regions at %1% per second."
 stack-addComplete: "[gray]Added %0% regions%1%."
 stack-tooHigh: ", %0% regions skipped because they were above Y=256"
-stack-tooHigh: ", %0% regions skipped because they were below Y=0"
+stack-tooLow: ", %0% regions skipped because they were below Y=0"
 stack-unclearDirection: "Please look clearly in the north, east, south, west, up or down direction, currently detected %0%."
 
 setlandlord-help: "/as setlandlord <player> [region], the region you stand in will be used if not specified."

@@ -324,8 +324,8 @@ public class Message {
 		Pattern variablePattern = Pattern.compile(Pattern.quote(VARIABLESTART)+"[a-zA-Z]+"+Pattern.quote(VARIABLEEND));
 		for(int i = 0; i < message.size(); i++) {
 			int number = 0;
-			String line = message.get(i);
 			for(Object param : replacements) {
+				String line = message.get(i);
 				if(param != null) {
 					if(param instanceof ReplacementProvider) {
 						Matcher matcher = variablePattern.matcher(line);

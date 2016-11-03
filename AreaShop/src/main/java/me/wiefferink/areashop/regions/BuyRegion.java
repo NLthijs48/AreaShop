@@ -45,6 +45,11 @@ public class BuyRegion extends GeneralRegion {
 		}
 	}
 	
+	@Override
+	public boolean isAvailable() {
+		return !isSold();
+	}
+	
 	/**
 	 * Get the UUID of the owner of this region
 	 * @return The UUID of the owner of this region

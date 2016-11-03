@@ -162,6 +162,12 @@ permissions:
   areashop.teleportfriendsign:
     description: Teleport to the sign of regions where you are added as friend
     default: true
+  areashop.teleportavailable:
+    description: Teleport to regions which are available
+    default: true
+  areashop.teleportavailablesign:
+    description: Teleport to the sign of regions which are available
+    default: true
   areashop.setteleport:
     description: Set the teleport spot for your region
     default: true

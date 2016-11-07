@@ -41,11 +41,9 @@ public class WorldEditHandler5 extends WorldEditInterface {
 			}
 			clipBoard.place(editSession, origin, false);
 		} catch(MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of " + regionInterface.getName());
+			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of "+regionInterface.getName()+", limit in exception: "+e.getBlockLimit()+", limit passed by AreaShop: "+pluginInterface.getConfig().getInt("maximumBlocks"));
 			result = false;
-		} catch(DataException e) {
-			otherException = e;
-		} catch(IOException e) {
+		} catch(DataException|IOException e) {
 			otherException = e;
 		}
 		if(otherException != null) {
@@ -72,9 +70,7 @@ public class WorldEditHandler5 extends WorldEditInterface {
 		Exception otherException = null;
 		try {
 			SchematicFormat.MCEDIT.save(clipboard, file);
-		} catch (DataException e) {
-			otherException = e;
-		} catch (IOException e) {
+		} catch(DataException|IOException e) {
 			otherException = e;
 		}
 		if(otherException != null) {

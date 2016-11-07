@@ -74,7 +74,7 @@ public class WorldEditHandler6 extends WorldEditInterface {
 					.build();
 			Operations.completeLegacy(operation);
 		} catch (MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of " + regionInterface.getName());
+			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of "+regionInterface.getName()+", limit in exception: "+e.getBlockLimit()+", limit passed by AreaShop: "+pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;
 		} catch (IOException e) {
 			pluginInterface.getLogger().warning("An error occured while restoring schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
@@ -108,8 +108,8 @@ public class WorldEditHandler6 extends WorldEditInterface {
 		ForwardExtentCopy copy = new ForwardExtentCopy(editSession, new CuboidRegion(world, regionInterface.getRegion().getMinimumPoint(), regionInterface.getRegion().getMaximumPoint()), clipboard, regionInterface.getRegion().getMinimumPoint());
 		try {
 			Operations.completeLegacy(copy);
-		} catch (MaxChangedBlocksException e1) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while saving schematic of " + regionInterface.getName());
+		} catch(MaxChangedBlocksException e) {
+			pluginInterface.getLogger().warning("Exeeded the block limit while saving schematic of "+regionInterface.getName()+", limit in exception: "+e.getBlockLimit()+", limit passed by AreaShop: "+pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;
 		}
 		Closer closer = Closer.create();

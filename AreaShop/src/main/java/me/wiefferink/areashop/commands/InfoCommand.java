@@ -365,11 +365,7 @@ public class InfoCommand extends CommandAreaShop {
 						}
 						// Restoring
 						if(rent.isRestoreEnabled()) {
-							if(sender.hasPermission("areashop.setrestore")) {
-								plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent, Message.fromKey("info-regionRestoringProfile").replacements(rent.getRestoreProfile()));
-							} else {
-								plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent, "");
-							}
+							plugin.messageNoPrefix(sender, "info-regionRestoringRent", rent);
 						}
 						// Restrictions
 						if(!rent.isRented()) {
@@ -444,11 +440,7 @@ public class InfoCommand extends CommandAreaShop {
 						}
 						// Restoring
 						if(buy.isRestoreEnabled()) {
-							if(sender.hasPermission("areashop.setrestore")) {
-								plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy, Message.fromKey("info-regionRestoringProfile").replacements(buy.getRestoreProfile()));
-							} else {
-								plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy, "");
-							}
+							plugin.messageNoPrefix(sender, "info-regionRestoringBuy", buy);
 						}
 						// Restrictions
 						if(!buy.isSold()) {

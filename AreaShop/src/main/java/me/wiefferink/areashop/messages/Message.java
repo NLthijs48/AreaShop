@@ -28,6 +28,7 @@ public class Message {
 	private List<String> message;
 	private Object[] replacements;
 	private String key = null;
+	private boolean doLanguageReplacements = true;
 
 	/**
 	 * Internal use only
@@ -72,16 +73,6 @@ public class Message {
 	}
 
 	/**
-	 * Apply replacements to a string
-	 * @param message The string to apply replacements to
-	 * @param replacements The replacements to apply
-	 * @return The message with the replacements applied
-	 */
-	public static String applyReplacements(String message, Object... replacements) {
-		return Message.fromString(message).replacements(replacements).doReplacements().getSingleRaw();
-	}
-
-	/**
 	 * Get the message with all replacements done
 	 * @return Message as a list
 	 */
@@ -101,6 +92,15 @@ public class Message {
 		}
 		doReplacements(limit);
 		return message;
+	}
+
+	/**
+	 * Get the message with all replacements done
+	 * @return Message as a string
+	 */
+	public String getSingle() {
+		doReplacements();
+		return StringUtils.join(message, "");
 	}
 
 	/**
@@ -183,6 +183,15 @@ public class Message {
 	 */
 	public Message append(String line) {
 		message.add(line);
+		return this;
+	}
+
+	/**
+	 * Turn off language replacements for this message
+	 * @return this
+	 */
+	public Message noLanguageReplacements() {
+		doLanguageReplacements = false;
 		return this;
 	}
 
@@ -299,7 +308,9 @@ public class Message {
 					break;
 				}
 				replaceArgumentVariables(limit);
-				replaceLanguageVariables(limit);
+				if(doLanguageReplacements) {
+					replaceLanguageVariables(limit);
+				}
 
 				shouldReplace = !message.equals(original);
 			}

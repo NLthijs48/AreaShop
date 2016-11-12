@@ -6,38 +6,38 @@
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ TIMERS: Settings to define how often scheduled tasks run.                                                                  │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-## Setting the 'delay' setting to 0 or lower will prevent the taks from runnning.
-## The 'delay' settings are specified using a number followed by one of the identifiers as defined in config.yml.
-## The 'regionsPerTick' settings are to configure how fast something goes, lower value is less lag, but slower updates.
-## There are 20 ticks in 1 second, so if you set 'regionPerTick' to 5, then 5*20=100 regions per second will be updated.
+# Setting the 'delay' setting to 0 or lower will prevent the taks from runnning.
+# The 'delay' settings are specified using a number followed by one of the identifiers as defined in config.yml.
+# The 'regionsPerTick' settings are to configure how fast something goes, lower value is less lag, but slower updates.
+# There are 20 ticks in 1 second, so if you set 'regionPerTick' to 5, then 5*20=100 regions per second will be updated.
 
-## Timings for saving files that need saving.
+# Timings for saving files that need saving.
 saving:
-  delay: '10 minutes'
+  delay: '11 minutes'
   regionsPerTick: 1
-## Timings for rent expiration checking.
+# Timings for rent expiration checking.
 expiration:
-  delay: '59 seconds'
+  delay: '29 seconds'
   regionsPerTick: 5
-## Timings for expiration warning to online players.
+# Timings for expiration warning to online players.
 expireWarning:
-  delay: '5 minutes'
+  delay: '61 seconds'
   regionsPerTick: 5
-## Timings for updating signs and region flags ('/as reload' or after '/as groupadd' or '/as groupdel').
+# Timings for updating signs and region flags ('/as reload' or after '/as groupadd' or '/as groupdel').
 update:
   regionsPerTick: 5
-## Time between checking if any regions need to be unrented because the player was not online for the specified time period.
+# Time between checking if any regions need to be unrented because the player was not online for the specified time period.
 inactive:
-  delay: '15 minutes'
+  delay: '17 minutes'
   regionsPerTick: 5
-## Timings for the periodic updating of signs (for timeleft tags etc).
+# Timings for the periodic updating of signs (for timeleft tags etc).
 signs:
-  delay: '60 seconds'
+  delay: '1 minute'
   regionsPerTick: 3
-## Number of regions per tick to check when a player joins to see if his name changed for regions he owned (updates the regions when changed).
+# Number of regions per tick to check when a player joins to see if his name changed for regions he owned (updates the regions when changed).
 nameupdate:
   regionsPerTick: 10
-## Timings for adding regions to AreaShop ('/as stack').
+# Timings for adding regions to AreaShop ('/as stack').
 adding:
   regionsPerTick: 2
 
@@ -45,6 +45,14 @@ adding:
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ OTHER: All other settings.                                                                                                 │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-## Allow or disallow extending a rental region when the player is above his limits enforced by the 'limitGroups' section below.
-## false will ensure a player will eventually lose his region when he has no access anymore.
+# Allow or disallow extending a rental region when the player is above his limits enforced by the 'limitGroups' section below.
+# false will ensure a player will eventually lose his region when he has no access anymore.
 allowRegionExtendsWhenAboveLimits: false
+# Flag profiles that can be used by the 'general.flagProfile' setting in default.yml
+flagProfiles:
+# Event command profiles that can be used by the 'general.eventCommandProfile' setting in default.yml
+eventCommandProfiles:
+# Sign profiles that can be used by the 'general.signProfile' setting in default.yml
+signProfiles:
+# Schematic profiles that can be used by the 'general.schematicProfile' setting in default.yml
+schematicProfiles:

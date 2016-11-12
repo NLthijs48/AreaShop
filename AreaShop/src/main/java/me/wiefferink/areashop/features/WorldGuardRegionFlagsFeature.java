@@ -28,21 +28,24 @@ public class WorldGuardRegionFlagsFeature extends Feature {
 	 * @return true if the flags have been set correctly, otherwise false
 	 */
 	protected boolean updateRegionFlags(GeneralRegion region) {
-		boolean result = true;
+		boolean result;
 
-		// General region flags
+		// Get section defining the region flag profile
+		ConfigurationSection flagProfileSection = region.getConfigurationSectionSetting("general.flagProfile", "flagProfiles");
+		if(flagProfileSection == null) {
+			return false;
+		}
+
+		// Region flags for all states
 		String allPath = "flagProfiles."+region.getStringSetting("general.flagProfile")+".ALL";
-		ConfigurationSection generalFlags = plugin.getConfig().getConfigurationSection(allPath);
-		if(plugin.getConfig().isSet(allPath) && generalFlags != null) { // Explicitely check if it is set, so don't apply if only in the default config
-			result = updateRegionFlags(region, generalFlags);
-		}
+		ConfigurationSection allFlags = flagProfileSection.getConfigurationSection("ALL");
+		result = updateRegionFlags(region, allFlags);
 
-		// Specific region flags
+		// Region flags for the current state
 		String specificPath = "flagProfiles."+region.getStringSetting("general.flagProfile")+"."+region.getState().getValue();
-		if(plugin.getConfig().isSet(specificPath)) { // Do no apply default flags if they are removed from the active config
-			ConfigurationSection specificFlags = plugin.getConfig().getConfigurationSection(specificPath);
-			result = result && specificFlags != null && updateRegionFlags(region, specificFlags);
-		}
+		ConfigurationSection stateFlags = flagProfileSection.getConfigurationSection(region.getState().getValue());
+		result = result && updateRegionFlags(region, stateFlags);
+
 		return result;
 	}
 	/**

@@ -18,8 +18,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -274,14 +276,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public boolean isRestoreEnabled() {
 		return getBooleanSetting("general.enableRestore");
 	}
-	/**
-	 * Get the restoreprofile as defined in config.yml
-	 * @return The restoreprofile
-	 */
-	public String getRestoreProfile() {
-		return getStringSetting("general.schematicProfile");
-	}
-	
+
 	/**
 	 * Get the time that the player was last active
 	 * @return Current time if he is online, last online time if offline, -1 if the region has no owner
@@ -694,7 +689,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
         File parent = saveFile.getParentFile();
         if (parent != null && !parent.exists()) {
             if (!parent.mkdirs()) {
-				AreaShop.warn("Did not save region "+getName()+", schematic directory could not be created: "+saveFile);
+				AreaShop.warn("Did not save region "+getName()+", schematic directory could not be created: "+saveFile.getAbsolutePath());
 				return false;
             }
         }		
@@ -718,12 +713,20 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		// The path to save the schematic
 		File restoreFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
 		if(!restoreFile.exists() || !restoreFile.isFile()) {
-			AreaShop.info("Did not restore region "+getName()+", schematic file does not exist: "+restoreFile);
+			AreaShop.info("Did not restore region "+getName()+", schematic file does not exist: "+restoreFile.getAbsolutePath());
 			return false;
 		}
 		boolean result = plugin.getWorldEditHandler().restoreRegionBlocks(restoreFile, this);
 		if(result) {
 			AreaShop.debug("Restored schematic for region " + getName());
+
+			// Workaround for signs inside the region in combination with async restore of plugins like AsyncWorldEdit and FastAsyncWorldEdit
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					getSignsFeature().update();
+				}
+			}.runTaskLater(plugin, 10L);
 		}
 		return result;
 	}
@@ -1382,6 +1385,89 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	}
 
 	/**
+	 * Get a configuration section setting for this region, defined as follows
+	 * - If the region has the setting in its own file (/regions/regionName.yml), use that
+	 * - If the region has groups, use the setting defined by the most important group, if any
+	 * - Otherwise fallback to the default.yml file setting
+	 * @param path The path to get the setting of
+	 * @return The value of the setting
+	 */
+	public ConfigurationSection getConfigurationSectionSetting(String path) {
+		if(config.isSet(path)) {
+			return config.getConfigurationSection(path);
+		}
+		ConfigurationSection result = null;
+		int priority = Integer.MIN_VALUE;
+		boolean found = false;
+		for(RegionGroup group : plugin.getFileManager().getGroups()) {
+			if(group.isMember(this) && group.getSettings().isSet(path) && group.getPriority() > priority) {
+				result = group.getSettings().getConfigurationSection(path);
+				priority = group.getPriority();
+				found = true;
+			}
+		}
+		if(found) {
+			return result;
+		}
+		return this.getFileManager().getDefaultSettings().getConfigurationSection(path);
+	}
+
+	/**
+	 * Get a configuration section setting for this region, defined as follows
+	 * - If the region has the setting in its own file (/regions/regionName.yml), use that
+	 * - If the region has groups, use the setting defined by the most important group, if any
+	 * - Otherwise fallback to the default.yml file setting
+	 * @param path                 The path to get the setting of
+	 * @param translateProfileName The name of the profile section in the plugin config file to translate result strings into sections
+	 * @return The value of the setting
+	 */
+	public ConfigurationSection getConfigurationSectionSetting(String path, String translateProfileName) {
+		return getConfigurationSectionSetting(path, translateProfileName, null);
+	}
+
+	/**
+	 * Get a configuration section setting for this region, defined as follows
+	 * - If earlyResult is non-null, use that
+	 * - Else if the region has the setting in its own file (/regions/regionName.yml), use that
+	 * - Else if the region has groups, use the setting defined by the most important group, if any
+	 * - Otherwise fallback to the default.yml file setting
+	 * @param path                 The path to get the setting of
+	 * @param translateProfileName The name of the profile section in the plugin config file to translate result strings into sections
+	 * @param earlyResult          Result that should have priority over the rest
+	 * @return The value of the setting
+	 */
+	public ConfigurationSection getConfigurationSectionSetting(String path, String translateProfileName, Object earlyResult) {
+		Object result = null;
+		if(earlyResult != null) {
+			result = earlyResult;
+		} else if(config.isSet(path)) {
+			result = config.get(path);
+		} else {
+			boolean found = false;
+			int priority = Integer.MIN_VALUE;
+			for(RegionGroup group : plugin.getFileManager().getGroups()) {
+				if(group.isMember(this) && group.getSettings().isSet(path) && group.getPriority() > priority) {
+					result = group.getSettings().get(path);
+					priority = group.getPriority();
+					found = true;
+				}
+			}
+			if(!found) {
+				result = this.getFileManager().getDefaultSettings().get(path);
+			}
+		}
+
+		// Either result is a ConfigurationSection or is used as key in the plugin config to get a ConfigurationSection
+		if(result == null) {
+			return null;
+		} else if(result instanceof ConfigurationSection) {
+			return (ConfigurationSection)result;
+		} else {
+			return plugin.getConfig().getConfigurationSection(translateProfileName+"."+result.toString());
+		}
+	}
+
+	/**
 	 * Set a setting in the file of the region itself
 	 * @param path The path to set
 	 * @param value The value to set it to, null to remove the setting
@@ -1623,9 +1709,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		return false;
 	}
-	
-	
-	
+
 	/**
 	 * Checks an event and handles saving to and restoring from schematic for it
 	 * @param type The type of event
@@ -1633,25 +1717,27 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public void handleSchematicEvent(RegionEvent type) {
 		// Check the individual>group>default setting
 		if(!isRestoreEnabled()) {
-			AreaShop.debug("Schematic operations for " + getName() + " not enabled, skipped"); 
+			AreaShop.debug("Schematic operations for "+getName()+" not enabled, skipped");
 			return;
 		}
-		// Get the safe and restore names		
-		String save = plugin.getConfig().getString("schematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".save");
-		String restore = plugin.getConfig().getString("schematicProfiles." + getRestoreProfile() + "." + type.getValue() + ".restore");
+		// Get the safe and restore names
+		ConfigurationSection profileSection = getConfigurationSectionSetting("general.schematicProfile", "schematicProfiles");
+		String save = profileSection.getString(type.getValue()+".save");
+		String restore = profileSection.getString(type.getValue()+".restore");
 		// Save the region if needed
 		if(save != null && save.length() != 0) {
-			save = Message.applyReplacements(save, this);
-			this.saveRegionBlocks(save);
+			save = Message.fromString(save).replacements(this).getSingle();
+			saveRegionBlocks(save);
 		}
 		// Restore the region if needed
 		if(restore != null && restore.length() != 0) {
-			restore = Message.applyReplacements(restore, this);
-			this.restoreRegionBlocks(restore);
+			restore = Message.fromString(restore).replacements(this).getSingle();
+			restoreRegionBlocks(restore);
 		}
 	}
 	
-	// COMMAND EXECUTING	
+	// COMMAND EXECUTING
+
 	/**
 	 * Run commands as the CommandsSender, replacing all tags with the relevant values
 	 * @param sender The sender that should perform the command
@@ -1666,7 +1752,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			if(command == null || command.length() == 0) {
 				continue;
 			}
-			command = Message.applyReplacements(command, this);
+			// It is not ideal we have to disable language replacements here, but otherwise giving language variables
+			// to '/areashop message' by a command in the config gets replaced and messes up the fancy formatting.
+			command = Message.fromString(command).replacements(this).noLanguageReplacements().getSingle();
 
 			boolean result;
 			String error = null;
@@ -1707,21 +1795,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @param before The 'before' or 'after' commands
 	 */
 	public void runEventCommands(RegionEvent event, boolean before) {
-		String profile = getStringSetting("general.eventCommandProfile");
-		if(profile == null || profile.length() == 0) {
+		ConfigurationSection eventCommandProfileSection = getConfigurationSectionSetting("general.eventCommandProfile", "eventCommandProfiles");
+		if(eventCommandProfileSection == null) {
 			return;
 		}
-		String path = "eventCommandProfiles." + profile + "." + event.getValue().toLowerCase();
-		if(before) {
-			path += ".before";
-		} else {
-			path += ".after";
-		}
-		List<String> commands = plugin.getConfig().getStringList(path);
-		// Don't waste time if there are no commands to be run
+		List<String> commands = eventCommandProfileSection.getStringList(event.getValue()+"."+(before ? "before" : "after"));
 		if(commands == null || commands.isEmpty()) {
 			return;
-		}		
+		}
 		runCommands(Bukkit.getConsoleSender(), commands);
 	}
 }

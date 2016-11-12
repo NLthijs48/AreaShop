@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static me.wiefferink.areashop.Utils.millisToHumanFormat;
@@ -320,7 +321,7 @@ public class RentRegion extends GeneralRegion {
 		double percentage = (getMoneyBackPercentage()) / 100.0;
 		Double timePeriod = (double) (getDuration());
 		double periods = timeLeft / timePeriod;
-		return periods * getPrice() * percentage;
+		return Math.max(0, periods*getPrice()*percentage);
 	}
 	
 	/**
@@ -348,7 +349,7 @@ public class RentRegion extends GeneralRegion {
 		if(!isDeleted() && isRented() && now > getRentedUntil()) {
 			// Send message to the player if online
 			Player player = Bukkit.getPlayer(getRenter());
-			if(unRent(false, player)) {
+			if(unRent(false, null)) {
 				if(player != null) {
 					message(player, "unrent-expired");
 				}
@@ -363,19 +364,19 @@ public class RentRegion extends GeneralRegion {
 	 * Sends all warnings since previous call until (now + normal delay), delay can be found in the config as well
 	 */
 	public void sendExpirationWarnings() {
-		// send from warningsDoneUntil to current+delay
+		// Send from warningsDoneUntil to current+delay
 		if(isDeleted() || !isRented()) {
 			return;
 		}
-		Player player = Bukkit.getPlayer(getRenter());
-		long sendUntil = Calendar.getInstance().getTimeInMillis()+(plugin.getConfig().getInt("expireWarning.delay")*60*1000);
-		// loop through warning defined in the config for the profile that is set for this region
-		String configPath = "expirationWarningProfiles."+getStringSetting("rent.expirationWarningProfile");
-		ConfigurationSection section = plugin.getConfig().getConfigurationSection(configPath);
-		if(section == null) {
+		ConfigurationSection profileSection = getConfigurationSectionSetting("rent.expirationWarningProfile", "expirationWarningProfiles");
+		if(profileSection == null) {
 			return;
 		}
-		for(String timeBefore : section.getKeys(false)) {
+
+		// Check if a warning needs to be send for each defined point in time
+		Player player = Bukkit.getPlayer(getRenter());
+		long sendUntil = Calendar.getInstance().getTimeInMillis()+(plugin.getConfig().getInt("expireWarning.delay")*60*1000);
+		for(String timeBefore : profileSection.getKeys(false)) {
 			long timeBeforeParsed = Utils.durationStringToLong(timeBefore);
 			if(timeBeforeParsed <= 0) {
 				return;
@@ -383,10 +384,22 @@ public class RentRegion extends GeneralRegion {
 			long checkTime = getRentedUntil()-timeBeforeParsed;
 
 			if(checkTime > warningsDoneUntil && checkTime <= sendUntil) {
-				if(plugin.getConfig().getBoolean(configPath+"."+timeBefore+".warnPlayer") && player != null) {
-					message(player, "rent-expireWarning");
+				List<String> commands;
+				if(profileSection.isConfigurationSection(timeBefore)) {
+					/* Legacy config layout:
+					 *   "1 minute":
+					 *     warnPlayer: true
+					 *     commands: ["say hi"]
+					 */
+					commands = profileSection.getStringList(timeBefore+".commands");
+					// Warn player
+					if(profileSection.getBoolean(timeBefore+".warnPlayer") && player != null) {
+						message(player, "rent-expireWarning", this);
+					}
+				} else {
+					commands = profileSection.getStringList(timeBefore);
 				}
-				this.runCommands(Bukkit.getConsoleSender(), plugin.getConfig().getStringList(configPath+"."+timeBefore+".commands"));
+				this.runCommands(Bukkit.getConsoleSender(), commands);
 			}
 		}
 		warningsDoneUntil = sendUntil;

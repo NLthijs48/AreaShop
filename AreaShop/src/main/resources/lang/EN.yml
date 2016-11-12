@@ -116,6 +116,7 @@ rent-maxRentTime: "You cannot rent %lang:region% more time in advance, the maxim
 rent-restrictedToWorld: "You need to be in the '%world%' world to rent %lang:region% (you are in '%0%')."
 rent-restrictedToRegion: "You need to be inside %lang:region% to rent it."
 rent-expireWarning: "Your region %lang:region% has %timeleft% left, be sure to extend it if you want to keep it."
+rent-expiringSoon: "Your region %lang:tRegion|%0%|% has %1% left, be sure to extend it if you want to keep it."
 rent-alreadyAtFull: "%lang:region% is already at or above the maximum rental time, you cannot extend it yet."
 
 buy-help: "/as buy [region], the region you stand in will be used if not specified."
@@ -285,9 +286,8 @@ info-regionRestrictedRegionRent: "[darkgreen][bold]►[reset] You must be inside
 info-regionRestrictedWorldRent: "[darkgreen][bold]►[reset] You need to be inside world '%world%' to rent %lang:region%."
 info-regionRestrictedRegionBuy: "[darkgreen][bold]►[reset] You must be inside %lang:region% to buy it."
 info-regionRestrictedWorldBuy: "[darkgreen][bold]►[reset] You need to be inside world '%world%' to buy %lang:region%."
-info-regionRestoringRent: "[darkgreen][bold]►[reset] Restoring is enabled [gray](region will reset at unrent)%0%."
-info-regionRestoringBuy: "[darkgreen][bold]►[reset] Restoring is enabled [gray](region will reset at sell)%0%."
-info-regionRestoringProfile: " (profile: %0%)"
+info-regionRestoringRent: "[darkgreen][bold]►[reset] Restoring is enabled [gray](region will reset at unrent)."
+info-regionRestoringBuy: "[darkgreen][bold]►[reset] Restoring is enabled [gray](region will reset at sell)."
 info-regionLandlord: "[darkgreen][bold]►[reset] Landlord: [gray]%lang:landlord% (receives the money)."
 info-regionNotExisting: "The specified region is not registered: %0%."
 

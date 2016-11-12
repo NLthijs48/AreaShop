@@ -206,12 +206,12 @@ public class SignsFeature extends Feature {
 			region.setSetting("general.signs."+key, null);
 		}
 
-		public String getProfile() {
-			String profile = region.getConfig().getString("general.signs."+key+".profile");
-			if(profile == null || profile.length() == 0) {
-				profile = region.getStringSetting("general.signProfile");
-			}
-			return profile;
+		/**
+		 * Get the ConfigurationSection defining the sign layout
+		 * @return The sign layout config
+		 */
+		public ConfigurationSection getProfile() {
+			return region.getConfigurationSectionSetting("general.signProfile", "signProfiles", region.getConfig().get("general.signs."+key+".profile"));
 		}
 
 		/**
@@ -222,72 +222,80 @@ public class SignsFeature extends Feature {
 			if(region.isDeleted()) {
 				return false;
 			}
-			YamlConfiguration config = region.getConfig();
-			// Get the prefix
-			String prefix = "signProfiles."+getProfile()+"."+region.getState().getValue().toLowerCase()+".";
+
+			YamlConfiguration regionConfig = region.getConfig();
+			ConfigurationSection signConfig = getProfile();
+			Block block = getLocation().getBlock();
+			if(signConfig == null || !signConfig.isSet(region.getState().getValue())) {
+				block.setType(Material.AIR);
+				return true;
+			}
+
+			ConfigurationSection stateConfig = signConfig.getConfigurationSection(region.getState().getValue());
+
 			// Get the lines
 			String[] signLines = new String[4];
-			signLines[0] = plugin.getConfig().getString(prefix+"line1");
-			signLines[1] = plugin.getConfig().getString(prefix+"line2");
-			signLines[2] = plugin.getConfig().getString(prefix+"line3");
-			signLines[3] = plugin.getConfig().getString(prefix+"line4");
-			// Check if the sign should be present
-			Block block = getLocation().getBlock();
-			if(!plugin.getConfig().isSet(prefix)
-					|| ((signLines[0] == null || signLines[0].length() == 0)
-					&& (signLines[1] == null || signLines[1].length() == 0)
-					&& (signLines[2] == null || signLines[2].length() == 0)
-					&& (signLines[3] == null || signLines[3].length() == 0))) {
-				block.setType(Material.AIR);
-			} else {
-				Sign signState = null;
-				if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
-					Material signType;
-					try {
-						signType = Material.valueOf(config.getString("general.signs."+key+".signType"));
-					} catch(NullPointerException|IllegalArgumentException e) {
-						signType = null;
-					}
-					if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
-						AreaShop.debug("  setting sign failed");
-						return false;
-					}
-					block.setType(signType);
-					signState = (Sign)block.getState();
-					org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
-					BlockFace signFace;
-					try {
-						signFace = BlockFace.valueOf(config.getString("general.signs."+key+".facing"));
-					} catch(NullPointerException|IllegalArgumentException e) {
-						signFace = null;
-					}
-					if(signFace != null) {
-						signData.setFacingDirection(signFace);
-						signState.setData(signData);
-					}
-				}
-				if(signState == null) {
-					signState = (Sign)block.getState();
-				}
-				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
-				if(!config.isString("general.signs."+key+".signType")) {
-					region.setSetting("general.signs."+key+".signType", signState.getType().toString());
-				}
-				if(!config.isString("general.signs."+key+".facing")) {
-					region.setSetting("general.signs."+key+".facing", signData.getFacing().toString());
-				}
-				// Apply replacements and color and then set it on the sign
-				for(int i = 0; i < signLines.length; i++) {
-					if(signLines[i] == null) {
-						signState.setLine(i, "");
-						continue;
-					}
-					signLines[i] = Message.applyReplacements(signLines[i], region);
-					signLines[i] = Utils.applyColors(signLines[i]);
-					signState.setLine(i, signLines[i]);
-				}
-				signState.update();
+			boolean signEmpty = true;
+			for(int i = 0; i < 4; i++) {
+				signLines[i] = stateConfig.getString("line"+(i+1));
+				signEmpty &= (signLines[i] == null || signLines[i].isEmpty());
 			}
+			if(signEmpty) {
+				block.setType(Material.AIR);
+				return true;
+			}
+
+			Sign signState = null;
+			// Place the sign back (with proper rotation and type) after it has been hidden or (indirectly) destroyed
+			if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
+				Material signType;
+				try {
+					signType = Material.valueOf(regionConfig.getString("general.signs."+key+".signType"));
+				} catch(NullPointerException|IllegalArgumentException e) {
+					signType = null;
+				}
+				if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
+					AreaShop.debug("Setting sign", key, "of region", region.getName(), "failed, could not set sign block back");
+					return false;
+				}
+				block.setType(signType);
+				signState = (Sign)block.getState();
+				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
+				BlockFace signFace;
+				try {
+					signFace = BlockFace.valueOf(regionConfig.getString("general.signs."+key+".facing"));
+				} catch(NullPointerException|IllegalArgumentException e) {
+					signFace = null;
+				}
+				if(signFace != null) {
+					signData.setFacingDirection(signFace);
+					signState.setData(signData);
+				}
+			}
+			if(signState == null) {
+				signState = (Sign)block.getState();
+			}
+
+			// Save current rotation and type
+			org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
+			if(!regionConfig.isString("general.signs."+key+".signType")) {
+				region.setSetting("general.signs."+key+".signType", signState.getType().toString());
+			}
+			if(!regionConfig.isString("general.signs."+key+".facing")) {
+				region.setSetting("general.signs."+key+".facing", signData.getFacing().toString());
+			}
+
+			// Apply replacements and color and then set it on the sign
+			for(int i = 0; i < signLines.length; i++) {
+				if(signLines[i] == null) {
+					signState.setLine(i, "");
+					continue;
+				}
+				signLines[i] = Message.fromString(signLines[i]).replacements(region).getSingle();
+				signLines[i] = Utils.applyColors(signLines[i]);
+				signState.setLine(i, signLines[i]);
+			}
+			signState.update();
 			return true;
 		}
 
@@ -296,13 +304,15 @@ public class SignsFeature extends Feature {
 		 * @return true if it needs periodic updates, otherwise false
 		 */
 		public boolean needsPeriodicUpdate() {
-			// Get the prefix
-			String prefix = "signProfiles."+getProfile()+"."+region.getState().getValue().toLowerCase()+".line";
-			String line;
-			// Get the lines
-			for(int i = 1; i < 5; i++) {
-				line = plugin.getConfig().getString(prefix+i);
-				if(line != null && line.length() != 0 && line.contains(AreaShop.tagTimeLeft)) {
+			ConfigurationSection signConfig = getProfile();
+			if(signConfig == null || !signConfig.isSet(region.getState().getValue().toLowerCase())) {
+				return false;
+			}
+			ConfigurationSection stateConfig = signConfig.getConfigurationSection(region.getState().getValue().toLowerCase());
+			// Check the lines for the timeleft tag
+			for(int i = 1; i <= 4; i++) {
+				String line = stateConfig.getString("line"+i);
+				if(line != null && !line.isEmpty() && line.contains(Message.VARIABLESTART+AreaShop.tagTimeLeft+Message.VARIABLEEND)) {
 					return true;
 				}
 			}
@@ -316,27 +326,23 @@ public class SignsFeature extends Feature {
 		 * @return true if the commands ran successfully, false if any of them failed
 		 */
 		public boolean runSignCommands(Player clicker, GeneralRegion.ClickType clickType) {
-			// Get the profile set in the config
-			String profile = region.getConfig().getString("general.signs."+key+".profile");
-			if(profile == null || profile.length() == 0) {
-				profile = region.getStringSetting("general.signProfile");
+			ConfigurationSection signConfig = getProfile();
+			if(signConfig == null) {
+				return false;
 			}
-
-			// Get paths (state may change after running them)
-			String playerPath = "signProfiles."+profile+"."+region.getState().getValue().toLowerCase()+"."+clickType.getValue()+"Player";
-			String consolePath = "signProfiles."+profile+"."+region.getState().getValue().toLowerCase()+"."+clickType.getValue()+"Console";
+			ConfigurationSection stateConfig = signConfig.getConfigurationSection(region.getState().getValue().toLowerCase());
 
 			// Run player commands if specified
 			List<String> playerCommands = new ArrayList<>();
-			for(String command : plugin.getConfig().getStringList(playerPath)) {
-				playerCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));
+			for(String command : stateConfig.getStringList(clickType.getValue()+"Player")) {
+				playerCommands.add(command.replace(Message.VARIABLESTART+AreaShop.tagClicker+Message.VARIABLEEND, clicker.getName()));
 			}
 			region.runCommands(clicker, playerCommands);
 
 			// Run console commands if specified
 			List<String> consoleCommands = new ArrayList<>();
-			for(String command : plugin.getConfig().getStringList(consolePath)) {
-				consoleCommands.add(command.replace(AreaShop.tagClicker, clicker.getName()));
+			for(String command : stateConfig.getStringList(clickType.getValue()+"Console")) {
+				consoleCommands.add(command.replace(Message.VARIABLESTART+AreaShop.tagClicker+Message.VARIABLEEND, clicker.getName()));
 			}
 			region.runCommands(Bukkit.getConsoleSender(), consoleCommands);
 

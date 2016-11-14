@@ -28,7 +28,7 @@ public class WorldGuardRegionFlagsFeature extends Feature {
 	 * @return true if the flags have been set correctly, otherwise false
 	 */
 	protected boolean updateRegionFlags(GeneralRegion region) {
-		boolean result;
+		boolean result = true;
 
 		// Get section defining the region flag profile
 		ConfigurationSection flagProfileSection = region.getConfigurationSectionSetting("general.flagProfile", "flagProfiles");
@@ -39,12 +39,16 @@ public class WorldGuardRegionFlagsFeature extends Feature {
 		// Region flags for all states
 		String allPath = "flagProfiles."+region.getStringSetting("general.flagProfile")+".ALL";
 		ConfigurationSection allFlags = flagProfileSection.getConfigurationSection("ALL");
-		result = updateRegionFlags(region, allFlags);
+		if(allFlags != null) {
+			result = result && updateRegionFlags(region, allFlags);
+		}
 
 		// Region flags for the current state
 		String specificPath = "flagProfiles."+region.getStringSetting("general.flagProfile")+"."+region.getState().getValue();
 		ConfigurationSection stateFlags = flagProfileSection.getConfigurationSection(region.getState().getValue());
-		result = result && updateRegionFlags(region, stateFlags);
+		if(stateFlags != null) {
+			result = result && updateRegionFlags(region, stateFlags);
+		}
 
 		return result;
 	}

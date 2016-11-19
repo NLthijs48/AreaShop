@@ -175,6 +175,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public abstract RegionType getType();	
 
+	/**
+	 * Get the region availability
+	 * @return true/false if region cant be rented or sell
+	 */
+	public abstract boolean isAvailable();
+
 	// Sorting by name
 
 	/**
@@ -800,6 +806,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		int checked = 1;
 		boolean owner;
 		boolean friend = getFriendsFeature().getFriends().contains(player.getUniqueId());
+		boolean available = isAvailable();
 		Location startLocation = null;
 		ProtectedRegion region = getRegion();
 		if(getWorld() == null) {
@@ -816,32 +823,40 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			owner = player.getUniqueId().equals(((BuyRegion)this).getBuyer());
 		}
 		
+		
 		if(checkPermissions) {
 			// Teleport to sign instead if they dont have permission for teleporting to region
 			if(		  (!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
 					|| !toSign && !owner && !friend && !player.hasPermission("areashop.teleportall") && player.hasPermission("areashop.teleportsignall")
-					|| !toSign && !owner && friend && !player.hasPermission("areashop.teleportfriend") && player.hasPermission("areashop.teleportfriendsign"))) {
+					|| !toSign && !owner && friend && !player.hasPermission("areashop.teleportfriend") && player.hasPermission("areashop.teleportfriendsign")
+					|| !toSign && !owner && !friend && available && !player.hasPermission("areashop.teleportavailable") && player.hasPermission("areashop.teleportavailablesign"))) {
 				message(player, "teleport-changedToSign");
 				toSign = true;
 			}
 			// Check permissions
-			if(owner && !player.hasPermission("areashop.teleport") && !toSign) {
+			if(owner && !available && !player.hasPermission("areashop.teleport") && !toSign) {
 				message(player, "teleport-noPermission");
 				return false;
-			} else if(!owner && !player.hasPermission("areashop.teleportall") && !toSign && !friend) {
+			} else if(!owner && !available && !player.hasPermission("areashop.teleportall") && !toSign && !friend) {
 				message(player, "teleport-noPermissionOther");
 				return false;
-			} else if(!owner && !player.hasPermission("areashop.teleportfriend") && !toSign && friend) {
+			} else if(!owner && !available && !player.hasPermission("areashop.teleportfriend") && !toSign && friend) {
 				message(player, "teleport-noPermissionFriend");
 				return false;
-			} else if(owner && !player.hasPermission("areashop.teleportsign") && toSign) {
+			} else if(available && !player.hasPermission("areashop.teleportavailable") && !toSign) {
+				message(player, "teleport-noPermissionAvailable");
+				return false;
+			} else if(owner && !available && !player.hasPermission("areashop.teleportsign") && toSign) {
 				message(player, "teleport-noPermissionSign");
 				return false;
-			} else if(!owner && !player.hasPermission("areashop.teleportsignall") && toSign && !friend) {
+			} else if(!owner && !available && !player.hasPermission("areashop.teleportsignall") && toSign && !friend) {
 				message(player, "teleport-noPermissionOtherSign");
 				return false;
-			} else if(!owner && !player.hasPermission("areashop.teleportfriendsign") && toSign && friend) {
+			} else if(!owner && !available && !player.hasPermission("areashop.teleportfriendsign") && toSign && friend) {
 				message(player, "teleport-noPermissionFriendSign");
+				return false;
+			} else if(available && !player.hasPermission("areashop.teleportavailablesign") && toSign) {
+				message(player, "teleport-noPermissionAvailableSign");
 				return false;
 			}
 		}

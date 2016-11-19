@@ -59,6 +59,11 @@ public class RentRegion extends GeneralRegion {
 		}
 	}
 	
+	@Override
+	public boolean isAvailable() {
+		return !isRented();
+	}
+	
 	/**
 	 * Get the UUID of the player renting the region
 	 * @return The UUID of the renter

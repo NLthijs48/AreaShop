@@ -40,12 +40,13 @@ public class TeleportCommand extends CommandAreaShop {
 		Player player = (Player)person;
 		return player.hasPermission("areashop.teleportall")
 				|| region.isOwner(player) && player.hasPermission("areashop.teleport")
+				|| region.isAvailable() && player.hasPermission("areashop.teleportavailable")
 				|| region.getFriendsFeature().getFriends().contains(player.getUniqueId()) && player.hasPermission("areashop.teleportfriend");
 	}
 
 	@Override
 	public void execute(CommandSender sender, String[] args) {
-		if(!sender.hasPermission("areashop.teleport") && !sender.hasPermission("areashop.teleportall") && !sender.hasPermission("areashop.teleportsign") && !sender.hasPermission("areashop.teleportsignall") && !sender.hasPermission("areashop.teleportfriend") && !sender.hasPermission("teleportfriendsign")) {
+		if(!sender.hasPermission("areashop.teleport") && !sender.hasPermission("areashop.teleportall") && !sender.hasPermission("areashop.teleportavailable") && !sender.hasPermission("areashop.teleportavailablesign") && !sender.hasPermission("areashop.teleportsign") && !sender.hasPermission("areashop.teleportsignall") && !sender.hasPermission("areashop.teleportfriend") && !sender.hasPermission("teleportfriendsign")) {
 			plugin.message(sender, "teleport-noPermission");
 			return;
 		}

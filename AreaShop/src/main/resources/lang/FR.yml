@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: French, Version: V2.3.2, Percentage translated: 100%                                                             ║
+# ║ Language: French, Version: V2.4.0, Percentage translated: 97%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -58,7 +58,6 @@ cmd-weOnlyByPlayer: "Utiliser une sélection WorldEdit n'est possible qu'en tant
 cmd-noSelection: "Vous n'avez pas de séléction WorldEdit."
 cmd-noRegionsFound: "Aucune région enregistrée dans AreaShop n'a été trouvée dans votre séléction."
 cmd-noWERegionsFound: "Aucune région WorldEdit croisant votre séléction n'a été trouvée."
-cmd-notRegistered: "La région spécifiée n'est pas disponible dans AreaShop: %0%."
 cmd-noRegionsAtLocation: "Aucune région trouvée à votre emplacement, spécifiez la région comme un argument."
 cmd-moreRegionsAtLocation: "Plus d'une région ont été trouvées à votre emplacement, spécifiez la région comme un argument."
 cmd-automaticRegionOnlyByPlayer: "Déterminer la région automatiquement est possible uniquement pour les joueurs, spécifiez la région comme un argument."
@@ -155,16 +154,6 @@ reload-updateComplete: "[gray]Mise à jour des régions terminée."
 reload-noPermission: "Vous n'avez pas la permission de recharger les fichiers."
 reload-updateCommandChanged: "'/as updaterents' et '/as updatebuys' ont été supprimées, '/as reload' est la commande à utiliser pour mettre à jour les régions."
 
-info-help:
-  - "/as info[break]"
-  - "    %lang:command|all|/as info all|%[break]"
-  - "    %lang:command|rented|/as info rented|% [group] [page][break]"
-  - "    %lang:command|forrent|/as info forrent|% [group] [page][break]"
-  - "    %lang:command|sold|/as info sold|% [group] [page][break]"
-  - "    %lang:command|forsale|/as info forsale|% [group] [page][break]"
-  - "    %lang:command|reselling|/as info reselling|% [group] [page][break]"
-  - "    %lang:command|nogroup|/as info nogroup [page]|%"
-  - "    %lang:command|region|/as info region|% [region][break]"
 info-noPermission: "Vous n'avez pas la permission d'avoir des informations à propos des régions."
 info-allHeader: "Toutes les régions%0%:"
 info-rentedHeader: "Les régions louées%0%:"
@@ -279,9 +268,6 @@ info-regionRestrictedRegionRent: "[darkgreen][bold]►[reset] Vous devez être �
 info-regionRestrictedWorldRent: "[darkgreen][bold]►[reset] Vous devez à l'intérieur du monde '%world%' pour louer %lang:region%."
 info-regionRestrictedRegionBuy: "[darkgreen][bold]►[reset] Vous devez être à l'intérieur de %lang:region% pour l'acheter."
 info-regionRestrictedWorldBuy: "[darkgreen][bold]►[reset] Vous devez à l'intérieur du monde '%world%' pour acheter %lang:region%."
-info-regionRestoringRent: "[darkgreen][bold]►[reset] La restauration est activée [gray](la région sera remise à zéro a la fin de la location)%0%"
-info-regionRestoringBuy: "[darkgreen][bold]►[reset] La restauration est activée  [gray](la région sera remise à zéro a la fin de la location)%0%"
-info-regionRestoringProfile: "(Profil : %0%)"
 info-regionLandlord: "[darkgreen][bold]►[reset] Bailleur :  [gray]%lang:landlord%  (reçoit l'argent)."
 info-regionNotExisting: "La région spécifiée n'est pas enregistrée : %0%."
 
@@ -399,7 +385,6 @@ add-failed: "Déjà enregistré: [gray]%0%."
 add-blacklisted: "Dans la liste noir: [gray]%0%."
 add-specifyWorld: "Spécifiez le monde de la région lors de l'utilisation de la console."
 add-incorrectWorld: "Le monde '%0%' est introuvable, essayez de nouveau (attention à la casse)."
-add-noRegion: "La région WorldGuard '%0%' n'existe pas dans ce monde."
 add-noPermissionRegions: "Pas de permission à ajouter: [gray]%0%."
 add-noPermissionOwnerMember: "[gray]Soit vous n'êtes pas membre / propriétaire de cette région ou n'avez pas la permission d'ajouter vos régions."
 
@@ -516,8 +501,6 @@ stack-wrongAmount: "'%0%' n'est pas une quantité correcte de régions."
 stack-wrongGap: "'%0%' n'est pas un nombre correct pour le nombre de blocs séparant deux régions."
 stack-noSelection: "Vous n'avez pas de sélection qui indique où doit se trouver la première région créée."
 stack-addStart: "[gray]Ajout de %0% régions, %1% par seconde."
-stack-addComplete: "[gray]Ajout de régions terminé."
-stack-unclearDirection: "Merci de regarder clairement le Nord, l'Est, le Sud ou l'Ouest, actuellement détectée %0%."
 
 setlandlord-help: "/as setlandlord <joueur> [région], la région où vous êtes sera utilisé si non spécifié."
 setlandlord-noPermission: "Vous n'avez pas la permission de définir le bailleur d'une région."

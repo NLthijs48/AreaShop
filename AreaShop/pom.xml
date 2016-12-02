@@ -4,7 +4,7 @@
   <artifactId>areashop</artifactId>
   <packaging>jar</packaging>
   <name>AreaShop</name>
-  <version>2.3.2</version> <!-- Main plugin version -->
+  <version>2.4.0</version> <!-- Main plugin version -->
 
   <parent>
     <groupId>me.wiefferink</groupId>

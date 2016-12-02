@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Norwegian, Version: V2.3.2, Percentage translated: 96%                                                           ║
+# ║ Language: Norwegian, Version: V2.4.0, Percentage translated: 94%                                                           ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -56,7 +56,6 @@ cmd-weOnlyByPlayer: "Du kan bare bruke en WorldEdit markering som en spiller, sp
 cmd-noSelection: "Du har ikke laget en WorldEdit markering."
 cmd-noRegionsFound: "Ingen regioner som er registrert i AreaShop er funnet i din markering."
 cmd-noWERegionsFound: "Ingen WorldEdit regioner som overlapper din markering er funnet."
-cmd-notRegistered: "Den spesifiserte regionen er ikke tilgjengelig i AreaShop: %0%."
 cmd-noRegionsAtLocation: "Ingen regioner er funnet på din plassering, spesifiser region navnet som et argument."
 cmd-moreRegionsAtLocation: "Mer enn en region er funnet på din plassering, spesifiser region navnet som et argument."
 cmd-automaticRegionOnlyByPlayer: "Automatisk valg av region er bare mulig for spillere, spesifiser region navnet som som et argument."
@@ -153,16 +152,6 @@ reload-updateComplete: "[gray]Oppdatering av regioner ferdig."
 reload-noPermission: "Du har ikke rettigheter til å laste inn konfigurasjonen på nytt."
 reload-updateCommandChanged: "'/as updaterents' og '/as updatebuys' har blitt fjernet, '/as reload' vil også oppdatere regioner så bruk den kommandoen fremover."
 
-info-help:
-  - "/as info[break]"
-  - "    %lang:command|all|/as info all|%[break]"
-  - "    %lang:command|rented|/as info rented|% [group] [page][break]"
-  - "    %lang:command|forrent|/as info forrent|% [group] [page][break]"
-  - "    %lang:command|sold|/as info sold|% [group] [page][break]"
-  - "    %lang:command|forsale|/as info forsale|% [group] [page][break]"
-  - "    %lang:command|reselling|/as info reselling|% [group] [page][break]"
-  - "    %lang:command|nogroup|/as info nogroup [page]|%"
-  - "    %lang:command|region|/as info region|% [region][break]"
 info-noPermission: "Du har ikke rettigheter til å få informasjon om regioner."
 info-allHeader: "Alle regioner%0%:"
 info-rentedHeader: "Leide regioner%0%:"
@@ -263,9 +252,6 @@ info-regionRestrictedRegionRent: "[darkgreen][bold]►[reset] Du må stå på in
 info-regionRestrictedWorldRent: "[darkgreen][bold]►[reset] Du må være i '%world%' for å leie %lang:region%."
 info-regionRestrictedRegionBuy: "[darkgreen][bold]►[reset] Du må være på innsiden av %lang:region% for å kjøpe den."
 info-regionRestrictedWorldBuy: "[darkgreen][bold]►[reset] Du må være i '%world%' for å kjøpe %lang:region%."
-info-regionRestoringRent: "[darkgreen][bold]►[reset] Gjenoppretting er aktivert [gray](regionen vil gjenopprettes ved stopp av leie)%0%."
-info-regionRestoringBuy: "[darkgreen][bold]►[reset] Gjenoppretting er aktivert [gray](regionen vil gjenopprettes ved salg)%0%."
-info-regionRestoringProfile: "(profil: %0%)"
 info-regionLandlord: "[darkgreen][bold]►[reset] Grunneier: [gray]%lang:landlord% (mottar pengene)."
 info-regionNotExisting: "Den spesifiserte regionen er ikke registrert: %0%."
 
@@ -383,7 +369,6 @@ add-failed: "Allerede registrert: [gray]%0%."
 add-blacklisted: "På svartelisten: [gray]%0%."
 add-specifyWorld: "Spesifiser verdenen til en region når du bruker konsoll."
 add-incorrectWorld: "Verden '%0%' ikke funnet, prøv igjen (sensitiv for store og små bokstaver)."
-add-noRegion: "WorldGuard region '%0%' eksisterer ikke i denne verdenen."
 add-noPermissionRegions: "Ingen rettigheter til å legge til: [gray]%0%."
 add-noPermissionOwnerMember: "[gray]Du er enten ikke et medlem/eier av disse regionene eller har ikke rettigheter til å legge til dine regioner."
 
@@ -481,6 +466,7 @@ stack-help:
   - "    [gray]<rent|buy> Bestem om dem skal leies eller kjøpes.[break]"
   - "    [gray][group] En gruppe du vil legge dem til i.[break]"
   - "    [gray]Regionene vil bli laget i rettningen du ser."
+
 stack-accepted: "Begynner å lage %0% %1% regioner med %2% blokker mellom dem, navnene starter med %3% og vil ha nummer bak seg.%4%"
 stack-addToGroup: "Regioner laget vil bli lagt til i gruppen '%0%'."
 stack-noPermission: "Du har ikke rettigheter til å lage og legge til regioner i AreaShop i store mengder."
@@ -488,8 +474,6 @@ stack-wrongAmount: "'%0%' er ikke en riktig mengde regioner."
 stack-wrongGap: "'%0%' er ikke et riktig nummer for antall blokker mellom regioner."
 stack-noSelection: "Du har ikke laget en markering som indikerer hvor den første regionen skal bli laget."
 stack-addStart: "[gray]Legger til %0% regioner på %1% per sekund."
-stack-addComplete: "[gray]Regioner er ferdig lagt til."
-stack-unclearDirection: "Du må se rett mot nord, sør, øst eller vest, du ser mot %0%."
 
 setlandlord-help: "/as setlandlord <spiller> [region], regionen du står i vil bli brukt om ikke spesifisert."
 setlandlord-noPermission: "Du har ikke rettigheter til å sette grunneier for en region."

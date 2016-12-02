@@ -1,6 +1,6 @@
 ﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: Dutch, Version: V2.3.2, Percentage translated: 100%                                                              ║
+# ║ Language: Dutch, Version: V2.4.0, Percentage translated: 100%                                                              ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
 # ║ 1: Make a copy of this file                                                                                                ║
 # ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
@@ -58,7 +58,8 @@ cmd-weOnlyByPlayer: "Gebruikmaken van een WorldEdit selectie is alleen mogelijk 
 cmd-noSelection: "Je hebt geen WorldEdit selectie."
 cmd-noRegionsFound: "Er zijn geen gebieden in je selectie gevonden die geregistreerd staan in AreaShop."
 cmd-noWERegionsFound: "Er zijn geen WorldEdit gebieden gevonden die zich in je selectie bevinden."
-cmd-notRegistered: "Het aangegeven gebied is niet geregistreerd in AreaShop: %0%."
+cmd-notRegistered: "Gebied '%0%' is niet beschikbaar in AreaShop."
+cmd-noRegion: "'%0%' is geen geldig WorldGuard gebied."
 cmd-noRegionsAtLocation: "Geen gebieden gevonden op je lokatie, geef het gebied mee als argument."
 cmd-moreRegionsAtLocation: "Meerdere gebieden gevonden op je lokatie, geef het gebied mee als argument."
 cmd-automaticRegionOnlyByPlayer: "Automatisch bepalen van het gebied is alleen mogelijk voor spelers, geef het gebied mee als argument."
@@ -115,6 +116,7 @@ rent-maxRentTime: "Je kunt %lang:region% niet meer tijd van tevoren huren, de ma
 rent-restrictedToWorld: "Je moet in de wereld '%world%' zijn om %lang:region% te kopen (je ben in '%0%')."
 rent-restrictedToRegion: "Je moet in %lang:region% staan om hem te huren."
 rent-expireWarning: "Je gebied %lang:region% heeft nog %timeleft% over, verleng het als je het wilt houden.."
+rent-expiringSoon: "Je gebied %lang:tRegion|%0%|% heeft nog %1% over, verleng het als je het wilt houden."
 rent-alreadyAtFull: "%lang:region% is al verhuurd voor de maximale tijd, je kunt hem niet verlengen."
 
 buy-help: "/as buy [region], het gebied waarin je staat word gebruikt als je het niet aangeeft."
@@ -163,8 +165,9 @@ info-help:
   - "    %lang:command|sold|/as info sold|% [group] [page][break]"
   - "    %lang:command|forsale|/as info forsale|% [group] [page][break]"
   - "    %lang:command|reselling|/as info reselling|% [group] [page][break]"
-  - "    %lang:command|nogroup|/as info nogroup [page]|%"
-  - "    %lang:command|region|/as info region|% [region][break]"
+  - "    %lang:command|nogroup|/as info nogroup [page]|%[break]"
+  - "    %lang:command|region|/as info region|% [break]"
+
 info-noPermission: "Je hebt geen toestemming om informatie over gebieden te bekijken."
 info-allHeader: "Alle gebieden%0%:"
 info-rentedHeader: "Verhuurde gebieden%0%:"
@@ -279,9 +282,8 @@ info-regionRestrictedRegionRent: "[darkgreen][bold]►[reset] Je moet in %lang:r
 info-regionRestrictedWorldRent: "[darkgreen][bold]►[reset] je moet in de wereld '%world%' zijn om %lang:region% te huren."
 info-regionRestrictedRegionBuy: "[darkgreen][bold]►[reset] Je moet in %lang:region% staan om deze te kopen."
 info-regionRestrictedWorldBuy: "[darkgreen][bold]►[reset] Je moet in de wereld '%world%' staan om %lang:region% te kopen."
-info-regionRestoringRent: "[darkgreen][bold]►[reset] Herstellen is ingeschakeld [gray](gebied zal resetten bij een huurstop)%0%."
+info-regionRestoringRent: "[darkgreen][bold]►[reset] Herstellen is ingeschakeld [gray](gebied zal resetten bij een huurstop)."
 info-regionRestoringBuy: "[darkgreen][bold]►[reset] Herstellen is ingeschakeld [gray](gebied zal resetten bij verkoop)%0%."
-info-regionRestoringProfile: " (profiel: %0%)"
 info-regionLandlord: "[darkgreen][bold]►[reset] Landeigenaar: [gray]%lang:landlord% (krijgt het geld)."
 info-regionNotExisting: "Het aangegeven gebied is niet geregistreerd: %0%."
 
@@ -399,7 +401,6 @@ add-failed: "Al geregistreerd: [gray]%0%."
 add-blacklisted: "Op de blacklist: [gray]%0%."
 add-specifyWorld: "Geef de wereld van het gebied aan als je het commando vanuit de console gebruikt."
 add-incorrectWorld: "Wereld '%0%' niet gevonden, probeer opnieuw (hoofdlettergevoelig)."
-add-noRegion: "WorldGuard gebied '%0%' bestaat niet in deze wereld."
 add-noPermissionRegions: "Geen toestemming om toe te voegen: [gray]%0%."
 add-noPermissionOwnerMember: "[gray]Je bent geen member/owner van deze gebieden of hebt geen toestemming om je gebieden toe te voegen."
 
@@ -516,8 +517,10 @@ stack-wrongAmount: "'%0%' is geen goed aantal gebieden."
 stack-wrongGap: "'%0%' is geen correct getal voor het aantal blokken ruimte tussen gebieden."
 stack-noSelection: "Je hebt geen selectie die aangeeft waar het eerste gebied word gemaakt."
 stack-addStart: "[gray]%0% gebieden aan het toevoegen met %1% per seconde."
-stack-addComplete: "[gray]Toevoegen van gebieden voltooid."
-stack-unclearDirection: "Kijk precies in het noorden, oosten, zuiden of westen, op dit moment gedetecteert: %0%."
+stack-addComplete: "[gray]%0% gebieden toegevoegd%1%."
+stack-tooHigh: ", %0% gebieden overgeslagen omdat ze zich boven Y=256 bevinden"
+stack-tooLow: ", %0% gebieden overgeslagen omdat ze zich onder Y=0 bevinden"
+stack-unclearDirection: "Kijk duidelijk in de noord, oost, zuid, west, omhoog of naar beneden richting, gedetecteerd: %0%."
 
 setlandlord-help: "/as setlandlord <speler> [gebied], het gebied waar je in staat zal worden gebruikt als niet aangegeven."
 setlandlord-noPermission: "Je hebt geen toestemming om de landeigenaar in te stellen voor een gebied."

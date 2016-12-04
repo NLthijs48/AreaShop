@@ -14,13 +14,17 @@
 4. 
 
 
-#### Your environment
+#### Your environment (for bugs)
 <!--- Indicate which versions you use -->
-<!-- Attention: "LATEST" or "NEWEST" are no valid answers here and WILL result an invalid issue report -->
-<!-- Use /version command if unsure -->
+<!--- Attention: "LATEST" or "NEWEST" are no valid answers here and WILL result an invalid issue report -->
+<!--- Use '/version' for Platform version and '/version <plugin>' for plugin versions if unsure -->
 * Server platform (Bukkit, Spigot, etc.): 
 * Server version: 
 * AreaShop version: 
 * WorldEdit version: 
 * WorldGuard version: 
 * Vault version: 
+
+
+#### Your config files (for bugs)
+<!--- Attach a '.zip' file of the '/plugins/AreaShop' directory to show your configuration setup -->

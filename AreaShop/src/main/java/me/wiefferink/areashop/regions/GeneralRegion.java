@@ -1737,6 +1737,10 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		// Get the safe and restore names
 		ConfigurationSection profileSection = getConfigurationSectionSetting("general.schematicProfile", "schematicProfiles");
+		if(profileSection == null) {
+			return;
+		}
+
 		String save = profileSection.getString(type.getValue()+".save");
 		String restore = profileSection.getString(type.getValue()+".restore");
 		// Save the region if needed

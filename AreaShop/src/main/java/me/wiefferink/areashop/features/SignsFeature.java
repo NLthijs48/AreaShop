@@ -48,6 +48,14 @@ public class SignsFeature extends Feature {
 		}
 	}
 
+	@Override
+	public void destroy() {
+		// Deregister signs from the registry
+		for(String key : signs.keySet()) {
+			allSigns.remove(key);
+		}
+	}
+
 	/**
 	 * Convert a location to a string to use as map key
 	 * @param location The location to get the key for

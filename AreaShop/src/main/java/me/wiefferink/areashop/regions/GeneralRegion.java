@@ -7,6 +7,7 @@ import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.NotifyRegionEvent;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
+import me.wiefferink.areashop.features.Feature;
 import me.wiefferink.areashop.features.FriendsFeature;
 import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
@@ -41,6 +42,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	// Features
 	private FriendsFeature friendsFeature;
 	private SignsFeature signsFeature;
+
+	private Map<Class, Feature> features;
 
 	// Enum for region types
 	public enum RegionType {		
@@ -146,10 +149,32 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		setupFeatures();
 	}
 
-	// Create instance of the features
-	public void setupFeatures() {
-		friendsFeature = new FriendsFeature(this);
-		signsFeature = new SignsFeature(this);
+	/**
+	 * Deregister everything
+	 */
+	public void destroy() {
+		destroyFeatures();
+	}
+
+	/**
+	 * Setup the features of this class
+	 */
+	private void setupFeatures() {
+		addFeature(new FriendsFeature(this));
+		addFeature(new SignsFeature(this));
+	}
+
+
+	private void addFeature(Feature feature) {
+		features.put(feature.getClass(), feature);
+	}
+
+	/**
+	 * Destroy the features created for this region
+	 */
+	private void destroyFeatures() {
+		friendsFeature.destroyFeature();
+		signsFeature.destroyFeature();
 	}
 
 	/**

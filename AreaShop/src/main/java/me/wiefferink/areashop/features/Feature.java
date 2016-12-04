@@ -17,10 +17,17 @@ public class Feature implements Listener {
 	}
 
 	/**
-	 * Stop listening to events
+	 * Destroy the feature and deregister everything
 	 */
-	public void stopListen() {
+	public void destroyFeature() {
 		HandlerList.unregisterAll(this);
+		destroy();
+	}
+
+	/**
+	 * Dummy method a Feature implementation can override
+	 */
+	public void destroy() {
 	}
 
 }

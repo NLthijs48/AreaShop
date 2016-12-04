@@ -15,7 +15,9 @@
 
 
 #### Your environment
-<!--- Indicate which versions you use (latest is NOT a version) -->
+<!--- Indicate which versions you use -->
+<!-- Attention: "LATEST" or "NEWEST" are no valid answers here and WILL result an invalid issue report -->
+<!-- Use /version command if unsure -->
 * Server platform (Bukkit, Spigot, etc.): 
 * Server version: 
 * AreaShop version: 

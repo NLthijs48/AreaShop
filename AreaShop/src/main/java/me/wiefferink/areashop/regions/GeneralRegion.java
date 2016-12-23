@@ -7,7 +7,6 @@ import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.NotifyRegionEvent;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
-import me.wiefferink.areashop.features.Feature;
 import me.wiefferink.areashop.features.FriendsFeature;
 import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
@@ -42,8 +41,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	// Features
 	private FriendsFeature friendsFeature;
 	private SignsFeature signsFeature;
-
-	private Map<Class, Feature> features;
 
 	// Enum for region types
 	public enum RegionType {		
@@ -160,13 +157,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Setup the features of this class
 	 */
 	private void setupFeatures() {
-		addFeature(new FriendsFeature(this));
-		addFeature(new SignsFeature(this));
-	}
-
-
-	private void addFeature(Feature feature) {
-		features.put(feature.getClass(), feature);
+		friendsFeature = new FriendsFeature(this);
+		signsFeature = new SignsFeature(this);
 	}
 
 	/**
@@ -1277,11 +1269,15 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(found) {
 			return result;
 		}
-		
-		if(this.getFileManager().getDefaultSettings().isString(path)) {
-			return this.getFileManager().getDefaultSettings().getString(path).equalsIgnoreCase("true");
+
+		if(this.getFileManager().getRegionSettings().isString(path)) {
+			return this.getFileManager().getRegionSettings().getString(path).equalsIgnoreCase("true");
 		}
-		return this.getFileManager().getDefaultSettings().getBoolean(path);
+		if(this.getFileManager().getRegionSettings().isSet(path)) {
+			return this.getFileManager().getRegionSettings().getBoolean(path);
+		} else {
+			return this.getFileManager().getFallbackRegionSettings().getBoolean(path);
+		}
 	}
 
 	/**
@@ -1309,7 +1305,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(found) {
 			return result;
 		}
-		return this.getFileManager().getDefaultSettings().getInt(path);
+
+		if(this.getFileManager().getRegionSettings().isSet(path)) {
+			return this.getFileManager().getRegionSettings().getInt(path);
+		} else {
+			return this.getFileManager().getFallbackRegionSettings().getInt(path);
+		}
 	}
 
 	/**
@@ -1337,7 +1338,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(found) {
 			return result;
 		}
-		return this.getFileManager().getDefaultSettings().getDouble(path);
+
+		if(this.getFileManager().getRegionSettings().isSet(path)) {
+			return this.getFileManager().getRegionSettings().getDouble(path);
+		} else {
+			return this.getFileManager().getFallbackRegionSettings().getDouble(path);
+		}
 	}
 
 	/**
@@ -1365,7 +1371,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(found) {
 			return result;
 		}
-		return this.getFileManager().getDefaultSettings().getLong(path);
+
+		if(this.getFileManager().getRegionSettings().isSet(path)) {
+			return this.getFileManager().getRegionSettings().getLong(path);
+		} else {
+			return this.getFileManager().getFallbackRegionSettings().getLong(path);
+		}
 	}
 
 	/**
@@ -1393,7 +1404,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(found) {
 			return result;
 		}
-		return this.getFileManager().getDefaultSettings().getString(path);
+
+		if(this.getFileManager().getRegionSettings().isSet(path)) {
+			return this.getFileManager().getRegionSettings().getString(path);
+		} else {
+			return this.getFileManager().getFallbackRegionSettings().getString(path);
+		}
 	}
 
 	/**
@@ -1421,7 +1437,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(found) {
 			return result;
 		}
-		return this.getFileManager().getDefaultSettings().getStringList(path);
+
+		if(this.getFileManager().getRegionSettings().isSet(path)) {
+			return this.getFileManager().getRegionSettings().getStringList(path);
+		} else {
+			return this.getFileManager().getFallbackRegionSettings().getStringList(path);
+		}
 	}
 
 	/**
@@ -1449,7 +1470,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(found) {
 			return result;
 		}
-		return this.getFileManager().getDefaultSettings().getConfigurationSection(path);
+
+		if(this.getFileManager().getRegionSettings().isSet(path)) {
+			return this.getFileManager().getRegionSettings().getConfigurationSection(path);
+		} else {
+			return this.getFileManager().getFallbackRegionSettings().getConfigurationSection(path);
+		}
 	}
 
 	/**
@@ -1493,7 +1519,11 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				}
 			}
 			if(!found) {
-				result = this.getFileManager().getDefaultSettings().get(path);
+				if(this.getFileManager().getRegionSettings().isSet(path)) {
+					result = this.getFileManager().getRegionSettings().getConfigurationSection(path);
+				} else {
+					result = this.getFileManager().getFallbackRegionSettings().getConfigurationSection(path);
+				}
 			}
 		}
 

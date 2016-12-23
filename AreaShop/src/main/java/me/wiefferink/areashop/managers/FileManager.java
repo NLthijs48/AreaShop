@@ -39,6 +39,7 @@ public class FileManager {
 	private YamlConfiguration groupsConfig = null;
 	private String defaultPath = null;
 	private YamlConfiguration defaultConfig = null;
+	private YamlConfiguration defaultConfigFallback = null;
 	private boolean saveGroupsRequired = false;
 	private Set<String> worldRegionsRequireSaving;
 	
@@ -112,9 +113,13 @@ public class FileManager {
 	public Collection<RegionGroup> getGroups() {
 		return groups.values();
 	}
-	
-	public YamlConfiguration getDefaultSettings() {
+
+	public YamlConfiguration getRegionSettings() {
 		return defaultConfig;
+	}
+
+	public YamlConfiguration getFallbackRegionSettings() {
+		return defaultConfigFallback;
 	}
 	
 	public YamlConfiguration getConfig() {
@@ -763,9 +768,8 @@ public class FileManager {
 			if(defaultConfig.getKeys(false).size() == 0) {
 				AreaShop.warn("File 'default.yml' is empty, check for errors in the log.");
 				result = false;
-			} else {
-				defaultConfig.addDefaults(YamlConfiguration.loadConfiguration(normal));
 			}
+			defaultConfigFallback = YamlConfiguration.loadConfiguration(normal);
 		} catch(IOException e) {
 			result = false;
 		}

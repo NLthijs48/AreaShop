@@ -22,7 +22,6 @@ public class SignsFeature extends RegionFeature {
 
 	private static Map<String, RegionSign> allSigns = new HashMap<>();
 
-	private GeneralRegion region;
 	private Map<String, RegionSign> signs;
 
 	public SignsFeature() {

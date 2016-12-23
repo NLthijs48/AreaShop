@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.regions;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
@@ -9,14 +8,16 @@ import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
 import me.wiefferink.areashop.features.FriendsFeature;
 import me.wiefferink.areashop.features.RegionFeature;
 import me.wiefferink.areashop.features.SignsFeature;
+import me.wiefferink.areashop.features.TeleportFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.tools.Utils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,9 +35,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	static final AreaShop plugin = AreaShop.getInstance();
 
 	YamlConfiguration config;
-	private static ArrayList<Material> canSpawnIn = new ArrayList<>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
-	private static ArrayList<Material> cannotSpawnOn = new ArrayList<>(Arrays.asList(Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.CACTUS, Material.IRON_FENCE, Material.FENCE_GATE, Material.THIN_GLASS, Material.NETHER_FENCE, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE, Material.STAINED_GLASS_PANE));
-	private static ArrayList<Material> cannotSpawnBeside = new ArrayList<>(Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CACTUS));
 	private boolean saveRequired = false;
 	private boolean deleted = false;
 
@@ -130,11 +128,20 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 	}
 
+	/**
+	 * Constructor, used to restore regions from disk at startup
+	 * @param config The configuration of the region
+	 */
 	public GeneralRegion(YamlConfiguration config) {
 		this.config = config;
 		setup();
 	}
 
+	/**
+	 * Constructor, used for adding new regions
+	 * @param name Name of the WorldGuard region that this region is attached to
+	 * @param world The world of the WorldGuard region
+	 */
 	public GeneralRegion(String name, World world) {
 		config = new YamlConfiguration();
 		setSetting("general.name", name);
@@ -143,6 +150,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		setup();
 	}
 
+	/**
+	 * Shared setup of all constructors
+	 */
 	public void setup() {
 		features = plugin.getFeatureManager().getRegionFeatures(this);
 	}
@@ -170,6 +180,14 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public SignsFeature getSignsFeature() {
 		return (SignsFeature)features.get(SignsFeature.class);
+	}
+
+	/**
+	 * Get the teleport feature to teleport players to the region and signs
+	 * @return The TeleportFeature
+	 */
+	public TeleportFeature getTeleportFeature() {
+		return (TeleportFeature)features.get(TeleportFeature.class);
 	}
 		
 	// ABSTRACT
@@ -239,16 +257,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public abstract RegionState getState();
 	
 	// GETTERS
-	/**
-	 * Get the teleportlocation set for this region
-	 * @return The teleport location, or null if not set
-	 */
-	public Location getTeleportLocation() {
-		Location result;
-		result = Utils.configToLocation(config.getConfigurationSection("general.teleportLocation"));
-		return result;
-	}
-	
 	/**
 	 * Check if the region has been deleted
 	 * @return true if the region has been deleted, otherwise false
@@ -555,7 +563,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 
 			// Teleport locations
 			default:
-				Location tp = getTeleportLocation();
+				Location tp = getTeleportFeature().getTeleportLocation();
 				if(tp == null) {
 					return null;
 				}
@@ -587,15 +595,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				}
 		}
 	}
-	
-	/**
-	 * Check if the region has a teleportLocation specified
-	 * @return true if the region has a teleportlocation, false otherwise
-	 */
-	public boolean hasTeleportLocation() {
-		return config.isSet("general.teleportLocation");
-	}
-	
+
 	/**
 	 * Check if this region is a RentRegion
 	 * @return true if this region is a RentRegion otherwise false
@@ -784,444 +784,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return false;
 		}
 	}
-	
-	
-	/**
-	 * Set the teleport location of this region
-	 * @param location The location to set as teleport location
-	 */
-	public void setTeleport(Location location) {
-		if(location == null) {
-			setSetting("general.teleportLocation", null);
-		} else {
-			setSetting("general.teleportLocation", Utils.locationToConfig(location, true));
-		}
-	}
-	
-	
-	/**
-	 * Teleport a player to the region or sign
-	 * @param player Player that should be teleported
-	 * @param toSign true to teleport to the first sign of the region, false for teleporting to the region itself
-	 * @param checkPermissions Set to true if teleport permissions should be checked, false otherwise
-	 * @return true if the teleport succeeded, otherwise false
-	 */
-	public boolean teleportPlayer(Player player, boolean toSign, boolean checkPermissions) {
-		int checked = 1;
-		boolean owner;
-		boolean friend = getFriendsFeature().getFriends().contains(player.getUniqueId());
-		boolean available = isAvailable();
-		Location startLocation = null;
-		ProtectedRegion region = getRegion();
-		if(getWorld() == null) {
-			message(player, "general-noWorld");
-			return false;
-		}
-		if(getRegion() == null) {
-			message(player, "general-noRegion");
-			return false;
-		}	
-		if(isRentRegion()) {
-			owner = player.getUniqueId().equals(((RentRegion)this).getRenter());
-		} else {
-			owner = player.getUniqueId().equals(((BuyRegion)this).getBuyer());
-		}
-		
-		
-		if(checkPermissions) {
-			// Teleport to sign instead if they dont have permission for teleporting to region
-			if(		  (!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
-					|| !toSign && !owner && !friend && !player.hasPermission("areashop.teleportall") && player.hasPermission("areashop.teleportsignall")
-					|| !toSign && !owner && friend && !player.hasPermission("areashop.teleportfriend") && player.hasPermission("areashop.teleportfriendsign")
-					|| !toSign && !owner && !friend && available && !player.hasPermission("areashop.teleportavailable") && player.hasPermission("areashop.teleportavailablesign"))) {
-				message(player, "teleport-changedToSign");
-				toSign = true;
-			}
-			// Check permissions
-			if(owner && !available && !player.hasPermission("areashop.teleport") && !toSign) {
-				message(player, "teleport-noPermission");
-				return false;
-			} else if(!owner && !available && !player.hasPermission("areashop.teleportall") && !toSign && !friend) {
-				message(player, "teleport-noPermissionOther");
-				return false;
-			} else if(!owner && !available && !player.hasPermission("areashop.teleportfriend") && !toSign && friend) {
-				message(player, "teleport-noPermissionFriend");
-				return false;
-			} else if(available && !player.hasPermission("areashop.teleportavailable") && !toSign) {
-				message(player, "teleport-noPermissionAvailable");
-				return false;
-			} else if(owner && !available && !player.hasPermission("areashop.teleportsign") && toSign) {
-				message(player, "teleport-noPermissionSign");
-				return false;
-			} else if(!owner && !available && !player.hasPermission("areashop.teleportsignall") && toSign && !friend) {
-				message(player, "teleport-noPermissionOtherSign");
-				return false;
-			} else if(!owner && !available && !player.hasPermission("areashop.teleportfriendsign") && toSign && friend) {
-				message(player, "teleport-noPermissionFriendSign");
-				return false;
-			} else if(available && !player.hasPermission("areashop.teleportavailablesign") && toSign) {
-				message(player, "teleport-noPermissionAvailableSign");
-				return false;
-			}
-		}
 
-		List<Location> signs = getSignsFeature().getSignLocations();
-		boolean signAvailable = !signs.isEmpty();
-		if(toSign) {
-			if(signAvailable) {
-				// Use the location 1 below the sign to prevent weird spawing above the sign
-				startLocation = signs.get(0).subtract(0.0, 1.0, 0.0);
-				startLocation.setPitch(player.getLocation().getPitch());
-				startLocation.setYaw(player.getLocation().getYaw());
-			} else {
-				// No sign available
-				message(player, "teleport-changedToNoSign");
-				toSign = false;
-			}
-		}		
 
-		if(startLocation == null && this.hasTeleportLocation()) {
-			startLocation = getTeleportLocation();
-		}
-		// Set default startLocation if not set
-		if(startLocation == null) {
-			// Set to block in the middle, y configured in the config
-			Vector middle = Vector.getMidpoint(region.getMaximumPoint(), region.getMinimumPoint());
-			String configSetting = getStringSetting("general.teleportLocationY");
-			if("bottom".equalsIgnoreCase(configSetting)) {
-				middle = middle.setY(region.getMinimumPoint().getBlockY());
-			} else if("top".equalsIgnoreCase(configSetting)) {
-				middle = middle.setY(region.getMaximumPoint().getBlockY());
-			} else if("middle".equalsIgnoreCase(configSetting)) {
-				middle = middle.setY(middle.getBlockY());
-			} else {
-				try {
-					int vertical = Integer.parseInt(configSetting);
-					middle = middle.setY(vertical);
-				} catch(NumberFormatException e) {
-					AreaShop.warn("Could not parse general.teleportLocationY: '"+configSetting+"'");
-				}
-			}
-			startLocation = new Location(getWorld(), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
-		}
-		boolean insideRegion;
-		if(toSign) {
-			insideRegion = getBooleanSetting("general.teleportToSignIntoRegion");
-		} else {
-			insideRegion = getBooleanSetting("general.teleportIntoRegion");
-		}
-		int maxTries = plugin.getConfig().getInt("maximumTries");
-
-		// set location in the center of the block
-		startLocation.setX(startLocation.getBlockX() + 0.5);
-		startLocation.setZ(startLocation.getBlockZ() + 0.5);
-		
-		// Check locations starting from startLocation and then a cube that increases
-		// radius around that (until no block in the region is found at all cube sides)
-		Location safeLocation = startLocation;
-		int radius = 1;
-		boolean blocksInRegion = region.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
-		if(!blocksInRegion && insideRegion) {
-			message(player, "teleport-blocked");
-			return false;
-		}
-		boolean done = isSafe(safeLocation) && ((blocksInRegion && insideRegion) || (!insideRegion));
-		boolean north=false, east=false, south=false, west=false, top=false, bottom=false;
-		boolean track;
-		while(((blocksInRegion && insideRegion) || (!insideRegion)) && !done) {
-			blocksInRegion = false;
-			// North side
-			track = false;
-			for(int x=-radius+1; x<=radius && !done && !north; x++) {
-				for(int y=-radius+1; y<radius && !done; y++) {
-					safeLocation = startLocation.clone().add(x, y, -radius);
-					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
-						continue;
-					}
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-			}
-			north = north || !track;
-			
-			// East side
-			track = false;
-			for(int z=-radius+1; z<=radius && !done && !east; z++) {
-				for(int y=-radius+1; y<radius && !done; y++) {
-					safeLocation = startLocation.clone().add(radius, y, z);
-					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
-						continue;
-					}
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-			}
-			east = east || !track;
-			
-			// South side
-			track = false;
-			for(int x=radius-1; x>=-radius && !done && !south; x--) {
-				for(int y=-radius+1; y<radius && !done; y++) {
-					safeLocation = startLocation.clone().add(x, y, radius);
-					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
-						continue;
-					}
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-			}
-			south = south || !track;
-			
-			// West side
-			track = false;
-			for(int z=radius-1; z>=-radius && !done && !west; z--) {
-				for(int y=-radius+1; y<radius && !done; y++) {
-					safeLocation = startLocation.clone().add(-radius, y, z);
-					if(safeLocation.getBlockY()>256 || safeLocation.getBlockY()<0) {
-						continue;
-					}
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-			}
-			west = west || !track;
-			
-			// Top side
-			track = false;
-			// Middle block of the top
-			if((startLocation.getBlockY() + radius) > 256) {
-				top = true;
-			}
-			if(!done && !top) {
-				safeLocation = startLocation.clone().add(0, radius, 0);
-				if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-					checked++;
-					done = isSafe(safeLocation) || checked > maxTries;
-					blocksInRegion = true;
-					track = true;
-				}
-			}
-			for(int r=1; r<=radius && !done && !top; r++) {
-				// North
-				for(int x=-r+1; x<=r && !done; x++) {
-					safeLocation = startLocation.clone().add(x, radius, -r);
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-				// East
-				for(int z=-r+1; z<=r && !done; z++) {
-					safeLocation = startLocation.clone().add(r, radius, z);
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-				// South side
-				for(int x=r-1; x>=-r && !done; x--) {
-					safeLocation = startLocation.clone().add(x, radius, r);
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-				// West side
-				for(int z=r-1; z>=-r && !done; z--) {
-					safeLocation = startLocation.clone().add(-r, radius, z);
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}			
-			}
-			top = top || !track;
-			
-			// Bottom side
-			track = false;
-			// Middle block of the bottom
-			if(startLocation.getBlockY() - radius < 0) {
-				bottom = true;
-			}
-			if(!done && !bottom) {
-				safeLocation = startLocation.clone().add(0, -radius, 0);
-				if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-					checked++;
-					done = isSafe(safeLocation) || checked > maxTries;
-					blocksInRegion = true;
-					track = true;
-				}
-			}
-			for(int r=1; r<=radius && !done && !bottom; r++) {
-				// North
-				for(int x=-r+1; x<=r && !done; x++) {
-					safeLocation = startLocation.clone().add(x, -radius, -r);
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-				// East
-				for(int z=-r+1; z<=r && !done; z++) {
-					safeLocation = startLocation.clone().add(r, -radius, z);
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-				// South side
-				for(int x=r-1; x>=-r && !done; x--) {
-					safeLocation = startLocation.clone().add(x, -radius, r);
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}
-				// West side
-				for(int z=r-1; z>=-r && !done; z--) {
-					safeLocation = startLocation.clone().add(-r, -radius, z);
-					if(region.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
-						checked++;
-						done = isSafe(safeLocation) || checked > maxTries;
-						blocksInRegion = true;
-						track = true;
-					}
-				}			
-			}
-			bottom = bottom || !track;
-			
-			// Increase cube radius
-			radius++;
-		}
-		if(done && isSafe(safeLocation)) {
-			if(toSign) {
-				message(player, "teleport-successSign");
-			} else {
-				message(player, "teleport-success");
-			}			
-			player.teleport(safeLocation);
-			AreaShop.debug("Found location: " + safeLocation.toString() + " Tries: " + (checked-1));
-			return true;
-		} else {
-			message(player, "teleport-noSafe", checked-1, maxTries);
-			AreaShop.debug("No location found, checked " + (checked-1) + " spots of max " + maxTries);
-			return false;
-		}	
-	}
-
-	/**
-	 * Teleport a player to the region or sign when he has permissions for it
-	 * @param player Player that should be teleported
-	 * @param toSign true to teleport to the first sign of the region, false for teleporting to the region itself
-	 * @return true if the teleport succeeded, otherwise false
-	 */
-	public boolean teleportPlayer(Player player, boolean toSign) {
-		return teleportPlayer(player, toSign, true);
-	}
-
-	/**
-	 * Teleport a player to the region when he has permissions for it
-	 * @param player           Player that should be teleported
-	 * @return true if the teleport succeeded, otherwise false
-	 */
-	public boolean teleportPlayer(Player player) {
-		return teleportPlayer(player, false, true);
-	}
-	
-	/**
-	 * Checks if a certain location is safe to teleport to
-	 * @param location The location to check
-	 * @return true if it is safe, otherwise false
-	 */
-	protected boolean isSafe(Location location) {
-		Block feet = location.getBlock();
-		Block head = feet.getRelative(BlockFace.UP);
-		Block below = feet.getRelative(BlockFace.DOWN);
-		Block above = head.getRelative(BlockFace.UP);
-		// Check the block at the feet of the player
-		if((feet.getType().isSolid() && !canSpawnIn.contains(feet.getType())) || feet.isLiquid()) {
-			return false;
-		} else if((head.getType().isSolid() && !canSpawnIn.contains(head.getType())) || head.isLiquid()) {
-			return false;
-		} else if(!below.getType().isSolid() || cannotSpawnOn.contains(below.getType()) || below.isLiquid()) {
-			return false;
-		} else if(above.isLiquid() || cannotSpawnBeside.contains(above.getType())) {
-			return false;
-		}
-		// Check all blocks around
-		ArrayList<Material> around = new ArrayList<>(Arrays.asList(
-				feet.getRelative(BlockFace.NORTH).getType(),
-				feet.getRelative(BlockFace.NORTH_EAST).getType(),
-				feet.getRelative(BlockFace.EAST).getType(),
-				feet.getRelative(BlockFace.SOUTH_EAST).getType(),
-				feet.getRelative(BlockFace.SOUTH).getType(),
-				feet.getRelative(BlockFace.SOUTH_WEST).getType(),
-				feet.getRelative(BlockFace.WEST).getType(),
-				feet.getRelative(BlockFace.NORTH_WEST).getType(),
-				below.getRelative(BlockFace.NORTH).getType(),
-				below.getRelative(BlockFace.NORTH_EAST).getType(),
-				below.getRelative(BlockFace.EAST).getType(),
-				below.getRelative(BlockFace.SOUTH_EAST).getType(),
-				below.getRelative(BlockFace.SOUTH).getType(),
-				below.getRelative(BlockFace.SOUTH_WEST).getType(),
-				below.getRelative(BlockFace.WEST).getType(),
-				below.getRelative(BlockFace.NORTH_WEST).getType(),
-				head.getRelative(BlockFace.NORTH).getType(),
-				head.getRelative(BlockFace.NORTH_EAST).getType(),
-				head.getRelative(BlockFace.EAST).getType(),
-				head.getRelative(BlockFace.SOUTH_EAST).getType(),
-				head.getRelative(BlockFace.SOUTH).getType(),
-				head.getRelative(BlockFace.SOUTH_WEST).getType(),
-				head.getRelative(BlockFace.WEST).getType(),
-				head.getRelative(BlockFace.NORTH_WEST).getType(),
-				above.getRelative(BlockFace.NORTH).getType(),
-				above.getRelative(BlockFace.NORTH_EAST).getType(),
-				above.getRelative(BlockFace.EAST).getType(),
-				above.getRelative(BlockFace.SOUTH_EAST).getType(),
-				above.getRelative(BlockFace.SOUTH).getType(),
-				above.getRelative(BlockFace.SOUTH_WEST).getType(),
-				above.getRelative(BlockFace.WEST).getType(),
-				above.getRelative(BlockFace.NORTH_WEST).getType()
-				));
-		for(Material material : around) {
-			if(cannotSpawnBeside.contains(material)) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	
 	// CONFIG
 
 	/**

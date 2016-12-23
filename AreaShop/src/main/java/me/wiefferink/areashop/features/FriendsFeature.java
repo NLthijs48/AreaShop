@@ -11,8 +11,6 @@ import java.util.*;
 
 public class FriendsFeature extends RegionFeature {
 
-	private GeneralRegion region;
-
 	public FriendsFeature(GeneralRegion region) {
 		this.region = region;
 	}

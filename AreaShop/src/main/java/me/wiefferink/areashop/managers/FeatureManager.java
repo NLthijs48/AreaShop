@@ -15,7 +15,8 @@ public class FeatureManager extends Manager {
 			DebugFeature.class,
 			SignsFeature.class,
 			FriendsFeature.class,
-			WorldGuardRegionFlagsFeature.class
+			WorldGuardRegionFlagsFeature.class,
+			TeleportFeature.class
 	));
 	// One instance of each feature, registered for event handling
 	private Set<RegionFeature> globalFeatures;

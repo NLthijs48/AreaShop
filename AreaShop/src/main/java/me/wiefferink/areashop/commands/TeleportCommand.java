@@ -65,9 +65,9 @@ public class TeleportCommand extends CommandAreaShop {
 			return;
 		}
 		if(args.length >= 3 && (args[2].equalsIgnoreCase("sign") || args[2].equalsIgnoreCase("yes") || args[2].equalsIgnoreCase("true"))) {
-			region.teleportPlayer(player, true);
+			region.getTeleportFeature().teleportPlayer(player, true);
 		} else {
-			region.teleportPlayer(player, false);
+			region.getTeleportFeature().teleportPlayer(player, false);
 		}
 
 	}

@@ -94,7 +94,7 @@ public class FindCommand extends CommandAreaShop {
 				} else {
 					plugin.message(player, "find-success", "buy", Utils.formatCurrency(balance), onlyInGroup, region);
 				}
-				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
+				region.getTeleportFeature().teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);
 			} else {
 				Message onlyInGroup = Message.empty();
 				if(group != null) {
@@ -128,7 +128,7 @@ public class FindCommand extends CommandAreaShop {
 				} else {
 					plugin.message(player, "find-success", "rent", Utils.formatCurrency(balance), onlyInGroup, region);
 				}
-				region.teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);		
+				region.getTeleportFeature().teleportPlayer(player, region.getBooleanSetting("general.findTeleportToSign"), false);
 			} else {
 				Message onlyInGroup = Message.empty();
 				if(group != null) {

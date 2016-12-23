@@ -95,7 +95,7 @@ public class SetteleportCommand extends CommandAreaShop {
 
 		ProtectedRegion wgRegion = region.getRegion();
 		if(args.length > 2 && args[2] != null && (args[2].equalsIgnoreCase("reset") || args[2].equalsIgnoreCase("yes") || args[2].equalsIgnoreCase("true"))) {
-			region.setTeleport(null);
+			region.getTeleportFeature().setTeleport(null);
 			region.update();
 			plugin.message(player, "setteleport-reset", region);
 			return;
@@ -104,7 +104,7 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(player, "setteleport-notInside", region);
 			return;
 		}
-		region.setTeleport(player.getLocation());
+		region.getTeleportFeature().setTeleport(player.getLocation());
 		region.update();
 		plugin.message(player, "setteleport-success", region);
 	}

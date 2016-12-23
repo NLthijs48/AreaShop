@@ -3,7 +3,7 @@ package me.wiefferink.areashop;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.wiefferink.areashop.features.DebugFeature;
-import me.wiefferink.areashop.features.Feature;
+import me.wiefferink.areashop.features.RegionFeature;
 import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.features.WorldGuardRegionFlagsFeature;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
@@ -17,12 +17,10 @@ import me.wiefferink.areashop.listeners.PlayerLoginLogoutListener;
 import me.wiefferink.areashop.listeners.SignBreakListener;
 import me.wiefferink.areashop.listeners.SignChangeListener;
 import me.wiefferink.areashop.listeners.SignClickListener;
-import me.wiefferink.areashop.managers.CommandManager;
-import me.wiefferink.areashop.managers.FileManager;
-import me.wiefferink.areashop.managers.SignLinkerManager;
+import me.wiefferink.areashop.managers.*;
 import me.wiefferink.areashop.messages.LanguageManager;
 import me.wiefferink.areashop.messages.Message;
-import me.wiefferink.areashop.regions.GeneralRegion;
+import me.wiefferink.areashop.tools.Utils;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -37,9 +35,8 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +57,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	private LanguageManager languageManager = null;
 	private CommandManager commandManager = null;
 	private SignLinkerManager signLinkerManager = null;
+	private FeatureManager featureManager = null;
+	private Set<Manager> managers = null;
 	private boolean debug = false;
 	private List<String> chatprefix = null;
 	private Updater updater = null;
@@ -144,6 +143,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public void onEnable() {
 		AreaShop.instance = this;
+		managers = new HashSet<>();
 		boolean error = false;
 		
 		// Check if WorldGuard is present
@@ -260,8 +260,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	    }
         
 		// Load all data from files and check versions
-	    fileManager = new FileManager(this);
-	    error = error | !fileManager.loadFiles();
+		fileManager = new FileManager();
+		managers.add(fileManager);
+		error = error | !fileManager.loadFiles();
 	    
 	    // Print loaded version of WG and WE in debug
 	    if(wgVersion != null) {
@@ -277,6 +278,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		if(error) {
 			error("The plugin has not started, fix the errors listed above");
 		} else {
+			featureManager = new FeatureManager();
+			managers.add(featureManager);
+
 			// Register the event listeners
 			getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 			getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
@@ -287,10 +291,12 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			setupTasks();
 	        
 		    // Startup the CommandManager (registers itself for the command)
-	        commandManager = new CommandManager(this);
-	        
-	        // Create a signLinkerManager
-	        signLinkerManager = new SignLinkerManager(this);
+			commandManager = new CommandManager();
+			managers.add(commandManager);
+
+			// Create a signLinkerManager
+			signLinkerManager = new SignLinkerManager();
+			managers.add(signLinkerManager);
 			
 	        // Enable Metrics if config allows it
 			if(getConfig().getBoolean("sendStats")) {
@@ -337,21 +343,27 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 *  Called on shutdown or reload of the server 
 	 */
 	public void onDisable() {
-		// Update lastactive time for players that are online now
-		for(GeneralRegion region : fileManager.getRegions()) {
-			Player player = Bukkit.getPlayer(region.getOwner());
-			if(player != null) {
-				region.updateLastActiveTime();
-			}
-		}
-		fileManager.saveRequiredFilesAtOnce();
+
 		Bukkit.getServer().getScheduler().cancelTasks(this);
-		
-		worldGuard = null;
-		worldEdit = null;
+
+		// Cleanup managers
+		for(Manager manager : managers) {
+			manager.shutdown();
+		}
+		managers = null;
 		fileManager = null;
 		languageManager = null;
 		commandManager = null;
+		signLinkerManager = null;
+		featureManager = null;
+
+		// Cleanup plugins
+		worldGuard = null;
+		worldGuardInterface = null;
+		worldEdit = null;
+		worldEditInterface = null;
+
+		// Cleanup other stuff
 		chatprefix = null;
 		debug = false;
 		ready = false;
@@ -359,19 +371,29 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Instanciate and register all Feature classes
+	 * Instanciate and register all RegionFeature classes
 	 */
 	public void setupFeatures() {
-		Set<Feature> features = new HashSet<>();
-
-		features.add(new DebugFeature());
-		features.add(new SignsFeature());
-		features.add(new WorldGuardRegionFlagsFeature());
+		Map<Class<? extends RegionFeature>, RegionFeature> features = new HashMap<>();
+		Set<Class<? extends RegionFeature>> featureClasses = new HashSet<>(Arrays.asList(
+				DebugFeature.class,
+				SignsFeature.class,
+				WorldGuardRegionFlagsFeature.class)
+		);
+		for(Class<? extends RegionFeature> clazz : featureClasses) {
+			try {
+				features.put(clazz, clazz.getConstructor().newInstance());
+			} catch(NoSuchMethodException|InstantiationException|IllegalAccessException|IllegalArgumentException|InvocationTargetException e) {
+				AreaShop.error("Failed to instantiate feature:", clazz);
+			}
+		}
 
 		// Register as listener when necessary
-		for(Feature feature : features) {
+		/*
+		for(RegionFeature feature : features) {
 			feature.listen();
 		}
+		*/
 	}
 	
 	/**
@@ -453,11 +475,25 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public CommandManager getCommandManager() {
 		return commandManager;
 	}
-	
+
+	/**
+	 * Get the SignLinkerManager
+	 * Handles sign linking mode
+	 * @return The SignLinkerManager
+	 */
 	public SignLinkerManager getSignlinkerManager() {
 		return signLinkerManager;
 	}
-	
+
+	/**
+	 * Get the FeatureManager
+	 * Manages region specific features
+	 * @return The FeatureManager
+	 */
+	public FeatureManager getFeatureManager() {
+		return featureManager;
+	}
+
 	/**
 	 * Function to get the Vault plugin
 	 * @return Economy

@@ -2,10 +2,10 @@ package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

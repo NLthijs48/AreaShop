@@ -1,9 +1,9 @@
 package me.wiefferink.areashop.listeners;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

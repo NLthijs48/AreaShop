@@ -4,11 +4,11 @@ import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -131,7 +131,7 @@ public final class SignChangeListener implements Listener {
 				}
 				
 				// Add rent to the FileManager
-				final RentRegion rent = new RentRegion(plugin, secondLine, event.getPlayer().getWorld());
+				final RentRegion rent = new RentRegion(secondLine, event.getPlayer().getWorld());
 				boolean isMember = plugin.getWorldGuardHandler().containsMember(rent.getRegion(), player.getUniqueId());
 				boolean isOwner = plugin.getWorldGuardHandler().containsOwner(rent.getRegion(), player.getUniqueId());
 				boolean landlord = (!player.hasPermission("areashop.createrent")
@@ -242,7 +242,7 @@ public final class SignChangeListener implements Listener {
 				}
 				
 				// Add buy to the FileManager
-				final BuyRegion buy = new BuyRegion(plugin, secondLine, event.getPlayer().getWorld());
+				final BuyRegion buy = new BuyRegion(secondLine, event.getPlayer().getWorld());
 				boolean isMember = plugin.getWorldGuardHandler().containsMember(buy.getRegion(), player.getUniqueId());
 				boolean isOwner = plugin.getWorldGuardHandler().containsOwner(buy.getRegion(), player.getUniqueId());
 				boolean landlord = (!player.hasPermission("areashop.createbuy")

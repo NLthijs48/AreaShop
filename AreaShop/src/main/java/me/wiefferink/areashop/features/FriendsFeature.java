@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.*;
 
-public class FriendsFeature extends Feature {
+public class FriendsFeature extends RegionFeature {
 
 	private GeneralRegion region;
 

@@ -1,10 +1,10 @@
 package me.wiefferink.areashop.features;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
 import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.GeneralRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,7 +18,7 @@ import org.bukkit.event.EventHandler;
 
 import java.util.*;
 
-public class SignsFeature extends Feature {
+public class SignsFeature extends RegionFeature {
 
 	private static Map<String, RegionSign> allSigns = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class SignsFeature extends Feature {
 	}
 
 	@Override
-	public void destroy() {
+	public void shutdown() {
 		// Deregister signs from the registry
 		for(String key : signs.keySet()) {
 			allSigns.remove(key);

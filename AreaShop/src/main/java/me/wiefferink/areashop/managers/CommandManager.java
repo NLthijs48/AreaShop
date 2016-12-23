@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.managers;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.commands.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,16 +11,13 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class CommandManager implements CommandExecutor, TabCompleter {
-	private AreaShop plugin;
+public class CommandManager extends Manager implements CommandExecutor, TabCompleter {
 	private ArrayList<CommandAreaShop> commands;
 	
 	/**
 	 * Constructor
-	 * @param plugin The AreaShop plugin
 	 */
-	public CommandManager(AreaShop plugin) {
-		this.plugin = plugin;
+	public CommandManager() {
 		commands = new ArrayList<>();
 		commands.add(new HelpCommand(plugin));
 		commands.add(new RentCommand(plugin));

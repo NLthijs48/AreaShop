@@ -5,7 +5,6 @@ import com.google.common.io.Files;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.notify.AddedRegionEvent;
 import me.wiefferink.areashop.events.notify.DeletedRegionEvent;
 import me.wiefferink.areashop.regions.BuyRegion;
@@ -14,6 +13,7 @@ import me.wiefferink.areashop.regions.GeneralRegion.RegionEvent;
 import me.wiefferink.areashop.regions.GeneralRegion.RegionType;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,10 +26,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FileManager {
+public class FileManager extends Manager {
 	private static FileManager instance = null;
-	
-	private AreaShop plugin = null;
+
 	private HashMap<String, GeneralRegion> regions = null;
 	private String regionsPath = null;
 	private HashMap<String, RegionGroup> groups = null;
@@ -66,10 +65,8 @@ public class FileManager {
 	
 	/**
 	 * Constructor, initialize variabeles
-	 * @param plugin AreaShop
 	 */
-	public FileManager(AreaShop plugin) {
-		this.plugin = plugin;
+	public FileManager() {
 		regions = new HashMap<>();
 		regionsPath = plugin.getDataFolder() + File.separator + AreaShop.regionsFolder;
 		configPath = plugin.getDataFolder() + File.separator + "config.yml";
@@ -85,14 +82,20 @@ public class FileManager {
 		}
 		loadVersions();
 	}
-	
-	public static FileManager getInstance() {
-		if(instance == null) {
-			instance = new FileManager(AreaShop.getInstance());
+
+	@Override
+	public void shutdown() {
+		// Update lastactive time for players that are online now
+		for(GeneralRegion region : getRegions()) {
+			Player player = Bukkit.getPlayer(region.getOwner());
+			if(player != null) {
+				region.updateLastActiveTime();
+			}
 		}
-		return instance;
+		// Save files that need to be saved
+		saveRequiredFilesAtOnce();
 	}
-	
+
 	
 	//////////////////////////////////////////////////////////
 	// GETTERS
@@ -904,9 +907,9 @@ public class FileManager {
 							String type = config.getString("general.type");
 							GeneralRegion region;
 							if(RegionType.RENT.getValue().equals(type)) {
-								region = new RentRegion(plugin, config);
+								region = new RentRegion(config);
 							} else if(RegionType.BUY.getValue().equals(type)) {
-								region = new BuyRegion(plugin, config);
+								region = new BuyRegion(config);
 							} else {
 								noNamePaths.add(regionFile.getPath());
 								continue;

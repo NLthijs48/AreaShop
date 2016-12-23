@@ -14,7 +14,7 @@ import org.bukkit.event.EventHandler;
 
 import java.util.Set;
 
-public class WorldGuardRegionFlagsFeature extends Feature {
+public class WorldGuardRegionFlagsFeature extends RegionFeature {
 
 
 	@EventHandler

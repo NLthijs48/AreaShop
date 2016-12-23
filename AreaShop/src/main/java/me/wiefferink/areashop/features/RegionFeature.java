@@ -5,8 +5,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
-public class Feature implements Listener {
-	public AreaShop plugin = AreaShop.getInstance();
+public abstract class RegionFeature implements Listener {
+	static final AreaShop plugin = AreaShop.getInstance();
+
 	public YamlConfiguration config = plugin.getConfig();
 
 	/**
@@ -19,15 +20,15 @@ public class Feature implements Listener {
 	/**
 	 * Destroy the feature and deregister everything
 	 */
-	public void destroyFeature() {
+	public void shutdownFeature() {
 		HandlerList.unregisterAll(this);
-		destroy();
+		shutdown();
 	}
 
 	/**
-	 * Dummy method a Feature implementation can override
+	 * Dummy method a RegionFeature implementation can override
 	 */
-	public void destroy() {
+	public void shutdown() {
 	}
 
 }

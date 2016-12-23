@@ -1,11 +1,11 @@
 package me.wiefferink.areashop.regions;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.ask.RentingRegionEvent;
 import me.wiefferink.areashop.events.ask.UnrentingRegionEvent;
 import me.wiefferink.areashop.events.notify.RentedRegionEvent;
 import me.wiefferink.areashop.events.notify.UnrentedRegionEvent;
+import me.wiefferink.areashop.tools.Utils;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -21,28 +21,26 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static me.wiefferink.areashop.Utils.millisToHumanFormat;
+import static me.wiefferink.areashop.tools.Utils.millisToHumanFormat;
 
 public class RentRegion extends GeneralRegion {
 	private long warningsDoneUntil = Calendar.getInstance().getTimeInMillis();
 	
 	/**
 	 * Constructor
-	 * @param plugin The areashop plugin
 	 * @param config All settings of this region
 	 */
-	public RentRegion(AreaShop plugin, YamlConfiguration config) {
-		super(plugin, config);
+	public RentRegion(YamlConfiguration config) {
+		super(config);
 	}
 	
 	/**
 	 * Create a new RentRegion
-	 * @param plugin The AreaShop plugin
 	 * @param name The name of the region (correct casing)
 	 * @param world The world of the WorldGuard region
 	 */
-	public RentRegion(AreaShop plugin, String name, World world) {
-		super(plugin, name, world);
+	public RentRegion(String name, World world) {
+		super(name, world);
 	}
 	
 	@Override

@@ -1,10 +1,11 @@
-package me.wiefferink.areashop;
+package me.wiefferink.areashop.tools;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;

@@ -1,7 +1,7 @@
 package me.wiefferink.areashop.messages;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
+import me.wiefferink.areashop.tools.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;

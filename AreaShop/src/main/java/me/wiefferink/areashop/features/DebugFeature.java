@@ -1,14 +1,14 @@
 package me.wiefferink.areashop.features;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.ask.*;
 import me.wiefferink.areashop.events.askandnotify.AddedFriendEvent;
 import me.wiefferink.areashop.events.askandnotify.DeletedFriendEvent;
 import me.wiefferink.areashop.events.notify.*;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.event.EventHandler;
 
-public class DebugFeature extends Feature {
+public class DebugFeature extends RegionFeature {
 
 	@EventHandler
 	public void buyingRegion(BuyingRegionEvent event) {

@@ -1,11 +1,11 @@
 package me.wiefferink.areashop.commands;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

@@ -1,9 +1,9 @@
 package me.wiefferink.areashop.managers;
 
-import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
+import me.wiefferink.areashop.tools.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,15 +21,20 @@ import org.bukkit.util.BlockIterator;
 
 import java.util.*;
 
-public class SignLinkerManager implements Listener {
-	private AreaShop plugin = null;
+public class SignLinkerManager extends Manager implements Listener {
 	private Map<UUID, SignLinker> signLinkers;
 	private boolean eventsRegistered;
-	
-	public SignLinkerManager(AreaShop plugin) {
-		this.plugin = plugin;
+
+	public SignLinkerManager() {
 		signLinkers = new HashMap<>();
 		eventsRegistered = false;
+	}
+
+	@Override
+	public void shutdown() {
+		for(UUID uuid : signLinkers.keySet()) {
+			exitSignLinkMode(Bukkit.getPlayer(uuid));
+		}
 	}
 	
 	/**
@@ -131,7 +136,7 @@ public class SignLinkerManager implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLeave(PlayerQuitEvent event) {
-		signLinkers.remove(event.getPlayer().getUniqueId());
+		exitSignLinkMode(event.getPlayer());
 	}
 	
 	/**

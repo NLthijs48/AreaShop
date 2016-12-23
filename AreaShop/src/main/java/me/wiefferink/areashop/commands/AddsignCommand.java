@@ -2,9 +2,9 @@ package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;

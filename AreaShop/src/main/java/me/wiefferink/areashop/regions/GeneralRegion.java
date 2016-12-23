@@ -4,14 +4,15 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.NotifyRegionEvent;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
 import me.wiefferink.areashop.features.FriendsFeature;
+import me.wiefferink.areashop.features.RegionFeature;
 import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.messages.Message;
+import me.wiefferink.areashop.tools.Utils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -30,17 +31,16 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion>, Message.ReplacementProvider {
+	static final AreaShop plugin = AreaShop.getInstance();
+
 	YamlConfiguration config;
 	private static ArrayList<Material> canSpawnIn = new ArrayList<>(Arrays.asList(Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE));
 	private static ArrayList<Material> cannotSpawnOn = new ArrayList<>(Arrays.asList(Material.PISTON_EXTENSION, Material.PISTON_MOVING_PIECE, Material.SIGN_POST, Material.WALL_SIGN, Material.STONE_PLATE, Material.IRON_DOOR_BLOCK, Material.WOOD_PLATE, Material.TRAP_DOOR, Material.REDSTONE_LAMP_OFF, Material.REDSTONE_LAMP_ON, Material.CACTUS, Material.IRON_FENCE, Material.FENCE_GATE, Material.THIN_GLASS, Material.NETHER_FENCE, Material.DRAGON_EGG, Material.GOLD_PLATE, Material.IRON_PLATE, Material.STAINED_GLASS_PANE));
 	private static ArrayList<Material> cannotSpawnBeside = new ArrayList<>(Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CACTUS));
-	AreaShop plugin = null;
 	private boolean saveRequired = false;
 	private boolean deleted = false;
-	
-	// Features
-	private FriendsFeature friendsFeature;
-	private SignsFeature signsFeature;
+
+	private Map<Class<? extends RegionFeature>, RegionFeature> features;
 
 	// Enum for region types
 	public enum RegionType {		
@@ -130,43 +130,30 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 	}
 
-	GeneralRegion(AreaShop plugin, YamlConfiguration config) {
-		this.plugin = plugin;
+	public GeneralRegion(YamlConfiguration config) {
 		this.config = config;
-		setupFeatures();
+		setup();
 	}
 
-	GeneralRegion(AreaShop plugin, String name, World world) {
-		this.plugin = plugin;
-		
+	public GeneralRegion(String name, World world) {
 		config = new YamlConfiguration();
 		setSetting("general.name", name);
 		setSetting("general.world", world.getName());
 		setSetting("general.type", getType().getValue().toLowerCase());
-		setupFeatures();
+		setup();
+	}
+
+	public void setup() {
+		features = plugin.getFeatureManager().getRegionFeatures(this);
 	}
 
 	/**
 	 * Deregister everything
 	 */
 	public void destroy() {
-		destroyFeatures();
-	}
-
-	/**
-	 * Setup the features of this class
-	 */
-	private void setupFeatures() {
-		friendsFeature = new FriendsFeature(this);
-		signsFeature = new SignsFeature(this);
-	}
-
-	/**
-	 * Destroy the features created for this region
-	 */
-	private void destroyFeatures() {
-		friendsFeature.destroyFeature();
-		signsFeature.destroyFeature();
+		for(RegionFeature feature : features.values()) {
+			feature.shutdown();
+		}
 	}
 
 	/**
@@ -174,7 +161,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return The FriendsFeature of this region
 	 */
 	public FriendsFeature getFriendsFeature() {
-		return friendsFeature;
+		return (FriendsFeature)features.get(FriendsFeature.class);
 	}
 
 	/**
@@ -182,7 +169,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return The SignsFeature of this region
 	 */
 	public SignsFeature getSignsFeature() {
-		return signsFeature;
+		return (SignsFeature)features.get(SignsFeature.class);
 	}
 		
 	// ABSTRACT

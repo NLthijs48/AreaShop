@@ -6,12 +6,12 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -184,7 +184,7 @@ public class StackCommand extends CommandAreaShop {
                         manager.addRegion(region);
 						// Add the region to AreaShop
 						if(rentRegions) {
-							RentRegion rent = new RentRegion(plugin, region.getId(), selection.getWorld());
+							RentRegion rent = new RentRegion(region.getId(), selection.getWorld());
 							if(finalGroup != null) {
 								finalGroup.addMember(rent);
 							}
@@ -194,7 +194,7 @@ public class StackCommand extends CommandAreaShop {
 							rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 							rent.update();
 						} else {
-							BuyRegion buy = new BuyRegion(plugin, region.getId(), selection.getWorld());
+							BuyRegion buy = new BuyRegion(region.getId(), selection.getWorld());
 							if(finalGroup != null) {
 								finalGroup.addMember(buy);
 							}

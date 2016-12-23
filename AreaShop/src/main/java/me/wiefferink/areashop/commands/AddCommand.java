@@ -3,11 +3,11 @@ package me.wiefferink.areashop.commands;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -146,7 +146,7 @@ public class AddCommand extends CommandAreaShop {
 								&& ((sender.hasPermission("areashop.create" + type + ".owner") && isOwner)
 									|| (sender.hasPermission("areashop.create" + type + ".member") && isMember)));
 							if(isRent) {
-								RentRegion rent = new RentRegion(plugin, region.getId(), finalWorld);
+								RentRegion rent = new RentRegion(region.getId(), finalWorld);
 								// Set landlord
 								if(landlord) {
 									rent.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
@@ -162,7 +162,7 @@ public class AddCommand extends CommandAreaShop {
 								rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 								regionsSuccess.add(rent);
 							} else {
-								BuyRegion buy = new BuyRegion(plugin, region.getId(), finalWorld);
+								BuyRegion buy = new BuyRegion(region.getId(), finalWorld);
 								// Set landlord
 								if(landlord) {
 									buy.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());

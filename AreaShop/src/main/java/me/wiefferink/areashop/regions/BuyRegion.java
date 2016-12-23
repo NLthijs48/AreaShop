@@ -1,13 +1,13 @@
 package me.wiefferink.areashop.regions;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.events.ask.BuyingRegionEvent;
 import me.wiefferink.areashop.events.ask.ResellingRegionEvent;
 import me.wiefferink.areashop.events.ask.SellingRegionEvent;
 import me.wiefferink.areashop.events.notify.BoughtRegionEvent;
 import me.wiefferink.areashop.events.notify.ResoldRegionEvent;
 import me.wiefferink.areashop.events.notify.SoldRegionEvent;
+import me.wiefferink.areashop.tools.Utils;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -21,12 +21,12 @@ import java.util.UUID;
 
 public class BuyRegion extends GeneralRegion {
 
-	public BuyRegion(AreaShop plugin, YamlConfiguration config) {
-		super(plugin, config);
+	public BuyRegion(YamlConfiguration config) {
+		super(config);
 	}
-	
-	public BuyRegion(AreaShop plugin, String name, World world) {
-		super(plugin, name, world);
+
+	public BuyRegion(String name, World world) {
+		super(name, world);
 	}
 	
 	@Override

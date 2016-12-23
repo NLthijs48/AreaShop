@@ -2,10 +2,10 @@ package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.Utils;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -98,17 +98,17 @@ public class DelCommand extends CommandAreaShop {
 				// Remove the rent if the player has permission
 				if(sender.hasPermission("areashop.destroyrent") || (isLandlord && sender.hasPermission("areashop.destroyrent.landlord"))) {
 					plugin.getFileManager().removeRent((RentRegion)region, true);
-					plugin.message(sender, "destroy-successRent", region);
+					plugin.message(sender, "shutdown-successRent", region);
 				} else {
-					plugin.message(sender, "destroy-noPermissionRent", region);
+					plugin.message(sender, "shutdown-noPermissionRent", region);
 				}
 			} else if(region.isBuyRegion()) {
 				// Remove the buy if the player has permission
 				if(sender.hasPermission("areashop.destroybuy") || (isLandlord && sender.hasPermission("areashop.destroybuy.landlord"))) {
 					plugin.getFileManager().removeBuy((BuyRegion)region, true);
-					plugin.message(sender, "destroy-successBuy", region);
+					plugin.message(sender, "shutdown-successBuy", region);
 				} else {
-					plugin.message(sender, "destroy-noPermissionBuy", region);
+					plugin.message(sender, "shutdown-noPermissionBuy", region);
 				}
 			}
 		}

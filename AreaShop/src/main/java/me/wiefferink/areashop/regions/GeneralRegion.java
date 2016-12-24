@@ -603,7 +603,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public boolean isRentRegion() {
 		return getType() == RegionType.RENT;
 	}
-	
+
 	/**
 	 * Check if this region is a BuyRegion
 	 * @return true if this region is a BuyRegion otherwise false
@@ -611,7 +611,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public boolean isBuyRegion() {
 		return getType() == RegionType.BUY;
 	}
-	
+
 	/**
 	 * Check if for renting this region you should be inside of it
 	 * @return true if you need to be inside, otherwise false

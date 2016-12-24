@@ -50,8 +50,10 @@ public class SignsFeature extends RegionFeature {
 	@Override
 	public void shutdown() {
 		// Deregister signs from the registry
-		for(String key : signs.keySet()) {
-			allSigns.remove(key);
+		if(signs != null) {
+			for(String key : signs.keySet()) {
+				allSigns.remove(key);
+			}
 		}
 	}
 

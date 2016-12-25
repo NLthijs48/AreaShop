@@ -1071,9 +1071,9 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			}
 			if(!found) {
 				if(this.getFileManager().getRegionSettings().isSet(path)) {
-					result = this.getFileManager().getRegionSettings().getConfigurationSection(path);
+					result = this.getFileManager().getRegionSettings().get(path);
 				} else {
-					result = this.getFileManager().getFallbackRegionSettings().getConfigurationSection(path);
+					result = this.getFileManager().getFallbackRegionSettings().get(path);
 				}
 			}
 		}

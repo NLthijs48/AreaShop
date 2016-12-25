@@ -2,10 +2,6 @@ package me.wiefferink.areashop;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import me.wiefferink.areashop.features.DebugFeature;
-import me.wiefferink.areashop.features.RegionFeature;
-import me.wiefferink.areashop.features.SignsFeature;
-import me.wiefferink.areashop.features.WorldGuardRegionFlagsFeature;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
@@ -35,8 +31,9 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -262,9 +259,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Load all data from files and check versions
 		fileManager = new FileManager();
 		managers.add(fileManager);
-		error = error | !fileManager.loadFiles();
-	    
-	    // Print loaded version of WG and WE in debug
+		error = error|!fileManager.loadFiles(false);
+
+		// Print loaded version of WG and WE in debug
 	    if(wgVersion != null) {
 			AreaShop.debug("Loaded WorldGuardHandler"+wgVersion+" (raw version: "+rawVersion+", major:"+major+", minor:"+minor+", fixes:"+fixes+", build:"+build+")");
 		}
@@ -287,7 +284,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			getServer().getPluginManager().registerEvents(new SignClickListener(this), this);
 			getServer().getPluginManager().registerEvents(new PlayerLoginLogoutListener(this), this);
 
-			setupFeatures();
 			setupTasks();
 	        
 		    // Startup the CommandManager (registers itself for the command)
@@ -370,32 +366,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		updater = null;
 	}
 
-	/**
-	 * Instanciate and register all RegionFeature classes
-	 */
-	public void setupFeatures() {
-		Map<Class<? extends RegionFeature>, RegionFeature> features = new HashMap<>();
-		Set<Class<? extends RegionFeature>> featureClasses = new HashSet<>(Arrays.asList(
-				DebugFeature.class,
-				SignsFeature.class,
-				WorldGuardRegionFlagsFeature.class)
-		);
-		for(Class<? extends RegionFeature> clazz : featureClasses) {
-			try {
-				features.put(clazz, clazz.getConstructor().newInstance());
-			} catch(NoSuchMethodException|InstantiationException|IllegalAccessException|IllegalArgumentException|InvocationTargetException e) {
-				AreaShop.error("Failed to instantiate feature:", clazz);
-			}
-		}
-
-		// Register as listener when necessary
-		/*
-		for(RegionFeature feature : features) {
-			feature.listen();
-		}
-		*/
-	}
-	
 	/**
 	 * Indicates if the plugin is ready to be used
 	 * @return true if the plugin is ready, false otherwise
@@ -753,7 +723,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public void reload(final CommandSender confirmationReceiver) {
 		setReady(false);
 		fileManager.saveRequiredFilesAtOnce();
-		fileManager.loadFiles();
+		fileManager.loadFiles(true);
 		languageManager = new LanguageManager(this);
 		message(confirmationReceiver, "reload-reloading");
 		fileManager.checkRents();

@@ -720,7 +720,7 @@ public class FileManager extends Manager {
 	 * Load all files from disk
 	 * @return true if the files are loaded correctly, otherwise false
 	 */
-	public boolean loadFiles() {
+	public boolean loadFiles(boolean thisTick) {
 		// Load config.yml + add defaults from .jar
 		boolean result = loadConfigFile();
 		// Load default.yml + add defaults from .jar
@@ -728,7 +728,7 @@ public class FileManager extends Manager {
 		// Convert old formats to the latest (object saving to .yml saving)
 		preUpdateFiles();
 		// Load region files (regions folder)
-		loadRegionFiles();
+		loadRegionFiles(thisTick);
 		// Convert old formats to the latest (changes in .yml saving format)
 		postUpdateFiles();
 		// Load groups.yml
@@ -862,7 +862,7 @@ public class FileManager extends Manager {
 	/**
 	 * Load all region files
 	 */
-	public void loadRegionFiles() {
+	public void loadRegionFiles(boolean thisTick) {
 		regions.clear();
 		final File file = new File(regionsPath);
 		if(!file.exists()) {
@@ -872,124 +872,132 @@ public class FileManager extends Manager {
 			}
 			plugin.setReady(true);
 		} else if(file.isDirectory()) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					File[] regionFiles = file.listFiles();
-					if(regionFiles == null) {
-						plugin.setReady(true);
-						return;
+			if(thisTick) {
+				loadRegionFilesNow();
+			} else {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						loadRegionFilesNow();
 					}
-
-					List<String> noRegionType = new ArrayList<>();
-					List<String> noNamePaths = new ArrayList<>();
-					List<GeneralRegion> noWorld = new ArrayList<>();
-					List<GeneralRegion> noRegion = new ArrayList<>();
-					List<GeneralRegion> incorrectDuration = new ArrayList<>();
-					for(File regionFile : regionFiles) {
-						if(regionFile.exists() && regionFile.isFile()) {
-
-							// Load the region file from disk in UTF8 mode
-							YamlConfiguration config;
-							try(
-									InputStreamReader reader = new InputStreamReader(new FileInputStream(regionFile), Charsets.UTF_8)
-							) {
-								config = YamlConfiguration.loadConfiguration(reader);
-								if(config.getKeys(false).size() == 0) {
-									AreaShop.warn("Region file '"+regionFile.getName()+"' is empty, check for errors in the log.");
-								}
-							} catch(IOException e) {
-								AreaShop.warn("Something went wrong reading region file: "+regionFile.getAbsolutePath());
-								continue;
-							}
-
-							// Construct the correct type of region
-							String type = config.getString("general.type");
-							GeneralRegion region;
-							if(RegionType.RENT.getValue().equals(type)) {
-								region = new RentRegion(config);
-							} else if(RegionType.BUY.getValue().equals(type)) {
-								region = new BuyRegion(config);
-							} else {
-								noNamePaths.add(regionFile.getPath());
-								continue;
-							}
-
-							// Check consistency
-							boolean added = false;
-							if(region.getName() == null) {
-								noNamePaths.add(regionFile.getPath());
-							} else if(region.getWorld() == null) {
-								noWorld.add(region);
-							} else if(region.getRegion() == null) {
-								noRegion.add(region);
-							} else if(region instanceof RentRegion && !Utils.checkTimeFormat(((RentRegion)region).getDurationString())) {
-								incorrectDuration.add(region);
-							} else {
-								added = true;
-								if(region instanceof RentRegion) {
-									addRentNoSave((RentRegion)region);
-								} else if(region instanceof BuyRegion) {
-									addBuyNoSave((BuyRegion)region);
-								}
-							}
-							if(!added) {
-								region.destroy();
-							}
-						}
-					}
-
-					// All files are loaded, print problems to the console
-					if(!noRegionType.isEmpty()) {
-						AreaShop.warn("The following region files do no have a region type: "+Utils.createCommaSeparatedList(noRegionType));
-					}
-
-					if(!noNamePaths.isEmpty()) {
-						AreaShop.warn("The following region files do no have a name in their file: "+Utils.createCommaSeparatedList(noNamePaths));
-					}
-
-					if(!noRegion.isEmpty()) {
-						List<String> noRegionNames = new ArrayList<>();
-						for(GeneralRegion region : noRegion) {
-							noRegionNames.add(region.getName());
-						}
-						AreaShop.warn("AreaShop regions that are missing their WorldGuard region: "+Utils.createCommaSeparatedList(noRegionNames));
-						AreaShop.warn("Remove these regions from AreaShop with '/as del' or recreate their regions in WorldGuard.");
-					}
-
-					boolean noWorldRegions = !noWorld.isEmpty();
-					while(!noWorld.isEmpty()) {
-						List<GeneralRegion> toDisplay = new ArrayList<>();
-						String missingWorld = noWorld.get(0).getWorldName();
-						toDisplay.add(noWorld.get(0));
-						for(int i=1; i<noWorld.size(); i++) {
-							if(noWorld.get(i).getWorldName().equalsIgnoreCase(missingWorld)) {
-								toDisplay.add(noWorld.get(i));
-							}
-						}
-						List<String> noWorldNames = new ArrayList<>();
-						for(GeneralRegion region : noRegion) {
-							noWorldNames.add(region.getName());
-						}
-						AreaShop.warn("World "+missingWorld+" is not loaded, the following AreaShop regions are not functional now: "+Utils.createCommaSeparatedList(noWorldNames));
-						noWorld.removeAll(toDisplay);
-					}
-					if(noWorldRegions) {
-						AreaShop.warn("Remove these regions from AreaShop with '/as del' or load the world(s) on the server again.");
-					}
-
-					if(!incorrectDuration.isEmpty()) {
-						List<String> incorrectDurationNames = new ArrayList<>();
-						for(GeneralRegion region : incorrectDuration) {
-							incorrectDurationNames.add(region.getName());
-						}
-						AreaShop.warn("The following regions have an incorrect time format as duration: "+Utils.createCommaSeparatedList(incorrectDurationNames));
-					}
-					plugin.setReady(true);
-				}
-			}.runTask(plugin);
-
+				}.runTask(plugin);
+			}
 		}
+	}
+
+	private void loadRegionFilesNow() {
+		File file = new File(regionsPath);
+		File[] regionFiles = file.listFiles();
+		if(regionFiles == null) {
+			plugin.setReady(true);
+			return;
+		}
+
+		List<String> noRegionType = new ArrayList<>();
+		List<String> noNamePaths = new ArrayList<>();
+		List<GeneralRegion> noWorld = new ArrayList<>();
+		List<GeneralRegion> noRegion = new ArrayList<>();
+		List<GeneralRegion> incorrectDuration = new ArrayList<>();
+		for(File regionFile : regionFiles) {
+			if(regionFile.exists() && regionFile.isFile()) {
+
+				// Load the region file from disk in UTF8 mode
+				YamlConfiguration config;
+				try(
+						InputStreamReader reader = new InputStreamReader(new FileInputStream(regionFile), Charsets.UTF_8)
+				) {
+					config = YamlConfiguration.loadConfiguration(reader);
+					if(config.getKeys(false).size() == 0) {
+						AreaShop.warn("Region file '"+regionFile.getName()+"' is empty, check for errors in the log.");
+					}
+				} catch(IOException e) {
+					AreaShop.warn("Something went wrong reading region file: "+regionFile.getAbsolutePath());
+					continue;
+				}
+
+				// Construct the correct type of region
+				String type = config.getString("general.type");
+				GeneralRegion region;
+				if(RegionType.RENT.getValue().equals(type)) {
+					region = new RentRegion(config);
+				} else if(RegionType.BUY.getValue().equals(type)) {
+					region = new BuyRegion(config);
+				} else {
+					noNamePaths.add(regionFile.getPath());
+					continue;
+				}
+
+				// Check consistency
+				boolean added = false;
+				if(region.getName() == null) {
+					noNamePaths.add(regionFile.getPath());
+				} else if(region.getWorld() == null) {
+					noWorld.add(region);
+				} else if(region.getRegion() == null) {
+					noRegion.add(region);
+				} else if(region instanceof RentRegion && !Utils.checkTimeFormat(((RentRegion)region).getDurationString())) {
+					incorrectDuration.add(region);
+				} else {
+					added = true;
+					if(region instanceof RentRegion) {
+						addRentNoSave((RentRegion)region);
+					} else if(region instanceof BuyRegion) {
+						addBuyNoSave((BuyRegion)region);
+					}
+				}
+				if(!added) {
+					region.destroy();
+				}
+			}
+		}
+
+		// All files are loaded, print problems to the console
+		if(!noRegionType.isEmpty()) {
+			AreaShop.warn("The following region files do no have a region type: "+Utils.createCommaSeparatedList(noRegionType));
+		}
+
+		if(!noNamePaths.isEmpty()) {
+			AreaShop.warn("The following region files do no have a name in their file: "+Utils.createCommaSeparatedList(noNamePaths));
+		}
+
+		if(!noRegion.isEmpty()) {
+			List<String> noRegionNames = new ArrayList<>();
+			for(GeneralRegion region : noRegion) {
+				noRegionNames.add(region.getName());
+			}
+			AreaShop.warn("AreaShop regions that are missing their WorldGuard region: "+Utils.createCommaSeparatedList(noRegionNames));
+			AreaShop.warn("Remove these regions from AreaShop with '/as del' or recreate their regions in WorldGuard.");
+		}
+
+		boolean noWorldRegions = !noWorld.isEmpty();
+		while(!noWorld.isEmpty()) {
+			List<GeneralRegion> toDisplay = new ArrayList<>();
+			String missingWorld = noWorld.get(0).getWorldName();
+			toDisplay.add(noWorld.get(0));
+			for(int i = 1; i < noWorld.size(); i++) {
+				if(noWorld.get(i).getWorldName().equalsIgnoreCase(missingWorld)) {
+					toDisplay.add(noWorld.get(i));
+				}
+			}
+			List<String> noWorldNames = new ArrayList<>();
+			for(GeneralRegion region : noRegion) {
+				noWorldNames.add(region.getName());
+			}
+			AreaShop.warn("World "+missingWorld+" is not loaded, the following AreaShop regions are not functional now: "+Utils.createCommaSeparatedList(noWorldNames));
+			noWorld.removeAll(toDisplay);
+		}
+		if(noWorldRegions) {
+			AreaShop.warn("Remove these regions from AreaShop with '/as del' or load the world(s) on the server again.");
+		}
+
+		if(!incorrectDuration.isEmpty()) {
+			List<String> incorrectDurationNames = new ArrayList<>();
+			for(GeneralRegion region : incorrectDuration) {
+				incorrectDurationNames.add(region.getName());
+			}
+			AreaShop.warn("The following regions have an incorrect time format as duration: "+Utils.createCommaSeparatedList(incorrectDurationNames));
+		}
+		plugin.setReady(true);
 	}
 	
 	

@@ -72,6 +72,8 @@ public class FindCommand extends CommandAreaShop {
 				return;
 			}
 		}
+
+		// Find buy regions
 		if(args[1].equalsIgnoreCase("buy")) {
 			List<BuyRegion> regions = plugin.getFileManager().getBuys();
 			List<BuyRegion> results = new ArrayList<>();
@@ -106,7 +108,10 @@ public class FindCommand extends CommandAreaShop {
 					plugin.message(player, "find-noneFound", "buy", Utils.formatCurrency(balance), onlyInGroup);
 				}
 			}
-		} else {
+		}
+
+		// Find rental regions
+		else {
 			List<RentRegion> regions = plugin.getFileManager().getRents();
 			List<RentRegion> results = new ArrayList<>();
 			for(RentRegion region : regions) {

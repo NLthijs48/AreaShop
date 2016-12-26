@@ -66,11 +66,8 @@ public class TeleportFeature extends RegionFeature {
 	 * @return true if the teleport succeeded, otherwise false
 	 */
 	public boolean teleportPlayer(Player player, boolean toSign, boolean checkPermissions) {
-		int checked = 1;
-		boolean owner;
-		boolean friend = region.getFriendsFeature().getFriends().contains(player.getUniqueId());
-		boolean available = region.isAvailable();
-		ProtectedRegion wRegion = region.getRegion();
+
+		// Check basics
 		if(region.getWorld() == null) {
 			region.message(player, "general-noWorld");
 			return false;
@@ -79,9 +76,18 @@ public class TeleportFeature extends RegionFeature {
 			region.message(player, "general-noRegion");
 			return false;
 		}
-		owner = player.getUniqueId().equals(region.getOwner());
 
+		// Check correct world
+		if(!region.getBooleanSetting("general.teleportCrossWorld") && !player.getWorld().equals(region.getWorld())) {
+			region.message(player, "teleport-wrongWorld", player.getWorld().getName());
+			return false;
+		}
+
+		ProtectedRegion wRegion = region.getRegion();
 		if(checkPermissions) {
+			boolean owner = player.getUniqueId().equals(region.getOwner());
+			boolean friend = region.getFriendsFeature().getFriends().contains(player.getUniqueId());
+			boolean available = region.isAvailable();
 			// Teleport to sign instead if they dont have permission for teleporting to region
 			if((!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
 					|| !toSign && !owner && !friend && !player.hasPermission("areashop.teleportall") && player.hasPermission("areashop.teleportsignall")
@@ -129,20 +135,26 @@ public class TeleportFeature extends RegionFeature {
 		} else {
 			insideRegion = region.getBooleanSetting("general.teleportIntoRegion");
 		}
-		int maxTries = plugin.getConfig().getInt("maximumTries");
 
 		// Check locations starting from startLocation and then a cube that increases
 		// radius around that (until no block in the region is found at all cube sides)
 		Location safeLocation = startLocation;
-		int radius = 1;
 		boolean blocksInRegion = wRegion.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
 		if(!blocksInRegion && insideRegion) {
 			region.message(player, "teleport-blocked");
 			return false;
 		}
+
+		// Tries limit tracking
+		int radius = 1;
+		int checked = 1;
+		int maxTries = plugin.getConfig().getInt("maximumTries");
+
+		// Tracking of which sides to continue the search
 		boolean done = isSafe(safeLocation) && ((blocksInRegion && insideRegion) || (!insideRegion));
 		boolean northDone = false, eastDone = false, southDone = false, westDone = false, topDone = false, bottomDone = false;
 		boolean continueThisDirection;
+
 		while(((blocksInRegion && insideRegion) || (!insideRegion)) && !done) {
 			blocksInRegion = false;
 

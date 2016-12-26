@@ -62,10 +62,10 @@ public class TeleportFeature extends RegionFeature {
 	 * Teleport a player to the region or sign
 	 * @param player           Player that should be teleported
 	 * @param toSign           true to teleport to the first sign of the region, false for teleporting to the region itself
-	 * @param checkPermissions Set to true if teleport permissions should be checked, false otherwise
+	 * @param checkRestrictions Set to true if teleport permissions should be checked, false otherwise, also toggles cross-world check
 	 * @return true if the teleport succeeded, otherwise false
 	 */
-	public boolean teleportPlayer(Player player, boolean toSign, boolean checkPermissions) {
+	public boolean teleportPlayer(Player player, boolean toSign, boolean checkRestrictions) {
 
 		// Check basics
 		if(region.getWorld() == null) {
@@ -77,14 +77,15 @@ public class TeleportFeature extends RegionFeature {
 			return false;
 		}
 
-		// Check correct world
-		if(!region.getBooleanSetting("general.teleportCrossWorld") && !player.getWorld().equals(region.getWorld())) {
-			region.message(player, "teleport-wrongWorld", player.getWorld().getName());
-			return false;
-		}
 
 		ProtectedRegion wRegion = region.getRegion();
-		if(checkPermissions) {
+		if(checkRestrictions) {
+			// Check correct world
+			if(!region.getBooleanSetting("general.teleportCrossWorld") && !player.getWorld().equals(region.getWorld())) {
+				region.message(player, "teleport-wrongWorld", player.getWorld().getName());
+				return false;
+			}
+
 			boolean owner = player.getUniqueId().equals(region.getOwner());
 			boolean friend = region.getFriendsFeature().getFriends().contains(player.getUniqueId());
 			boolean available = region.isAvailable();

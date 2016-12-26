@@ -79,8 +79,9 @@ public class FindCommand extends CommandAreaShop {
 			List<BuyRegion> results = new ArrayList<>();
 			for(BuyRegion region : regions) {
 				if(!region.isSold() 
-						&& ((region.getPrice() <= balance && !maxPriceSet) || (region.getPrice() <= maxPrice && maxPriceSet)) 
-						&& (group == null || group.isMember(region))) {
+						&& ((region.getPrice() <= balance && !maxPriceSet) || (region.getPrice() <= maxPrice && maxPriceSet))
+						&& (group == null || group.isMember(region))
+						&& (region.getBooleanSetting("general.findCrossWorld") || player.getWorld().equals(region.getWorld()))) {
 					results.add(region);
 				}
 			}
@@ -91,6 +92,8 @@ public class FindCommand extends CommandAreaShop {
 				if(group != null) {
 					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}
+
+				// Teleport
 				if(maxPriceSet) {
 					plugin.message(player, "find-successMax", "buy", Utils.formatCurrency(maxPrice), onlyInGroup, region);
 				} else {
@@ -117,7 +120,8 @@ public class FindCommand extends CommandAreaShop {
 			for(RentRegion region : regions) {
 				if(!region.isRented() 
 						&& ((region.getPrice() <= balance && !maxPriceSet) || (region.getPrice() <= maxPrice && maxPriceSet))
-						&& (group == null || group.isMember(region))) {
+						&& (group == null || group.isMember(region))
+						&& (region.getBooleanSetting("general.findCrossWorld") || player.getWorld().equals(region.getWorld()))) {
 					results.add(region);
 				}
 			}
@@ -128,6 +132,8 @@ public class FindCommand extends CommandAreaShop {
 				if(group != null) {
 					onlyInGroup = Message.fromKey("find-onlyInGroup").replacements(args[3]);
 				}
+
+				// Teleport
 				if(maxPriceSet) {
 					plugin.message(player, "find-successMax", "rent", Utils.formatCurrency(maxPrice), onlyInGroup, region);
 				} else {

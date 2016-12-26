@@ -21,9 +21,10 @@ public class Message {
 	public static final String VARIABLEEND = "%";
 	public static final String LANGUAGEVARIABLE = "lang:";
 	public static final String CHATLANGUAGEVARIABLE = "prefix";
-	public static final int REPLACEMENTLIMIT = 50; // Maximum number of replacement rounds (the replaced value can have variables again)
+	public static final int REPLACEMENTLIMIT = 100; // Maximum number of replacement rounds (the replaced value can have variables again)
 	public static final int MAXIMUMJSONLENGTH = 30000; // Limit of the client is 32767 for the complete message
 	private static boolean fancyWorks = true;
+	private static final Pattern variablePattern = Pattern.compile(Pattern.quote(VARIABLESTART)+"[a-zA-Z]+"+Pattern.quote(VARIABLEEND));
 
 	private List<String> message;
 	private Object[] replacements;
@@ -287,38 +288,68 @@ public class Message {
 	 * @return this
 	 */
 	public Message doReplacements() {
-		return doReplacements(new Limit(REPLACEMENTLIMIT, this));
+		Limit limit = new Limit(REPLACEMENTLIMIT, this);
+		doReplacements(limit);
+		//depthPrint(limit, "Replacing took", System.currentTimeMillis()-limit.started, "milliseconds", this);
+		return this;
 	}
 
 	private Message doReplacements(Limit limit) {
+		if(limit.reached()) {
+			return this;
+		}
+
+		limit.depth++;
+
+		//depthPrint(limit, ">>> doReplacements:", message, limit);
 		// Replace variables until they are all gone, or when the limit is reached
 		Pattern variable = Pattern.compile(Pattern.quote(VARIABLESTART)+"[a-zA-Z]+"+Pattern.quote(VARIABLEEND));
 
 		try {
-			boolean shouldReplace = true;
-			while(shouldReplace) {
-				List<String> original = new ArrayList<>(message);
-
+			List<String> outerOriginal;
+			// Repeat replacements for if language replacements introduced new variables
+			int fullRounds = 0;
+			do {
+				outerOriginal = new ArrayList<>(message);
+				List<String> innerOriginal;
 				limit.left--;
 				if(limit.reached()) {
-					if(!limit.notified) {
-						limit.notified = true;
-						AreaShop.error("Reached replacement limit, probably has replacements loops, problematic message key: "+limit.message.key+", first characters of the message: "+Utils.getMessageStart(limit.message, 100));
-					}
 					break;
 				}
-				replaceArgumentVariables(limit);
+
+				// Do argument replacements
+				do {
+					innerOriginal = new ArrayList<>(message);
+					if(limit.reached()) {
+						break;
+					}
+					replaceArgumentVariables(limit);
+				} while(!message.equals(innerOriginal));
+
+				// Do language replacements
 				if(doLanguageReplacements) {
-					replaceLanguageVariables(limit);
+					do {
+						innerOriginal = new ArrayList<>(message);
+						if(limit.reached()) {
+							break;
+						}
+						replaceLanguageVariables(limit);
+					} while(!message.equals(innerOriginal));
 				}
 
-				shouldReplace = !message.equals(original);
+				fullRounds++;
+			} while(!message.equals(outerOriginal));
+
+			// Increase limit by one to compensate for the last round where no replacements have been done
+			if(!limit.reached() && fullRounds >= 1) {
+				limit.left++;
 			}
 		} catch(StackOverflowError e) {
 			limit.left = 0;
 			limit.notified = true;
-			AreaShop.error("Too many recursive replacements for message with key: "+limit.message.key+" (probably includes itself as replacement), start of the message: "+Utils.getMessageStart(limit.message, 100));
+			AreaShop.error("Too many recursive replacements for message with key: "+limit.message.key+" (probably includes itself as replacement), start of the message: "+Utils.getMessageStart(limit.message, 200));
 		}
+		limit.depth--;
 		return this;
 	}
 
@@ -329,78 +360,149 @@ public class Message {
 	 * - Else the parameter will replace its number surrounded with VARIABLESTART and VARIABLEEND
 	 */
 	private void replaceArgumentVariables(Limit limit) {
+		limit.depth++;
+		//depthPrint(limit, ">>> replaceArgumentVariables:", message, limit);
 		if(message == null || message.size() == 0 || replacements == null || limit.reached()) {
+			//depthPrint(limit, "quick return");
+			limit.depth--;
 			return;
 		}
-		Pattern variablePattern = Pattern.compile(Pattern.quote(VARIABLESTART)+"[a-zA-Z]+"+Pattern.quote(VARIABLEEND));
+
 		for(int i = 0; i < message.size(); i++) {
 			int number = 0;
 			for(Object param : replacements) {
 				String line = message.get(i);
 				if(param != null) {
 					if(param instanceof ReplacementProvider) {
+						// Find the first non-escaped named variable
 						Matcher matcher = variablePattern.matcher(line);
-						if(matcher.find()) {
+						int startAt = 0;
+						while(matcher.find()) {
+							// Check for escaping
+							int beforeAt = matcher.start()-1;
+							if(beforeAt >= 0 && line.charAt(beforeAt) == FancyMessageFormat.ESCAPE_CHAR) {
+								//depthPrint(limit, "skipping named variable:", matcher.group(), limit);
+								continue;
+							}
+							//depthPrint(limit, "replacing named variable:", matcher.group());
+
+							// Insert replacement provided by the ReplacementProvider
 							Object replacement = ((ReplacementProvider)param).provideReplacement(matcher.group().substring(1, matcher.group().length()-1));
 							if(replacement != null) {
 								String result = "";
+								// Prefix
 								if(matcher.start() > 0) {
 									result += line.substring(0, matcher.start());
 								}
-								result += replacement.toString();
+								// Replacement
+								String add = replacement.toString();
+								result += add;
+								// Suffix
 								if(matcher.end() < line.length()) {
 									result += line.substring(matcher.end());
 								}
+
 								message.set(i, result);
+								line = result;
+								int matcherStart = matcher.start();
+								matcher = variablePattern.matcher(line);
+								matcher.region(matcherStart+add.length(), line.length());
 							}
 						}
-					} else if(param instanceof Message) {
+					} else {
+						// Find first non-escaped numbered variable
 						Pattern indexPattern = Pattern.compile(Pattern.quote(VARIABLESTART)+number+Pattern.quote(VARIABLEEND));
 						Matcher matcher = indexPattern.matcher(line);
-						if(matcher.find()) { // Only replaces one occurance of the variable, others will be done next round
-							int startDiff = message.size()-i;
-							List<String> insertMessage = ((Message)param).get(limit);
-							if(limit.reached()) {
-								return;
+						while(matcher.find()) {
+							// Check for escaping
+							int beforeAt = matcher.start()-1;
+							if(beforeAt >= 0 && line.charAt(beforeAt) == FancyMessageFormat.ESCAPE_CHAR) {
+								//depthPrint(limit, "skipping indexed variable:", matcher.group(), limit);
+								continue;
 							}
-							FancyMessageFormat.insertMessage(message, insertMessage, i, matcher.start(), matcher.end());
-							// Skip to end of insert
-							i = message.size()-startDiff;
+							//depthPrint(limit, "replacing indexed variable:", matcher.group());
+
+							// Insert another Message
+							if(param instanceof Message) {
+								int startDiff = message.size()-i;
+								//depthPrint(limit, "insert message raw:", ((Message)param).message);
+								List<String> insertMessage = ((Message)param).get(limit);
+								//depthPrint(limit, "insert message resolved:", ((Message)param).message);
+								if(limit.reached()) {
+									limit.depth--;
+									return;
+								}
+								FancyMessageFormat.insertMessage(message, insertMessage, i, matcher.start(), matcher.end());
+								// Skip to end of insert
+								i = message.size()-startDiff;
+							}
+
+							// Insert a simple string
+							else {
+								// Only replace matched variable
+								//depthPrint(limit, "insert string:", param.toString());
+								String newMessage = "";
+								if(matcher.start() > 0) {
+									newMessage += line.substring(0, matcher.start());
+								}
+								newMessage += FancyMessageFormat.escape(param.toString()); // Assuming this might be user input, therefore escaping it
+								if(matcher.end() < line.length()) {
+									newMessage += line.substring(matcher.end());
+								}
+								message.set(i, newMessage);
+							}
+							break; // Maximum of one replacement
 						}
-						number++;
-					} else {
-						message.set(i, message.get(i).replace(VARIABLESTART+number+VARIABLEEND, param.toString()));
 						number++;
 					}
 				}
 			}
 		}
+		limit.depth--;
 	}
 
 	/**
 	 * Replace all language variables in a message
 	 */
 	private void replaceLanguageVariables(Limit limit) {
+		limit.depth++;
+		//depthPrint(limit, ">>> replaceLanguageVariables:", message, limit);
 		if(message == null || message.size() == 0 || limit.reached()) {
+			//depthPrint(limit, "quick return");
+			limit.depth--;
 			return;
 		}
 
 		Pattern variables = Pattern.compile(
 				Pattern.quote(VARIABLESTART)+
-						Pattern.quote(LANGUAGEVARIABLE)+"[a-zA-Z-]+"+        // Language key
-						"(\\|(.*?\\|)+)?"+                                    // Optional message arguments
+						Pattern.quote(LANGUAGEVARIABLE)+"[a-zA-Z-]+"+    // Language key
+						"(\\|(.*?\\|)+)?"+                                // Optional message arguments
 						Pattern.quote(VARIABLEEND)
 		);
 
 		for(int i = 0; i < message.size(); i++) {
-			Matcher matches = variables.matcher(message.get(i));
-			if(matches.find()) {
-				String variable = matches.group();
+			Matcher matcher = variables.matcher(message.get(i));
+			while(matcher.find()) {
+				// Check for escaping
+				int beforeAt = matcher.start()-1;
+				if(beforeAt >= 0 && message.get(i).charAt(beforeAt) == FancyMessageFormat.ESCAPE_CHAR) {
+					//depthPrint(limit, "skipping variable:", matcher.group(), limit);
+					continue;
+				}
+				//depthPrint(limit, "replacing variable:", matcher.group());
+
+				// Parse arguments
+				String variable = matcher.group();
 				String key;
 				Object[] arguments = null;
 				if(variable.contains("|")) {
 					key = variable.substring(VARIABLESTART.length()+LANGUAGEVARIABLE.length(), variable.indexOf("|"));
-					arguments = variable.substring(variable.indexOf("|")+1, variable.length()-VARIABLEEND.length()).split("\\|");
+					String[] stringArguments = variable.substring(variable.indexOf("|")+1, variable.length()-VARIABLEEND.length()).split("\\|");
+					// Wrap arguments in Message object to prevent escaping
+					arguments = new Message[stringArguments.length];
+					for(int argumentIndex = 0; argumentIndex < stringArguments.length; argumentIndex++) {
+						arguments[argumentIndex] = Message.fromString(stringArguments[argumentIndex]);
+					}
 				} else {
 					key = variable.substring(VARIABLESTART.length()+LANGUAGEVARIABLE.length(), variable.length()-VARIABLEEND.length());
 				}
@@ -413,13 +515,16 @@ public class Message {
 				int startDiff = message.size()-i;
 				List<String> insertMessage = insert.get(limit);
 				if(limit.reached()) {
+					limit.depth--;
 					return;
 				}
-				FancyMessageFormat.insertMessage(message, insertMessage, i, matches.start(), matches.end());
+				FancyMessageFormat.insertMessage(message, insertMessage, i, matcher.start(), matcher.end());
 				// Skip to end of insert
 				i = message.size()-startDiff;
+				break; // Maximum of one replacement
 			}
 		}
+		limit.depth--;
 	}
 
 	@Override
@@ -432,17 +537,22 @@ public class Message {
 	 * Class to store a limit
 	 */
 	private class Limit {
-		public int left = 0;
+		public int left;
+		public int depth;
 		public boolean notified = false;
 		public Message message;
+		public long started;
 
 		/**
 		 * Set the initial limit
 		 * @param count The limit to use
+		 * @param message The message this limit is started for
 		 */
 		public Limit(int count, Message message) {
-			left = count;
+			this.left = count;
+			this.depth = 0;
 			this.message = message;
+			this.started = System.currentTimeMillis();
 		}
 
 		/**
@@ -450,7 +560,17 @@ public class Message {
 		 * @return true if the limit is reached, otherwise false
 		 */
 		public boolean reached() {
-			return left <= 0;
+			boolean reached = left <= 0;
+			if(reached && !notified) {
+				notified = true;
+				AreaShop.error("Reached replacement limit, probably has replacements loops, problematic message key: "+message.key+", first characters of the message: "+Utils.getMessageStart(message, 200));
+			}
+			return reached;
+		}
+
+		@Override
+		public String toString() {
+			return "Limit(left: "+left+", notified: "+notified+", depth: "+depth+", message.key: "+message.key+")";
 		}
 	}
 
@@ -464,5 +584,21 @@ public class Message {
 		 * @return The replacement for the variable, or null if empty
 		 */
 		Object provideReplacement(String variable);
+	}
+
+	/**
+	 * Debug method to print indented messages
+	 * @param limit   The limit to use for the depth
+	 * @param message The message to print indented
+	 */
+	private void depthPrint(Limit limit, Object... message) {
+		String indent = "";
+		for(int i = 0; i < limit.depth; i++) {
+			indent += "  ";
+		}
+		Object[] iMessage = new Object[message.length+1];
+		iMessage[0] = indent;
+		System.arraycopy(message, 0, iMessage, 1, message.length);
+		AreaShop.debug(iMessage);
 	}
 }

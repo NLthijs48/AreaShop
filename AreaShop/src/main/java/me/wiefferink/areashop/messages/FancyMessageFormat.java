@@ -16,6 +16,7 @@ public class FancyMessageFormat {
 	private static final char TAG_BEFORE = '[';
 	private static final char TAG_AFTER = ']';
 	private static final char END_TAG_INDICATOR = '/';
+	public static final char ESCAPE_CHAR = '\\';
 
 	/**
 	 * The special character that prefixes all basic chat formatting codes.
@@ -203,6 +204,39 @@ public class FancyMessageFormat {
 	}
 
 
+	// Map to denote escape mappings
+	private static final List<String> toEscape = Arrays.asList(
+			ESCAPE_CHAR+"",    // Used for escapes, must be first
+			"%",            // Variables
+			"]",            // Formatting and control tags
+			"&",            // Traditional color formatting
+			SIMPLE_FORMAT_PREFIX_CHAR+"" // Legacy formatting tags
+	);
+
+	/**
+	 * Escape a (user provided) string for including it in a message
+	 * @param message The message part to escape
+	 * @return The escaped message part
+	 */
+	public static String escape(String message) {
+		for(String escape : toEscape) {
+			message = message.replace(escape, ESCAPE_CHAR+escape);
+		}
+		return message;
+	}
+
+	/**
+	 * Reverse the escaping of control characters in a (user provided) string
+	 * @param message The message part to escape
+	 * @return The escaped message part
+	 */
+	public static String unescape(String message) {
+		for(String escape : toEscape) {
+			message = message.replace(ESCAPE_CHAR+escape, escape);
+		}
+		return message;
+	}
+
 	// ------------------------------------------------------------------------------------------
 	// -------------------------------     Private functions      -------------------------------
 	// ------------------------------------------------------------------------------------------
@@ -232,11 +266,22 @@ public class FancyMessageFormat {
 	}
 
 
+	/**
+	 * Parse input lines to the internal representation format
+	 * @param inputLines The input lines to parse
+	 * @return A list of InteractiveMessagePart objects representing the message
+	 */
 	private static LinkedList<InteractiveMessagePart> parse(Iterable<String> inputLines) {
 		return parse(inputLines, true);
 	}
 
-	private static LinkedList<InteractiveMessagePart> parse(final Iterable<String> inputLines, boolean doInteractives) {
+	/**
+	 * Parse input lines to the internal representation format
+	 * @param inputLines     The input lines to parse
+	 * @param doInteractives true to parse interactive lines (click, hover, etc), false to skip them (for example for console messgages)
+	 * @return A list of InteractiveMessagePart objects representing the message
+	 */
+	private static LinkedList<InteractiveMessagePart> parse(Iterable<String> inputLines, boolean doInteractives) {
 		LinkedList<InteractiveMessagePart> message = new LinkedList<>();
 
 		Color currentColor = null;
@@ -312,7 +357,7 @@ public class FancyMessageFormat {
 					// Add a text part with the correct formatting
 					if(!textToAdd.isEmpty()) {
 						TextMessagePart part = new TextMessagePart();
-						part.text = textToAdd;
+						part.text = unescape(textToAdd);
 						part.formatTypes = new HashSet<>(currentLineFormatting);
 						part.color = currentLineColor;
 						targetList.add(part);
@@ -369,12 +414,17 @@ public class FancyMessageFormat {
 	 * Null if nothing is found.
 	 */
 	private static TaggedContent getNextTag(String line, boolean parseBreak) {
+		// TODO do something with parseBreak or remove
 		Pattern pattern = Pattern.compile("\\[[/a-zA-Z1-9]+\\]|[&"+SIMPLE_FORMAT_PREFIX_CHAR+"][1-9abcdeflonskr]");
 		Matcher matcher = pattern.matcher(line);
-		// TODO Fix for escape things, and something with parseBreak?
 		while(matcher.find()) {
 			Tag tag = null;
 			if(matcher.group().startsWith("&") || matcher.group().startsWith(SIMPLE_FORMAT_PREFIX_CHAR+"")) {
+				// Skip escaped color tags
+				if(matcher.start() > 0 && line.charAt(matcher.start()-1) == ESCAPE_CHAR) {
+					continue;
+				}
+
 				for(Color color : Color.class.getEnumConstants()) {
 					if(color.getNativeFormattingCode() == matcher.group().charAt(1)) {
 						tag = color;
@@ -397,46 +447,14 @@ public class FancyMessageFormat {
 			}
 		}
 		return null;
-
-		/*
-		for(int startIndex = 0; startIndex < line.length(); startIndex++) {
-			int start = line.indexOf(TAG_BEFORE, startIndex);
-			if(start != -1) {
-				int end = line.indexOf(TAG_AFTER, start);
-				if(end != -1) {
-					String inBetween = line.substring(start+1, end).toLowerCase();
-					if(BRACKET_TAG_LIST.containsKey(inBetween)) {
-						Tag tag = BRACKET_TAG_LIST.get(inBetween);
-						if(tag == ControlTag.ESCAPE) {
-							// Ignore next char
-							line = line.substring(0, start)+line.substring(end+1);
-							startIndex = start;
-						} else if(!parseBreak && tag == ControlTag.ESCAPE) {
-							// Ignore break
-							startIndex = end+1;
-						} else {
-							String previousContent = line.substring(0, start);
-							String subsequentContent = line.substring(end+1);
-							return new TaggedContent(previousContent, tag, subsequentContent);
-						}
-					} else {
-						startIndex = start;
-					}
-				} else {
-					return null;
-				}
-			} else {
-				return null;
-			}
-		}
-		return null;
-		*/
 	}
 
 
 	/**
 	 * If the given line defines an interactive property (e.g. "hover: myText")
 	 * the tag / property will be returned. Otherwise null is returned.
+	 * @param line The line to try and get the interactive tag for
+	 * @return TaggedContent object with the interactive tag type and split or null if not found
 	 */
 	private static TaggedContent getInteractiveTag(String line) {
 		for(int index = 0; index < line.length(); index++) {
@@ -459,7 +477,6 @@ public class FancyMessageFormat {
 		return null;
 	}
 
-
 	/**
 	 * Check if a line is an advanced declaration like hover or command
 	 * @param line The line to check
@@ -469,17 +486,16 @@ public class FancyMessageFormat {
 		return getInteractiveTag(line) != null;
 	}
 
-
 	/**
 	 * Produce a string in double quotes with backslash sequences in all the
 	 * right places.
+	 *
+	 * Copyright (c) 2002 JSON.org
+	 * Licensed under the Apache License, Version 2.0
+	 *
 	 * @param string A String
 	 * @param sb The StringBuilder to add the quoted string to
 	 * @return A String correctly formatted for insertion in a JSON text.
-	 */
-	/*
-	 * Copyright (c) 2002 JSON.org
-	 * Licensed under the Apache License, Version 2.0
 	 */
 	private static StringBuilder quoteStringJson(String string, StringBuilder sb) {
 		if(string == null || string.length() == 0) {
@@ -538,12 +554,20 @@ public class FancyMessageFormat {
 	// -------------------------------       Helper classes       -------------------------------
 	// ------------------------------------------------------------------------------------------
 
-
+	/**
+	 * Represents a tag that has been found in a line
+	 */
 	private static class TaggedContent {
 		final String precedingContent;
 		final Tag tag;
 		final String subsequentContent;
 
+		/**
+		 * Constructor
+		 * @param pre Content that appeared before the tag
+		 * @param tag The Tag that has been found (formatting or control)
+		 * @param sub Content found after the tag
+		 */
 		public TaggedContent(String pre, Tag tag, String sub) {
 			this.precedingContent = pre;
 			this.tag = tag;
@@ -583,8 +607,8 @@ public class FancyMessageFormat {
 
 		/**
 		 * Get a JSON component for this message part
-		 * @param sb The StringBuilder to append the result to
-		 * @return This part formatted in JSON
+		 * @param sb The StringBuilder to append the JSON result to
+		 * @return The StringBuilder where the result has been appended to
 		 */
 		StringBuilder toJSON(StringBuilder sb) {
 			sb.append('{');
@@ -602,6 +626,10 @@ public class FancyMessageFormat {
 			return sb;
 		}
 
+		/**
+		 * Check if this part has formatting
+		 * @return true if this part has formatting, otherwise false
+		 */
 		boolean hasFormatting() {
 			return !(color == Color.WHITE && formatTypes.isEmpty());
 		}
@@ -646,7 +674,7 @@ public class FancyMessageFormat {
 		/**
 		 * Get a JSON component for this message part
 		 * @param sb The StringBuilder to append the result to
-		 * @return This part formatted in JSON
+		 * @return The StringBuilder where the JSON has been appended to
 		 */
 		StringBuilder toJSON(StringBuilder sb) {
 			// Error case, should never happen, print something as safeguard
@@ -710,9 +738,7 @@ public class FancyMessageFormat {
 		}
 	}
 
-
 	// --------------------------------------- Tags ---------------------------------------
-
 
 	interface Tag {
 		/**
@@ -721,27 +747,27 @@ public class FancyMessageFormat {
 		String[] getTags();
 	}
 
-
 	/**
 	 * Indicates formatting that is applied until explicitly stopped.
 	 * Can also be used in simple Minecraft messages (Non-JSON).
 	 */
 	interface ContinuousTag extends Tag {
 		/**
-		 * The character that defines upcoming formatting in a native (non-JSON) Minecraft message.
+		 * @return The character that defines upcoming formatting in a native (non-JSON) Minecraft message.
 		 */
 		char getNativeFormattingCode();
 	}
-
 
 	/**
 	 * Indicates formatting that allows cursor interaction. Requires the
 	 * Minecraft JSON / tellraw format.
 	 */
 	interface InteractiveMessageTag extends Tag {
+		/**
+		 * @return The key that this tag should use in JSON format
+		 */
 		String getJsonKey();
 	}
-
 
 	enum Color implements ContinuousTag {
 		WHITE('f'),
@@ -848,7 +874,6 @@ public class FancyMessageFormat {
 
 	enum ControlTag implements Tag {
 		BREAK("break"),
-		ESCAPE("esc"),
 		RESET("reset");
 
 		private final String[] tags;

@@ -154,7 +154,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Shared setup of all constructors
 	 */
 	public void setup() {
-		features = plugin.getFeatureManager().getRegionFeatures(this);
+		features = new HashMap<>();
 	}
 
 	/**
@@ -167,11 +167,25 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	}
 
 	/**
+	 * Get a feature of this region
+	 * @param clazz The class of the feature to get
+	 * @return The feature (either just instanciated or cached)
+	 */
+	public RegionFeature getFeature(Class<? extends RegionFeature> clazz) {
+		RegionFeature result = features.get(clazz);
+		if(result == null) {
+			result = plugin.getFeatureManager().getRegionFeature(this, clazz);
+			features.put(clazz, result);
+		}
+		return result;
+	}
+
+	/**
 	 * Get the friends feature to query and manipulate friends of this region
 	 * @return The FriendsFeature of this region
 	 */
 	public FriendsFeature getFriendsFeature() {
-		return (FriendsFeature)features.get(FriendsFeature.class);
+		return (FriendsFeature)getFeature(FriendsFeature.class);
 	}
 
 	/**
@@ -179,7 +193,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return The SignsFeature of this region
 	 */
 	public SignsFeature getSignsFeature() {
-		return (SignsFeature)features.get(SignsFeature.class);
+		return (SignsFeature)getFeature(SignsFeature.class);
 	}
 
 	/**
@@ -187,7 +201,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return The TeleportFeature
 	 */
 	public TeleportFeature getTeleportFeature() {
-		return (TeleportFeature)features.get(TeleportFeature.class);
+		return (TeleportFeature)getFeature(TeleportFeature.class);
 	}
 		
 	// ABSTRACT
@@ -1403,13 +1417,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				}
 			}
 			if(!printed) {
-				if(error == null) {
-					AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", result=" + result);
-				} else {
-					AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command + ", error=" + error + ", stacktrace:");
-					AreaShop.debug(stacktrace);
-					AreaShop.debug("--- End of stacktrace ---");
-				}
+				AreaShop.debug("Command run, executor="+sender.getName()+", command=" + command);
 			}
 		}
 	}

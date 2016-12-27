@@ -59,20 +59,18 @@ public class FeatureManager extends Manager {
 	}
 
 	/**
-	 * Get instances of all features for a specific region
-	 * @param region The region to create features for
-	 * @return A map with all features
+	 * Instanciate a feature for a certain region
+	 * @param region The region to create a feature for
+	 * @param featureClazz The class of the feature to create
+	 * @return The feature class
 	 */
-	public Map<Class<? extends RegionFeature>, RegionFeature> getRegionFeatures(GeneralRegion region) {
-		Map<Class<? extends RegionFeature>, RegionFeature> result = new HashMap<>();
-		for(Class<? extends RegionFeature> clazz : regionFeatureConstructors.keySet()) {
-			try {
-				result.put(clazz, regionFeatureConstructors.get(clazz).newInstance(region));
-			} catch(InstantiationException|InvocationTargetException|IllegalAccessException|IllegalArgumentException e) {
-				AreaShop.error("Failed to instanciate feature", clazz, "for region", region);
-			}
+	public RegionFeature getRegionFeature(GeneralRegion region, Class<? extends RegionFeature> featureClazz) {
+		try {
+			return regionFeatureConstructors.get(featureClazz).newInstance(region);
+		} catch(InstantiationException|InvocationTargetException|IllegalAccessException|IllegalArgumentException e) {
+			AreaShop.error("Failed to instanciate feature", featureClazz, "for region", region);
 		}
-		return result;
+		return null;
 	}
 
 }

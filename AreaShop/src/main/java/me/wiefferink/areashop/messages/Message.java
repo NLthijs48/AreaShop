@@ -30,6 +30,7 @@ public class Message {
 	private Object[] replacements;
 	private String key = null;
 	private boolean doLanguageReplacements = true;
+	private boolean inline = false;
 
 	/**
 	 * Internal use only
@@ -193,6 +194,15 @@ public class Message {
 	 */
 	public Message noLanguageReplacements() {
 		doLanguageReplacements = false;
+		return this;
+	}
+
+	/**
+	 * Mark this message as inline, used for insertion into other messages
+	 * @return this
+	 */
+	public Message inline() {
+		inline = true;
 		return this;
 	}
 
@@ -426,30 +436,32 @@ public class Message {
 							if(param instanceof Message) {
 								int startDiff = message.size()-i;
 								//depthPrint(limit, "insert message raw:", ((Message)param).message);
-								List<String> insertMessage = ((Message)param).get(limit);
-								//depthPrint(limit, "insert message resolved:", ((Message)param).message);
-								if(limit.reached()) {
-									limit.depth--;
-									return;
+								Message mParam = (Message)param;
+
+								// Insert inline
+								if(mParam.inline) {
+									message.set(i, insert(line, mParam.getSingle(), matcher.start(), matcher.end()));
 								}
-								FancyMessageFormat.insertMessage(message, insertMessage, i, matcher.start(), matcher.end());
-								// Skip to end of insert
-								i = message.size()-startDiff;
+
+								// Insert as message
+								else {
+									List<String> insertMessage = ((Message)param).get(limit);
+									//depthPrint(limit, "insert message resolved:", ((Message)param).message);
+									if(limit.reached()) {
+										limit.depth--;
+										return;
+									}
+									FancyMessageFormat.insertMessage(message, insertMessage, i, matcher.start(), matcher.end());
+									// Skip to end of insert
+									i = message.size()-startDiff;
+								}
 							}
 
 							// Insert a simple string
 							else {
-								// Only replace matched variable
+								// Insert it inline, assuming this might be user input, therefore escaping it
 								//depthPrint(limit, "insert string:", param.toString());
-								String newMessage = "";
-								if(matcher.start() > 0) {
-									newMessage += line.substring(0, matcher.start());
-								}
-								newMessage += FancyMessageFormat.escape(param.toString()); // Assuming this might be user input, therefore escaping it
-								if(matcher.end() < line.length()) {
-									newMessage += line.substring(matcher.end());
-								}
-								message.set(i, newMessage);
+								message.set(i, insert(line, FancyMessageFormat.escape(param.toString()), matcher.start(), matcher.end()));
 							}
 							break; // Maximum of one replacement
 						}
@@ -459,6 +471,26 @@ public class Message {
 			}
 		}
 		limit.depth--;
+	}
+
+	/**
+	 * Insert a string into another one, replacing a part of the base
+	 * @param base   The base string to insert into
+	 * @param insert The string to insert
+	 * @param start  The start of the region to replace
+	 * @param end    The end of the region to replace
+	 * @return The formatted string
+	 */
+	private String insert(String base, String insert, int start, int end) {
+		String newMessage = "";
+		if(start > 0) {
+			newMessage += base.substring(0, start);
+		}
+		newMessage += insert;
+		if(end < base.length()) {
+			newMessage += base.substring(end);
+		}
+		return newMessage;
 	}
 
 	/**
@@ -501,7 +533,8 @@ public class Message {
 					// Wrap arguments in Message object to prevent escaping
 					arguments = new Message[stringArguments.length];
 					for(int argumentIndex = 0; argumentIndex < stringArguments.length; argumentIndex++) {
-						arguments[argumentIndex] = Message.fromString(stringArguments[argumentIndex]);
+						// Marks as inline to prevent spreading the language variable onto multiple lines
+						arguments[argumentIndex] = Message.fromString(stringArguments[argumentIndex]).inline();
 					}
 				} else {
 					key = variable.substring(VARIABLESTART.length()+LANGUAGEVARIABLE.length(), variable.length()-VARIABLEEND.length());

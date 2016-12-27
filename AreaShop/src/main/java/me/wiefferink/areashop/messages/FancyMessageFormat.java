@@ -179,11 +179,13 @@ public class FancyMessageFormat {
 			message.add(line, lineContent.substring(0, start)+convertToConsole(insert)+lineContent.substring(end));
 			return;
 		}
+
 		// Find interactive lines meant for this message
 		List<String> interactives = new ArrayList<>();
 		while(line < message.size() && isTaggedInteractive(message.get(line))) {
 			interactives.add(message.remove(line));
 		}
+
 		// Split the line and add the parts
 		int at = line;
 		if(start > 0) {

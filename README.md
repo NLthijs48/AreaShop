@@ -29,24 +29,27 @@
 
 ***
 
-This plugin is for giving players the option to rent or buy a region. It could be used to let them rent a jail in your Prison server or maybe a shop in the market of the Survival server. The player interacts with signs, making it easy to use. It also has a lot of commands to check the status of all regions, manage the renting and buying of a region and also features for admins. Also the plugin is capable of saving the region and restoring it later, this is very flexible and can be set general and per region, check the [config](https://github.com/NLthijs48/AreaShop/wiki/The-config-system) for more information.
+AreaShop allows you selling and renting regions to players. It could be used to let them rent a jail in your prison server, a shop in the market of the survival server or a plot on a creative server. The player interacts with signs, making it easy to use. It also has a lot of commands to check the status of all regions, manage the renting and buying of a region and also features for admins. A lot of messages send to the player can be clicked, for immediately performing actions (buying the region, selling the region, etc.) or getting more information (for example clicking region name for region information). To setup the renting and selling of the regions exactly as you want AreaShop has a lot of options to custimize it to your liking.
 
 ### All features in a list
-* Rent and sell regions to players + Players can resell their bought regions to other players.
-* [Signs](https://github.com/NLthijs48/AreaShop/wiki/Basic-regions-setup) for easy interacting and current status.
-* Change the [language](https://github.com/NLthijs48/AreaShop/wiki/Language-support) of the plugin or use of of the already provided language files (check [here](https://github.com/NLthijs48/AreaShop/tree/master/AreaShop/src/main/resources/lang) for supported languages, these are already packed with the plugin, just change the language setting in `config.yml`).
-* Automatically let the plugin [restore](https://github.com/NLthijs48/AreaShop/wiki/Region-blocks-save-restore) the region with schematics.
+* Rent and sell regions to players, and players can resell their bought regions to other players.
+* [Signs](https://github.com/NLthijs48/AreaShop/wiki/Basic-regions-setup) for easy interaction (rent/buy/unrent/sell/information) and current status (layout and actions customizable, multiple signs can be added).
+* ![rented-sign](https://cloud.githubusercontent.com/assets/6951068/21939029/3844896a-d9be-11e6-8492-7a23ec71fce2.png)
+* Messages that can be clicked for more information and actions ([language](https://github.com/NLthijs48/AreaShop/wiki/Language-support) can be changed, as well as click/hover actions).
+* ![region-information-message](https://cloud.githubusercontent.com/assets/6951068/21939161/bff2fe3c-d9be-11e6-802f-4a0bce073c64.png)
+* Change the  of the plugin or use of of the already provided language files (check [here]
+* Automatically restore the region to its original state when sold: [restore](https://github.com/NLthijs48/AreaShop/wiki/Region-blocks-save-restore) the region with schematics.
 * Change which [commands](https://github.com/NLthijs48/AreaShop/wiki/Commands-and-Permissions) players can use with [permissions](https://github.com/NLthijs48/AreaShop/wiki/Commands-and-Permissions).
 * Customize the plugin by changing the [config files](https://github.com/NLthijs48/AreaShop/wiki/The-config-system).
-* Automatically place the region name on the sign if it is placed inside a region.
-* Teleport to rent/buy regions and optionally set the teleport location (teleporting is safe and within the region).
-* Adding friends to regions (which also can teleport then).
+* Use any WorldGuard flags on regions: disable building in the region, deny entry to others, etc.
+* Teleport to regions (while making sure the location is safe for the player) and changing the teleport location.
+* Adding friends to regions (which also can teleport to it).
 * Automatic unrent/sell for regions of which the owner is offline for a certain time.
 * Warning to players when their rent is about to run out (at login and while they are online).
-* [Group system](https://github.com/NLthijs48/AreaShop/wiki/The-config-system) to set options for a couple of regions instead of all of them.
-* All heavy tasks are spread over time (each tick a part is executed until done), so the plugin should not cause any lag.
-* Rent/buy limits can be different per permission node (player group), world or group of regions (possible situation: Normal players can buy 1 market region in survival + 1 build region in survival and 2 plots in creative, while VIPs have double limits for all those), [check these examples](https://github.com/NLthijs48/AreaShop/wiki/Limitgroups-information-and-examples).
-* Supports name changes because of saving player info by UUID, for more details check the FAQ entry: [What happens when a player changes his name?](https://github.com/NLthijs48/AreaShop/wiki/Frequently-Asked-Questions#what-happens-when-a-player-changes-his-name).
+* [Group system](https://github.com/NLthijs48/AreaShop/wiki/The-config-system) to set options for a couple of regions instead of all of them (all settings in `default.yml` can also be used for groups and individual regions).
+* High performance: All heavy tasks are spread over time (each tick a part is executed until done), so the plugin should not cause any lag.
+* Limit number of regions a player can have: limits can be different per permission node (player group), world or group of regions (possible situation: Normal players can buy 1 market region in survival + 1 build region in survival and 2 plots in creative, while VIPs have double limits for all those), [check these examples](https://github.com/NLthijs48/AreaShop/wiki/Limitgroups-information-and-examples).
+* Supports name changes because of saving player info by UUID ([more details](https://github.com/NLthijs48/AreaShop/wiki/Frequently-Asked-Questions#what-happens-when-a-player-changes-his-name)).
 
 You need to have WorldEdit, WorldGuard and Vault installed on your server, WorldGuard is used for creating and managing regions, WorldEdit for the saving and restoring the blocks in regions and Vault is used to let players pay for the regions.
 

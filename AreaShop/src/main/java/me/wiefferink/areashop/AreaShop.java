@@ -103,6 +103,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public static final String tagMoneyBackPercentage = "moneybackpercent";
 	public static final String tagMoneyBackAmount = "moneyback";
 	public static final String tagRawMoneyBackAmount = "rawmoneyback";
+	public static final String tagTimesExtended = "timesExtended";
 	public static final String tagMaxExtends = "maxextends";
 	public static final String tagExtendsLeft = "extendsleft";
 	public static final String tagMaxRentTime = "maxrenttime";

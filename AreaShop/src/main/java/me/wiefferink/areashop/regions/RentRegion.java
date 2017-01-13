@@ -158,6 +158,8 @@ public class RentRegion extends GeneralRegion {
 				return getMoneyBackAmount();
 			case AreaShop.tagMoneyBackPercentage:
 				return getMoneyBackPercentage()%1.0 == 0.0 ? (int)getMoneyBackPercentage() : getMoneyBackPercentage();
+			case AreaShop.tagTimesExtended:
+				return this.getTimesExtended();
 			case AreaShop.tagMaxExtends:
 				return this.getMaxExtends();
 			case AreaShop.tagExtendsLeft:
@@ -220,7 +222,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The price of the region
 	 */
 	public double getPrice() {
-		return getDoubleSetting("rent.price");
+		return Utils.evaluateToDouble(getStringSetting("rent.price"), this);
 	}
 	
 	/**
@@ -311,7 +313,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The % of money the player will get back when unrenting
 	 */
 	public double getMoneyBackPercentage() {
-		return getDoubleSetting("rent.moneyBack");
+		return Utils.evaluateToDouble(getStringSetting("rent.moneyBack"), this);
 	}
 	
 	/**

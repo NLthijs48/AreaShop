@@ -129,7 +129,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The price of the region
 	 */
 	public double getPrice() {
-		return getDoubleSetting("buy.price");
+		return Utils.evaluateToDouble(getStringSetting("buy.price"), this);
 	}
 	
 	/**
@@ -193,7 +193,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The % of money the player will get back when selling
 	 */
 	public double getMoneyBackPercentage() {
-		return getDoubleSetting("buy.moneyBack");
+		return Utils.evaluateToDouble(getStringSetting("buy.moneyBack"), this);
 	}
 	
 	/**

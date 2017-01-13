@@ -144,6 +144,7 @@ maximumTries: 50000
 # %moneyback%      The amount of money the player will get back when unrenting/selling the region (formatted with currency layout).
 # %rawmoneyback%   The moneyback without formatting.
 # %moneybackpercent% The percentage of the price the player will get back when unrenting the region.
+# %timesExtended%  The number of times the region has been extended (zero when first rented)
 # %maxextends%     The maximum number of extends a player can do on the region.
 # %extendsleft%    The number of extends that are left (maxextends - timesextended).
 # %maxrenttime%    The maximum time you can rent a region in advance (human readable).

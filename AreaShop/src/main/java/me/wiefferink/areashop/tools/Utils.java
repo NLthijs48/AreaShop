@@ -10,12 +10,16 @@ import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,6 +39,7 @@ public class Utils {
 	private static ArrayList<String> weeks;
 	private static ArrayList<String> months;
 	private static ArrayList<String> years;
+	private static ScriptEngine scriptEngine;
 
 	public static void initialize(YamlConfiguration pluginConfig) {
 		config = pluginConfig;
@@ -668,12 +673,67 @@ public class Utils {
 	 * @param input The input to check
 	 * @return true if the input is numeric, otherwise false
 	 */
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public static boolean isNumeric(String input) {
 		try {
 			Integer.parseInt(input);
 			return true;
 		} catch(NumberFormatException ignored) {
 			return false;
+		}
+	}
+
+	/**
+	 * Check if a string is a double
+	 * @param input The input
+	 * @return true if the input is a double, otherwise false
+	 */
+	@SuppressWarnings("ResultOfMethodCallIgnored")
+	public static boolean isDouble(String input) {
+		try {
+			Double.parseDouble(input);
+			return true;
+		} catch(NumberFormatException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Evaluate string input to a number
+	 * Uses JavaScript for expressions
+	 * @param input  The input string
+	 * @param region The region to apply replacements for and use for logging
+	 * @return double evaluated from the input or a very high default in case of a script exception
+	 */
+	public static double evaluateToDouble(String input, GeneralRegion region) {
+		// Replace variables
+		input = Message.fromString(input).replacements(region).getSingle();
+
+		// Check for simple number
+		if(isDouble(input)) {
+			return Double.parseDouble(input);
+		}
+
+		// Lazy init scriptEngine
+		if(scriptEngine == null) {
+			scriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
+		}
+
+		// Evaluate expression
+		Object result;
+		try {
+			result = scriptEngine.eval(input);
+		} catch(ScriptException e) {
+			AreaShop.warn("Price of region", region.getName(), "is set with an invalid expression: '"+input+"', exception:", ExceptionUtils.getStackTrace(e));
+			return 99999999999.0; // High fallback for safety
+		}
+
+		// Handle the result
+		if(Utils.isDouble(result.toString())) {
+			return Double.parseDouble(result.toString());
+		} else {
+			AreaShop.warn("Price of region", region.getName(), "is set with the expression '"+input+"' that returns a result that is not a number:", result);
+			return 99999999999.0; // High fallback for safety
 		}
 	}
 

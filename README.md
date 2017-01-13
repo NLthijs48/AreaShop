@@ -51,8 +51,6 @@ AreaShop allows you selling and renting regions to players. It could be used to 
 * Limit number of regions a player can have: limits can be different per permission node (player group), world or group of regions (possible situation: Normal players can buy 1 market region in survival + 1 build region in survival and 2 plots in creative, while VIPs have double limits for all those), [check these examples](https://github.com/NLthijs48/AreaShop/wiki/Limitgroups-information-and-examples).
 * Supports name changes because of saving player info by UUID ([more details](https://github.com/NLthijs48/AreaShop/wiki/Frequently-Asked-Questions#what-happens-when-a-player-changes-his-name)).
 
-You need to have WorldEdit, WorldGuard and Vault installed on your server, WorldGuard is used for creating and managing regions, WorldEdit for the saving and restoring the blocks in regions and Vault is used to let players pay for the regions.
-
 ### Preview
 For a preview join 'mc.go-craft.com' and go to the Survival server, the shops around the spawn use AreaShop.
 

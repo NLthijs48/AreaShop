@@ -111,6 +111,8 @@ general:
       members: ''
       interact: 'deny g:non_members' # Only allow region members/owners to use things in the region (chests, furnace, animals, etc.)
       build: 'deny g:non_members'
+      block-break: 'deny g:non_members'
+      block-place: 'deny g:non_members'
     forrent:
       greeting: '%lang:prefix%%lang:greeting-forrent%'
     rented:

@@ -191,11 +191,12 @@ general:
 # │ RENT: Settings that apply to rent regions.                                                                                 │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 rent:
-  # The default price of a rental region.
+  # The default price of a rental region (variables, mathematical expressions and JavaScript can be used).
   price: 1000
   # The default duration of a rental region, you can find all time indicators in config.yml below the RENTING header.
   duration: '1 day'
-  # The percentage of the rent price you get back if you unrent the region (price of time left will be multiplied by this/100).
+  # The percentage of the rent price you get back if you unrent the region (only the time that is unused is given back).
+  # (variables, mathematical expressions and JavaScript can be used)
   moneyBack: 100
   # Maximum number of extends a player can do (-1 for infinite, 0 for no extending), if they are at this number then
   # they are force to let their rent run out (and can rent it again at that point).
@@ -227,9 +228,9 @@ rent:
 # │ BUY: Settings that apply to buy regions.                                                                                   │
 # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 buy:
-  # The default price of a buy region.
+  # The default price of a buy region (variables, mathematical expressions and JavaScript can be used).
   price: 1000
-  # The percentage of the price you get back if you sell the region.
+  # The percentage of the price you get back if you sell the region (variables, mathematical expressions and JavaScript can be used)
   moneyBack: 100
   # Automatically sell the region after the specified number of minutes between the last login time of the buyer and the current time
   # Use times like '1 day' etc, or 'disabled' for never.

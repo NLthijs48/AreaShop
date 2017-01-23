@@ -17,11 +17,11 @@ saving:
   regionsPerTick: 1
 # Timings for rent expiration checking.
 expiration:
-  delay: '29 seconds'
+  delay: '14 seconds'
   regionsPerTick: 5
 # Timings for expiration warning to online players.
 expireWarning:
-  delay: '61 seconds'
+  delay: '11 seconds'
   regionsPerTick: 5
 # Timings for updating signs and region flags ('/as reload' or after '/as groupadd' or '/as groupdel').
 update:

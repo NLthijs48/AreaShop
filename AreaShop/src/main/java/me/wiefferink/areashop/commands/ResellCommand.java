@@ -47,7 +47,7 @@ public class ResellCommand extends CommandAreaShop {
 			return;
 		}
 
-		if(price <= 0) {
+		if(price < 0) {
 			plugin.message(sender, "resell-wrongPrice", args[1]);
 			return;
 		}

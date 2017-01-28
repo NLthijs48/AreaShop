@@ -46,6 +46,12 @@ public class ResellCommand extends CommandAreaShop {
 			plugin.message(sender, "resell-wrongPrice", args[1]);
 			return;
 		}
+
+		if(price < 0) {
+			plugin.message(sender, "resell-wrongPrice", args[1]);
+			return;
+		}
+
 		BuyRegion buy;
 		if(args.length <= 2) {
 			if (sender instanceof Player) {

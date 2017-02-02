@@ -1,8 +1,8 @@
 package me.wiefferink.areashop.commands;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.interactivemessenger.processing.Message;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;

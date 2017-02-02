@@ -11,8 +11,9 @@ import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.features.TeleportFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.managers.FileManager;
-import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.interactivemessenger.processing.Message;
+import me.wiefferink.interactivemessenger.processing.ReplacementProvider;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -31,7 +32,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion>, Message.ReplacementProvider {
+public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion>, ReplacementProvider {
 	static final AreaShop plugin = AreaShop.getInstance();
 
 	YamlConfiguration config;

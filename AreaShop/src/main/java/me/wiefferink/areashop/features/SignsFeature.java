@@ -2,9 +2,9 @@ package me.wiefferink.areashop.features;
 
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
-import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.interactivemessenger.processing.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

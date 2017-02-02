@@ -14,9 +14,9 @@ import me.wiefferink.areashop.listeners.SignBreakListener;
 import me.wiefferink.areashop.listeners.SignChangeListener;
 import me.wiefferink.areashop.listeners.SignClickListener;
 import me.wiefferink.areashop.managers.*;
-import me.wiefferink.areashop.messages.LanguageManager;
-import me.wiefferink.areashop.messages.Message;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.interactivemessenger.processing.Message;
+import me.wiefferink.interactivemessenger.source.LanguageManager;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -269,10 +269,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	    if(weVersion != null) {
 	    	AreaShop.debug("Loaded WorldEditHandler" + weVersion);
 	    }
-        
-	    // Create a LanguageMananager
-	    languageManager = new LanguageManager(this);
-	    
+
+		setupLanguageManager();
+
 		if(error) {
 			error("The plugin has not started, fix the errors listed above");
 		} else {
@@ -389,6 +388,19 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+
+	/**
+	 * Setup a new LanguageManager
+	 */
+	private void setupLanguageManager() {
+		languageManager = new LanguageManager(
+				this,
+				languageFolder,
+				getConfig().getString("language"),
+				"EN",
+				getChatPrefix()
+		);
 	}
 	
 	/**
@@ -725,7 +737,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		setReady(false);
 		fileManager.saveRequiredFilesAtOnce();
 		fileManager.loadFiles(true);
-		languageManager = new LanguageManager(this);
+		setupLanguageManager();
 		message(confirmationReceiver, "reload-reloading");
 		fileManager.checkRents();
 		fileManager.updateAllRegions(confirmationReceiver);

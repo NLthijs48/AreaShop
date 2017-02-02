@@ -42,7 +42,7 @@ public class BuyCommand extends CommandAreaShop {
 		if(args.length > 1 && args[1] != null) {
 			BuyRegion region = plugin.getFileManager().getBuy(args[1]);
 			if(region == null) {
-				plugin.message(player, "buy-notBuyable");
+				plugin.message(player, "buy-notBuyable", args[1]);
 			} else {
 				region.buy(player);
 			}

@@ -42,7 +42,7 @@ public class RentCommand extends CommandAreaShop {
 		if(args.length > 1 && args[1] != null) {
 			RentRegion rent = plugin.getFileManager().getRent(args[1]);
 			if(rent == null) {
-				plugin.message(sender, "rent-notRentable");
+				plugin.message(sender, "rent-notRentable", args[1]);
 			} else {
 				rent.rent(player);
 			}

@@ -129,7 +129,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The price of the region
 	 */
 	public double getPrice() {
-		return Utils.evaluateToDouble(getStringSetting("buy.price"), this);
+		return Math.max(0, Utils.evaluateToDouble(getStringSetting("buy.price"), this));
 	}
 	
 	/**
@@ -137,7 +137,7 @@ public class BuyRegion extends GeneralRegion {
 	 * @return The resell price if isInResellingMode(), otherwise 0.0
 	 */
 	public double getResellPrice() {
-		return config.getDouble("buy.resellPrice");
+		return Math.max(0, config.getDouble("buy.resellPrice"));
 	}
 	
 	/**

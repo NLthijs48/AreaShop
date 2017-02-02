@@ -222,7 +222,7 @@ public class RentRegion extends GeneralRegion {
 	 * @return The price of the region
 	 */
 	public double getPrice() {
-		return Utils.evaluateToDouble(getStringSetting("rent.price"), this);
+		return Math.max(0, Utils.evaluateToDouble(getStringSetting("rent.price"), this));
 	}
 	
 	/**

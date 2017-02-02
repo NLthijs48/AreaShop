@@ -718,6 +718,7 @@ public class FileManager extends Manager {
 
 	/**
 	 * Load all files from disk
+	 * @param thisTick Load files in the current tick or a tick later
 	 * @return true if the files are loaded correctly, otherwise false
 	 */
 	public boolean loadFiles(boolean thisTick) {
@@ -861,6 +862,7 @@ public class FileManager extends Manager {
 	
 	/**
 	 * Load all region files
+	 * @param thisTick Load files in the current tick or a tick later
 	 */
 	public void loadRegionFiles(boolean thisTick) {
 		regions.clear();

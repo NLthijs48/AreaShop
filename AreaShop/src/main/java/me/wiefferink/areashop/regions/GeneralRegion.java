@@ -398,11 +398,18 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 */
 	public UUID getLandlord() {
 		String landlord = getStringSetting("general.landlord");
-		if(landlord != null) {
+		if(landlord != null && !landlord.isEmpty()) {
 			try {
 				return UUID.fromString(landlord);
 			} catch(IllegalArgumentException e) {
 				// Incorrect UUID
+			}
+		}
+		String landlordName = getStringSetting("general.landlordName");
+		if(landlordName != null && !landlordName.isEmpty()) {
+			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(landlordName);
+			if(offlinePlayer != null) {
+				return offlinePlayer.getUniqueId();
 			}
 		}
 		return null;

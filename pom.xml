@@ -23,7 +23,7 @@
     </repository>
     <repository>
       <id>wiefferink-repo</id>
-      <url>http://jenkins.wiefferink.me/plugin/repository/everything/</url>
+      <url>http://maven.wiefferink.me</url>
     </repository>
   </repositories>
 

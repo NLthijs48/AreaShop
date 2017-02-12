@@ -21,11 +21,10 @@
 [►Compiling](https://github.com/NLthijs48/AreaShop/wiki/Compiling-AreaShop)&nbsp;&nbsp;
 [►Modules/classes overview](https://github.com/NLthijs48/AreaShop/wiki/Modules,-packages-and-classes-overview)
 [►Javadocs](https://wiefferink.me/AreaShop/javadocs/)
-[►Development builds](http://jenkins.wiefferink.me)<br/>
+[►Development builds](http://jenkins.wiefferink.me/job/AreaShop)<br/>
 **Connections:**
 [►AreaShop in Spigot Resources](http://www.spigotmc.org/resources/areashop.2991/)&nbsp;&nbsp;
-[►AreaShop on BukkitDev](http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/)&nbsp;&nbsp;
-[►Dev builds on Jenkins](http://jenkins.wiefferink.me/job/AreaShop/)
+[►AreaShop on BukkitDev](http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/)
 
 ***
 

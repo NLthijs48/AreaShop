@@ -25,7 +25,7 @@
 **Connections:**
 [►AreaShop in Spigot Resources](http://www.spigotmc.org/resources/areashop.2991/)&nbsp;&nbsp;
 [►AreaShop on BukkitDev](http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/)&nbsp;&nbsp;
-[►Dev builds on Jenkins](http://ci.frostcast.net/job/AreaShop/)
+[►Dev builds on Jenkins](http://jenkins.wiefferink.me/job/AreaShop/)
 
 ***
 

@@ -25,6 +25,10 @@
       <id>wiefferink-repo</id>
       <url>http://maven.wiefferink.me</url>
     </repository>
+    <repository>
+      <id>bstats-repo</id>
+      <url>http://repo.bstats.org/content/repositories/releases/</url>
+    </repository>
   </repositories>
 
   <properties>

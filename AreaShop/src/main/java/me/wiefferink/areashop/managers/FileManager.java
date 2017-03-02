@@ -705,7 +705,7 @@ public class FileManager extends Manager {
 	 */
 	public void saveVersions() {
 		if(!(new File(versionPath).exists())) {
-			AreaShop.info("versions file created, this should happen only after installing or upgrading the plugin");
+			AreaShop.debug("versions file created, this should happen only after installing or upgrading the plugin");
 		}
 		try {
 			ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(versionPath));
@@ -1008,7 +1008,7 @@ public class FileManager extends Manager {
 	 * After conversion the region files need to be loaded
 	 */
 	@SuppressWarnings("unchecked")
-	public void preUpdateFiles() {
+	private void preUpdateFiles() {
 		Integer fileStatus = versions.get(AreaShop.versionFiles);
 		
 		// If the the files are already the current version
@@ -1294,7 +1294,9 @@ public class FileManager extends Manager {
 			// Update versions file to 2
 			versions.put(AreaShop.versionFiles, 2);			
 			saveVersions();
-			AreaShop.info("  Updated to YAML based storage (v1 to v2)");
+			if (buyFileFound || rentFileFound) {
+				AreaShop.info("  Updated to YAML based storage (v1 to v2)");
+			}
 		}
 	}
 	
@@ -1302,7 +1304,7 @@ public class FileManager extends Manager {
 	 * Checks for old file formats and converts them to the latest format.
 	 * This is to be triggered after the load of the region files
 	 */
-	public void postUpdateFiles() {
+	private void postUpdateFiles() {
 		Integer fileStatus = versions.get(AreaShop.versionFiles);
 		
 		// If the the files are already the current version
@@ -1318,7 +1320,9 @@ public class FileManager extends Manager {
 			// Update versions file to 3
 			versions.put(AreaShop.versionFiles, 3);			
 			saveVersions();
-			AreaShop.info("  Added last active time to regions (v2 to v3)");
+			if (getRegions().size() > 0) {
+				AreaShop.info("  Added last active time to regions (v2 to v3)");
+			}
 		}
 	}
 	

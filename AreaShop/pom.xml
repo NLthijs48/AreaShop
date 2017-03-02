@@ -93,6 +93,11 @@
       <version>1.4</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.bstats</groupId>
+      <artifactId>bstats-bukkit</artifactId>
+      <version>1.1</version>
+    </dependency>
   </dependencies>
 
   <profiles>
@@ -228,6 +233,11 @@
                 <relocation>
                   <pattern>me.wiefferink.interactivemessenger</pattern>
                   <shadedPattern>me.wiefferink.areashop.interactivemessenger</shadedPattern>
+                </relocation>
+                <!-- Relocate bstats -->
+                <relocation>
+                  <pattern>org.bstats</pattern>
+                  <shadedPattern>me.wiefferink.areashop.bstats</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>

@@ -5,7 +5,6 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
-import me.wiefferink.areashop.lib.Metrics;
 import me.wiefferink.areashop.lib.Updater;
 import me.wiefferink.areashop.lib.Updater.UpdateResult;
 import me.wiefferink.areashop.lib.Updater.UpdateType;
@@ -20,6 +19,7 @@ import me.wiefferink.interactivemessenger.source.LanguageManager;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -301,9 +301,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			
 			// Register dynamic permission (things declared in config)
 			registerDynamicPermissions();
-			
-			// Dont initialize the updatechecker if disabled in the config
-			if(getConfig().getBoolean("checkForUpdates")) {
+
+            // Don't initialize the updatechecker if disabled in the config
+            if(getConfig().getBoolean("checkForUpdates")) {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
@@ -669,14 +669,55 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Start the Metrics stats collection
 	 */
 	private void startMetrics() {
-		try {
-		    Metrics metrics = new Metrics(this);
-		    metrics.start();
-		} catch (Exception e) {
-		    AreaShop.debug("Could not start Metrics");
-		}
-	}
+        // Legacy MCstats statistics (remove at some point)
+        try {
+            new me.wiefferink.areashop.lib.Metrics(this).start();
+            AreaShop.debug("Started mcstats.org statistics service");
+        } catch (Exception e) {
+            AreaShop.debug("Could not start mcstats.org statistics service");
+        }
 
+        // bStats statistics
+        try {
+            Metrics metrics = new Metrics(this);
+
+            // Number of regions
+            metrics.addCustomChart(new Metrics.SingleLineChart("region_count") {
+                @Override
+                public int getValue() {
+                    return getFileManager().getRegions().size();
+                }
+            });
+
+            // Number of rental regions
+            metrics.addCustomChart(new Metrics.SingleLineChart("rental_region_count") {
+                @Override
+                public int getValue() {
+                    return getFileManager().getRents().size();
+                }
+            });
+
+            // Number of buy regions
+            metrics.addCustomChart(new Metrics.SingleLineChart("buy_region_count") {
+                @Override
+                public int getValue() {
+                    return getFileManager().getBuys().size();
+                }
+            });
+
+            // Language
+            metrics.addCustomChart(new Metrics.SimplePie("language") {
+                @Override
+                public String getValue() {
+                    return getConfig().getString("language");
+                }
+            });
+
+            AreaShop.debug("Started bstats.org statistics service");
+        } catch (Exception e) {
+            AreaShop.debug("Could not start bstats.org statistics service");
+        }
+	}
 
 	/**
 	 * Sends an debug message to the console

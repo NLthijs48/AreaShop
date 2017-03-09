@@ -25,6 +25,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -364,6 +365,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		debug = false;
 		ready = false;
 		updater = null;
+
+		HandlerList.unregisterAll(this);
 	}
 
 	/**
@@ -399,7 +402,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				languageFolder,
 				getConfig().getString("language"),
 				"EN",
-				getChatPrefix()
+				chatprefix
 		);
 	}
 	
@@ -488,14 +491,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			return null;
         }		
 	    return economy.getProvider();
-	}	
-	
-	/**
-	 * Get the current chatPrefix
-	 * @return The current chatPrefix
-	 */
-	public List<String> getChatPrefix() {
-		return chatprefix;
 	}
 	
 	/**
@@ -525,7 +520,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	/**
 	 * Register dynamic permissions controlled by config settings
 	 */
-	public void registerDynamicPermissions() {
+	private void registerDynamicPermissions() {
 		// Register limit groups of amount of regions a player can have
 		ConfigurationSection section = getConfig().getConfigurationSection("limitGroups");
 		if(section == null) {

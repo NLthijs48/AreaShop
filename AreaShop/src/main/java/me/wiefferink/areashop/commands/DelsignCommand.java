@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.features.SignsFeature;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,10 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DelsignCommand extends CommandAreaShop {
-
-	public DelsignCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

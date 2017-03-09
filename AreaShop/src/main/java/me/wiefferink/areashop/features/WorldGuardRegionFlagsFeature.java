@@ -27,7 +27,7 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 	 * @param region The region to update the flags for
 	 * @return true if the flags have been set correctly, otherwise false
 	 */
-	protected boolean updateRegionFlags(GeneralRegion region) {
+	private boolean updateRegionFlags(GeneralRegion region) {
 		boolean result = true;
 
 		// Get section defining the region flag profile
@@ -37,14 +37,12 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 		}
 
 		// Region flags for all states
-		String allPath = "flagProfiles."+region.getStringSetting("general.flagProfile")+".ALL";
 		ConfigurationSection allFlags = flagProfileSection.getConfigurationSection("ALL");
 		if(allFlags != null) {
 			result = result && updateRegionFlags(region, allFlags);
 		}
 
 		// Region flags for the current state
-		String specificPath = "flagProfiles."+region.getStringSetting("general.flagProfile")+"."+region.getState().getValue();
 		ConfigurationSection stateFlags = flagProfileSection.getConfigurationSection(region.getState().getValue());
 		if(stateFlags != null) {
 			result = result && updateRegionFlags(region, stateFlags);
@@ -58,7 +56,7 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 	 * @param flags The flags to apply
 	 * @return true if the flags have been set correctly, otherwise false
 	 */
-	protected boolean updateRegionFlags(GeneralRegion region, ConfigurationSection flags) {
+	private boolean updateRegionFlags(GeneralRegion region, ConfigurationSection flags) {
 		boolean result = true;
 
 		Set<String> flagNames = flags.getKeys(false);
@@ -188,7 +186,7 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 	 * @param message The message where the color codes should be translated (this message has bukkit color codes)
 	 * @return The string with the WorldGuard color codes
 	 */
-	public String translateBukkitToWorldGuardColors(String message) {
+	private String translateBukkitToWorldGuardColors(String message) {
 		String result = message;
 		result = result.replace("&c", "&r");
 		result = result.replace("&4", "&R");

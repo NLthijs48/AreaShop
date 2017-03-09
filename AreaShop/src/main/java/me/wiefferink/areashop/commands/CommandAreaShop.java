@@ -11,16 +11,15 @@ import java.util.List;
  * Abstract class for generalising command classes
  */
 public abstract class CommandAreaShop {
-	AreaShop plugin;
-	
+
+	AreaShop plugin = AreaShop.getInstance();
+
 	/**
-	 * Save the instance of the main plugin class
-	 * @param plugin The main plugin
+	 * Check if this Command instance can execute the given command and arguments
+	 * @param command The command to check for execution
+	 * @param args The arguments to check
+	 * @return true if it can execute the command, false otherwise
 	 */
-	public CommandAreaShop(AreaShop plugin) {
-		this.plugin = plugin;
-	}
-	
 	public boolean canExecute(Command command, String[] args) {
 		String commandString = command.getName();
 		for(String argument : args) {

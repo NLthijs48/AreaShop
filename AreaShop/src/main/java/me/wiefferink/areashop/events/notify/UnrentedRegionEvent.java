@@ -10,7 +10,6 @@ import java.util.UUID;
  */
 public class UnrentedRegionEvent extends NotifyRegionEvent<RentRegion> {
 
-	private RentRegion region;
 	private UUID oldRenter;
 	private double refundedMoney;
 

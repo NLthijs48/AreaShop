@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,10 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TeleportCommand extends CommandAreaShop {
-
-	public TeleportCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

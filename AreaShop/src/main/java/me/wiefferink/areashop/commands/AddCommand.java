@@ -19,10 +19,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class AddCommand extends CommandAreaShop {
-
-	public AddCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {
@@ -117,9 +113,8 @@ public class AddCommand extends CommandAreaShop {
 			private TreeSet<GeneralRegion> regionsAlready = new TreeSet<>();
 			private TreeSet<String> namesBlacklisted = new TreeSet<>();
 			private TreeSet<String> namesNoPermission = new TreeSet<>();
-			private TreeSet<String> namesExternal = new TreeSet<>();
-			
-			@Override
+
+            @Override
 			public void run() {
 				for(int i=0; i<plugin.getConfig().getInt("adding.regionsPerTick"); i++) {
 					if(current < finalRegions.size()) {

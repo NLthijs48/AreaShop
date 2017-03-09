@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import org.bukkit.command.CommandSender;
 
@@ -8,10 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SetrestoreCommand extends CommandAreaShop {
-
-	public SetrestoreCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

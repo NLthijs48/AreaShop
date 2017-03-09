@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
@@ -16,10 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 public class MeCommand extends CommandAreaShop {
-
-	public MeCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

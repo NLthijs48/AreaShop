@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.interactivemessenger.processing.Message;
 import org.apache.commons.lang.StringUtils;
@@ -12,10 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageCommand extends CommandAreaShop {
-
-	public MessageCommand(AreaShop plugin) {
-		super(plugin);
-	}
 
 	@Override
 	public String getCommandStart() {

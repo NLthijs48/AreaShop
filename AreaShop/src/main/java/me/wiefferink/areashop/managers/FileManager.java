@@ -27,7 +27,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileManager extends Manager {
-	private static FileManager instance = null;
 
 	private HashMap<String, GeneralRegion> regions = null;
 	private String regionsPath = null;
@@ -100,10 +99,6 @@ public class FileManager extends Manager {
 	//////////////////////////////////////////////////////////
 	// GETTERS
 	//////////////////////////////////////////////////////////
-	
-	public AreaShop getPlugin() {
-		return plugin;
-	}
 	
 	public String getSchematicFolder() {
 		return schemFolder;

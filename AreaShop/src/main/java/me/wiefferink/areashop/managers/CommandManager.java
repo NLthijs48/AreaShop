@@ -19,38 +19,38 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 	 */
 	public CommandManager() {
 		commands = new ArrayList<>();
-		commands.add(new HelpCommand(plugin));
-		commands.add(new RentCommand(plugin));
-		commands.add(new UnrentCommand(plugin));
-		commands.add(new BuyCommand(plugin));
-		commands.add(new SellCommand(plugin));
-		commands.add(new MeCommand(plugin));
-		commands.add(new InfoCommand(plugin));
-		commands.add(new TeleportCommand(plugin));
-		commands.add(new SetteleportCommand(plugin));
-		commands.add(new AddfriendCommand(plugin));
-		commands.add(new DelfriendCommand(plugin));
-		commands.add(new FindCommand(plugin));
-		commands.add(new ResellCommand(plugin));
-		commands.add(new StopresellCommand(plugin));
-		commands.add(new SetrestoreCommand(plugin));
-		commands.add(new SetpriceCommand(plugin));
-		commands.add(new SetownerCommand(plugin));
-		commands.add(new SetdurationCommand(plugin));
-		commands.add(new ReloadCommand(plugin));
-		commands.add(new GroupaddCommand(plugin));
-		commands.add(new GroupdelCommand(plugin));
-		commands.add(new GrouplistCommand(plugin));
-		commands.add(new GroupinfoCommand(plugin));
-		commands.add(new SchematiceventCommand(plugin));
-		commands.add(new AddCommand(plugin));
-		commands.add(new DelCommand(plugin));
-		commands.add(new AddsignCommand(plugin));
-		commands.add(new DelsignCommand(plugin));
-		commands.add(new LinksignsCommand(plugin));
-		commands.add(new StackCommand(plugin));
-		commands.add(new SetlandlordCommand(plugin));
-		commands.add(new MessageCommand(plugin));
+		commands.add(new HelpCommand());
+		commands.add(new RentCommand());
+		commands.add(new UnrentCommand());
+		commands.add(new BuyCommand());
+		commands.add(new SellCommand());
+		commands.add(new MeCommand());
+		commands.add(new InfoCommand());
+		commands.add(new TeleportCommand());
+		commands.add(new SetteleportCommand());
+		commands.add(new AddfriendCommand());
+		commands.add(new DelfriendCommand());
+		commands.add(new FindCommand());
+		commands.add(new ResellCommand());
+		commands.add(new StopresellCommand());
+		commands.add(new SetrestoreCommand());
+		commands.add(new SetpriceCommand());
+		commands.add(new SetownerCommand());
+		commands.add(new SetdurationCommand());
+		commands.add(new ReloadCommand());
+		commands.add(new GroupaddCommand());
+		commands.add(new GroupdelCommand());
+		commands.add(new GrouplistCommand());
+		commands.add(new GroupinfoCommand());
+		commands.add(new SchematiceventCommand());
+		commands.add(new AddCommand());
+		commands.add(new DelCommand());
+		commands.add(new AddsignCommand());
+		commands.add(new DelsignCommand());
+		commands.add(new LinksignsCommand());
+		commands.add(new StackCommand());
+		commands.add(new SetlandlordCommand());
+		commands.add(new MessageCommand());
 
 		// Register commands in bukkit
 		plugin.getCommand("AreaShop").setExecutor(this);	
@@ -139,9 +139,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 		} else {
 			String[] start = new String[args.length];
 			start[0] = command.getName();
-			for(int i=1; i<args.length; i++) {
-				start[i] = args[i-1];
-			}
+			System.arraycopy(args, 0, start, 1, args.length - 1);
 			for(CommandAreaShop c : commands) {
 				if(c.canExecute(command, args)) {
 					result = c.getTabCompleteList(toCompleteNumber, start, sender);

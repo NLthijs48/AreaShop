@@ -1,7 +1,6 @@
 package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
@@ -13,10 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SetteleportCommand extends CommandAreaShop {
-
-	public SetteleportCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

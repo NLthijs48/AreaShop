@@ -1,7 +1,6 @@
 package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldedit.bukkit.selections.Selection;
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.tools.Utils;
@@ -13,10 +12,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class GroupaddCommand extends CommandAreaShop {
-
-	public GroupaddCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RegionGroup;
@@ -15,10 +14,6 @@ import java.util.*;
 
 public class InfoCommand extends CommandAreaShop {
 
-	public InfoCommand(AreaShop plugin) {
-		super(plugin);
-	}
-	
 	@Override
 	public String getCommandStart() {
 		return "areashop info";

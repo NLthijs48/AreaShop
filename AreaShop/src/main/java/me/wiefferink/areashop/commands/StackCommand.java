@@ -21,10 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StackCommand extends CommandAreaShop {
-
-	public StackCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

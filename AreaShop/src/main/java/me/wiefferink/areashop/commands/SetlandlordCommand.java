@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Bukkit;
@@ -12,10 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SetlandlordCommand extends CommandAreaShop {
-
-	public SetlandlordCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

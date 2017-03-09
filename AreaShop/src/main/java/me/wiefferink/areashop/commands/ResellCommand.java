@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.command.CommandSender;
@@ -10,10 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResellCommand extends CommandAreaShop {
-
-	public ResellCommand(AreaShop plugin) {
-		super(plugin);
-	}	
 	
 	@Override
 	public String getCommandStart() {

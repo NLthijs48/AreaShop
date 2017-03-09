@@ -1,13 +1,8 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import org.bukkit.command.CommandSender;
 
 public class HelpCommand extends CommandAreaShop {
-
-	public HelpCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

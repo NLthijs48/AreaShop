@@ -1,7 +1,6 @@
 package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Utils;
@@ -17,10 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 public class AddsignCommand extends CommandAreaShop {
-
-	public AddsignCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

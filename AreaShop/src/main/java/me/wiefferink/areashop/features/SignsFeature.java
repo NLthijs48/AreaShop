@@ -35,7 +35,7 @@ public class SignsFeature extends RegionFeature {
 		ConfigurationSection signSection = region.getConfig().getConfigurationSection("general.signs");
 		if(signSection != null) {
 			for(String signKey : signSection.getKeys(false)) {
-				RegionSign sign = new RegionSign(region, this, signKey);
+				RegionSign sign = new RegionSign(region, signKey);
 				Location location = sign.getLocation();
 				if(location == null) {
 					AreaShop.warn("Sign with key "+signKey+" of region "+region.getName()+" does not have a proper location");
@@ -62,7 +62,7 @@ public class SignsFeature extends RegionFeature {
 	 * @param location The location to get the key for
 	 * @return A string to use in a map for a location
 	 */
-	public static String locationToString(Location location) {
+	private static String locationToString(Location location) {
 		return location.getWorld().getName()+";"+location.getBlockX()+";"+location.getBlockY()+";"+location.getBlockZ();
 	}
 
@@ -136,7 +136,7 @@ public class SignsFeature extends RegionFeature {
 			region.setSetting(signPath+"profile", profile);
 		}
 		// Add to the map
-		RegionSign sign = new RegionSign(region, this, i+"");
+		RegionSign sign = new RegionSign(region, i + "");
 		signs.put(sign.getStringLocation(), sign);
 		allSigns.put(sign.getStringLocation(), sign);
 	}
@@ -172,12 +172,10 @@ public class SignsFeature extends RegionFeature {
 	public class RegionSign {
 
 		private GeneralRegion region;
-		private SignsFeature signsFeature;
 		private String key;
 
-		public RegionSign(GeneralRegion region, SignsFeature signsFeature, String key) {
+		public RegionSign(GeneralRegion region, String key) {
 			this.region = region;
-			this.signsFeature = signsFeature;
 			this.key = key;
 		}
 

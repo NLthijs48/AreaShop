@@ -1,14 +1,9 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import org.bukkit.command.CommandSender;
 
 public class ReloadCommand extends CommandAreaShop {
 
-	public ReloadCommand(AreaShop plugin) {
-		super(plugin);
-	}
-	
 	@Override
 	public String getCommandStart() {
 		return "areashop reload";

@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.interactivemessenger.processing.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,10 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 public class LinksignsCommand extends CommandAreaShop {
-
-	public LinksignsCommand(AreaShop plugin) {
-		super(plugin);
-	}
 	
 	@Override
 	public String getCommandStart() {

@@ -13,13 +13,13 @@ import me.wiefferink.areashop.listeners.SignBreakListener;
 import me.wiefferink.areashop.listeners.SignChangeListener;
 import me.wiefferink.areashop.listeners.SignClickListener;
 import me.wiefferink.areashop.managers.*;
+import me.wiefferink.areashop.tools.Analytics;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.interactivemessenger.processing.Message;
 import me.wiefferink.interactivemessenger.source.LanguageManager;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -296,8 +296,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			
 	        // Enable Metrics if config allows it
 			if(getConfig().getBoolean("sendStats")) {
-				startMetrics();
-			}
+                Analytics.start();
+            }
 			
 			// Register dynamic permission (things declared in config)
 			registerDynamicPermissions();
@@ -547,7 +547,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	/**
 	 * Register all required tasks
 	 */
-	public void setupTasks() {
+    private void setupTasks() {
         // Rent expiration timer
 		long expirationCheck = Utils.millisToTicks(Utils.getDurationFromSecondsOrString("expiration.delay"));
 		final AreaShop finalPlugin = this;
@@ -663,60 +663,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	@Override
 	public YamlConfiguration getConfig() {
 		return fileManager.getConfig();
-	}
-	
-	/**
-	 * Start the Metrics stats collection
-	 */
-	private void startMetrics() {
-        // Legacy MCstats statistics (remove at some point)
-        try {
-            new me.wiefferink.areashop.lib.Metrics(this).start();
-            AreaShop.debug("Started mcstats.org statistics service");
-        } catch (Exception e) {
-            AreaShop.debug("Could not start mcstats.org statistics service");
-        }
-
-        // bStats statistics
-        try {
-            Metrics metrics = new Metrics(this);
-
-            // Number of regions
-            metrics.addCustomChart(new Metrics.SingleLineChart("region_count") {
-                @Override
-                public int getValue() {
-                    return getFileManager().getRegions().size();
-                }
-            });
-
-            // Number of rental regions
-            metrics.addCustomChart(new Metrics.SingleLineChart("rental_region_count") {
-                @Override
-                public int getValue() {
-                    return getFileManager().getRents().size();
-                }
-            });
-
-            // Number of buy regions
-            metrics.addCustomChart(new Metrics.SingleLineChart("buy_region_count") {
-                @Override
-                public int getValue() {
-                    return getFileManager().getBuys().size();
-                }
-            });
-
-            // Language
-            metrics.addCustomChart(new Metrics.SimplePie("language") {
-                @Override
-                public String getValue() {
-                    return getConfig().getString("language");
-                }
-            });
-
-            AreaShop.debug("Started bstats.org statistics service");
-        } catch (Exception e) {
-            AreaShop.debug("Could not start bstats.org statistics service");
-        }
 	}
 
 	/**

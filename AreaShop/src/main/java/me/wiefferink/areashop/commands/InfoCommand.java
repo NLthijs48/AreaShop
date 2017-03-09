@@ -320,8 +320,9 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionMaxExtends", rent);
 							}
 						}
-						if(rent.getMaxRentTime() != -1) {
-							plugin.messageNoPrefix(sender, "info-regionMaxRentTime", rent);
+                        // If maxExtends is zero it does not make sense to show this message
+                        if (rent.getMaxRentTime() != -1 && rent.getMaxExtends() != 0) {
+                            plugin.messageNoPrefix(sender, "info-regionMaxRentTime", rent);
 						}
 						if(rent.getInactiveTimeUntilUnrent() != -1) {
 							plugin.messageNoPrefix(sender, "info-regionInactiveUnrent", rent);			

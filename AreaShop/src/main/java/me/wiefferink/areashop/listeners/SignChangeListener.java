@@ -21,8 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Checks for placement of signs for this plugin
- * @author NLThijs48
+ * Checks for placement of signs
  */
 public final class SignChangeListener implements Listener {
 	private AreaShop plugin;

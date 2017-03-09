@@ -63,7 +63,6 @@ public class InfoCommand extends CommandAreaShop {
 		if(regions.isEmpty()) {
 			plugin.message(sender, "info-noRegions");
 		} else {
-			long start = Calendar.getInstance().getTimeInMillis();
 			// First sort by type, then by name
 			Collections.sort(regions, new Comparator<GeneralRegion>() {
 				@Override
@@ -135,7 +134,6 @@ public class InfoCommand extends CommandAreaShop {
 					sender.sendMessage(" ");
 				}
 				footer.send(sender);
-				long end = Calendar.getInstance().getTimeInMillis();
 			}
 		}
 	}
@@ -275,10 +273,10 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.message(sender, "cmd-moreRegionsAtLocation");
 								return;
 							} else {
-								if(regions.get(0).isRentRegion()) {
-									rent = (RentRegion)regions.get(0);
-								} else if(regions.get(0).isBuyRegion()) {
-									buy = (BuyRegion)regions.get(0);
+                                if (regions.get(0) instanceof RentRegion) {
+                                    rent = (RentRegion)regions.get(0);
+                                } else if (regions.get(0) instanceof BuyRegion) {
+                                    buy = (BuyRegion)regions.get(0);
 								}
 							}
 						} else {
@@ -461,26 +459,6 @@ public class InfoCommand extends CommandAreaShop {
 		} else {
 			plugin.message(sender, "info-help");
 		}	
-	}
-	
-	
-	/**
-	 * Create a comma-space separated list from a collection of strings
-	 * @param list The collection with strings
-	 * @return A comma-space separated list of the strings in the collection
-	 */
-	public String createCommaString(Collection<String> list) {
-		String result = "";
-		boolean first = true;
-		for(String part : list) {
-			if(first) {
-				result += part;
-				first = false;
-			} else {
-				result += ", " + part;
-			}
-		}		
-		return result;
 	}
 	
 	@Override

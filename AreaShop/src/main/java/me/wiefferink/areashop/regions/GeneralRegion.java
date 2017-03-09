@@ -378,16 +378,16 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return true if the player currently rents or buys this region
 	 */
 	public boolean isOwner(UUID player) {
-		return (isRentRegion() && ((RentRegion)this).isRenter(player)) || (isBuyRegion() && ((BuyRegion)this).isBuyer(player));
-	}
+        return (this instanceof RentRegion && ((RentRegion) this).isRenter(player)) || (this instanceof BuyRegion && ((BuyRegion) this).isBuyer(player));
+    }
 	
 	/**
 	 * Get the player that is currently the owner of this region (either bought or rented it)
 	 * @return The UUID of the owner of this region
 	 */
 	public UUID getOwner() {
-		if(isRentRegion()) {
-			return ((RentRegion)this).getRenter();
+        if (this instanceof RentRegion) {
+            return ((RentRegion)this).getRenter();
 		} else {
 			return ((BuyRegion)this).getBuyer();
 		}
@@ -619,22 +619,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	}
 
 	/**
-	 * Check if this region is a RentRegion
-	 * @return true if this region is a RentRegion otherwise false
-	 */
-	public boolean isRentRegion() {
-		return getType() == RegionType.RENT;
-	}
-
-	/**
-	 * Check if this region is a BuyRegion
-	 * @return true if this region is a BuyRegion otherwise false
-	 */
-	public boolean isBuyRegion() {
-		return getType() == RegionType.BUY;
-	}
-
-	/**
 	 * Check if for renting this region you should be inside of it
 	 * @return true if you need to be inside, otherwise false
 	 */
@@ -684,8 +668,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return true if the signs of this region need periodic updating, otherwise false
 	 */
 	public boolean needsPeriodicUpdate() {
-		return !(isDeleted() || !isRentRegion()) && getSignsFeature().needsPeriodicUpdate();
-	}
+        return !(isDeleted() || !(this instanceof RentRegion)) && getSignsFeature().needsPeriodicUpdate();
+    }
 	
 	/**
 	 * Change the restore setting

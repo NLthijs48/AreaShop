@@ -86,9 +86,9 @@ public class DelfriendCommand extends CommandAreaShop {
 			}
 		}
 		if(sender.hasPermission("areashop.delfriendall")) {
-			if((region.isRentRegion() && !((RentRegion)region).isRented())
-					|| (region.isBuyRegion() && !((BuyRegion)region).isSold())) {
-				plugin.message(sender, "delfriend-noOwner", region);
+            if ((region instanceof RentRegion && !((RentRegion) region).isRented())
+                    || (region instanceof BuyRegion && !((BuyRegion) region).isSold())) {
+                plugin.message(sender, "delfriend-noOwner", region);
 				return;
 			}		
 			OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);

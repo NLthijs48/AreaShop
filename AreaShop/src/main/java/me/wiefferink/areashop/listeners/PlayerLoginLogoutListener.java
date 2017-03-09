@@ -1,6 +1,7 @@
 package me.wiefferink.areashop.listeners;
 
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
@@ -18,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Checks for placement of signs for this plugin
- * @author NLThijs48
+ * Notify region expiry and track activity time
  */
 public final class PlayerLoginLogoutListener implements Listener {
 	private AreaShop plugin;
@@ -91,13 +91,13 @@ public final class PlayerLoginLogoutListener implements Listener {
 					if(current < regions.size()) {
 						GeneralRegion region = regions.get(current);
 						if(region.isOwner(player)) {
-							if(region.isBuyRegion()) {
-								if(!player.getName().equals(region.getStringSetting("buy.buyerName"))) {
+                            if (region instanceof BuyRegion) {
+                                if(!player.getName().equals(region.getStringSetting("buy.buyerName"))) {
 									region.setSetting("buy.buyerName", player.getName());
 									region.update();
 								}
-							} else if(region.isRentRegion()) {
-								if(!player.getName().equals(region.getStringSetting("rent.renterName"))) {
+                            } else if (region instanceof RentRegion) {
+                                if(!player.getName().equals(region.getStringSetting("rent.renterName"))) {
 									region.setSetting("rent.renterName", player.getName());
 									region.update();
 								}

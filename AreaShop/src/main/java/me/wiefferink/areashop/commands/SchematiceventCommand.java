@@ -1,7 +1,9 @@
 package me.wiefferink.areashop.commands;
 
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
+import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.command.CommandSender;
 
@@ -77,10 +79,10 @@ public class SchematiceventCommand extends CommandAreaShop {
 		} else if(toComplete == 3) {
 			GeneralRegion region = plugin.getFileManager().getRegion(start[2]);
 			if(region != null) {
-				if(region.isRentRegion()) {
-					result.addAll(Arrays.asList("created", "deleted", "rented", "unrented"));
-				} else if(region.isBuyRegion()) {
-					result.addAll(Arrays.asList("created", "deleted", "bought", "sold"));
+                if (region instanceof RentRegion) {
+                    result.addAll(Arrays.asList("created", "deleted", "rented", "unrented"));
+                } else if (region instanceof BuyRegion) {
+                    result.addAll(Arrays.asList("created", "deleted", "bought", "sold"));
 				}
 			}
 		}

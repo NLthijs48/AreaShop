@@ -135,16 +135,16 @@ public class FileManager extends Manager {
 	
 	public RentRegion getRent(String name) {
 		GeneralRegion region = regions.get(name.toLowerCase());
-		if(region != null && region.isRentRegion()) {
-			return (RentRegion)region;
+        if (region != null && region instanceof RentRegion) {
+            return (RentRegion)region;
 		}
 		return null;
 	}
 	
 	public BuyRegion getBuy(String name) {
 		GeneralRegion region = regions.get(name.toLowerCase());
-		if(region != null && region.isBuyRegion()) {
-			return (BuyRegion)region;
+        if (region != null && region instanceof BuyRegion) {
+            return (BuyRegion)region;
 		}
 		return null;
 	}
@@ -152,8 +152,8 @@ public class FileManager extends Manager {
 	public List<RentRegion> getRents() {
 		List<RentRegion> result = new ArrayList<>();
 		for(GeneralRegion region : regions.values()) {
-			if(region.isRentRegion()) {
-				result.add((RentRegion)region);
+            if (region instanceof RentRegion) {
+                result.add((RentRegion)region);
 			}
 		}
 		return result;
@@ -162,8 +162,8 @@ public class FileManager extends Manager {
 	public List<BuyRegion> getBuys() {
 		List<BuyRegion> result = new ArrayList<>();
 		for(GeneralRegion region : regions.values()) {
-			if(region.isBuyRegion()) {
-				result.add((BuyRegion)region);
+            if (region instanceof BuyRegion) {
+                result.add((BuyRegion)region);
 			}
 		}
 		return result;

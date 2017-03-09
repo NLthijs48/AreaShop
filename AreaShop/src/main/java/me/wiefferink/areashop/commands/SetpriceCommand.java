@@ -70,10 +70,10 @@ public class SetpriceCommand extends CommandAreaShop {
 			return;
 		}
 		if("default".equalsIgnoreCase(args[1]) || "reset".equalsIgnoreCase(args[1])) {
-			if(region.isRentRegion()) {
-				((RentRegion)region).removePrice();
-			} else if(region.isBuyRegion()) {
-				((BuyRegion)region).removePrice();
+            if (region instanceof RentRegion) {
+                ((RentRegion)region).removePrice();
+            } else if (region instanceof BuyRegion) {
+                ((BuyRegion)region).removePrice();
 			}
 			region.update();
 			plugin.message(sender, "setprice-successRemoved", region);
@@ -86,11 +86,11 @@ public class SetpriceCommand extends CommandAreaShop {
 			plugin.message(sender, "setprice-wrongPrice", args[1], region);
 			return;
 		}
-		if(region.isRentRegion()) {
-			((RentRegion)region).setPrice(price);
+        if (region instanceof RentRegion) {
+            ((RentRegion)region).setPrice(price);
 			plugin.message(sender, "setprice-successRent", region);
-		} else if(region.isBuyRegion()) {
-			((BuyRegion)region).setPrice(price);
+        } else if (region instanceof BuyRegion) {
+            ((BuyRegion)region).setPrice(price);
 			plugin.message(sender, "setprice-successBuy", region);
 		}
 		region.update();

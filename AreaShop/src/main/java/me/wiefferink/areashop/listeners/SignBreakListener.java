@@ -13,7 +13,6 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 
 /**
  * Checks for placement of signs for this plugin
- * @author NLThijs48
  */
 public final class SignBreakListener implements Listener {
 	private AreaShop plugin;

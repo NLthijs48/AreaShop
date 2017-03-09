@@ -69,13 +69,13 @@ public class SetownerCommand extends CommandAreaShop {
 			plugin.message(sender, "setowner-notRegistered");
 			return;
 		}
-		
-		if(region.isRentRegion() && !sender.hasPermission("areashop.setownerrent")) {
-			plugin.message(sender, "setowner-noPermissionRent", region);
+
+        if (region instanceof RentRegion && !sender.hasPermission("areashop.setownerrent")) {
+            plugin.message(sender, "setowner-noPermissionRent", region);
 			return;
 		}
-		if(region.isBuyRegion() && !sender.hasPermission("areashop.setownerbuy")) {
-			plugin.message(sender, "setowner-noPermissionBuy", region);
+        if (region instanceof BuyRegion && !sender.hasPermission("areashop.setownerbuy")) {
+            plugin.message(sender, "setowner-noPermissionBuy", region);
 			return;
 		}
 		
@@ -88,10 +88,10 @@ public class SetownerCommand extends CommandAreaShop {
 		if(uuid == null) {
 			plugin.message(sender, "setowner-noPlayer", args[1], region);
 			return;
-		}		
-		
-		if(region.isRentRegion()) {
-			RentRegion rent = (RentRegion)region;
+		}
+
+        if (region instanceof RentRegion) {
+            RentRegion rent = (RentRegion)region;
 			if(rent.isRenter(uuid)) {
 				// extend
 				Calendar calendar = Calendar.getInstance();
@@ -105,8 +105,8 @@ public class SetownerCommand extends CommandAreaShop {
 				plugin.message(sender, "setowner-succesRent", region);
 			}
 		}
-		if(region.isBuyRegion()) {
-			BuyRegion buy = (BuyRegion)region;
+        if (region instanceof BuyRegion) {
+            BuyRegion buy = (BuyRegion)region;
 			buy.setBuyer(uuid);
 			plugin.message(sender, "setowner-succesBuy", region);
 		}

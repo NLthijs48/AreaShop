@@ -80,8 +80,8 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(player, "setteleport-noRentOrBuy", args[1]);
 			return;
 		}
-		if(region.isRentRegion()) {
-			owner = player.getUniqueId().equals(((RentRegion)region).getRenter());
+        if (region instanceof RentRegion) {
+            owner = player.getUniqueId().equals(((RentRegion)region).getRenter());
 		} else {
 			owner = player.getUniqueId().equals(((BuyRegion)region).getBuyer());
 		}

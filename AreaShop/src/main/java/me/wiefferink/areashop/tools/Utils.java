@@ -404,9 +404,9 @@ public class Utils {
 			for(ProtectedRegion pr : regions) {
 				GeneralRegion region = AreaShop.getInstance().getFileManager().getRegion(pr.getId());
 				if(region != null && (
-						(type == GeneralRegion.RegionType.RENT && region.isRentRegion())
-								|| (type == GeneralRegion.RegionType.BUY && region.isBuyRegion())
-						|| type == null)) {
+                        (type == GeneralRegion.RegionType.RENT && region instanceof RentRegion)
+                                || (type == GeneralRegion.RegionType.BUY && region instanceof BuyRegion)
+                                || type == null)) {
 					candidates.add(region);
 				}
 			}		

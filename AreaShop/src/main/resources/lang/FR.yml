@@ -22,7 +22,7 @@ helpCommand:
   - "    hover: %lang:action|Utilisez %0%|%"
   - "    command: %0%"
 
-region: "%lang:tRégion|%region%|%"
+region: "%lang:tRegion|%region%|%"
 
 tRegion:
   - "[bold]%0%[/bold]"

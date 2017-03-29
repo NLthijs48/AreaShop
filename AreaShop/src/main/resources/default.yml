@@ -110,6 +110,7 @@ general:
       priority: 10
       members: ''
       interact: 'deny g:non_members' # Only allow region members/owners to use things in the region (chests, furnace, animals, etc.)
+      use: 'deny g:non_members'
       build: 'deny g:non_members'
       block-break: 'deny g:non_members'
       block-place: 'deny g:non_members'

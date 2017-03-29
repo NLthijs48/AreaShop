@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class AddCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop add";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.createrent") || target.hasPermission("areashop.createbuy")) {
@@ -35,17 +35,17 @@ public class AddCommand extends CommandAreaShop {
 
 	@Override
 	public void execute(final CommandSender sender, final String[] args) {
-		if(		   !sender.hasPermission("areashop.createrent") 
+		if(!sender.hasPermission("areashop.createrent")
 				&& !sender.hasPermission("areashop.createrent.member")
 				&& !sender.hasPermission("areashop.createrent.owner")
-				
+
 				&& !sender.hasPermission("areashop.createbuy")
 				&& !sender.hasPermission("areashop.createbuy.member")
 				&& !sender.hasPermission("areashop.createbuy.owner")) {
 			plugin.message(sender, "add-noPermission");
 			return;
 		}
-		
+
 		if(args.length < 2 || args[1] == null || (!"rent".equals(args[1].toLowerCase()) && !"buy".equals(args[1].toLowerCase()))) {
 			plugin.message(sender, "add-help");
 			return;
@@ -60,14 +60,14 @@ public class AddCommand extends CommandAreaShop {
 			if(player == null) {
 				plugin.message(sender, "cmd-weOnlyByPlayer");
 				return;
-			}		
+			}
 			Selection selection = plugin.getWorldEdit().getSelection(player);
 			if(selection == null) {
 				plugin.message(player, "cmd-noSelection");
 				return;
 			}
 			world = selection.getWorld();
-			regions = Utils.getWERegionsInSelection(selection);
+			regions = Utils.getWorldEditRegionsInSelection(selection);
 			if(regions.size() == 0) {
 				plugin.message(player, "cmd-noWERegionsFound");
 				return;
@@ -107,16 +107,16 @@ public class AddCommand extends CommandAreaShop {
 		final Player finalPlayer = player;
 		final World finalWorld = world;
 		AreaShop.debug("Starting add task with " + regions.size() + " regions");
-        new BukkitRunnable() {
+		new BukkitRunnable() {
 			private int current = 0;
 			private TreeSet<GeneralRegion> regionsSuccess = new TreeSet<>();
 			private TreeSet<GeneralRegion> regionsAlready = new TreeSet<>();
 			private TreeSet<String> namesBlacklisted = new TreeSet<>();
 			private TreeSet<String> namesNoPermission = new TreeSet<>();
 
-            @Override
+			@Override
 			public void run() {
-				for(int i=0; i<plugin.getConfig().getInt("adding.regionsPerTick"); i++) {
+				for(int i = 0; i < plugin.getConfig().getInt("adding.regionsPerTick"); i++) {
 					if(current < finalRegions.size()) {
 						ProtectedRegion region = finalRegions.get(current);
 						// Determine if the player is an owner or member of the region
@@ -138,7 +138,7 @@ public class AddCommand extends CommandAreaShop {
 						} else {
 							// Check if the player should be landlord
 							boolean landlord = (!sender.hasPermission("areashop.create" + type)
-								&& ((sender.hasPermission("areashop.create" + type + ".owner") && isOwner)
+									&& ((sender.hasPermission("areashop.create" + type + ".owner") && isOwner)
 									|| (sender.hasPermission("areashop.create" + type + ".member") && isMember)));
 							if(isRent) {
 								RentRegion rent = new RentRegion(region.getId(), finalWorld);
@@ -164,7 +164,7 @@ public class AddCommand extends CommandAreaShop {
 								}
 								// Run commands
 								buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
-								
+
 								plugin.getFileManager().addBuy(buy);
 								buy.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
 
@@ -195,9 +195,9 @@ public class AddCommand extends CommandAreaShop {
 					this.cancel();
 				}
 			}
-        }.runTaskTimer(plugin, 1, 1);
+		}.runTaskTimer(plugin, 1, 1);
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();

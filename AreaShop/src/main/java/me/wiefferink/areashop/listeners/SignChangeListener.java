@@ -21,21 +21,21 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Checks for placement of signs
+ * Checks for placement of signs.
  */
 public final class SignChangeListener implements Listener {
 	private AreaShop plugin;
-	
+
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param plugin The AreaShop plugin
 	 */
 	public SignChangeListener(AreaShop plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	/**
-	 * Called when a sign is changed
+	 * Called when a sign is changed.
 	 * @param event The event
 	 */
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -48,22 +48,22 @@ public final class SignChangeListener implements Listener {
 			plugin.message(player, "general-notReady");
 			return;
 		}
-		
+
 		// Check if the sign is meant for this plugin
 		if(event.getLine(0).contains(plugin.getConfig().getString("signTags.rent"))) {
 			if(!player.hasPermission("areashop.createrent") && !player.hasPermission("areashop.createrent.member") && !player.hasPermission("areashop.createrent.owner")) {
-				plugin.message(player, "setup-noPermissionRent");				
+				plugin.message(player, "setup-noPermissionRent");
 				return;
 			}
-			
+
 			// Get the other lines
 			String secondLine = event.getLine(1);
 			String thirdLine = event.getLine(2);
 			String fourthLine = event.getLine(3);
-			
+
 			// Get the regionManager for accessing regions
 			RegionManager regionManager = plugin.getWorldGuard().getRegionManager(event.getPlayer().getWorld());
-			
+
 			// If the secondLine does not contain a name try to find the region by location
 			if(secondLine == null || secondLine.length() == 0) {
 				Set<ProtectedRegion> regions = plugin.getWorldGuardHandler().getApplicableRegionsSet(event.getBlock().getLocation());
@@ -93,8 +93,8 @@ public final class SignChangeListener implements Listener {
 						secondLine = candidate.getId();
 					}
 				}
-			}			
-		
+			}
+
 			boolean priceSet = fourthLine != null && fourthLine.length() != 0;
 			boolean durationSet = thirdLine != null && thirdLine.length() != 0;
 			// check if all the lines are correct			
@@ -123,19 +123,19 @@ public final class SignChangeListener implements Listener {
 					// Check the fourth line
 					try {
 						price = Double.parseDouble(fourthLine);
-					} catch (NumberFormatException e) {
+					} catch(NumberFormatException e) {
 						plugin.message(player, "setup-wrongPrice");
 						return;
 					}
 				}
-				
+
 				// Add rent to the FileManager
 				final RentRegion rent = new RentRegion(secondLine, event.getPlayer().getWorld());
 				boolean isMember = plugin.getWorldGuardHandler().containsMember(rent.getRegion(), player.getUniqueId());
 				boolean isOwner = plugin.getWorldGuardHandler().containsOwner(rent.getRegion(), player.getUniqueId());
 				boolean landlord = (!player.hasPermission("areashop.createrent")
 						&& ((player.hasPermission("areashop.createrent.owner") && isOwner)
-						|| (player.hasPermission("areashop.createrent.member") && isMember)));					
+						|| (player.hasPermission("areashop.createrent.member") && isMember)));
 
 				if(landlord) {
 					rent.setLandlord(player.getUniqueId(), player.getName());
@@ -151,7 +151,7 @@ public final class SignChangeListener implements Listener {
 
 				// Run commands
 				rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
-				
+
 				plugin.getFileManager().addRent(rent);
 				rent.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
 				plugin.message(player, "setup-rentSuccess", rent);
@@ -165,10 +165,10 @@ public final class SignChangeListener implements Listener {
 				// Run commands
 				rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 			}
-		} else if (event.getLine(0).contains(plugin.getConfig().getString("signTags.buy"))) {
+		} else if(event.getLine(0).contains(plugin.getConfig().getString("signTags.buy"))) {
 			// Check for permission
 			if(!player.hasPermission("areashop.createbuy") && !player.hasPermission("areashop.createbuy.member") && !player.hasPermission("areashop.createbuy.owner")) {
-				plugin.message(player, "setup-noPermissionBuy");				
+				plugin.message(player, "setup-noPermissionBuy");
 				return;
 			}
 
@@ -234,19 +234,19 @@ public final class SignChangeListener implements Listener {
 					// Check the fourth line
 					try {
 						price = Double.parseDouble(thirdLine);
-					} catch (NumberFormatException e) {
+					} catch(NumberFormatException e) {
 						plugin.message(player, "setup-wrongPrice");
 						return;
 					}
 				}
-				
+
 				// Add buy to the FileManager
 				final BuyRegion buy = new BuyRegion(secondLine, event.getPlayer().getWorld());
 				boolean isMember = plugin.getWorldGuardHandler().containsMember(buy.getRegion(), player.getUniqueId());
 				boolean isOwner = plugin.getWorldGuardHandler().containsOwner(buy.getRegion(), player.getUniqueId());
 				boolean landlord = (!player.hasPermission("areashop.createbuy")
 						&& ((player.hasPermission("areashop.createbuy.owner") && isOwner)
-						|| (player.hasPermission("areashop.createbuy.member") && isMember)));					
+						|| (player.hasPermission("areashop.createbuy.member") && isMember)));
 
 				if(landlord) {
 					buy.setLandlord(player.getUniqueId(), player.getName());
@@ -258,7 +258,7 @@ public final class SignChangeListener implements Listener {
 				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
 				// Run commands
 				buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
-				
+
 				plugin.getFileManager().addBuy(buy);
 				buy.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
 				plugin.message(player, "setup-buySuccess", buy);
@@ -276,10 +276,10 @@ public final class SignChangeListener implements Listener {
 		} else if(event.getLine(0).contains(plugin.getConfig().getString("signTags.add"))) {
 			// Check for permission
 			if(!player.hasPermission("areashop.addsign")) {
-				plugin.message(player, "addsign-noPermission");				
+				plugin.message(player, "addsign-noPermission");
 				return;
 			}
-			
+
 			// Get the other lines
 			String secondLine = event.getLine(1);
 			String thirdLine = event.getLine(2);
@@ -291,10 +291,10 @@ public final class SignChangeListener implements Listener {
 				if(region == null) {
 					plugin.message(player, "cmd-noRegion", secondLine);
 					return;
-				}			
+				}
 			} else {
 				// Get region by sign position
-				List<GeneralRegion> regions = Utils.getASRegionsInSelection(new CuboidSelection(event.getBlock().getWorld(), event.getBlock().getLocation(), event.getBlock().getLocation()));
+				List<GeneralRegion> regions = Utils.getRegionsInSelection(new CuboidSelection(event.getBlock().getWorld(), event.getBlock().getLocation(), event.getBlock().getLocation()));
 				if(regions.isEmpty()) {
 					plugin.message(player, "addsign-noRegions");
 					return;

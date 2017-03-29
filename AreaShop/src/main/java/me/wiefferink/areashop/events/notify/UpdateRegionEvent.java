@@ -10,7 +10,7 @@ import me.wiefferink.areashop.regions.GeneralRegion;
 public class UpdateRegionEvent extends NotifyRegionEvent<GeneralRegion> {
 
 	/**
-	 * Contructor
+	 * Contructor.
 	 * @param region The region that has been updated
 	 */
 	public UpdateRegionEvent(GeneralRegion region) {

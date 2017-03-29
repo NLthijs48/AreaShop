@@ -16,7 +16,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SignsFeature extends RegionFeature {
 
@@ -28,6 +32,10 @@ public class SignsFeature extends RegionFeature {
 
 	}
 
+	/**
+	 * Constructor.
+	 * @param region The region to bind to
+	 */
 	public SignsFeature(GeneralRegion region) {
 		this.region = region;
 		signs = new HashMap<>();
@@ -38,7 +46,7 @@ public class SignsFeature extends RegionFeature {
 				RegionSign sign = new RegionSign(region, signKey);
 				Location location = sign.getLocation();
 				if(location == null) {
-					AreaShop.warn("Sign with key "+signKey+" of region "+region.getName()+" does not have a proper location");
+					AreaShop.warn("Sign with key " + signKey + " of region " + region.getName() + " does not have a proper location");
 					continue;
 				}
 				signs.put(sign.getStringLocation(), sign);
@@ -58,16 +66,16 @@ public class SignsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Convert a location to a string to use as map key
+	 * Convert a location to a string to use as map key.
 	 * @param location The location to get the key for
 	 * @return A string to use in a map for a location
 	 */
 	private static String locationToString(Location location) {
-		return location.getWorld().getName()+";"+location.getBlockX()+";"+location.getBlockY()+";"+location.getBlockZ();
+		return location.getWorld().getName() + ";" + location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ();
 	}
 
 	/**
-	 * Get a sign by a location
+	 * Get a sign by a location.
 	 * @param location The location to get the sign for
 	 * @return The RegionSign that is at the location, or null if none
 	 */
@@ -81,31 +89,31 @@ public class SignsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Update all signs connected to this region
+	 * Update all signs connected to this region.
 	 * @return true if all signs are updated correctly, false if one or more updates failed
 	 */
 	public boolean update() {
 		boolean result = true;
 		for(RegionSign sign : signs.values()) {
-			result = result&sign.update();
+			result = result & sign.update();
 		}
 		return result;
 	}
 
 	/**
-	 * Check if any of the signs need periodic updating
+	 * Check if any of the signs need periodic updating.
 	 * @return true if one or more of the signs need periodic updating, otherwise false
 	 */
 	public boolean needsPeriodicUpdate() {
 		boolean result = false;
 		for(RegionSign sign : signs.values()) {
-			result = result|sign.needsPeriodicUpdate();
+			result = result | sign.needsPeriodicUpdate();
 		}
 		return result;
 	}
 
 	/**
-	 * Get a list with all sign locations
+	 * Get a list with all sign locations.
 	 * @return A List with all sign locations
 	 */
 	public List<Location> getSignLocations() {
@@ -117,7 +125,7 @@ public class SignsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Add a sign to this region
+	 * Add a sign to this region.
 	 * @param location The location of the sign
 	 * @param signType The type of the sign (WALL_SIGN or SIGN_POST)
 	 * @param facing   The orientation of the sign
@@ -125,15 +133,15 @@ public class SignsFeature extends RegionFeature {
 	 */
 	public void addSign(Location location, Material signType, BlockFace facing, String profile) {
 		int i = 0;
-		while(region.getConfig().isSet("general.signs."+i)) {
+		while(region.getConfig().isSet("general.signs." + i)) {
 			i++;
 		}
-		String signPath = "general.signs."+i+".";
-		region.setSetting(signPath+"location", Utils.locationToConfig(location));
-		region.setSetting(signPath+"facing", facing.name());
-		region.setSetting(signPath+"signType", signType.name());
+		String signPath = "general.signs." + i + ".";
+		region.setSetting(signPath + "location", Utils.locationToConfig(location));
+		region.setSetting(signPath + "facing", facing.name());
+		region.setSetting(signPath + "signType", signType.name());
 		if(profile != null && profile.length() != 0) {
-			region.setSetting(signPath+"profile", profile);
+			region.setSetting(signPath + "profile", profile);
 		}
 		// Add to the map
 		RegionSign sign = new RegionSign(region, i + "");
@@ -142,7 +150,7 @@ public class SignsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Checks if there is a sign from this region at the specified location
+	 * Checks if there is a sign from this region at the specified location.
 	 * @param location Location to check
 	 * @return true if this region has a sign at the location, otherwise false
 	 */
@@ -153,7 +161,7 @@ public class SignsFeature extends RegionFeature {
 		}
 		signs = region.getConfig().getConfigurationSection("general.signs").getKeys(false);
 		for(String sign : signs) {
-			Location signLocation = Utils.configToLocation(region.getConfig().getConfigurationSection("general.signs."+sign+".location"));
+			Location signLocation = Utils.configToLocation(region.getConfig().getConfigurationSection("general.signs." + sign + ".location"));
 			if(signLocation != null
 					&& signLocation.getWorld().equals(location.getWorld())
 					&& signLocation.getBlockX() == location.getBlockX()
@@ -167,7 +175,7 @@ public class SignsFeature extends RegionFeature {
 
 
 	/**
-	 * Sign that is connected to a region to display information and interact with the region
+	 * Sign that is connected to a region to display information and interact with the region.
 	 */
 	public class RegionSign {
 
@@ -180,15 +188,15 @@ public class SignsFeature extends RegionFeature {
 		}
 
 		/**
-		 * Get the location of this sign
+		 * Get the location of this sign.
 		 * @return The location of this sign
 		 */
 		public Location getLocation() {
-			return Utils.configToLocation(region.getConfig().getConfigurationSection("general.signs."+key+".location"));
+			return Utils.configToLocation(region.getConfig().getConfigurationSection("general.signs." + key + ".location"));
 		}
 
 		/**
-		 * Location string to be used as key in maps
+		 * Location string to be used as key in maps.
 		 * @return Location string
 		 */
 		public String getStringLocation() {
@@ -196,7 +204,7 @@ public class SignsFeature extends RegionFeature {
 		}
 
 		/**
-		 * Get the region this sign is linked to
+		 * Get the region this sign is linked to.
 		 * @return The region this sign is linked to
 		 */
 		public GeneralRegion getRegion() {
@@ -204,25 +212,25 @@ public class SignsFeature extends RegionFeature {
 		}
 
 		/**
-		 * Remove this sign from the region
+		 * Remove this sign from the region.
 		 */
 		public void remove() {
 			getLocation().getBlock().setType(Material.AIR);
 			signs.remove(getStringLocation());
 			allSigns.remove(getStringLocation());
-			region.setSetting("general.signs."+key, null);
+			region.setSetting("general.signs." + key, null);
 		}
 
 		/**
-		 * Get the ConfigurationSection defining the sign layout
+		 * Get the ConfigurationSection defining the sign layout.
 		 * @return The sign layout config
 		 */
 		public ConfigurationSection getProfile() {
-			return region.getConfigurationSectionSetting("general.signProfile", "signProfiles", region.getConfig().get("general.signs."+key+".profile"));
+			return region.getConfigurationSectionSetting("general.signProfile", "signProfiles", region.getConfig().get("general.signs." + key + ".profile"));
 		}
 
 		/**
-		 * Update this sign
+		 * Update this sign.
 		 * @return true if the update was successful, otherwise false
 		 */
 		public boolean update() {
@@ -244,7 +252,7 @@ public class SignsFeature extends RegionFeature {
 			String[] signLines = new String[4];
 			boolean signEmpty = true;
 			for(int i = 0; i < 4; i++) {
-				signLines[i] = stateConfig.getString("line"+(i+1));
+				signLines[i] = stateConfig.getString("line" + (i + 1));
 				signEmpty &= (signLines[i] == null || signLines[i].isEmpty());
 			}
 			if(signEmpty) {
@@ -257,8 +265,8 @@ public class SignsFeature extends RegionFeature {
 			if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
 				Material signType;
 				try {
-					signType = Material.valueOf(regionConfig.getString("general.signs."+key+".signType"));
-				} catch(NullPointerException|IllegalArgumentException e) {
+					signType = Material.valueOf(regionConfig.getString("general.signs." + key + ".signType"));
+				} catch(NullPointerException | IllegalArgumentException e) {
 					signType = null;
 				}
 				if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
@@ -270,8 +278,8 @@ public class SignsFeature extends RegionFeature {
 				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 				BlockFace signFace;
 				try {
-					signFace = BlockFace.valueOf(regionConfig.getString("general.signs."+key+".facing"));
-				} catch(NullPointerException|IllegalArgumentException e) {
+					signFace = BlockFace.valueOf(regionConfig.getString("general.signs." + key + ".facing"));
+				} catch(NullPointerException | IllegalArgumentException e) {
 					signFace = null;
 				}
 				if(signFace != null) {
@@ -285,11 +293,11 @@ public class SignsFeature extends RegionFeature {
 
 			// Save current rotation and type
 			org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
-			if(!regionConfig.isString("general.signs."+key+".signType")) {
-				region.setSetting("general.signs."+key+".signType", signState.getType().toString());
+			if(!regionConfig.isString("general.signs." + key + ".signType")) {
+				region.setSetting("general.signs." + key + ".signType", signState.getType().toString());
 			}
-			if(!regionConfig.isString("general.signs."+key+".facing")) {
-				region.setSetting("general.signs."+key+".facing", signData.getFacing().toString());
+			if(!regionConfig.isString("general.signs." + key + ".facing")) {
+				region.setSetting("general.signs." + key + ".facing", signData.getFacing().toString());
 			}
 
 			// Apply replacements and color and then set it on the sign
@@ -307,7 +315,7 @@ public class SignsFeature extends RegionFeature {
 		}
 
 		/**
-		 * Check if the sign needs to update periodically
+		 * Check if the sign needs to update periodically.
 		 * @return true if it needs periodic updates, otherwise false
 		 */
 		public boolean needsPeriodicUpdate() {
@@ -318,8 +326,8 @@ public class SignsFeature extends RegionFeature {
 			ConfigurationSection stateConfig = signConfig.getConfigurationSection(region.getState().getValue().toLowerCase());
 			// Check the lines for the timeleft tag
 			for(int i = 1; i <= 4; i++) {
-				String line = stateConfig.getString("line"+i);
-				if(line != null && !line.isEmpty() && line.contains(Message.VARIABLESTART+AreaShop.tagTimeLeft+Message.VARIABLEEND)) {
+				String line = stateConfig.getString("line" + i);
+				if(line != null && !line.isEmpty() && line.contains(Message.VARIABLE_START + AreaShop.tagTimeLeft + Message.VARIABLE_END)) {
 					return true;
 				}
 			}
@@ -327,7 +335,7 @@ public class SignsFeature extends RegionFeature {
 		}
 
 		/**
-		 * Run commands when a player clicks a sign
+		 * Run commands when a player clicks a sign.
 		 * @param clicker   The player that clicked the sign
 		 * @param clickType The type of clicking
 		 * @return true if the commands ran successfully, false if any of them failed
@@ -341,15 +349,16 @@ public class SignsFeature extends RegionFeature {
 
 			// Run player commands if specified
 			List<String> playerCommands = new ArrayList<>();
-			for(String command : stateConfig.getStringList(clickType.getValue()+"Player")) {
-				playerCommands.add(command.replace(Message.VARIABLESTART+AreaShop.tagClicker+Message.VARIABLEEND, clicker.getName()));
+			for(String command : stateConfig.getStringList(clickType.getValue() + "Player")) {
+				// TODO move variable checking code to InteractiveMessenger?
+				playerCommands.add(command.replace(Message.VARIABLE_START + AreaShop.tagClicker + Message.VARIABLE_END, clicker.getName()));
 			}
 			region.runCommands(clicker, playerCommands);
 
 			// Run console commands if specified
 			List<String> consoleCommands = new ArrayList<>();
-			for(String command : stateConfig.getStringList(clickType.getValue()+"Console")) {
-				consoleCommands.add(command.replace(Message.VARIABLESTART+AreaShop.tagClicker+Message.VARIABLEEND, clicker.getName()));
+			for(String command : stateConfig.getStringList(clickType.getValue() + "Console")) {
+				consoleCommands.add(command.replace(Message.VARIABLE_START + AreaShop.tagClicker + Message.VARIABLE_END, clicker.getName()));
 			}
 			region.runCommands(Bukkit.getConsoleSender(), consoleCommands);
 

@@ -12,7 +12,11 @@ import me.wiefferink.areashop.listeners.PlayerLoginLogoutListener;
 import me.wiefferink.areashop.listeners.SignBreakListener;
 import me.wiefferink.areashop.listeners.SignChangeListener;
 import me.wiefferink.areashop.listeners.SignClickListener;
-import me.wiefferink.areashop.managers.*;
+import me.wiefferink.areashop.managers.CommandManager;
+import me.wiefferink.areashop.managers.FeatureManager;
+import me.wiefferink.areashop.managers.FileManager;
+import me.wiefferink.areashop.managers.Manager;
+import me.wiefferink.areashop.managers.SignLinkerManager;
 import me.wiefferink.areashop.tools.Analytics;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.interactivemessenger.processing.Message;
@@ -39,8 +43,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Main class for the AreaShop plugin
- * Contains methods to get parts of the plugins functionality and definitions for constants
+ * Main class for the AreaShop plugin.
+ * Contains methods to get parts of the plugins functionality and definitions for constants.
  */
 public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	// Statically available instance
@@ -62,25 +66,25 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	private Updater updater = null;
 	private boolean updateAvailable = false;
 	private boolean ready = false;
-	
+
 	// Folders and file names
 	public static final String languageFolder = "lang";
 	public static final String schematicFolder = "schem";
-	public static final String schematicExtension = ".schematic";	
+	public static final String schematicExtension = ".schematic";
 	public static final String regionsFolder = "regions";
 	public static final String groupsFile = "groups.yml";
 	public static final String defaultFile = "default.yml";
 	public static final String configFile = "config.yml";
 	public static final String configFileHidden = "hiddenConfig.yml";
 	public static final String versionFile = "versions";
-	
+
 	// Euro tag for in the config
 	public static final String currencyEuro = "%euro%";
-	
+
 	// Constants for handling file versions
 	public static final String versionFiles = "files";
 	public static final int versionFilesCurrent = 3;
-	
+
 	// Keys for replacing parts of flags, commands, strings
 	public static final String tagPlayerName = "player";
 	public static final String tagPlayerUUID = "uuid";
@@ -136,37 +140,39 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public static AreaShop getInstance() {
 		return AreaShop.instance;
 	}
-	
+
 	/**
-	 * Called on start or reload of the server
+	 * Called on start or reload of the server.
 	 */
 	public void onEnable() {
 		AreaShop.instance = this;
 		managers = new HashSet<>();
 		boolean error = false;
-		
+
 		// Check if WorldGuard is present
 		String wgVersion = null;
 		String rawVersion = null;
-		int major = 0, minor = 0, fixes = 0;
+		int major = 0;
+		int minor = 0;
+		int fixes = 0;
 		Integer build = null;
 		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
-	    if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+		if(plugin == null || !(plugin instanceof WorldGuardPlugin)) {
 			error("WorldGuard plugin is not present or has not loaded correctly");
 			error = true;
-	    } else {
-		    worldGuard = (WorldGuardPlugin)plugin;
-		    // Get correct WorldGuardInterface (handles things that changed version to version)
+		} else {
+			worldGuard = (WorldGuardPlugin)plugin;
+			// Get correct WorldGuardInterface (handles things that changed version to version)
 			try {
 				rawVersion = worldGuard.getDescription().getVersion();
 				if(rawVersion.contains("-SNAPSHOT;")) {
-					String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;")+10, rawVersion.length());
+					String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;") + 10, rawVersion.length());
 					if(buildNumber.contains("-")) {
 						buildNumber = buildNumber.substring(0, buildNumber.indexOf("-"));
 						try {
 							build = Integer.parseInt(buildNumber);
 						} catch(NumberFormatException e) {
-							warn("Could not correctly parse the build of WorldGuard, raw version: "+rawVersion+", buildNumber: "+buildNumber);
+							warn("Could not correctly parse the build of WorldGuard, raw version: " + rawVersion + ", buildNumber: " + buildNumber);
 						}
 					}
 				}
@@ -191,7 +197,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 						fixes = Integer.parseInt(versionParts[2]);
 					}
 				} catch(NumberFormatException e) {
-					warn("Something went wrong while parsing WorldGuard version number: "+rawVersion);
+					warn("Something went wrong while parsing WorldGuard version number: " + rawVersion);
 				}
 				// Determine correct implementation to use
 				if(worldGuard.getDescription().getVersion().startsWith("5.")) {
@@ -213,63 +219,63 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			}
 			// Load chosen implementation
 			try {
-				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldGuardHandler"+wgVersion);
+				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldGuardHandler" + wgVersion);
 				// Check if we have a NMSHandler class at that location.
-				if (WorldGuardInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldGuardInterface
+				if(WorldGuardInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldGuardInterface
 					worldGuardInterface = (WorldGuardInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
 				}
-	        } catch (final Exception e) {
-				error("Could not load the handler for WorldGuard (tried to load "+wgVersion+"), report this problem to the author:"+ExceptionUtils.getStackTrace(e));
+			} catch(final Exception e) {
+				error("Could not load the handler for WorldGuard (tried to load " + wgVersion + "), report this problem to the author:" + ExceptionUtils.getStackTrace(e));
 				error = true;
-	            wgVersion = null;
-	        }
-	    }
- 
+				wgVersion = null;
+			}
+		}
+
 		// Check if WorldEdit is present
 		String weVersion = null;
 		plugin = getServer().getPluginManager().getPlugin("WorldEdit");
-	    if (plugin == null || !(plugin instanceof WorldEditPlugin)) {
+		if(plugin == null || !(plugin instanceof WorldEditPlugin)) {
 			error("WorldEdit plugin is not present or has not loaded correctly");
 			error = true;
-	    } else {
-		    worldEdit = (WorldEditPlugin)plugin;
-		    // Get correct WorldEditInterface (handles things that changed version to version)
-	        if(worldEdit.getDescription().getVersion().startsWith("5.")) {
-	        	weVersion = "5";
-	        } else {
-		        weVersion = "6";
-	        }
-	        try {
-				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldEditHandler"+weVersion);
+		} else {
+			worldEdit = (WorldEditPlugin)plugin;
+			// Get correct WorldEditInterface (handles things that changed version to version)
+			if(worldEdit.getDescription().getVersion().startsWith("5.")) {
+				weVersion = "5";
+			} else {
+				weVersion = "6";
+			}
+			try {
+				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldEditHandler" + weVersion);
 				// Check if we have a NMSHandler class at that location.
-				if (WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
+				if(WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
 					worldEditInterface = (WorldEditInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
 				}
-	        } catch (final Exception e) {
-				error("Could not load the handler for WorldEdit (tried to load "+weVersion+"), report this problem to the author: "+ExceptionUtils.getStackTrace(e));
+			} catch(final Exception e) {
+				error("Could not load the handler for WorldEdit (tried to load " + weVersion + "), report this problem to the author: " + ExceptionUtils.getStackTrace(e));
 				error = true;
-	            weVersion = null;
-	        }
-	    }
+				weVersion = null;
+			}
+		}
 
-	    // Check if Vault is present
-	    if(getServer().getPluginManager().getPlugin("Vault") == null) {
+		// Check if Vault is present
+		if(getServer().getPluginManager().getPlugin("Vault") == null) {
 			error("Vault plugin is not present or has not loaded correctly");
 			error = true;
-	    }
-        
+		}
+
 		// Load all data from files and check versions
 		fileManager = new FileManager();
 		managers.add(fileManager);
-		error = error|!fileManager.loadFiles(false);
+		error = error | !fileManager.loadFiles(false);
 
 		// Print loaded version of WG and WE in debug
-	    if(wgVersion != null) {
-			AreaShop.debug("Loaded WorldGuardHandler"+wgVersion+" (raw version: "+rawVersion+", major:"+major+", minor:"+minor+", fixes:"+fixes+", build:"+build+")");
+		if(wgVersion != null) {
+			AreaShop.debug("Loaded WorldGuardHandler" + wgVersion + " (raw version: " + rawVersion + ", major:" + major + ", minor:" + minor + ", fixes:" + fixes + ", build:" + build + ")");
 		}
-	    if(weVersion != null) {
-	    	AreaShop.debug("Loaded WorldEditHandler" + weVersion);
-	    }
+		if(weVersion != null) {
+			AreaShop.debug("Loaded WorldEditHandler" + weVersion);
+		}
 
 		setupLanguageManager();
 
@@ -286,25 +292,25 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			getServer().getPluginManager().registerEvents(new PlayerLoginLogoutListener(this), this);
 
 			setupTasks();
-	        
-		    // Startup the CommandManager (registers itself for the command)
+
+			// Startup the CommandManager (registers itself for the command)
 			commandManager = new CommandManager();
 			managers.add(commandManager);
 
 			// Create a signLinkerManager
 			signLinkerManager = new SignLinkerManager();
 			managers.add(signLinkerManager);
-			
-	        // Enable Metrics if config allows it
+
+			// Enable Metrics if config allows it
 			if(getConfig().getBoolean("sendStats")) {
-                Analytics.start();
-            }
-			
+				Analytics.start();
+			}
+
 			// Register dynamic permission (things declared in config)
 			registerDynamicPermissions();
 
-            // Don't initialize the updatechecker if disabled in the config
-            if(getConfig().getBoolean("checkForUpdates")) {
+			// Don't initialize the updatechecker if disabled in the config
+			if(getConfig().getBoolean("checkForUpdates")) {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
@@ -313,16 +319,16 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 							AreaShop.debug("Result=" + updater.getResult().toString() + ", Latest=" + updater.getLatestName() + ", Type=" + updater.getLatestType());
 							updateAvailable = updater.getResult() == UpdateResult.UPDATE_AVAILABLE;
 							if(updateAvailable) {
-								AreaShop.info("Update from AreaShop V"+AreaShop.getInstance().getDescription().getVersion()+" to "+updater.getLatestName()+" available, get the latest version at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/");
+								AreaShop.info("Update from AreaShop V" + AreaShop.getInstance().getDescription().getVersion() + " to " + updater.getLatestName() + " available, get the latest version at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/");
 								new BukkitRunnable() {
 									@Override
 									public void run() {
 										for(Player player : Utils.getOnlinePlayers()) {
 											if(player.hasPermission("areashop.notifyupdate")) {
-												AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());	
+												AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());
 											}
 										}
-									}								
+									}
 								}.runTask(AreaShop.getInstance());
 							}
 						} catch(Exception e) {
@@ -331,13 +337,13 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 							updateAvailable = false;
 						}
 					}
-		        }.runTaskAsynchronously(this);
+				}.runTaskAsynchronously(this);
 			}
 		}
 	}
-	
+
 	/**
-	 *  Called on shutdown or reload of the server 
+	 * Called on shutdown or reload of the server.
 	 */
 	public void onDisable() {
 
@@ -370,23 +376,23 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Indicates if the plugin is ready to be used
+	 * Indicates if the plugin is ready to be used.
 	 * @return true if the plugin is ready, false otherwise
 	 */
 	public boolean isReady() {
 		return ready;
 	}
-	
+
 	/**
-	 * Set if the plugin is ready to be used or not (not to be used from another plugin!)
+	 * Set if the plugin is ready to be used or not (not to be used from another plugin!).
 	 * @param ready Indicate if the plugin is ready to be used
 	 */
 	public void setReady(boolean ready) {
 		this.ready = ready;
 	}
-	
+
 	/**
-	 * Set if the plugin should output debug messages (loaded from config normally)
+	 * Set if the plugin should output debug messages (loaded from config normally).
 	 * @param debug Indicates if the plugin should output debug messages or not
 	 */
 	public void setDebug(boolean debug) {
@@ -394,7 +400,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Setup a new LanguageManager
+	 * Setup a new LanguageManager.
 	 */
 	private void setupLanguageManager() {
 		languageManager = new LanguageManager(
@@ -405,57 +411,57 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				chatprefix
 		);
 	}
-	
+
 	/**
-	 * Set the chatprefix to use in the chat (loaded from config normally)
+	 * Set the chatprefix to use in the chat (loaded from config normally).
 	 * @param chatprefix The string to use in front of chat messages (supports formatting codes)
 	 */
 	public void setChatprefix(List<String> chatprefix) {
 		this.chatprefix = chatprefix;
 	}
- 
+
 	/**
-	 * Function to get the WorldGuard plugin
+	 * Function to get the WorldGuard plugin.
 	 * @return WorldGuardPlugin
 	 */
 	public WorldGuardPlugin getWorldGuard() {
-	    return worldGuard;
+		return worldGuard;
 	}
-	
+
 	/**
-	 * Function to get WorldGuardInterface for version dependent things
+	 * Function to get WorldGuardInterface for version dependent things.
 	 * @return WorldGuardInterface
 	 */
 	public WorldGuardInterface getWorldGuardHandler() {
 		return this.worldGuardInterface;
 	}
-	
+
 	/**
-	 * Function to get the WorldEdit plugin
+	 * Function to get the WorldEdit plugin.
 	 * @return WorldEditPlugin
 	 */
 	public WorldEditPlugin getWorldEdit() {
-	    return worldEdit;
+		return worldEdit;
 	}
-	
+
 	/**
-	 * Function to get WorldGuardInterface for version dependent things
+	 * Function to get WorldGuardInterface for version dependent things.
 	 * @return WorldGuardInterface
 	 */
 	public WorldEditInterface getWorldEditHandler() {
 		return this.worldEditInterface;
 	}
-	
+
 	/**
-	 * Function to get the LanguageManager
+	 * Function to get the LanguageManager.
 	 * @return the LanguageManager
 	 */
 	public LanguageManager getLanguageManager() {
-	    return languageManager;
+		return languageManager;
 	}
-	
+
 	/**
-	 * Function to get the CommandManager
+	 * Function to get the CommandManager.
 	 * @return the CommandManager
 	 */
 	public CommandManager getCommandManager() {
@@ -463,8 +469,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Get the SignLinkerManager
-	 * Handles sign linking mode
+	 * Get the SignLinkerManager.
+	 * Handles sign linking mode.
 	 * @return The SignLinkerManager
 	 */
 	public SignLinkerManager getSignlinkerManager() {
@@ -472,8 +478,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Get the FeatureManager
-	 * Manages region specific features
+	 * Get the FeatureManager.
+	 * Manages region specific features.
 	 * @return The FeatureManager
 	 */
 	public FeatureManager getFeatureManager() {
@@ -481,44 +487,44 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Function to get the Vault plugin
+	 * Function to get the Vault plugin.
 	 * @return Economy
 	 */
 	public Economy getEconomy() {
 		RegisteredServiceProvider<Economy> economy = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economy == null || economy.getProvider() == null) {
+		if(economy == null || economy.getProvider() == null) {
 			error("There is no economy provider to support Vault, make sure you installed an economy plugin");
 			return null;
-        }		
-	    return economy.getProvider();
+		}
+		return economy.getProvider();
 	}
-	
+
 	/**
-	 * Method to get the FileManager (loads/save regions and can be used to get regions)
+	 * Method to get the FileManager (loads/save regions and can be used to get regions).
 	 * @return The fileManager
 	 */
 	public FileManager getFileManager() {
 		return fileManager;
 	}
-	
+
 	/**
-	 * Get the updater (check the update result)
+	 * Get the updater (check the update result).
 	 * @return The updater
 	 */
 	public Updater getUpdater() {
 		return updater;
 	}
-	
+
 	/**
-	 * Check if an update for AreaShop is available
+	 * Check if an update for AreaShop is available.
 	 * @return true if an update is available, otherwise false
 	 */
 	public boolean updateAvailable() {
 		return updateAvailable;
 	}
-	
+
 	/**
-	 * Register dynamic permissions controlled by config settings
+	 * Register dynamic permissions controlled by config settings.
 	 */
 	private void registerDynamicPermissions() {
 		// Register limit groups of amount of regions a player can have
@@ -532,22 +538,22 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				try {
 					Bukkit.getPluginManager().addPermission(perm);
 				} catch(IllegalArgumentException e) {
-					warn("Could not add the following permission to be used as limit: "+perm.getName());
+					warn("Could not add the following permission to be used as limit: " + perm.getName());
 				}
 			}
-		}	
+		}
 		Bukkit.getPluginManager().recalculatePermissionDefaults(Bukkit.getPluginManager().getPermission("playerwarps.limits"));
 	}
-	
+
 	/**
-	 * Register all required tasks
+	 * Register all required tasks.
 	 */
-    private void setupTasks() {
-        // Rent expiration timer
+	private void setupTasks() {
+		// Rent expiration timer
 		long expirationCheck = Utils.millisToTicks(Utils.getDurationFromSecondsOrString("expiration.delay"));
 		final AreaShop finalPlugin = this;
 		if(expirationCheck > 0) {
-	        new BukkitRunnable() {
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					if(isReady()) {
@@ -557,9 +563,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 						AreaShop.debugTask("Skipped checking rent expirations, plugin not ready");
 					}
 				}
-	        }.runTaskTimer(this, 1, expirationCheck);
-        }
-	    // Inactive unrenting/selling timer
+			}.runTaskTimer(this, 1, expirationCheck);
+		}
+		// Inactive unrenting/selling timer
 		long inactiveCheck = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("inactive.delay"));
 		if(inactiveCheck > 0) {
 			new BukkitRunnable() {
@@ -572,9 +578,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 						AreaShop.debugTask("Skipped checking for regions of inactive players, plugin not ready");
 					}
 				}
-	        }.runTaskTimer(this, inactiveCheck, inactiveCheck);	     
-        }	        
-	    // Periodic updating of signs for timeleft tags
+			}.runTaskTimer(this, inactiveCheck, inactiveCheck);
+		}
+		// Periodic updating of signs for timeleft tags
 		long periodicUpdate = Utils.millisToTicks(Utils.getDurationFromSecondsOrString("signs.delay"));
 		if(periodicUpdate > 0) {
 			new BukkitRunnable() {
@@ -587,9 +593,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 						AreaShop.debugTask("Skipped performing periodic sign update, plugin not ready");
 					}
 				}
-	        }.runTaskTimer(this, periodicUpdate, periodicUpdate);	     
-        }
-        // Saving regions and group settings
+			}.runTaskTimer(this, periodicUpdate, periodicUpdate);
+		}
+		// Saving regions and group settings
 		long saveFiles = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("saving.delay"));
 		if(saveFiles > 0) {
 			new BukkitRunnable() {
@@ -602,9 +608,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 						AreaShop.debugTask("Skipped saving required files, plugin not ready");
 					}
 				}
-	        }.runTaskTimer(this, saveFiles, saveFiles);	     
-        }
-        // Sending warnings about rent regions to online players
+			}.runTaskTimer(this, saveFiles, saveFiles);
+		}
+		// Sending warnings about rent regions to online players
 		long expireWarning = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("expireWarning.delay"));
 		if(expireWarning > 0) {
 			new BukkitRunnable() {
@@ -617,22 +623,22 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 						AreaShop.debugTask("Skipped sending rent expire warnings, plugin not ready");
 					}
 				}
-	        }.runTaskTimer(this, expireWarning, expireWarning);	     
-        }
-        // Update all regions on startup
-        if(getConfig().getBoolean("updateRegionsOnStartup")) {
-	        new BukkitRunnable() {
+			}.runTaskTimer(this, expireWarning, expireWarning);
+		}
+		// Update all regions on startup
+		if(getConfig().getBoolean("updateRegionsOnStartup")) {
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					finalPlugin.getFileManager().updateAllRegions();
 					AreaShop.debugTask("Updating all regions at startup...");
 				}
-	        }.runTaskLater(this, 20L);	     
-        }
+			}.runTaskLater(this, 20L);
+		}
 	}
 
 	/**
-	 * Send a message to a target without a prefix
+	 * Send a message to a target without a prefix.
 	 * @param target       The target to send the message to
 	 * @param key          The key of the language string
 	 * @param replacements The replacements to insert in the message
@@ -642,7 +648,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Send a message to a target, prefixed by the default chat prefix
+	 * Send a message to a target, prefixed by the default chat prefix.
 	 * @param target       The target to send the message to
 	 * @param key          The key of the language string
 	 * @param replacements The replacements to insert in the message
@@ -651,9 +657,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		Message.fromKey(key).prefix().replacements(replacements).send(target);
 	}
 
-	
+
 	/**
-	 * Return the config
+	 * Return the config.
 	 */
 	@Override
 	public YamlConfiguration getConfig() {
@@ -661,23 +667,24 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Sends an debug message to the console
+	 * Sends an debug message to the console.
 	 * @param message The message that should be printed to the console
 	 */
 	public static void debug(Object... message) {
 		if(AreaShop.getInstance().debug) {
-			info("Debug: "+StringUtils.join(message, " "));
+			info("Debug: " + StringUtils.join(message, " "));
 		}
 	}
+
 	/**
-	 * Non-static debug to use as implementation of the interface
+	 * Non-static debug to use as implementation of the interface.
 	 */
 	public void debugI(Object... message) {
 		AreaShop.debug(StringUtils.join(message, " "));
 	}
 
 	/**
-	 * Print an information message to the console
+	 * Print an information message to the console.
 	 * @param message The message to print
 	 */
 	public static void info(Object... message) {
@@ -685,7 +692,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Print a warning to the console
+	 * Print a warning to the console.
 	 * @param message The message to print
 	 */
 	public static void warn(Object... message) {
@@ -693,7 +700,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Print an error to the console
+	 * Print an error to the console.
 	 * @param message The messagfe to print
 	 */
 	public static void error(Object... message) {
@@ -701,7 +708,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Print debug message for periodic task
+	 * Print debug message for periodic task.
 	 * @param message The message to print
 	 */
 	public static void debugTask(Object... message) {
@@ -711,9 +718,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Reload all files of the plugin and update all regions
-	 * confirmationReceiver The CommandSender that should receive confirmation messages, null for nobody
-	 * @param confirmationReceiver The CommandSender which should be notified when complete
+	 * Reload all files of the plugin and update all regions.
+	 * @param confirmationReceiver The CommandSender which should be notified when complete, null for nobody
 	 */
 	public void reload(final CommandSender confirmationReceiver) {
 		setReady(false);
@@ -724,13 +730,14 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		fileManager.checkRents();
 		fileManager.updateAllRegions(confirmationReceiver);
 	}
+
 	/**
-	 * Reload all files of the plugin and update all regions
+	 * Reload all files of the plugin and update all regions.
 	 */
 	public void reload() {
 		reload(null);
 	}
-	
+
 }
 
 

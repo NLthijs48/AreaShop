@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Random;
 
 public class FindCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop find";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.find")) {
@@ -32,11 +32,11 @@ public class FindCommand extends CommandAreaShop {
 		if(!sender.hasPermission("areashop.find")) {
 			plugin.message(sender, "find-noPermission");
 			return;
-		}	
-		if (!(sender instanceof Player)) {
+		}
+		if(!(sender instanceof Player)) {
 			plugin.message(sender, "cmd-onlyByPlayer");
 			return;
-		}		
+		}
 		if(args.length <= 1 || args[1] == null || (!args[1].equalsIgnoreCase("buy") && !args[1].equalsIgnoreCase("rent"))) {
 			plugin.message(sender, "find-help");
 			return;
@@ -73,7 +73,7 @@ public class FindCommand extends CommandAreaShop {
 			List<BuyRegion> regions = plugin.getFileManager().getBuys();
 			List<BuyRegion> results = new ArrayList<>();
 			for(BuyRegion region : regions) {
-				if(!region.isSold() 
+				if(!region.isSold()
 						&& ((region.getPrice() <= balance && !maxPriceSet) || (region.getPrice() <= maxPrice && maxPriceSet))
 						&& (group == null || group.isMember(region))
 						&& (region.getBooleanSetting("general.findCrossWorld") || player.getWorld().equals(region.getWorld()))) {
@@ -113,7 +113,7 @@ public class FindCommand extends CommandAreaShop {
 			List<RentRegion> regions = plugin.getFileManager().getRents();
 			List<RentRegion> results = new ArrayList<>();
 			for(RentRegion region : regions) {
-				if(!region.isRented() 
+				if(!region.isRented()
 						&& ((region.getPrice() <= balance && !maxPriceSet) || (region.getPrice() <= maxPrice && maxPriceSet))
 						&& (group == null || group.isMember(region))
 						&& (region.getBooleanSetting("general.findCrossWorld") || player.getWorld().equals(region.getWorld()))) {
@@ -149,7 +149,7 @@ public class FindCommand extends CommandAreaShop {
 		}
 
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<>();

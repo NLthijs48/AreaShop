@@ -28,7 +28,7 @@ public class WorldEditHandler5 extends WorldEditInterface {
 		EditSession editSession = pluginInterface.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(new BukkitWorld(regionInterface.getWorld()), pluginInterface.getConfig().getInt("maximumBlocks"));
 		// Get the origin and size of the region
 		Vector origin = new Vector(regionInterface.getRegion().getMinimumPoint().getBlockX(), regionInterface.getRegion().getMinimumPoint().getBlockY(), regionInterface.getRegion().getMinimumPoint().getBlockZ());
-		
+
 		editSession.enableQueue();
 		Exception otherException = null;
 		try {
@@ -41,9 +41,9 @@ public class WorldEditHandler5 extends WorldEditInterface {
 			}
 			clipBoard.place(editSession, origin, false);
 		} catch(MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of "+regionInterface.getName()+", limit in exception: "+e.getBlockLimit()+", limit passed by AreaShop: "+pluginInterface.getConfig().getInt("maximumBlocks"));
+			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			result = false;
-		} catch(DataException|IOException e) {
+		} catch(DataException | IOException e) {
 			otherException = e;
 		}
 		if(otherException != null) {
@@ -61,7 +61,7 @@ public class WorldEditHandler5 extends WorldEditInterface {
 		ProtectedRegion region = regionInterface.getRegion();
 		// Get the origin and size of the region
 		Vector origin = new Vector(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
-		Vector size = (new Vector(region.getMaximumPoint().getBlockX(), region.getMaximumPoint().getBlockY(), region.getMaximumPoint().getBlockZ()).subtract(origin)).add(new Vector(1,1,1));
+		Vector size = (new Vector(region.getMaximumPoint().getBlockX(), region.getMaximumPoint().getBlockY(), region.getMaximumPoint().getBlockZ()).subtract(origin)).add(new Vector(1, 1, 1));
 		EditSession editSession = new EditSession(new BukkitWorld(regionInterface.getWorld()), pluginInterface.getConfig().getInt("maximumBlocks"));
 		// Save the schematic
 		editSession.enableQueue();
@@ -70,7 +70,7 @@ public class WorldEditHandler5 extends WorldEditInterface {
 		Exception otherException = null;
 		try {
 			SchematicFormat.MCEDIT.save(clipboard, file);
-		} catch(DataException|IOException e) {
+		} catch(DataException | IOException e) {
 			otherException = e;
 		}
 		if(otherException != null) {
@@ -83,5 +83,4 @@ public class WorldEditHandler5 extends WorldEditInterface {
 	}
 
 
-	
 }

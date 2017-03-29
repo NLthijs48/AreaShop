@@ -21,7 +21,7 @@ public class RegionEvent<T> extends Event {
 	}
 
 	/**
-	 * Get the region of this event
+	 * Get the region of this event.
 	 * @return The region the event is about
 	 */
 	public T getRegion() {

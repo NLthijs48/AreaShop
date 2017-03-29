@@ -16,7 +16,7 @@ public class SetpriceCommand extends CommandAreaShop {
 	public String getCommandStart() {
 		return "areashop setprice";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.setprice")) {
@@ -30,20 +30,20 @@ public class SetpriceCommand extends CommandAreaShop {
 		if(!sender.hasPermission("areashop.setprice") && (!sender.hasPermission("areashop.setprice.landlord") && sender instanceof Player)) {
 			plugin.message(sender, "setprice-noPermission");
 			return;
-		}		
+		}
 		if(args.length < 2 || args[1] == null) {
 			plugin.message(sender, "setprice-help");
 			return;
 		}
 		GeneralRegion region;
 		if(args.length < 3) {
-			if (sender instanceof Player) {
+			if(sender instanceof Player) {
 				// get the region by location
-				List<GeneralRegion> regions = Utils.getAllApplicableRegions(((Player) sender).getLocation());
-				if (regions.isEmpty()) {
+				List<GeneralRegion> regions = Utils.getImportantRegions(((Player)sender).getLocation());
+				if(regions.isEmpty()) {
 					plugin.message(sender, "cmd-noRegionsAtLocation");
 					return;
-				} else if (regions.size() > 1) {
+				} else if(regions.size() > 1) {
 					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
@@ -52,10 +52,10 @@ public class SetpriceCommand extends CommandAreaShop {
 			} else {
 				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}		
+			}
 		} else {
 			region = plugin.getFileManager().getRegion(args[2]);
-		}		
+		}
 		if(region == null) {
 			plugin.message(sender, "setprice-notRegistered", args[2]);
 			return;
@@ -65,10 +65,10 @@ public class SetpriceCommand extends CommandAreaShop {
 			return;
 		}
 		if("default".equalsIgnoreCase(args[1]) || "reset".equalsIgnoreCase(args[1])) {
-            if (region instanceof RentRegion) {
-                ((RentRegion)region).removePrice();
-            } else if (region instanceof BuyRegion) {
-                ((BuyRegion)region).removePrice();
+			if(region instanceof RentRegion) {
+				((RentRegion)region).removePrice();
+			} else if(region instanceof BuyRegion) {
+				((BuyRegion)region).removePrice();
 			}
 			region.update();
 			plugin.message(sender, "setprice-successRemoved", region);
@@ -81,21 +81,21 @@ public class SetpriceCommand extends CommandAreaShop {
 			plugin.message(sender, "setprice-wrongPrice", args[1], region);
 			return;
 		}
-        if (region instanceof RentRegion) {
-            ((RentRegion)region).setPrice(price);
+		if(region instanceof RentRegion) {
+			((RentRegion)region).setPrice(price);
 			plugin.message(sender, "setprice-successRent", region);
-        } else if (region instanceof BuyRegion) {
-            ((BuyRegion)region).setPrice(price);
+		} else if(region instanceof BuyRegion) {
+			((BuyRegion)region).setPrice(price);
 			plugin.message(sender, "setprice-successBuy", region);
 		}
 		region.update();
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();
 		if(toComplete == 3) {
-			result = plugin.getFileManager().getRegionNames();		
+			result = plugin.getFileManager().getRegionNames();
 		}
 		return result;
 	}

@@ -28,12 +28,12 @@ public class BuyRegion extends GeneralRegion {
 	public BuyRegion(String name, World world) {
 		super(name, world);
 	}
-	
+
 	@Override
 	public RegionType getType() {
 		return RegionType.BUY;
 	}
-	
+
 	@Override
 	public RegionState getState() {
 		if(isSold() && isInResellingMode()) {
@@ -44,14 +44,14 @@ public class BuyRegion extends GeneralRegion {
 			return RegionState.FORSALE;
 		}
 	}
-	
+
 	@Override
 	public boolean isAvailable() {
 		return !isSold();
 	}
-	
+
 	/**
-	 * Get the UUID of the owner of this region
+	 * Get the UUID of the owner of this region.
 	 * @return The UUID of the owner of this region
 	 */
 	public UUID getBuyer() {
@@ -65,22 +65,23 @@ public class BuyRegion extends GeneralRegion {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Check if a player is the buyer of this region
+	 * Check if a player is the buyer of this region.
 	 * @param player Player to check
 	 * @return true if this player owns this region, otherwise false
 	 */
 	public boolean isBuyer(Player player) {
 		return player != null && isBuyer(player.getUniqueId());
 	}
+
 	public boolean isBuyer(UUID player) {
 		UUID buyer = getBuyer();
 		return !(buyer == null || player == null) && buyer.equals(player);
 	}
-	
+
 	/**
-	 * Set the buyer of this region
+	 * Set the buyer of this region.
 	 * @param buyer The UUID of the player that should be set as buyer
 	 */
 	public void setBuyer(UUID buyer) {
@@ -92,9 +93,9 @@ public class BuyRegion extends GeneralRegion {
 			setSetting("buy.buyerName", Utils.toName(buyer));
 		}
 	}
-	
+
 	/**
-	 * Get the name of the player that owns this region
+	 * Get the name of the player that owns this region.
 	 * @return The name of the player that owns this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return &lt;UNKNOWN&gt;
 	 */
 	public String getPlayerName() {
@@ -107,105 +108,105 @@ public class BuyRegion extends GeneralRegion {
 		}
 		return result;
 	}
-	
+
 	/**
-	 * Check if the region is sold
+	 * Check if the region is sold.
 	 * @return true if the region is sold, otherwise false
 	 */
 	public boolean isSold() {
 		return getBuyer() != null;
 	}
-	
+
 	/**
-	 * Check if the region is being resold
+	 * Check if the region is being resold.
 	 * @return true if the region is available for reselling, otherwise false
 	 */
 	public boolean isInResellingMode() {
 		return config.getBoolean("buy.resellMode");
 	}
-	
+
 	/**
-	 * Get the price of the region
+	 * Get the price of the region.
 	 * @return The price of the region
 	 */
 	public double getPrice() {
 		return Math.max(0, Utils.evaluateToDouble(getStringSetting("buy.price"), this));
 	}
-	
+
 	/**
-	 * Get the resell price of this region
+	 * Get the resell price of this region.
 	 * @return The resell price if isInResellingMode(), otherwise 0.0
 	 */
 	public double getResellPrice() {
 		return Math.max(0, config.getDouble("buy.resellPrice"));
 	}
-	
+
 	/**
-	 * Get the formatted string of the price (includes prefix and suffix)
+	 * Get the formatted string of the price (includes prefix and suffix).
 	 * @return The formatted string of the price
 	 */
 	public String getFormattedPrice() {
 		return Utils.formatCurrency(getPrice());
 	}
-	
+
 	/**
-	 * Get the formatted string of the resellprice (includes prefix and suffix)
+	 * Get the formatted string of the resellprice (includes prefix and suffix).
 	 * @return The formatted string of the resellprice
 	 */
 	public String getFormattedResellPrice() {
 		return Utils.formatCurrency(getResellPrice());
 	}
-	
+
 	/**
-	 * Change the price of the region
+	 * Change the price of the region.
 	 * @param price The price to set this region to
 	 */
 	public void setPrice(double price) {
 		setSetting("buy.price", price);
 	}
-	
+
 	/**
 	 * Remove the price so that the price will be taken from a group or the default.yml file
 	 */
 	public void removePrice() {
 		setSetting("buy.price", null);
 	}
-	
+
 	/**
-	 * Set the region into resell mode with the given price
+	 * Set the region into resell mode with the given price.
 	 * @param price The price this region should be put up for sale
 	 */
 	public void enableReselling(double price) {
 		setSetting("buy.resellMode", true);
 		setSetting("buy.resellPrice", price);
 	}
-	
+
 	/**
-	 * Stop this region from being in resell mode
+	 * Stop this region from being in resell mode.
 	 */
 	public void disableReselling() {
 		setSetting("buy.resellMode", null);
 		setSetting("buy.resellPrice", null);
 	}
-	
+
 	/**
-	 * Get the moneyBack percentage
+	 * Get the moneyBack percentage.
 	 * @return The % of money the player will get back when selling
 	 */
 	public double getMoneyBackPercentage() {
 		return Utils.evaluateToDouble(getStringSetting("buy.moneyBack"), this);
 	}
-	
+
 	/**
-	 * Get the amount of money that should be paid to the player when selling the region
+	 * Get the amount of money that should be paid to the player when selling the region.
 	 * @return The amount of money the player should get back
 	 */
 	public double getMoneyBackAmount() {
 		return getPrice() * (getMoneyBackPercentage() / 100.0);
 	}
-	
+
 	/**
-	 * Get the formatted string of the amount of the moneyBack amount
+	 * Get the formatted string of the amount of the moneyBack amount.
 	 * @return String with currency symbols and proper fractional part
 	 */
 	public String getFormattedMoneyBackAmount() {
@@ -232,7 +233,7 @@ public class BuyRegion extends GeneralRegion {
 			case AreaShop.tagRawMoneyBackAmount:
 				return getMoneyBackAmount();
 			case AreaShop.tagMoneyBackPercentage:
-				return getMoneyBackPercentage()%1.0 == 0.0 ? (int)getMoneyBackPercentage() : getMoneyBackPercentage();
+				return getMoneyBackPercentage() % 1.0 == 0.0 ? (int)getMoneyBackPercentage() : getMoneyBackPercentage();
 			case AreaShop.tagMaxInactiveTime:
 				return this.getFormattedInactiveTimeUntilSell();
 
@@ -240,25 +241,25 @@ public class BuyRegion extends GeneralRegion {
 				return super.provideReplacement(variable);
 		}
 	}
-	
+
 	/**
-	 * Minutes until automatic unrent when player is offline
+	 * Minutes until automatic unrent when player is offline.
 	 * @return The number of milliseconds until the region is unrented while player is offline
 	 */
 	public long getInactiveTimeUntilSell() {
 		return Utils.getDurationFromMinutesOrStringInput(getStringSetting("buy.inactiveTimeUntilSell"));
 	}
-	
+
 	/**
-	 * Get a human readable string indicating how long the player can be offline until automatic unrent
+	 * Get a human readable string indicating how long the player can be offline until automatic unrent.
 	 * @return String indicating the inactive time until unrent
 	 */
 	public String getFormattedInactiveTimeUntilSell() {
 		return Utils.millisToHumanFormat(getInactiveTimeUntilSell());
 	}
-	
+
 	/**
-	 * Buy a region
+	 * Buy a region.
 	 * @param player The player that wants to buy the region
 	 * @return true if it succeeded and false if not
 	 */
@@ -292,15 +293,15 @@ public class BuyRegion extends GeneralRegion {
 			if(!isSold() || (isInResellingMode() && !isBuyer(player))) {
 				boolean isResell = isInResellingMode();
 				// Check if the players needs to be in the world or region for buying
-				if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName()) 
+				if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName())
 						|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
 					message(player, "buy-restrictedToRegion");
 					return false;
-				}	
+				}
 				if(restrictedToWorld() && !player.getWorld().getName().equals(getWorldName())) {
 					message(player, "buy-restrictedToWorld", player.getWorld().getName());
 					return false;
-				}			
+				}
 				// Check region limits
 				LimitResult limitResult = this.limitsAllow(RegionType.BUY, player);
 				AreaShop.debug("LimitResult: " + limitResult.toString());
@@ -344,11 +345,11 @@ public class BuyRegion extends GeneralRegion {
 						if(oldOwnerPlayer != null && oldOwnerPlayer.getName() != null) {
 							r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
 							oldOwnerName = oldOwnerPlayer.getName();
-						} else if (oldOwnerName != null) {
+						} else if(oldOwnerName != null) {
 							r = plugin.getEconomy().depositPlayer(oldOwnerName, getWorldName(), getResellPrice());
 						}
 						if(r == null || !r.transactionSuccess()) {
-							AreaShop.warn("Something went wrong with paying '"+oldOwnerName+"' "+getFormattedPrice()+" for his resell of region "+getName()+" to "+player.getName());
+							AreaShop.warn("Something went wrong with paying '" + oldOwnerName + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + player.getName());
 						}
 						// Resell is done, disable that now
 						disableReselling();
@@ -400,7 +401,7 @@ public class BuyRegion extends GeneralRegion {
 								r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), getPrice());
 							}
 							if(r != null && !r.transactionSuccess()) {
-								AreaShop.warn("Something went wrong with paying '"+landlordName+"' "+getFormattedPrice()+" for his sell of region "+getName()+" to "+player.getName());
+								AreaShop.warn("Something went wrong with paying '" + landlordName + "' " + getFormattedPrice() + " for his sell of region " + getName() + " to " + player.getName());
 							}
 						}
 
@@ -420,7 +421,7 @@ public class BuyRegion extends GeneralRegion {
 						message(player, "buy-succes");
 						// Run commands
 						this.runEventCommands(RegionEvent.BOUGHT, false);
-					}				
+					}
 					return true;
 				} else {
 					// Player has not enough money
@@ -436,17 +437,17 @@ public class BuyRegion extends GeneralRegion {
 				} else {
 					message(player, "buy-someoneElse");
 				}
-			}	
+			}
 		} else {
 			message(player, "buy-noPermission");
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Sell a buyed region, get part of the money back
+	 * Sell a buyed region, get part of the money back.
 	 * @param giveMoneyBack true if the player should be given money back, otherwise false
-	 * @param executor CommandSender to receive a message when the sell fails, or null
+	 * @param executor      CommandSender to receive a message when the sell fails, or null
 	 * @return true if the region has been sold, otherwise false
 	 */
 	@SuppressWarnings("deprecation")
@@ -477,10 +478,10 @@ public class BuyRegion extends GeneralRegion {
 
 		// Run commands
 		this.runEventCommands(RegionEvent.SOLD, true);
-		
+
 		disableReselling();
 		// Give part of the buying price back
-		double moneyBack =  getMoneyBackAmount();
+		double moneyBack = getMoneyBackAmount();
 		if(moneyBack > 0 && giveMoneyBack) {
 			boolean noPayBack = false;
 			OfflinePlayer landlordPlayer = null;
@@ -498,8 +499,8 @@ public class BuyRegion extends GeneralRegion {
 				if(r == null || !r.transactionSuccess()) {
 					noPayBack = true;
 				}
-			}	
-			
+			}
+
 			// Give back the money
 			OfflinePlayer player = Bukkit.getOfflinePlayer(getBuyer());
 			if(player != null && !noPayBack) {
@@ -515,8 +516,8 @@ public class BuyRegion extends GeneralRegion {
 					error = true;
 				}
 				if(error || response == null || !response.transactionSuccess()) {
-					AreaShop.warn("Something went wrong with paying back money to "+getPlayerName()+" while selling region "+getName());
-				}	
+					AreaShop.warn("Something went wrong with paying back money to " + getPlayerName() + " while selling region " + getName());
+				}
 			}
 		}
 
@@ -552,8 +553,8 @@ public class BuyRegion extends GeneralRegion {
 		long lastPlayed = getLastActiveTime();
 		//AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
 		if(Calendar.getInstance().getTimeInMillis() > (lastPlayed + inactiveSetting)) {
-			AreaShop.info("Region "+getName()+" unrented because of inactivity for player "+getPlayerName());
-			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
+			AreaShop.info("Region " + getName() + " unrented because of inactivity for player " + getPlayerName());
+			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis() - player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
 			return this.sell(true, null);
 		}
 		return false;

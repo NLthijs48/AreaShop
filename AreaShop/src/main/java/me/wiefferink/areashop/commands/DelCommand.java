@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class DelCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop del";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.destroyrent") || target.hasPermission("areashop.destroybuy")) {
@@ -29,9 +29,9 @@ public class DelCommand extends CommandAreaShop {
 
 	@Override
 	public void execute(CommandSender sender, String[] args) {
-		if(		   !sender.hasPermission("areashop.destroybuy")
+		if(!sender.hasPermission("areashop.destroybuy")
 				&& !sender.hasPermission("areashop.destroybuy.landlord")
-			
+
 				&& !sender.hasPermission("areashop.destroyrent")
 				&& !sender.hasPermission("areashop.destroyrent.landlord")) {
 			plugin.message(sender, "del-noPermission");
@@ -48,8 +48,8 @@ public class DelCommand extends CommandAreaShop {
 			if(selection == null) {
 				plugin.message(player, "cmd-noSelection");
 				return;
-			}			
-			List<GeneralRegion> regions = Utils.getASRegionsInSelection(selection);
+			}
+			List<GeneralRegion> regions = Utils.getRegionsInSelection(selection);
 			if(regions == null || regions.size() == 0) {
 				plugin.message(player, "cmd-noRegionsFound");
 				return;
@@ -59,15 +59,15 @@ public class DelCommand extends CommandAreaShop {
 			TreeSet<GeneralRegion> namesFailed = new TreeSet<>();
 			for(GeneralRegion region : regions) {
 				boolean isLandlord = region.isLandlord(((Player)sender).getUniqueId());
-                if (region instanceof RentRegion) {
-                    if(!sender.hasPermission("areashop.destroyrent") && !(isLandlord && sender.hasPermission("areashop.destroyrent.landlord"))) {
+				if(region instanceof RentRegion) {
+					if(!sender.hasPermission("areashop.destroyrent") && !(isLandlord && sender.hasPermission("areashop.destroyrent.landlord"))) {
 						namesFailed.add(region);
 					} else {
 						plugin.getFileManager().removeRent((RentRegion)region, true);
 						namesSuccess.add(region.getName());
 					}
-                } else if (region instanceof BuyRegion) {
-                    if(!sender.hasPermission("areashop.destroybuy") && !(isLandlord && sender.hasPermission("areashop.destroybuy.landlord"))) {
+				} else if(region instanceof BuyRegion) {
+					if(!sender.hasPermission("areashop.destroybuy") && !(isLandlord && sender.hasPermission("areashop.destroybuy.landlord"))) {
 						namesFailed.add(region);
 					} else {
 						plugin.getFileManager().removeBuy((BuyRegion)region, true);
@@ -89,16 +89,16 @@ public class DelCommand extends CommandAreaShop {
 				return;
 			}
 			boolean isLandlord = sender instanceof Player && region.isLandlord(((Player)sender).getUniqueId());
-            if (region instanceof RentRegion) {
-                // Remove the rent if the player has permission
+			if(region instanceof RentRegion) {
+				// Remove the rent if the player has permission
 				if(sender.hasPermission("areashop.destroyrent") || (isLandlord && sender.hasPermission("areashop.destroyrent.landlord"))) {
 					plugin.getFileManager().removeRent((RentRegion)region, true);
 					plugin.message(sender, "shutdown-successRent", region);
 				} else {
 					plugin.message(sender, "shutdown-noPermissionRent", region);
 				}
-            } else if (region instanceof BuyRegion) {
-                // Remove the buy if the player has permission
+			} else if(region instanceof BuyRegion) {
+				// Remove the buy if the player has permission
 				if(sender.hasPermission("areashop.destroybuy") || (isLandlord && sender.hasPermission("areashop.destroybuy.landlord"))) {
 					plugin.getFileManager().removeBuy((BuyRegion)region, true);
 					plugin.message(sender, "shutdown-successBuy", region);
@@ -108,7 +108,7 @@ public class DelCommand extends CommandAreaShop {
 			}
 		}
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();

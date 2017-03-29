@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class GroupdelCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop groupdel";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.groupdel")) {
@@ -31,11 +31,11 @@ public class GroupdelCommand extends CommandAreaShop {
 		if(!sender.hasPermission("areashop.groupdel")) {
 			plugin.message(sender, "groupdel-noPermission");
 			return;
-		}		
+		}
 		if(args.length < 2 || args[1] == null) {
 			plugin.message(sender, "groupdel-help");
 			return;
-		}	
+		}
 		RegionGroup group = plugin.getFileManager().getGroup(args[1]);
 		if(group == null) {
 			group = new RegionGroup(plugin, args[1]);
@@ -52,7 +52,7 @@ public class GroupdelCommand extends CommandAreaShop {
 				plugin.message(player, "cmd-noSelection");
 				return;
 			}
-			List<GeneralRegion> regions = Utils.getASRegionsInSelection(selection);
+			List<GeneralRegion> regions = Utils.getRegionsInSelection(selection);
 			if(regions.size() == 0) {
 				plugin.message(player, "cmd-noRegionsFound");
 				return;
@@ -80,7 +80,7 @@ public class GroupdelCommand extends CommandAreaShop {
 			if(region == null) {
 				plugin.message(sender, "cmd-notRegistered", args[2]);
 				return;
-			}	
+			}
 			if(group.removeMember(region)) {
 				region.update();
 				plugin.message(sender, "groupdel-success", group.getName(), group.getMembers().size(), region);
@@ -89,12 +89,12 @@ public class GroupdelCommand extends CommandAreaShop {
 			}
 		}
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();
 		if(toComplete == 2) {
-			result = plugin.getFileManager().getGroupNames();		
+			result = plugin.getFileManager().getGroupNames();
 		} else if(toComplete == 3) {
 			result = plugin.getFileManager().getRegionNames();
 		}

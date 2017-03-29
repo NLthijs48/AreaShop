@@ -8,8 +8,12 @@ import java.util.logging.Logger;
 
 public interface AreaShopInterface {
 	void debugI(Object... message);
+
 	YamlConfiguration getConfig();
+
 	WorldGuardPlugin getWorldGuard();
+
 	WorldEditPlugin getWorldEdit();
+
 	Logger getLogger();
 }

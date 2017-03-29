@@ -12,7 +12,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TeleportFeature extends RegionFeature {
 
@@ -29,7 +33,7 @@ public class TeleportFeature extends RegionFeature {
 	}
 
 	/**
-	 * Get the teleportlocation set for this region
+	 * Get the teleportlocation set for this region.
 	 * @return The teleport location, or null if not set
 	 */
 	public Location getTeleportLocation() {
@@ -39,7 +43,7 @@ public class TeleportFeature extends RegionFeature {
 	}
 
 	/**
-	 * Check if the region has a teleportLocation specified
+	 * Check if the region has a teleportLocation specified.
 	 * @return true if the region has a teleportlocation, false otherwise
 	 */
 	public boolean hasTeleportLocation() {
@@ -47,7 +51,7 @@ public class TeleportFeature extends RegionFeature {
 	}
 
 	/**
-	 * Set the teleport location of this region
+	 * Set the teleport location of this region.
 	 * @param location The location to set as teleport location
 	 */
 	public void setTeleport(Location location) {
@@ -59,9 +63,9 @@ public class TeleportFeature extends RegionFeature {
 	}
 
 	/**
-	 * Teleport a player to the region or sign
-	 * @param player           Player that should be teleported
-	 * @param toSign           true to teleport to the first sign of the region, false for teleporting to the region itself
+	 * Teleport a player to the region or sign.
+	 * @param player            Player that should be teleported
+	 * @param toSign            true to teleport to the first sign of the region, false for teleporting to the region itself
 	 * @param checkRestrictions Set to true if teleport permissions should be checked, false otherwise, also toggles cross-world check
 	 * @return true if the teleport succeeded, otherwise false
 	 */
@@ -77,8 +81,6 @@ public class TeleportFeature extends RegionFeature {
 			return false;
 		}
 
-
-		ProtectedRegion wRegion = region.getRegion();
 		if(checkRestrictions) {
 			// Check correct world
 			if(!region.getBooleanSetting("general.teleportCrossWorld") && !player.getWorld().equals(region.getWorld())) {
@@ -140,7 +142,8 @@ public class TeleportFeature extends RegionFeature {
 		// Check locations starting from startLocation and then a cube that increases
 		// radius around that (until no block in the region is found at all cube sides)
 		Location safeLocation = startLocation;
-		boolean blocksInRegion = wRegion.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
+		ProtectedRegion worldguardRegion = region.getRegion();
+		boolean blocksInRegion = worldguardRegion.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
 		if(!blocksInRegion && insideRegion) {
 			region.message(player, "teleport-blocked");
 			return false;
@@ -161,13 +164,13 @@ public class TeleportFeature extends RegionFeature {
 
 			// North side
 			continueThisDirection = false;
-			for(int x = -radius+1; x <= radius && !done && !northDone; x++) {
-				for(int y = -radius+1; y < radius && !done; y++) {
+			for(int x = -radius + 1; x <= radius && !done && !northDone; x++) {
+				for(int y = -radius + 1; y < radius && !done; y++) {
 					safeLocation = startLocation.clone().add(x, y, -radius);
 					if(safeLocation.getBlockY() > 256 || safeLocation.getBlockY() < 0) {
 						continue;
 					}
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -179,13 +182,13 @@ public class TeleportFeature extends RegionFeature {
 
 			// East side
 			continueThisDirection = false;
-			for(int z = -radius+1; z <= radius && !done && !eastDone; z++) {
-				for(int y = -radius+1; y < radius && !done; y++) {
+			for(int z = -radius + 1; z <= radius && !done && !eastDone; z++) {
+				for(int y = -radius + 1; y < radius && !done; y++) {
 					safeLocation = startLocation.clone().add(radius, y, z);
 					if(safeLocation.getBlockY() > 256 || safeLocation.getBlockY() < 0) {
 						continue;
 					}
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -197,13 +200,13 @@ public class TeleportFeature extends RegionFeature {
 
 			// South side
 			continueThisDirection = false;
-			for(int x = radius-1; x >= -radius && !done && !southDone; x--) {
-				for(int y = -radius+1; y < radius && !done; y++) {
+			for(int x = radius - 1; x >= -radius && !done && !southDone; x--) {
+				for(int y = -radius + 1; y < radius && !done; y++) {
 					safeLocation = startLocation.clone().add(x, y, radius);
 					if(safeLocation.getBlockY() > 256 || safeLocation.getBlockY() < 0) {
 						continue;
 					}
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -215,13 +218,13 @@ public class TeleportFeature extends RegionFeature {
 
 			// West side
 			continueThisDirection = false;
-			for(int z = radius-1; z >= -radius && !done && !westDone; z--) {
-				for(int y = -radius+1; y < radius && !done; y++) {
+			for(int z = radius - 1; z >= -radius && !done && !westDone; z--) {
+				for(int y = -radius + 1; y < radius && !done; y++) {
 					safeLocation = startLocation.clone().add(-radius, y, z);
 					if(safeLocation.getBlockY() > 256 || safeLocation.getBlockY() < 0) {
 						continue;
 					}
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -234,12 +237,12 @@ public class TeleportFeature extends RegionFeature {
 			// Top side
 			continueThisDirection = false;
 			// Middle block of the top
-			if((startLocation.getBlockY()+radius) > 256) {
+			if((startLocation.getBlockY() + radius) > 256) {
 				topDone = true;
 			}
 			if(!done && !topDone) {
 				safeLocation = startLocation.clone().add(0, radius, 0);
-				if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+				if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 					checked++;
 					done = isSafe(safeLocation) || checked > maxTries;
 					blocksInRegion = true;
@@ -248,9 +251,9 @@ public class TeleportFeature extends RegionFeature {
 			}
 			for(int r = 1; r <= radius && !done && !topDone; r++) {
 				// North
-				for(int x = -r+1; x <= r && !done; x++) {
+				for(int x = -r + 1; x <= r && !done; x++) {
 					safeLocation = startLocation.clone().add(x, radius, -r);
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -258,9 +261,9 @@ public class TeleportFeature extends RegionFeature {
 					}
 				}
 				// East
-				for(int z = -r+1; z <= r && !done; z++) {
+				for(int z = -r + 1; z <= r && !done; z++) {
 					safeLocation = startLocation.clone().add(r, radius, z);
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -268,9 +271,9 @@ public class TeleportFeature extends RegionFeature {
 					}
 				}
 				// South side
-				for(int x = r-1; x >= -r && !done; x--) {
+				for(int x = r - 1; x >= -r && !done; x--) {
 					safeLocation = startLocation.clone().add(x, radius, r);
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -278,9 +281,9 @@ public class TeleportFeature extends RegionFeature {
 					}
 				}
 				// West side
-				for(int z = r-1; z >= -r && !done; z--) {
+				for(int z = r - 1; z >= -r && !done; z--) {
 					safeLocation = startLocation.clone().add(-r, radius, z);
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -293,12 +296,12 @@ public class TeleportFeature extends RegionFeature {
 			// Bottom side
 			continueThisDirection = false;
 			// Middle block of the bottom
-			if(startLocation.getBlockY()-radius < 0) {
+			if(startLocation.getBlockY() - radius < 0) {
 				bottomDone = true;
 			}
 			if(!done && !bottomDone) {
 				safeLocation = startLocation.clone().add(0, -radius, 0);
-				if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+				if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 					checked++;
 					done = isSafe(safeLocation) || checked > maxTries;
 					blocksInRegion = true;
@@ -307,9 +310,9 @@ public class TeleportFeature extends RegionFeature {
 			}
 			for(int r = 1; r <= radius && !done && !bottomDone; r++) {
 				// North
-				for(int x = -r+1; x <= r && !done; x++) {
+				for(int x = -r + 1; x <= r && !done; x++) {
 					safeLocation = startLocation.clone().add(x, -radius, -r);
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -317,9 +320,9 @@ public class TeleportFeature extends RegionFeature {
 					}
 				}
 				// East
-				for(int z = -r+1; z <= r && !done; z++) {
+				for(int z = -r + 1; z <= r && !done; z++) {
 					safeLocation = startLocation.clone().add(r, -radius, z);
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -327,9 +330,9 @@ public class TeleportFeature extends RegionFeature {
 					}
 				}
 				// South side
-				for(int x = r-1; x >= -r && !done; x--) {
+				for(int x = r - 1; x >= -r && !done; x--) {
 					safeLocation = startLocation.clone().add(x, -radius, r);
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -337,9 +340,9 @@ public class TeleportFeature extends RegionFeature {
 					}
 				}
 				// West side
-				for(int z = r-1; z >= -r && !done; z--) {
+				for(int z = r - 1; z >= -r && !done; z--) {
 					safeLocation = startLocation.clone().add(-r, -radius, z);
-					if(wRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
+					if(worldguardRegion.contains(safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ()) || !insideRegion) {
 						checked++;
 						done = isSafe(safeLocation) || checked > maxTries;
 						blocksInRegion = true;
@@ -359,17 +362,17 @@ public class TeleportFeature extends RegionFeature {
 				region.message(player, "teleport-success");
 			}
 			player.teleport(safeLocation);
-			AreaShop.debug("Found location: "+safeLocation.toString()+" Tries: "+(checked-1));
+			AreaShop.debug("Found location: " + safeLocation.toString() + " Tries: " + (checked - 1));
 			return true;
 		} else {
-			region.message(player, "teleport-noSafe", checked-1, maxTries);
-			AreaShop.debug("No location found, checked "+(checked-1)+" spots of max "+maxTries);
+			region.message(player, "teleport-noSafe", checked - 1, maxTries);
+			AreaShop.debug("No location found, checked " + (checked - 1) + " spots of max " + maxTries);
 			return false;
 		}
 	}
 
 	/**
-	 * Teleport a player to the region or sign when he has permissions for it
+	 * Teleport a player to the region or sign when he has permissions for it.
 	 * @param player Player that should be teleported
 	 * @param toSign true to teleport to the first sign of the region, false for teleporting to the region itself
 	 * @return true if the teleport succeeded, otherwise false
@@ -379,7 +382,7 @@ public class TeleportFeature extends RegionFeature {
 	}
 
 	/**
-	 * Teleport a player to the region when he has permissions for it
+	 * Teleport a player to the region when he has permissions for it.
 	 * @param player Player that should be teleported
 	 * @return true if the teleport succeeded, otherwise false
 	 */
@@ -388,7 +391,7 @@ public class TeleportFeature extends RegionFeature {
 	}
 
 	/**
-	 * Checks if a certain location is safe to teleport to
+	 * Checks if a certain location is safe to teleport to.
 	 * @param location The location to check
 	 * @return true if it is safe, otherwise false
 	 */
@@ -434,14 +437,14 @@ public class TeleportFeature extends RegionFeature {
 	}
 
 	/**
-	 * Get the start location of a safe teleport search
+	 * Get the start location of a safe teleport search.
 	 * @param player The player to get it for
 	 * @param toSign true to try teleporting to the first sign, false for teleporting to the region
 	 * @return The start location
 	 */
 	private Location getStartLocation(Player player, Value<Boolean> toSign) {
 		Location startLocation = null;
-		ProtectedRegion wRegion = region.getRegion();
+		ProtectedRegion worldguardRegion = region.getRegion();
 
 		// Handle teleporting to a sign
 		List<Location> signs = region.getSignsFeature().getSignLocations();
@@ -467,12 +470,12 @@ public class TeleportFeature extends RegionFeature {
 		// Calculate a default location
 		if(startLocation == null) {
 			// Set to block in the middle, y configured in the config
-			Vector middle = Vector.getMidpoint(wRegion.getMaximumPoint(), wRegion.getMinimumPoint());
+			Vector middle = Vector.getMidpoint(worldguardRegion.getMaximumPoint(), worldguardRegion.getMinimumPoint());
 			String configSetting = region.getStringSetting("general.teleportLocationY");
 			if("bottom".equalsIgnoreCase(configSetting)) {
-				middle = middle.setY(wRegion.getMinimumPoint().getBlockY());
+				middle = middle.setY(worldguardRegion.getMinimumPoint().getBlockY());
 			} else if("top".equalsIgnoreCase(configSetting)) {
-				middle = middle.setY(wRegion.getMaximumPoint().getBlockY());
+				middle = middle.setY(worldguardRegion.getMaximumPoint().getBlockY());
 			} else if("middle".equalsIgnoreCase(configSetting)) {
 				middle = middle.setY(middle.getBlockY());
 			} else {
@@ -480,15 +483,15 @@ public class TeleportFeature extends RegionFeature {
 					int vertical = Integer.parseInt(configSetting);
 					middle = middle.setY(vertical);
 				} catch(NumberFormatException e) {
-					AreaShop.warn("Could not parse general.teleportLocationY: '"+configSetting+"'");
+					AreaShop.warn("Could not parse general.teleportLocationY: '" + configSetting + "'");
 				}
 			}
 			startLocation = new Location(region.getWorld(), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
 		}
 
 		// Set location in the center of the block
-		startLocation.setX(startLocation.getBlockX()+0.5);
-		startLocation.setZ(startLocation.getBlockZ()+0.5);
+		startLocation.setX(startLocation.getBlockX() + 0.5);
+		startLocation.setZ(startLocation.getBlockZ() + 0.5);
 
 		return startLocation;
 	}

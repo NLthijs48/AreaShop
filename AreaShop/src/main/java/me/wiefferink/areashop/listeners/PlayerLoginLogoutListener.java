@@ -19,21 +19,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Notify region expiry and track activity time
+ * Notify region expiry and track activity time.
  */
 public final class PlayerLoginLogoutListener implements Listener {
 	private AreaShop plugin;
-	
+
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param plugin The AreaShop plugin
 	 */
 	public PlayerLoginLogoutListener(AreaShop plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	/**
-	 * Called when a sign is changed
+	 * Called when a sign is changed.
 	 * @param event The event
 	 */
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -44,16 +44,16 @@ public final class PlayerLoginLogoutListener implements Listener {
 		final Player player = event.getPlayer();
 		// Notify admins for plugin updates
 		if(plugin.updateAvailable() && player.hasPermission("areashop.notifyupdate")) {
-			AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());	
+			AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());
 		}
 		// Schedule task to check for notifications, prevents a lag spike at login
-        new BukkitRunnable() {
+		new BukkitRunnable() {
 			@Override
 			public void run() {
 				// Delay until all regions are loaded
 				if(!plugin.isReady()) {
 					return;
-				}	
+				}
 				if(!player.isOnline()) {
 					this.cancel();
 					return;
@@ -68,18 +68,18 @@ public final class PlayerLoginLogoutListener implements Listener {
 						long warningTime = Utils.durationStringToLong(warningSetting);
 						if(region.getTimeLeft() < warningTime) {
 							// Send the warning message later to let it appear after general MOTD messages
-							AreaShop.getInstance().message(player, "rent-expireWarning", region);		        
-						}				
+							AreaShop.getInstance().message(player, "rent-expireWarning", region);
+						}
 					}
 				}
 				this.cancel();
 			}
-        }.runTaskTimer(plugin, 25, 25);	
+		}.runTaskTimer(plugin, 25, 25);
 		// Check if the player has regions that use an old name of him and update them
 		final List<GeneralRegion> regions = new ArrayList<>(plugin.getFileManager().getRegions());
 		new BukkitRunnable() {
 			private int current = 0;
-			
+
 			@Override
 			public void run() {
 				// Delay until all regions are loaded
@@ -87,17 +87,17 @@ public final class PlayerLoginLogoutListener implements Listener {
 					return;
 				}
 				// Check all regions
-				for(int i=0; i<plugin.getConfig().getInt("nameupdate.regionsPerTick"); i++) {
+				for(int i = 0; i < plugin.getConfig().getInt("nameupdate.regionsPerTick"); i++) {
 					if(current < regions.size()) {
 						GeneralRegion region = regions.get(current);
 						if(region.isOwner(player)) {
-                            if (region instanceof BuyRegion) {
-                                if(!player.getName().equals(region.getStringSetting("buy.buyerName"))) {
+							if(region instanceof BuyRegion) {
+								if(!player.getName().equals(region.getStringSetting("buy.buyerName"))) {
 									region.setSetting("buy.buyerName", player.getName());
 									region.update();
 								}
-                            } else if (region instanceof RentRegion) {
-                                if(!player.getName().equals(region.getStringSetting("rent.renterName"))) {
+							} else if(region instanceof RentRegion) {
+								if(!player.getName().equals(region.getStringSetting("rent.renterName"))) {
 									region.setSetting("rent.renterName", player.getName());
 									region.update();
 								}
@@ -112,20 +112,20 @@ public final class PlayerLoginLogoutListener implements Listener {
 			}
 		}.runTaskTimer(plugin, 22, 1); // Wait a bit before starting to prevent a lot of stress on the server when a player joins (a lot of plugins already do stuff then)
 	}
-	
+
 	// Active time updates
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLogout(PlayerQuitEvent event) {
 		updateLastActive(event.getPlayer());
 	}
-	
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerKick(PlayerKickEvent event) {
 		updateLastActive(event.getPlayer());
 	}
-	
+
 	/**
-	 * Update the last active time for all regions the player is owner off
+	 * Update the last active time for all regions the player is owner off.
 	 * @param player The player to update the active times for
 	 */
 	private void updateLastActive(Player player) {

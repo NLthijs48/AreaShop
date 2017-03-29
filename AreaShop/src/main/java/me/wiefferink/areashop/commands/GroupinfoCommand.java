@@ -13,7 +13,7 @@ public class GroupinfoCommand extends CommandAreaShop {
 	public String getCommandStart() {
 		return "areashop groupinfo";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.groupinfo")) {
@@ -28,11 +28,11 @@ public class GroupinfoCommand extends CommandAreaShop {
 		if(!sender.hasPermission("areashop.groupinfo")) {
 			plugin.message(sender, "groupinfo-noPermission");
 			return;
-		}		
+		}
 		if(args.length < 2 || args[1] == null) {
 			plugin.message(sender, "groupinfo-help");
 			return;
-		}		
+		}
 		RegionGroup group = plugin.getFileManager().getGroup(args[1]);
 		if(group == null) {
 			plugin.message(sender, "groupinfo-noGroup", args[1]);
@@ -45,7 +45,7 @@ public class GroupinfoCommand extends CommandAreaShop {
 			plugin.message(sender, "groupinfo-members", group.getName(), Utils.createCommaSeparatedList(members));
 		}
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();

@@ -1,12 +1,21 @@
 package me.wiefferink.areashop.managers;
 
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.features.*;
+import me.wiefferink.areashop.features.DebugFeature;
+import me.wiefferink.areashop.features.FriendsFeature;
+import me.wiefferink.areashop.features.RegionFeature;
+import me.wiefferink.areashop.features.SignsFeature;
+import me.wiefferink.areashop.features.TeleportFeature;
+import me.wiefferink.areashop.features.WorldGuardRegionFlagsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class FeatureManager extends Manager {
 
@@ -22,6 +31,9 @@ public class FeatureManager extends Manager {
 	private Set<RegionFeature> globalFeatures;
 	private Map<Class<? extends RegionFeature>, Constructor<? extends RegionFeature>> regionFeatureConstructors;
 
+	/**
+	 * Constructor.
+	 */
 	public FeatureManager() {
 		// Instantiate and register global features (one per type, for event handling)
 		globalFeatures = new HashSet<>();
@@ -32,7 +44,7 @@ public class FeatureManager extends Manager {
 					RegionFeature feature = constructor.newInstance();
 					feature.listen();
 					globalFeatures.add(feature);
-				} catch(InstantiationException|IllegalAccessException|InvocationTargetException|IllegalArgumentException e) {
+				} catch(InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 					AreaShop.error("Failed to instantiate global feature:", clazz);
 				}
 			} catch(NoSuchMethodException e) {
@@ -45,7 +57,7 @@ public class FeatureManager extends Manager {
 		for(Class<? extends RegionFeature> clazz : featureClasses) {
 			try {
 				regionFeatureConstructors.put(clazz, clazz.getConstructor(GeneralRegion.class));
-			} catch(NoSuchMethodException|IllegalArgumentException e) {
+			} catch(NoSuchMethodException | IllegalArgumentException e) {
 				// The feature does not have a region specific part
 			}
 		}
@@ -59,15 +71,15 @@ public class FeatureManager extends Manager {
 	}
 
 	/**
-	 * Instanciate a feature for a certain region
-	 * @param region The region to create a feature for
+	 * Instanciate a feature for a certain region.
+	 * @param region       The region to create a feature for
 	 * @param featureClazz The class of the feature to create
 	 * @return The feature class
 	 */
 	public RegionFeature getRegionFeature(GeneralRegion region, Class<? extends RegionFeature> featureClazz) {
 		try {
 			return regionFeatureConstructors.get(featureClazz).newInstance(region);
-		} catch(InstantiationException|InvocationTargetException|IllegalAccessException|IllegalArgumentException e) {
+		} catch(InstantiationException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
 			AreaShop.error("Failed to instanciate feature", featureClazz, "for region", region);
 		}
 		return null;

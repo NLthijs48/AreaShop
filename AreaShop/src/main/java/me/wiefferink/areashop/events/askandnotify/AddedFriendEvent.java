@@ -6,7 +6,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 /**
- * Broadcasted when a friend is being added to a region
+ * Broadcasted when a friend is being added to a region.
  */
 public class AddedFriendEvent extends CancellableRegionEvent<GeneralRegion> {
 
@@ -14,7 +14,7 @@ public class AddedFriendEvent extends CancellableRegionEvent<GeneralRegion> {
 	private CommandSender by;
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param region The region the friend is getting added to
 	 * @param friend The friend that is about to be added
 	 * @param by     The CommandSender that is adding the friend, or null if none
@@ -26,7 +26,7 @@ public class AddedFriendEvent extends CancellableRegionEvent<GeneralRegion> {
 	}
 
 	/**
-	 * Get the OfflinePlayer that is getting added as friend
+	 * Get the OfflinePlayer that is getting added as friend.
 	 * @return The friend that is getting added
 	 */
 	public OfflinePlayer getFriend() {
@@ -34,7 +34,7 @@ public class AddedFriendEvent extends CancellableRegionEvent<GeneralRegion> {
 	}
 
 	/**
-	 * Get the CommandSender that is adding the friend
+	 * Get the CommandSender that is adding the friend.
 	 * @return null if none, a CommandSender if done by someone (likely Player or ConsoleCommandSender)
 	 */
 	public CommandSender getBy() {

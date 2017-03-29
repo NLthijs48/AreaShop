@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 public class MeCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop me";
@@ -28,7 +28,7 @@ public class MeCommand extends CommandAreaShop {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.me")) {

@@ -7,7 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class FriendsFeature extends RegionFeature {
 
@@ -16,7 +20,7 @@ public class FriendsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Add a friend to the region
+	 * Add a friend to the region.
 	 * @param player The UUID of the player to add
 	 * @param by     The CommandSender that is adding the friend, or null
 	 * @return true if the friend has been added, false if adding a friend was cancelled by another plugin
@@ -38,7 +42,7 @@ public class FriendsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Delete a friend from the region
+	 * Delete a friend from the region.
 	 * @param player The UUID of the player to delete
 	 * @param by     The CommandSender that is adding the friend, or null
 	 * @return true if the friend has been added, false if adding a friend was cancelled by another plugin
@@ -64,7 +68,7 @@ public class FriendsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Get the list of friends added to this region
+	 * Get the list of friends added to this region.
 	 * @return Friends added to this region
 	 */
 	public Set<UUID> getFriends() {
@@ -81,7 +85,7 @@ public class FriendsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Get the list of friends added to this region
+	 * Get the list of friends added to this region.
 	 * @return Friends added to this region
 	 */
 	public Set<String> getFriendNames() {
@@ -96,7 +100,7 @@ public class FriendsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Remove all friends that are added to this region
+	 * Remove all friends that are added to this region.
 	 */
 	public void clearFriends() {
 		region.setSetting("general.friends", null);

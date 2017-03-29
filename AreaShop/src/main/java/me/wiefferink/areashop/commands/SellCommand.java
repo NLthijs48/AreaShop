@@ -25,7 +25,7 @@ public class SellCommand extends CommandAreaShop {
 	}
 
 	/**
-	 * Check if a person can sell the region
+	 * Check if a person can sell the region.
 	 * @param person The person to check
 	 * @param region The region to check for
 	 * @return true if the person can sell it, otherwise false
@@ -40,7 +40,7 @@ public class SellCommand extends CommandAreaShop {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.sell") && !sender.hasPermission("areashop.sellown")) {
@@ -49,13 +49,13 @@ public class SellCommand extends CommandAreaShop {
 		}
 		BuyRegion buy;
 		if(args.length <= 1) {
-			if (sender instanceof Player) {
+			if(sender instanceof Player) {
 				// get the region by location
-				List<BuyRegion> regions = Utils.getApplicableBuyRegions(((Player) sender).getLocation());
-				if (regions.isEmpty()) {
+				List<BuyRegion> regions = Utils.getImportantBuyRegions(((Player)sender).getLocation());
+				if(regions.isEmpty()) {
 					plugin.message(sender, "cmd-noRegionsAtLocation");
 					return;
-				} else if (regions.size() > 1) {
+				} else if(regions.size() > 1) {
 					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
@@ -64,7 +64,7 @@ public class SellCommand extends CommandAreaShop {
 			} else {
 				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}		
+			}
 		} else {
 			buy = plugin.getFileManager().getBuy(args[1]);
 		}
@@ -78,7 +78,7 @@ public class SellCommand extends CommandAreaShop {
 		}
 		buy.sell(true, sender);
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<>();

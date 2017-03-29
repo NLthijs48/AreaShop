@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Set;
 
 public class LinksignsCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop linksigns";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.linksigns")) {
@@ -28,12 +28,12 @@ public class LinksignsCommand extends CommandAreaShop {
 		if(!sender.hasPermission("areashop.linksigns")) {
 			plugin.message(sender, "linksigns-noPermission");
 			return;
-		}		
-		if (!(sender instanceof Player)) {
+		}
+		if(!(sender instanceof Player)) {
 			plugin.message(sender, "cmd-onlyByPlayer");
 			return;
 		}
-		
+
 		Player player = (Player)sender;
 		if(plugin.getSignlinkerManager().isInSignLinkMode(player)) {
 			plugin.getSignlinkerManager().exitSignLinkMode(player);
@@ -58,7 +58,7 @@ public class LinksignsCommand extends CommandAreaShop {
 			plugin.getSignlinkerManager().enterSignLinkMode(player, profile);
 		}
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();

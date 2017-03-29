@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SetrestoreCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop setrestore";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.setrestore")) {
@@ -45,7 +45,7 @@ public class SetrestoreCommand extends CommandAreaShop {
 		region.setRestoreSetting(value);
 		String valueString = "general";
 		if(value != null) {
-			valueString = value+"";
+			valueString = value + "";
 		}
 		if(args.length > 3) {
 			region.setSchematicProfile(args[3]);
@@ -55,7 +55,7 @@ public class SetrestoreCommand extends CommandAreaShop {
 		}
 		region.update();
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();

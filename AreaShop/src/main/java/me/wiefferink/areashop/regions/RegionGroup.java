@@ -12,11 +12,11 @@ public class RegionGroup {
 
 	private AreaShop plugin;
 	private String name;
-	
+
 	/**
 	 * Constructor, used when creating new groups or restoring them from groups.yml at server boot
 	 * @param plugin The AreaShop plugin
-	 * @param name Name of the group, has to be unique
+	 * @param name   Name of the group, has to be unique
 	 */
 	public RegionGroup(AreaShop plugin, String name) {
 		this.plugin = plugin;
@@ -45,9 +45,9 @@ public class RegionGroup {
 			plugin.getFileManager().removeGroup(this);
 		}
 	}
-	
+
 	/**
-	 * Adds a member to a group
+	 * Adds a member to a group.
 	 * @param region The region to add to the group (GeneralRegion or a subclass of it)
 	 * @return true if the region was not already added, otherwise false
 	 */
@@ -62,9 +62,9 @@ public class RegionGroup {
 			return true;
 		}
 	}
-	
+
 	/**
-	 * Remove a member from the group
+	 * Remove a member from the group.
 	 * @param region The region to remove
 	 * @return true if the region was in the group before, otherwise false
 	 */
@@ -82,9 +82,9 @@ public class RegionGroup {
 		}
 		return result;
 	}
-	
+
 	/**
-	 * Get all members of the group
+	 * Get all members of the group.
 	 * @return A list with the names of all members of the group
 	 */
 	public List<String> getMembers() {
@@ -93,9 +93,9 @@ public class RegionGroup {
 		}
 		return getSettings().getStringList("regions");
 	}
-	
+
 	/**
-	 * Get all members of the group as GeneralRegions
+	 * Get all members of the group as GeneralRegions.
 	 * @return A Set with all group members
 	 */
 	public Set<GeneralRegion> getMemberRegions() {
@@ -105,50 +105,51 @@ public class RegionGroup {
 		}
 		return result;
 	}
-	
+
 	/**
-	 * Get the name of the group
+	 * Get the name of the group.
 	 * @return The name of the group
 	 */
 	public String getName() {
 		return name;
-	}	
+	}
+
 	/**
-	 * Get the lowercase name of the group (used for getting the config etc)
+	 * Get the lowercase name of the group (used for getting the config etc).
 	 * @return The name of the group in lowercase
 	 */
 	public String getLowerCaseName() {
 		return getName().toLowerCase();
 	}
-	
+
 	/**
-	 * Check if a region is member of the group
+	 * Check if a region is member of the group.
 	 * @param region Region to check
 	 * @return true if the region is in the group, otherwise false
 	 */
 	public boolean isMember(GeneralRegion region) {
 		return getMembers().contains(region.getName());
 	}
-	
+
 	/**
-	 * Get the priority of the group (higher overwrites)
+	 * Get the priority of the group (higher overwrites).
 	 * @return The priority of the group
 	 */
 	public int getPriority() {
 		return getSettings().getInt("priority");
 	}
-	
+
 	/**
-	 * Get the configurationsection with the settings of this group
+	 * Get the configurationsection with the settings of this group.
 	 * @return The ConfigurationSection with the settings of the group
 	 */
 	public ConfigurationSection getSettings() {
 		return plugin.getFileManager().getGroupSettings(name);
 	}
-	
+
 	/**
-	 * Set a setting of this group
-	 * @param path The path to set
+	 * Set a setting of this group.
+	 * @param path    The path to set
 	 * @param setting The value to set
 	 */
 	public void setSetting(String path, Object setting) {
@@ -156,14 +157,14 @@ public class RegionGroup {
 	}
 
 	/**
-	 * Indicates this file needs to be saved, will actually get saved later by a task
+	 * Indicates this file needs to be saved, will actually get saved later by a task.
 	 */
 	public void saveRequired() {
 		plugin.getFileManager().saveGroupsIsRequired();
 	}
-	
+
 	/**
-	 * Save the groups to disk now, normally saveRequired() is preferred because of performance
+	 * Save the groups to disk now, normally saveRequired() is preferred because of performance.
 	 */
 	public void saveNow() {
 		plugin.getFileManager().saveGroupsNow();

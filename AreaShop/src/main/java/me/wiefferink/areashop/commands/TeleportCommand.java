@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TeleportCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop tp";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.teleportall") || target.hasPermission("areashop.teleport")) {
@@ -23,7 +23,7 @@ public class TeleportCommand extends CommandAreaShop {
 	}
 
 	/**
-	 * Check if a person can teleport to the region (assuming he is not teleporting to a sign)
+	 * Check if a person can teleport to the region (assuming he is not teleporting to a sign).
 	 * @param person The person to check
 	 * @param region The region to check for
 	 * @return true if the person can teleport to it, otherwise false
@@ -45,10 +45,10 @@ public class TeleportCommand extends CommandAreaShop {
 			plugin.message(sender, "teleport-noPermission");
 			return;
 		}
-		if (!(sender instanceof Player)) {
+		if(!(sender instanceof Player)) {
 			plugin.message(sender, "cmd-onlyByPlayer");
 			return;
-		}		
+		}
 		if(args.length <= 1 || args[1] == null) {
 			plugin.message(sender, "teleport-help");
 			return;
@@ -66,7 +66,7 @@ public class TeleportCommand extends CommandAreaShop {
 		}
 
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<>();

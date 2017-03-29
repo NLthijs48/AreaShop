@@ -7,7 +7,7 @@ public abstract class Manager {
 	AreaShop plugin = AreaShop.getInstance();
 
 	/**
-	 * Called at shutdown of the plugin
+	 * Called at shutdown of the plugin.
 	 */
 	public void shutdown() {
 		// To override by extending classes

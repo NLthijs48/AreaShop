@@ -5,14 +5,14 @@ import me.wiefferink.areashop.regions.BuyRegion;
 import org.bukkit.entity.Player;
 
 /**
- * Broadcasted when a player tries to resell a region
+ * Broadcasted when a player tries to resell a region.
  */
 public class ResellingRegionEvent extends CancellableRegionEvent<BuyRegion> {
 
 	private Player player;
 
 	/**
-	 * Contructor
+	 * Contructor.
 	 * @param region The region that the player is trying to resell
 	 * @param player The player that is trying to buy this region from the current owner
 	 */
@@ -22,7 +22,7 @@ public class ResellingRegionEvent extends CancellableRegionEvent<BuyRegion> {
 	}
 
 	/**
-	 * Get the player that is trying to buy the region
+	 * Get the player that is trying to buy the region.
 	 * @return The player that is trying to buy the region
 	 */
 	public Player getBuyer() {

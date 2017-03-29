@@ -8,7 +8,7 @@ public class ReloadCommand extends CommandAreaShop {
 	public String getCommandStart() {
 		return "areashop reload";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.reload")) {

@@ -5,7 +5,7 @@ public class Value<T> {
 	private T value;
 
 	/**
-	 * Create a container with a default value
+	 * Create a container with a default value.
 	 * @param value The value to set
 	 */
 	public Value(T value) {
@@ -13,7 +13,7 @@ public class Value<T> {
 	}
 
 	/**
-	 * Get the stored value
+	 * Get the stored value.
 	 * @return The stored value
 	 */
 	public T get() {
@@ -21,7 +21,7 @@ public class Value<T> {
 	}
 
 	/**
-	 * Set the value
+	 * Set the value.
 	 * @param value The new value
 	 */
 	public void set(T value) {

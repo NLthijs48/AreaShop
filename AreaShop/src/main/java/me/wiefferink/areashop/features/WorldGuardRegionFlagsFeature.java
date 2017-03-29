@@ -23,7 +23,7 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Set the region flags/options to the values of a ConfigurationSection
+	 * Set the region flags/options to the values of a ConfigurationSection.
 	 * @param region The region to update the flags for
 	 * @return true if the flags have been set correctly, otherwise false
 	 */
@@ -50,10 +50,11 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 
 		return result;
 	}
+
 	/**
-	 * Set the region flags/options to the values of a ConfigurationSection
+	 * Set the region flags/options to the values of a ConfigurationSection.
 	 * @param region The region to update the flags for
-	 * @param flags The flags to apply
+	 * @param flags  The flags to apply
 	 * @return true if the flags have been set correctly, otherwise false
 	 */
 	private boolean updateRegionFlags(GeneralRegion region, ConfigurationSection flags) {
@@ -63,8 +64,8 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 		WorldGuardPlugin worldGuard = plugin.getWorldGuard();
 
 		// Get the region
-		ProtectedRegion wRegion = region.getRegion();
-		if(wRegion == null) {
+		ProtectedRegion worldguardRegion = region.getRegion();
+		if(worldguardRegion == null) {
 			AreaShop.debug("Region '" + region.getName() + "' does not exist, setting flags failed");
 			return false;
 		}
@@ -76,18 +77,18 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 				value = translateBukkitToWorldGuardColors(value);
 			}
 			if(flagName.equalsIgnoreCase("members")) {
-				plugin.getWorldGuardHandler().setMembers(wRegion, value);
+				plugin.getWorldGuardHandler().setMembers(worldguardRegion, value);
 				//AreaShop.debug("  Flag " + flagName + " set: " + members.toUserFriendlyString());
 			} else if(flagName.equalsIgnoreCase("owners")) {
-				plugin.getWorldGuardHandler().setOwners(wRegion, value);
+				plugin.getWorldGuardHandler().setOwners(worldguardRegion, value);
 				//AreaShop.debug("  Flag " + flagName + " set: " + owners.toUserFriendlyString());
 			} else if(flagName.equalsIgnoreCase("priority")) {
 				try {
 					int priority = Integer.parseInt(value);
-					wRegion.setPriority(priority);
+					worldguardRegion.setPriority(priority);
 					//AreaShop.debug("  Flag " + flagName + " set: " + value);
 				} catch(NumberFormatException e) {
-					AreaShop.warn("The value of flag "+flagName+" is not a number");
+					AreaShop.warn("The value of flag " + flagName + " is not a number");
 					result = false;
 				}
 			} else if(flagName.equalsIgnoreCase("parent")) {
@@ -97,7 +98,7 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 				ProtectedRegion parentRegion = worldGuard.getRegionManager(region.getWorld()).getRegion(value);
 				if(parentRegion != null) {
 					try {
-						wRegion.setParent(parentRegion);
+						worldguardRegion.setParent(parentRegion);
 						//AreaShop.debug("  Flag " + flagName + " set: " + value);
 					} catch(ProtectedRegion.CircularInheritanceException e) {
 						AreaShop.warn("The parent set in the config is not correct (circular inheritance)");
@@ -112,14 +113,14 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 
 				Flag<?> foundFlag = plugin.getWorldGuardHandler().fuzzyMatchFlag(flagName);
 				if(foundFlag == null) {
-					AreaShop.warn("Found wrong flag in flagProfiles section: "+flagName+", check if that is the correct WorldGuard flag");
+					AreaShop.warn("Found wrong flag in flagProfiles section: " + flagName + ", check if that is the correct WorldGuard flag");
 					continue;
 				}
 				RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
 				if(value == null || value.isEmpty()) {
-					wRegion.setFlag(foundFlag, null);
+					worldguardRegion.setFlag(foundFlag, null);
 					if(groupFlag != null) {
-						wRegion.setFlag(groupFlag, null);
+						worldguardRegion.setFlag(groupFlag, null);
 					}
 					//AreaShop.debug("  Flag " + flagName + " reset (+ possible group of flag)");
 				} else {
@@ -132,7 +133,7 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 									try {
 										groupValue = plugin.getWorldGuardHandler().parseFlagGroupInput(groupFlag, part.substring(2));
 									} catch(InvalidFlagFormat e) {
-										AreaShop.warn("Found wrong group value for flag "+flagName);
+										AreaShop.warn("Found wrong group value for flag " + flagName);
 									}
 								}
 							} else {
@@ -146,18 +147,18 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 					}
 					if(flagSetting != null) {
 						try {
-							setFlag(wRegion, foundFlag, flagSetting);
+							setFlag(worldguardRegion, foundFlag, flagSetting);
 							//AreaShop.debug("  Flag " + flagName + " set: " + flagSetting);
 						} catch(InvalidFlagFormat e) {
-							AreaShop.warn("Found wrong value for flag "+flagName);
+							AreaShop.warn("Found wrong value for flag " + flagName);
 						}
 					}
 					if(groupValue != null) {
 						if(groupValue == groupFlag.getDefault()) {
-							wRegion.setFlag(groupFlag, null);
+							worldguardRegion.setFlag(groupFlag, null);
 							//AreaShop.debug("    Group of flag " + flagName + " set to default: " + groupValue);
 						} else {
-							wRegion.setFlag(groupFlag, groupValue);
+							worldguardRegion.setFlag(groupFlag, groupValue);
 							//AreaShop.debug("    Group of flag " + flagName + " set: " + groupValue);
 						}
 					}
@@ -170,11 +171,11 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Set a WorldGuard region flag
+	 * Set a WorldGuard region flag.
 	 * @param region The WorldGuard region to set
 	 * @param flag   The flag to set
 	 * @param value  The value to set the flag to
-	 * @param <V> They type of flag to set
+	 * @param <V>    They type of flag to set
 	 * @throws InvalidFlagFormat When the value of the flag is wrong
 	 */
 	private <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value) throws InvalidFlagFormat {
@@ -182,7 +183,7 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 	}
 
 	/**
-	 * Translate the color codes you put in greeting/farewell messages to the weird color codes of WorldGuard
+	 * Translate the color codes you put in greeting/farewell messages to the weird color codes of WorldGuard.
 	 * @param message The message where the color codes should be translated (this message has bukkit color codes)
 	 * @return The string with the WorldGuard color codes
 	 */

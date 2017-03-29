@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Set;
 
 public class AddsignCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop addsign";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.addsign")) {
@@ -35,11 +35,11 @@ public class AddsignCommand extends CommandAreaShop {
 		if(!sender.hasPermission("areashop.addsign")) {
 			plugin.message(sender, "addsign-noPermission");
 			return;
-		}		
-		if (!(sender instanceof Player)) {
+		}
+		if(!(sender instanceof Player)) {
 			plugin.message(sender, "cmd-onlyByPlayer");
 			return;
-		}	
+		}
 		Player player = (Player)sender;
 
 		// Get the sign
@@ -63,10 +63,10 @@ public class AddsignCommand extends CommandAreaShop {
 			if(region == null) {
 				plugin.message(sender, "cmd-notRegistered", args[1]);
 				return;
-			}			
+			}
 		} else {
 			// Get region by sign position
-			List<GeneralRegion> regions = Utils.getASRegionsInSelection(new CuboidSelection(block.getWorld(), block.getLocation(), block.getLocation()));
+			List<GeneralRegion> regions = Utils.getRegionsInSelection(new CuboidSelection(block.getWorld(), block.getLocation(), block.getLocation()));
 			if(regions.isEmpty()) {
 				plugin.message(sender, "addsign-noRegions");
 				return;
@@ -100,7 +100,7 @@ public class AddsignCommand extends CommandAreaShop {
 		}
 		region.update();
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();

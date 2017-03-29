@@ -3,7 +3,11 @@ package me.wiefferink.areashop.handlers;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.*;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
@@ -21,6 +25,7 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 		super(pluginInterface);
 	}
 
+	@Override
 	public void setOwners(ProtectedRegion region, String input) {
 		// Split the string and parse all values
 		String[] names = input.split(", ");
@@ -36,9 +41,9 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 				} else if(owner.startsWith("n:")) {
 					if(owner.length() > 2) {
 						owners.addPlayer(owner.substring(2));
-					}							
+					}
 				} else {
-					UUID uuid;						
+					UUID uuid;
 					try {
 						uuid = UUID.fromString(owner);
 					} catch(IllegalArgumentException e) {
@@ -58,6 +63,7 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 		//System.out.println("  Flag " + flagName + " set: " + owners.toUserFriendlyString());		
 	}
 
+	@Override
 	public void setMembers(ProtectedRegion region, String input) {
 		// Split the string and parse all values
 		String[] names = input.split(", ");
@@ -73,9 +79,9 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 				} else if(member.startsWith("n:")) {
 					if(member.length() > 2) {
 						members.addPlayer(member.substring(2));
-					}							
+					}
 				} else {
-					UUID uuid;						
+					UUID uuid;
 					try {
 						uuid = UUID.fromString(member);
 					} catch(IllegalArgumentException e) {

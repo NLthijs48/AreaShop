@@ -14,7 +14,7 @@ public class SetdurationCommand extends CommandAreaShop {
 	public String getCommandStart() {
 		return "areashop setduration";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.setduration")) {
@@ -39,13 +39,13 @@ public class SetdurationCommand extends CommandAreaShop {
 		}
 		RentRegion rent;
 		if(args.length <= regionArgument) {
-			if (sender instanceof Player) {
+			if(sender instanceof Player) {
 				// get the region by location
-				List<RentRegion> regions = Utils.getApplicableRentRegions(((Player) sender).getLocation());
-				if (regions.isEmpty()) {
+				List<RentRegion> regions = Utils.getImportantRentRegions(((Player)sender).getLocation());
+				if(regions.isEmpty()) {
 					plugin.message(sender, "cmd-noRegionsAtLocation");
 					return;
-				} else if (regions.size() > 1) {
+				} else if(regions.size() > 1) {
 					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
@@ -54,7 +54,7 @@ public class SetdurationCommand extends CommandAreaShop {
 			} else {
 				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}		
+			}
 		} else {
 			rent = plugin.getFileManager().getRent(args[regionArgument]);
 		}
@@ -65,7 +65,7 @@ public class SetdurationCommand extends CommandAreaShop {
 		if(!sender.hasPermission("areashop.setduration") && !(sender instanceof Player && rent.isLandlord(((Player)sender).getUniqueId()))) {
 			plugin.message(sender, "setduration-noLandlord", rent);
 			return;
-		}	
+		}
 		if("default".equalsIgnoreCase(args[1]) || "reset".equalsIgnoreCase(args[1])) {
 			rent.setDuration(null);
 			rent.update();
@@ -78,15 +78,15 @@ public class SetdurationCommand extends CommandAreaShop {
 			plugin.message(sender, "setduration-wrongAmount", args[1], rent);
 			return;
 		}
-		if(!Utils.checkTimeFormat(args[1]+" "+args[2])) {
-			plugin.message(sender, "setduration-wrongFormat", args[1]+" "+args[2], rent);
+		if(!Utils.checkTimeFormat(args[1] + " " + args[2])) {
+			plugin.message(sender, "setduration-wrongFormat", args[1] + " " + args[2], rent);
 			return;
-		}					
-		rent.setDuration(args[1]+" "+args[2]);
+		}
+		rent.setDuration(args[1] + " " + args[2]);
 		rent.update();
 		plugin.message(sender, "setduration-success", rent);
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();

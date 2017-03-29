@@ -12,22 +12,22 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
 /**
- * Checks for placement of signs for this plugin
+ * Checks for placement of signs for this plugin.
  */
 public final class SignBreakListener implements Listener {
 	private AreaShop plugin;
-	
+
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param plugin The AreaShop plugin
 	 */
 	public SignBreakListener(AreaShop plugin) {
 		this.plugin = plugin;
 	}
-	
-	
+
+
 	/**
-	 * Called when a block is broken
+	 * Called when a block is broken.
 	 * @param event The event
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
@@ -53,29 +53,29 @@ public final class SignBreakListener implements Listener {
 			}
 		}
 	}
-	
+
 	/**
-	 * Called when the physics of a block change
+	 * Called when the physics of a block change.
 	 * @param event The event
 	 */
 	@EventHandler(priority = EventPriority.HIGHEST)
-    public void onIndirectSignBreak(BlockPhysicsEvent event){
-        Block block = event.getBlock();
-        if(event.isCancelled()) {
-        	return;
-        }
-        if(block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN){
-            Sign sign = (Sign)block.getState();
-            Block attachedTo = block.getRelative(((org.bukkit.material.Sign)sign.getData()).getAttachedFace());
-            if(attachedTo.getType() == Material.AIR){
+	public void onIndirectSignBreak(BlockPhysicsEvent event) {
+		Block block = event.getBlock();
+		if(event.isCancelled()) {
+			return;
+		}
+		if(block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN) {
+			Sign sign = (Sign)block.getState();
+			Block attachedTo = block.getRelative(((org.bukkit.material.Sign)sign.getData()).getAttachedFace());
+			if(attachedTo.getType() == Material.AIR) {
 				// Check if the rent sign is really the same as a saved rent
 				SignsFeature.RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
 				if(regionSign != null) {
 					event.setCancelled(true); // Cancel the sign breaking, will create a floating sign but at least it is not disconnected/gone
 				}
-            }
-        }
-    }
+			}
+		}
+	}
 }
 
 

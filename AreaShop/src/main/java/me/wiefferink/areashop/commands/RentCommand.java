@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RentCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop rent";
@@ -22,17 +22,17 @@ public class RentCommand extends CommandAreaShop {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.rent")) {
 			plugin.message(sender, "rent-noPermission");
 			return;
 		}
-		if (!(sender instanceof Player)) {
+		if(!(sender instanceof Player)) {
 			plugin.message(sender, "cmd-onlyByPlayer");
 			return;
-		}					
+		}
 		Player player = (Player)sender;
 		if(args.length > 1 && args[1] != null) {
 			RentRegion rent = plugin.getFileManager().getRent(args[1]);
@@ -43,17 +43,17 @@ public class RentCommand extends CommandAreaShop {
 			}
 		} else {
 			// get the region by location
-			List<RentRegion> regions = Utils.getApplicableRentRegions(((Player) sender).getLocation());
-			if (regions.isEmpty()) {
+			List<RentRegion> regions = Utils.getImportantRentRegions(((Player)sender).getLocation());
+			if(regions.isEmpty()) {
 				plugin.message(sender, "cmd-noRegionsAtLocation");
-			} else if (regions.size() > 1) {
+			} else if(regions.size() > 1) {
 				plugin.message(sender, "cmd-moreRegionsAtLocation");
 			} else {
 				regions.get(0).rent(player);
-			}	
-		}	
+			}
+		}
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<>();

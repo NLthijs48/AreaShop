@@ -24,7 +24,12 @@ import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class WorldEditHandler6 extends WorldEditInterface {
 
@@ -49,8 +54,7 @@ public class WorldEditHandler6 extends WorldEditInterface {
 		Vector origin = new Vector(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
 
 		// Read the schematic and paste it into the world
-		Closer closer = Closer.create();
-		try {
+		try(Closer closer = Closer.create()) {
 			FileInputStream fis = closer.register(new FileInputStream(file));
 			BufferedInputStream bis = closer.register(new BufferedInputStream(fis));
 			ClipboardReader reader = ClipboardFormat.SCHEMATIC.getReader(bis);
@@ -73,18 +77,13 @@ public class WorldEditHandler6 extends WorldEditInterface {
 					.to(origin)
 					.build();
 			Operations.completeLegacy(operation);
-		} catch (MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of "+regionInterface.getName()+", limit in exception: "+e.getBlockLimit()+", limit passed by AreaShop: "+pluginInterface.getConfig().getInt("maximumBlocks"));
+		} catch(MaxChangedBlocksException e) {
+			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;
-		} catch (IOException e) {
+		} catch(IOException e) {
 			pluginInterface.getLogger().warning("An error occured while restoring schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
 			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;
-		} finally {
-			try {
-				closer.close();
-			} catch (IOException ignored) {
-			}
 		}
 		editSession.flushQueue();
 		return true;
@@ -109,24 +108,19 @@ public class WorldEditHandler6 extends WorldEditInterface {
 		try {
 			Operations.completeLegacy(copy);
 		} catch(MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while saving schematic of "+regionInterface.getName()+", limit in exception: "+e.getBlockLimit()+", limit passed by AreaShop: "+pluginInterface.getConfig().getInt("maximumBlocks"));
+			pluginInterface.getLogger().warning("Exeeded the block limit while saving schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;
 		}
-		Closer closer = Closer.create();
-		try {
+
+		try(Closer closer = Closer.create()) {
 			FileOutputStream fos = closer.register(new FileOutputStream(file));
 			BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
 			ClipboardWriter writer = closer.register(ClipboardFormat.SCHEMATIC.getWriter(bos));
 			writer.write(clipboard, world.getWorldData());
-		} catch (IOException e) {
+		} catch(IOException e) {
 			pluginInterface.getLogger().warning("An error occured while saving schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
 			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;
-		} finally {
-			try {
-				closer.close();
-			} catch (IOException ignored) {
-			}
 		}
 		return true;
 	}

@@ -24,18 +24,18 @@ public class SchematiceventCommand extends CommandAreaShop {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.schematicevents")) {
 			plugin.message(sender, "schemevent-noPermission");
 			return;
 		}
-		
+
 		if(args.length < 3 || args[1] == null || args[2] == null) {
 			plugin.message(sender, "schemevent-help");
 			return;
-		}		
+		}
 		GeneralRegion region = plugin.getFileManager().getRegion(args[1]);
 		if(region == null) {
 			plugin.message(sender, "cmd-notRegistered", args[1]);
@@ -50,7 +50,7 @@ public class SchematiceventCommand extends CommandAreaShop {
 		try {
 			event = GeneralRegion.RegionEvent.valueOf(args[2].toUpperCase());
 		} catch(IllegalArgumentException e) {
-			exception = true;	
+			exception = true;
 		}
 		// Check for a totally wrong event or a non matching event
 		if(exception) {
@@ -59,8 +59,8 @@ public class SchematiceventCommand extends CommandAreaShop {
 				values.add(value.getValue().toLowerCase());
 			}
 			plugin.message(sender, "schemevent-wrongEvent", args[2], Utils.createCommaSeparatedList(values), region);
-			return;	
-		}		
+			return;
+		}
 		region.handleSchematicEvent(event);
 		region.update();
 		plugin.message(sender, "schemevent-success", args[2], region);
@@ -74,10 +74,10 @@ public class SchematiceventCommand extends CommandAreaShop {
 		} else if(toComplete == 3) {
 			GeneralRegion region = plugin.getFileManager().getRegion(start[2]);
 			if(region != null) {
-                if (region instanceof RentRegion) {
-                    result.addAll(Arrays.asList("created", "deleted", "rented", "unrented"));
-                } else if (region instanceof BuyRegion) {
-                    result.addAll(Arrays.asList("created", "deleted", "bought", "sold"));
+				if(region instanceof RentRegion) {
+					result.addAll(Arrays.asList("created", "deleted", "rented", "unrented"));
+				} else if(region instanceof BuyRegion) {
+					result.addAll(Arrays.asList("created", "deleted", "bought", "sold"));
 				}
 			}
 		}

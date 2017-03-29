@@ -13,14 +13,14 @@ public abstract class RegionFeature implements Listener {
 	GeneralRegion region;
 
 	/**
-	 * Start listening to events
+	 * Start listening to events.
 	 */
 	public void listen() {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
 	/**
-	 * Destroy the feature and deregister everything
+	 * Destroy the feature and deregister everything.
 	 */
 	public void shutdownFeature() {
 		HandlerList.unregisterAll(this);
@@ -28,7 +28,7 @@ public abstract class RegionFeature implements Listener {
 	}
 
 	/**
-	 * Dummy method a RegionFeature implementation can override
+	 * Dummy method a RegionFeature implementation can override.
 	 */
 	public void shutdown() {
 	}

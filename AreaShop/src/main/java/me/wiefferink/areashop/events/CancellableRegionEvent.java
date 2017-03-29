@@ -10,7 +10,7 @@ public class CancellableRegionEvent<T> extends RegionEvent<T> {
 	}
 
 	/**
-	 * Cancel the event from happening
+	 * Cancel the event from happening.
 	 * @param reason The reason of cancelling, used for display to the user, should end with a dot
 	 */
 	public void cancel(String reason) {
@@ -19,7 +19,7 @@ public class CancellableRegionEvent<T> extends RegionEvent<T> {
 	}
 
 	/**
-	 * Let the event continue, possible overwriting a cancel() call from another plugin
+	 * Let the event continue, possible overwriting a cancel() call from another plugin.
 	 */
 	public void allow() {
 		this.cancelled = false;
@@ -27,7 +27,7 @@ public class CancellableRegionEvent<T> extends RegionEvent<T> {
 	}
 
 	/**
-	 * Check if the event has been cancelled
+	 * Check if the event has been cancelled.
 	 * @return true if the event has been cancelled, otherwise false
 	 */
 	public boolean isCancelled() {
@@ -35,7 +35,7 @@ public class CancellableRegionEvent<T> extends RegionEvent<T> {
 	}
 
 	/**
-	 * Get the reason why this event is cancelled
+	 * Get the reason why this event is cancelled.
 	 * @return null if there is no reason or the event is not cancelled, otherwise a string
 	 */
 	public String getReason() {

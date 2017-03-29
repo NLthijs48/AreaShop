@@ -6,7 +6,7 @@ import me.wiefferink.areashop.regions.BuyRegion;
 import java.util.UUID;
 
 /**
- * Broadcasted when a region is sold
+ * Broadcasted when a region is sold.
  */
 public class SoldRegionEvent extends NotifyRegionEvent<BuyRegion> {
 
@@ -14,9 +14,9 @@ public class SoldRegionEvent extends NotifyRegionEvent<BuyRegion> {
 	private double refundedMoney;
 
 	/**
-	 * Constructor
-	 * @param region   The region that has been sold
-	 * @param oldBuyer The player for which the region has been sold
+	 * Constructor.
+	 * @param region        The region that has been sold
+	 * @param oldBuyer      The player for which the region has been sold
 	 * @param refundedMoney The amount of money that has been refunded
 	 */
 	public SoldRegionEvent(BuyRegion region, UUID oldBuyer, double refundedMoney) {
@@ -26,7 +26,7 @@ public class SoldRegionEvent extends NotifyRegionEvent<BuyRegion> {
 	}
 
 	/**
-	 * Get the player that the region is sold for
+	 * Get the player that the region is sold for.
 	 * @return The UUID of the player that the region is sold for
 	 */
 	public UUID getOldBuyer() {
@@ -34,7 +34,7 @@ public class SoldRegionEvent extends NotifyRegionEvent<BuyRegion> {
 	}
 
 	/**
-	 * Get the amount that is paid back to the player
+	 * Get the amount that is paid back to the player.
 	 * @return The amount of money paid back to the player
 	 */
 	public double getRefundedMoney() {

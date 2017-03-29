@@ -28,7 +28,7 @@ public class DelfriendCommand extends CommandAreaShop {
 	}
 
 	/**
-	 * Check if a person can remove friends
+	 * Check if a person can remove friends.
 	 * @param person The person to check
 	 * @param region The region to check for
 	 * @return true if the person can remove friends, otherwise false
@@ -43,27 +43,27 @@ public class DelfriendCommand extends CommandAreaShop {
 		}
 		return false;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.delfriend") && !sender.hasPermission("areashop.delfriendall")) {
 			plugin.message(sender, "delfriend-noPermission");
 			return;
-		}		
+		}
 		if(args.length < 2) {
 			plugin.message(sender, "delfriend-help");
 			return;
 		}
 		GeneralRegion region;
 		if(args.length <= 2) {
-			if (sender instanceof Player) {
+			if(sender instanceof Player) {
 				// get the region by location
-				List<GeneralRegion> regions = Utils.getAllApplicableRegions(((Player) sender).getLocation());
-				if (regions.isEmpty()) {
+				List<GeneralRegion> regions = Utils.getImportantRegions(((Player)sender).getLocation());
+				if(regions.isEmpty()) {
 					plugin.message(sender, "cmd-noRegionsAtLocation");
 					return;
-				} else if (regions.size() > 1) {
+				} else if(regions.size() > 1) {
 					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
@@ -72,7 +72,7 @@ public class DelfriendCommand extends CommandAreaShop {
 			} else {
 				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}	
+			}
 		} else {
 			region = plugin.getFileManager().getRegion(args[2]);
 			if(region == null) {
@@ -81,11 +81,11 @@ public class DelfriendCommand extends CommandAreaShop {
 			}
 		}
 		if(sender.hasPermission("areashop.delfriendall")) {
-            if ((region instanceof RentRegion && !((RentRegion) region).isRented())
-                    || (region instanceof BuyRegion && !((BuyRegion) region).isSold())) {
-                plugin.message(sender, "delfriend-noOwner", region);
+			if((region instanceof RentRegion && !((RentRegion)region).isRented())
+					|| (region instanceof BuyRegion && !((BuyRegion)region).isSold())) {
+				plugin.message(sender, "delfriend-noOwner", region);
 				return;
-			}		
+			}
 			OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
 			if(!region.getFriendsFeature().getFriends().contains(friend.getUniqueId())) {
 				plugin.message(sender, "delfriend-notAdded", friend.getName(), region);
@@ -115,7 +115,7 @@ public class DelfriendCommand extends CommandAreaShop {
 			}
 		}
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<>();

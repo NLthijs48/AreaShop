@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddfriendCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop addfriend";
@@ -26,7 +26,7 @@ public class AddfriendCommand extends CommandAreaShop {
 		}
 		return null;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public void execute(CommandSender sender, String[] args) {
@@ -34,7 +34,7 @@ public class AddfriendCommand extends CommandAreaShop {
 			plugin.message(sender, "addfriend-noPermission");
 			return;
 		}
-		
+
 		if(args.length < 2) {
 			plugin.message(sender, "addfriend-help");
 			return;
@@ -42,13 +42,13 @@ public class AddfriendCommand extends CommandAreaShop {
 
 		GeneralRegion region;
 		if(args.length <= 2) {
-			if (sender instanceof Player) {
+			if(sender instanceof Player) {
 				// get the region by location
-				List<GeneralRegion> regions = Utils.getAllApplicableRegions(((Player) sender).getLocation());
-				if (regions.isEmpty()) {
+				List<GeneralRegion> regions = Utils.getImportantRegions(((Player)sender).getLocation());
+				if(regions.isEmpty()) {
 					plugin.message(sender, "cmd-noRegionsAtLocation");
 					return;
-				} else if (regions.size() > 1) {
+				} else if(regions.size() > 1) {
 					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
@@ -57,7 +57,7 @@ public class AddfriendCommand extends CommandAreaShop {
 			} else {
 				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}	
+			}
 		} else {
 			region = plugin.getFileManager().getRegion(args[2]);
 			if(region == null) {
@@ -66,11 +66,11 @@ public class AddfriendCommand extends CommandAreaShop {
 			}
 		}
 		if(sender.hasPermission("areashop.addfriendall")) {
-            if ((region instanceof RentRegion && !((RentRegion) region).isRented())
-                    || (region instanceof BuyRegion && !((BuyRegion) region).isSold())) {
-                plugin.message(sender, "addfriend-noOwner", region);
+			if((region instanceof RentRegion && !((RentRegion)region).isRented())
+					|| (region instanceof BuyRegion && !((BuyRegion)region).isSold())) {
+				plugin.message(sender, "addfriend-noOwner", region);
 				return;
-			}	
+			}
 			OfflinePlayer friend = Bukkit.getOfflinePlayer(args[1]);
 			if(friend.getLastPlayed() == 0 && !friend.isOnline() && !plugin.getConfig().getBoolean("addFriendNotExistingPlayers")) {
 				plugin.message(sender, "addfriend-notVisited", args[1], region);
@@ -117,7 +117,7 @@ public class AddfriendCommand extends CommandAreaShop {
 			}
 		}
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<>();

@@ -1,6 +1,38 @@
 package me.wiefferink.areashop.managers;
 
-import me.wiefferink.areashop.commands.*;
+import me.wiefferink.areashop.commands.AddCommand;
+import me.wiefferink.areashop.commands.AddfriendCommand;
+import me.wiefferink.areashop.commands.AddsignCommand;
+import me.wiefferink.areashop.commands.BuyCommand;
+import me.wiefferink.areashop.commands.CommandAreaShop;
+import me.wiefferink.areashop.commands.DelCommand;
+import me.wiefferink.areashop.commands.DelfriendCommand;
+import me.wiefferink.areashop.commands.DelsignCommand;
+import me.wiefferink.areashop.commands.FindCommand;
+import me.wiefferink.areashop.commands.GroupaddCommand;
+import me.wiefferink.areashop.commands.GroupdelCommand;
+import me.wiefferink.areashop.commands.GroupinfoCommand;
+import me.wiefferink.areashop.commands.GrouplistCommand;
+import me.wiefferink.areashop.commands.HelpCommand;
+import me.wiefferink.areashop.commands.InfoCommand;
+import me.wiefferink.areashop.commands.LinksignsCommand;
+import me.wiefferink.areashop.commands.MeCommand;
+import me.wiefferink.areashop.commands.MessageCommand;
+import me.wiefferink.areashop.commands.ReloadCommand;
+import me.wiefferink.areashop.commands.RentCommand;
+import me.wiefferink.areashop.commands.ResellCommand;
+import me.wiefferink.areashop.commands.SchematiceventCommand;
+import me.wiefferink.areashop.commands.SellCommand;
+import me.wiefferink.areashop.commands.SetdurationCommand;
+import me.wiefferink.areashop.commands.SetlandlordCommand;
+import me.wiefferink.areashop.commands.SetownerCommand;
+import me.wiefferink.areashop.commands.SetpriceCommand;
+import me.wiefferink.areashop.commands.SetrestoreCommand;
+import me.wiefferink.areashop.commands.SetteleportCommand;
+import me.wiefferink.areashop.commands.StackCommand;
+import me.wiefferink.areashop.commands.StopresellCommand;
+import me.wiefferink.areashop.commands.TeleportCommand;
+import me.wiefferink.areashop.commands.UnrentCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,9 +45,9 @@ import java.util.TreeSet;
 
 public class CommandManager extends Manager implements CommandExecutor, TabCompleter {
 	private ArrayList<CommandAreaShop> commands;
-	
+
 	/**
-	 * Constructor
+	 * Constructor.
 	 */
 	public CommandManager() {
 		commands = new ArrayList<>();
@@ -53,20 +85,20 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 		commands.add(new MessageCommand());
 
 		// Register commands in bukkit
-		plugin.getCommand("AreaShop").setExecutor(this);	
+		plugin.getCommand("AreaShop").setExecutor(this);
 		plugin.getCommand("AreaShop").setTabCompleter(this);
-	}	
-	
+	}
+
 	/**
-	 * Get the list with AreaShop commands
+	 * Get the list with AreaShop commands.
 	 * @return The list with AreaShop commands
 	 */
 	public ArrayList<CommandAreaShop> getCommands() {
 		return commands;
 	}
-	
+
 	/**
-	 * Shows the help page for the CommandSender
+	 * Shows the help page for the CommandSender.
 	 * @param target The CommandSender to show the help to
 	 */
 	public void showHelp(CommandSender target) {
@@ -89,7 +121,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 			plugin.messageNoPrefix(target, message);
 		}
 	}
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
 		if(!plugin.isReady()) {
@@ -102,8 +134,8 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 			args[1] = args[2];
 		}
 		// Execute command
-		boolean executed = false;		
-		for(int i=0; i<commands.size() && !executed; i++) {
+		boolean executed = false;
+		for(int i = 0; i < commands.size() && !executed; i++) {
 			if(commands.get(i).canExecute(command, args)) {
 				commands.get(i).execute(sender, args);
 				executed = true;
@@ -129,12 +161,12 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 			return result;
 		}
 		int toCompleteNumber = args.length;
-		String toCompletePrefix = args[args.length-1].toLowerCase();
+		String toCompletePrefix = args[args.length - 1].toLowerCase();
 		//AreaShop.debug("toCompleteNumber=" + toCompleteNumber + ", toCompletePrefix=" + toCompletePrefix + ", length=" + toCompletePrefix.length());
 		if(toCompleteNumber == 1) {
 			for(CommandAreaShop c : commands) {
 				String begin = c.getCommandStart();
-				result.add(begin.substring(begin.indexOf(' ') +1));
+				result.add(begin.substring(begin.indexOf(' ') + 1));
 			}
 		} else {
 			String[] start = new String[args.length];
@@ -153,7 +185,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 				if(suggestion.toLowerCase().startsWith(toCompletePrefix)) {
 					set.add(suggestion);
 				}
-			}	
+			}
 			result.clear();
 			result.addAll(set);
 		}

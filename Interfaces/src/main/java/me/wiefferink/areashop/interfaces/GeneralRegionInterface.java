@@ -5,10 +5,16 @@ import org.bukkit.World;
 
 public interface GeneralRegionInterface {
 	ProtectedRegion getRegion();
+
 	String getName();
+
 	World getWorld();
+
 	String getWorldName();
+
 	int getWidth();
+
 	int getDepth();
+
 	int getHeight();
 }

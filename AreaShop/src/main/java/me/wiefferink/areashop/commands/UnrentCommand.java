@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UnrentCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop unrent";
@@ -25,7 +25,7 @@ public class UnrentCommand extends CommandAreaShop {
 	}
 
 	/**
-	 * Check if a person can unrent the region
+	 * Check if a person can unrent the region.
 	 * @param person The person to check
 	 * @param region The region to check for
 	 * @return true if the person can unrent it, otherwise false
@@ -49,13 +49,13 @@ public class UnrentCommand extends CommandAreaShop {
 		}
 		RentRegion rent;
 		if(args.length <= 1) {
-			if (sender instanceof Player) {
+			if(sender instanceof Player) {
 				// get the region by location
-				List<RentRegion> regions = Utils.getApplicableRentRegions(((Player) sender).getLocation());
-				if (regions.isEmpty()) {
+				List<RentRegion> regions = Utils.getImportantRentRegions(((Player)sender).getLocation());
+				if(regions.isEmpty()) {
 					plugin.message(sender, "cmd-noRegionsAtLocation");
 					return;
-				} else if (regions.size() > 1) {
+				} else if(regions.size() > 1) {
 					plugin.message(sender, "cmd-moreRegionsAtLocation");
 					return;
 				} else {
@@ -64,21 +64,21 @@ public class UnrentCommand extends CommandAreaShop {
 			} else {
 				plugin.message(sender, "cmd-automaticRegionOnlyByPlayer");
 				return;
-			}			
+			}
 		} else {
 			rent = plugin.getFileManager().getRent(args[1]);
 		}
 		if(rent == null) {
 			plugin.message(sender, "unrent-notRegistered");
 			return;
-		}		
+		}
 		if(!rent.isRented()) {
 			plugin.message(sender, "unrent-notRented", rent);
 			return;
 		}
 		rent.unRent(true, sender);
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<>();

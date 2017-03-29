@@ -14,15 +14,32 @@ import me.wiefferink.areashop.regions.GeneralRegion.RegionType;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,30 +57,31 @@ public class FileManager extends Manager {
 	private YamlConfiguration defaultConfigFallback = null;
 	private boolean saveGroupsRequired = false;
 	private Set<String> worldRegionsRequireSaving;
-	
-	private HashMap<String,Integer> versions = null;
+
+	private HashMap<String, Integer> versions = null;
 	private String versionPath = null;
 	private String schemFolder = null;
 
 	// Enum for region types
-	public enum AddResult {		
+	public enum AddResult {
 		BLACKLISTED("blacklisted"),
 		NOPERMISSION("nopermission"),
 		ALREADYADDED("alreadyadded"),
 		SUCCESS("success");
-		
+
 		private final String value;
 
 		AddResult(String value) {
 			this.value = value;
 		}
+
 		public String getValue() {
 			return value;
 		}
-	} 
-	
+	}
+
 	/**
-	 * Constructor, initialize variabeles
+	 * Constructor, initialize variabeles.
 	 */
 	public FileManager() {
 		regions = new HashMap<>();
@@ -77,7 +95,7 @@ public class FileManager extends Manager {
 		worldRegionsRequireSaving = new HashSet<>();
 		File schemFile = new File(schemFolder);
 		if(!schemFile.exists() & !schemFile.mkdirs()) {
-			AreaShop.warn("Could not create schematic files directory: "+schemFile.getAbsolutePath());
+			AreaShop.warn("Could not create schematic files directory: " + schemFile.getAbsolutePath());
 		}
 		loadVersions();
 	}
@@ -95,81 +113,133 @@ public class FileManager extends Manager {
 		saveRequiredFilesAtOnce();
 	}
 
-	
+
 	//////////////////////////////////////////////////////////
 	// GETTERS
 	//////////////////////////////////////////////////////////
-	
+
+	/**
+	 * Get the folder where schematics are stored.
+	 * @return The folder where schematics are stored
+	 */
 	public String getSchematicFolder() {
 		return schemFolder;
 	}
-	
+
+	/**
+	 * Get a group.
+	 * @param name The name of the group to get (will be normalized)
+	 * @return The group if found, otherwise null
+	 */
 	public RegionGroup getGroup(String name) {
 		return groups.get(name.toLowerCase());
 	}
-	
+
+	/**
+	 * Get all groups.
+	 * @return Collection with all groups (safe to modify)
+	 */
 	public Collection<RegionGroup> getGroups() {
 		return groups.values();
 	}
 
+	/**
+	 * Get the default region settings as provided by the user (default.yml).
+	 * @return YamlConfiguration with the settings (might miss settings, which should be filled in with {@link #getFallbackRegionSettings()})
+	 */
 	public YamlConfiguration getRegionSettings() {
 		return defaultConfig;
 	}
 
+	/**
+	 * Get the default regions settings as provided by AreaShop (default.yml).
+	 * @return YamlConfiguration with the default settings
+	 */
 	public YamlConfiguration getFallbackRegionSettings() {
 		return defaultConfigFallback;
 	}
-	
+
+	/**
+	 * Get the config file (config.yml).
+	 * @return YamlConfiguration with the settings of users, with fallback to the settings provided by AreaShop
+	 */
 	public YamlConfiguration getConfig() {
 		return config;
 	}
-	
+
+	/**
+	 * Get a region.
+	 * @param name The name of the region to get (will be normalized)
+	 * @return The region if found, otherwise null
+	 */
 	public GeneralRegion getRegion(String name) {
 		return regions.get(name.toLowerCase());
 	}
-	
+
+	/**
+	 * Get a rental region.
+	 * @param name The name of the rental region (will be normalized)
+	 * @return RentRegion if it could be found, otherwise null
+	 */
 	public RentRegion getRent(String name) {
 		GeneralRegion region = regions.get(name.toLowerCase());
-        if (region != null && region instanceof RentRegion) {
-            return (RentRegion)region;
+		if(region != null && region instanceof RentRegion) {
+			return (RentRegion)region;
 		}
 		return null;
 	}
-	
+
+	/**
+	 * Get a buy region.
+	 * @param name The name of the buy region (will be normalized)
+	 * @return BuyRegion if it could be found, otherwise null
+	 */
 	public BuyRegion getBuy(String name) {
 		GeneralRegion region = regions.get(name.toLowerCase());
-        if (region != null && region instanceof BuyRegion) {
-            return (BuyRegion)region;
+		if(region != null && region instanceof BuyRegion) {
+			return (BuyRegion)region;
 		}
 		return null;
 	}
-	
+
+	/**
+	 * Get all rental regions.
+	 * @return List of all rental regions
+	 */
 	public List<RentRegion> getRents() {
 		List<RentRegion> result = new ArrayList<>();
 		for(GeneralRegion region : regions.values()) {
-            if (region instanceof RentRegion) {
-                result.add((RentRegion)region);
+			if(region instanceof RentRegion) {
+				result.add((RentRegion)region);
 			}
 		}
 		return result;
 	}
-	
+
+	/**
+	 * Get all buy regions.
+	 * @return List of all buy regions
+	 */
 	public List<BuyRegion> getBuys() {
 		List<BuyRegion> result = new ArrayList<>();
 		for(GeneralRegion region : regions.values()) {
-            if (region instanceof BuyRegion) {
-                result.add((BuyRegion)region);
+			if(region instanceof BuyRegion) {
+				result.add((BuyRegion)region);
 			}
 		}
 		return result;
 	}
-	
+
+	/**
+	 * Get all regions.
+	 * @return List of all regions (it is safe to modify the list)
+	 */
 	public List<GeneralRegion> getRegions() {
 		return new ArrayList<>(regions.values());
 	}
-	
+
 	/**
-	 * Get a list of names of a certain group of things
+	 * Get a list of names of all buy regions.
 	 * @return A String list with all the names
 	 */
 	public List<String> getBuyNames() {
@@ -179,6 +249,11 @@ public class FileManager extends Manager {
 		}
 		return result;
 	}
+
+	/**
+	 * Get a list of names of all rent regions.
+	 * @return A String list with all the names
+	 */
 	public List<String> getRentNames() {
 		ArrayList<String> result = new ArrayList<>();
 		for(RentRegion region : getRents()) {
@@ -186,6 +261,11 @@ public class FileManager extends Manager {
 		}
 		return result;
 	}
+
+	/**
+	 * Get a list of names of all regions.
+	 * @return A String list with all the names
+	 */
 	public List<String> getRegionNames() {
 		ArrayList<String> result = new ArrayList<>();
 		for(GeneralRegion region : getRegions()) {
@@ -193,6 +273,11 @@ public class FileManager extends Manager {
 		}
 		return result;
 	}
+
+	/**
+	 * Get a list of names of all groups.
+	 * @return A String list with all the names
+	 */
 	public List<String> getGroupNames() {
 		ArrayList<String> result = new ArrayList<>();
 		for(RegionGroup group : getGroups()) {
@@ -200,9 +285,9 @@ public class FileManager extends Manager {
 		}
 		return result;
 	}
-	
+
 	/**
-	 * Add a rent to the list without saving it to disk (useful for loading at startup)
+	 * Add a rent to the list without saving it to disk (useful for loading at startup).
 	 * @param rent The rental region to add
 	 */
 	public void addRentNoSave(RentRegion rent) {
@@ -213,17 +298,18 @@ public class FileManager extends Manager {
 		regions.put(rent.getName().toLowerCase(), rent);
 		Bukkit.getPluginManager().callEvent(new AddedRegionEvent(rent));
 	}
+
 	/**
-	 * Add a rent to the list and mark it as to-be-saved
+	 * Add a rent to the list and mark it as to-be-saved.
 	 * @param rent Then rental region to add
 	 */
 	public void addRent(RentRegion rent) {
 		addRentNoSave(rent);
 		rent.saveRequired();
 	}
-	
+
 	/**
-	 * Add a buy to the list without saving it to disk (useful for laoding at startup)
+	 * Add a buy to the list without saving it to disk (useful for laoding at startup).
 	 * @param buy The buy region to add
 	 */
 	public void addBuyNoSave(BuyRegion buy) {
@@ -234,17 +320,18 @@ public class FileManager extends Manager {
 		regions.put(buy.getName().toLowerCase(), buy);
 		Bukkit.getPluginManager().callEvent(new AddedRegionEvent(buy));
 	}
+
 	/**
-	 * Add a buy to the list and mark it as to-be-saved
+	 * Add a buy to the list and mark it as to-be-saved.
 	 * @param buy The buy region to add
 	 */
 	public void addBuy(BuyRegion buy) {
 		addBuyNoSave(buy);
 		buy.saveRequired();
 	}
-	
+
 	/**
-	 * Add a RegionGroup
+	 * Add a RegionGroup.
 	 * @param group The RegionGroup to add
 	 */
 	public void addGroup(RegionGroup group) {
@@ -254,12 +341,12 @@ public class FileManager extends Manager {
 		groupsConfig.set(lowGroup + ".priority", 0);
 		saveGroupsIsRequired();
 	}
-	
+
 	/**
-	 * Check if a player can add a certain region as rent or buy region
+	 * Check if a player can add a certain region as rent or buy region.
 	 * @param sender The player/console that wants to add a region
 	 * @param region The WorldGuard region to add
-	 * @param type The type the region should have in AreaShop
+	 * @param type   The type the region should have in AreaShop
 	 * @return The result if a player would want to add this region
 	 */
 	public AddResult checkRegionAdd(CommandSender sender, ProtectedRegion region, RegionType type) {
@@ -269,7 +356,7 @@ public class FileManager extends Manager {
 		}
 		// Determine if the player is an owner or member of the region
 		boolean isMember = player != null && plugin.getWorldGuardHandler().containsMember(region, player.getUniqueId());
-		boolean isOwner = player != null && plugin.getWorldGuardHandler().containsOwner(region, player.getUniqueId());		
+		boolean isOwner = player != null && plugin.getWorldGuardHandler().containsOwner(region, player.getUniqueId());
 		AreaShop.debug("checkRegionAdd: isOwner=" + isOwner + ", isMember=" + isMember);
 		String typeString;
 		if(type == RegionType.RENT) {
@@ -292,10 +379,10 @@ public class FileManager extends Manager {
 			return AddResult.SUCCESS;
 		}
 	}
-	
+
 	/**
-	 * Remove a rent from the list
-	 * @param rent The region to remove
+	 * Remove a rent from the list.
+	 * @param rent          The region to remove
 	 * @param giveMoneyBack use true to give money back to the player if someone is currently renting this region, otherwise false
 	 * @return true if the rent has been removed, false otherwise
 	 */
@@ -332,7 +419,7 @@ public class FileManager extends Manager {
 					deleted = false;
 				}
 				if(!deleted) {
-					AreaShop.warn("File could not be deleted: "+file.toString());
+					AreaShop.warn("File could not be deleted: " + file.toString());
 				}
 			}
 			result = true;
@@ -342,13 +429,13 @@ public class FileManager extends Manager {
 
 			// Run commands
 			rent.runEventCommands(RegionEvent.DELETED, false);
-		}		
+		}
 		return result;
 	}
-	
+
 	/**
-	 * Remove a buy from the list
-	 * @param buy The BuyRegion to remove
+	 * Remove a buy from the list.
+	 * @param buy           The BuyRegion to remove
 	 * @param giveMoneyBack true if money should be given back to the player, otherwise false
 	 * @return true if the buy has been removed, false otherwise
 	 */
@@ -362,7 +449,7 @@ public class FileManager extends Manager {
 			// Handle schematics and run commands
 			buy.handleSchematicEvent(RegionEvent.DELETED);
 			buy.runEventCommands(RegionEvent.DELETED, true);
-			
+
 			// Delete the sign and the variable
 			if(buy.getWorld() != null) {
 				for(Location sign : buy.getSignsFeature().getSignLocations()) {
@@ -371,12 +458,12 @@ public class FileManager extends Manager {
 			}
 			regions.remove(buy.getLowerCaseName());
 			buy.resetRegionFlags();
-			
+
 			// Removing from groups
 			for(RegionGroup group : getGroups()) {
 				group.removeMember(buy);
 			}
-			
+
 			// Deleting the file
 			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + buy.getLowerCaseName() + ".yml");
 			boolean deleted;
@@ -387,10 +474,10 @@ public class FileManager extends Manager {
 					deleted = false;
 				}
 				if(!deleted) {
-					AreaShop.warn("File could not be deleted: "+file.toString());
+					AreaShop.warn("File could not be deleted: " + file.toString());
 				}
 			}
-			
+
 			result = true;
 
 			// Broadcast event
@@ -398,12 +485,12 @@ public class FileManager extends Manager {
 
 			// Run commands
 			buy.runEventCommands(RegionEvent.DELETED, false);
-		}		
+		}
 		return result;
 	}
-	
+
 	/**
-	 * Remove a group
+	 * Remove a group.
 	 * @param group Group to remove
 	 */
 	public void removeGroup(RegionGroup group) {
@@ -411,18 +498,18 @@ public class FileManager extends Manager {
 		groupsConfig.set(group.getLowerCaseName(), null);
 		saveGroupsIsRequired();
 	}
-	
+
 	/**
-	 * Update all signs that need periodic updating
+	 * Update all signs that need periodic updating.
 	 */
 	public void performPeriodicSignUpdate() {
 		final List<RentRegion> regions = new ArrayList<>(getRents());
 		new BukkitRunnable() {
 			private int current = 0;
-			
+
 			@Override
 			public void run() {
-				for(int i=0; i<plugin.getConfig().getInt("signs.regionsPerTick"); i++) {
+				for(int i = 0; i < plugin.getConfig().getInt("signs.regionsPerTick"); i++) {
 					if(current < regions.size()) {
 						if(regions.get(current).needsPeriodicUpdate()) {
 							regions.get(current).update();
@@ -434,20 +521,20 @@ public class FileManager extends Manager {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(plugin, 1, 1);		
+		}.runTaskTimer(plugin, 1, 1);
 	}
-	
+
 	/**
-	 * Send out rent expire warnings
+	 * Send out rent expire warnings.
 	 */
 	public void sendRentExpireWarnings() {
 		final List<RentRegion> regions = new ArrayList<>(getRents());
 		new BukkitRunnable() {
 			private int current = 0;
-			
+
 			@Override
 			public void run() {
-				for(int i=0; i<plugin.getConfig().getInt("expireWarning.regionsPerTick"); i++) {
+				for(int i = 0; i < plugin.getConfig().getInt("expireWarning.regionsPerTick"); i++) {
 					if(current < regions.size()) {
 						regions.get(current).sendExpirationWarnings();
 						current++;
@@ -459,26 +546,27 @@ public class FileManager extends Manager {
 			}
 		}.runTaskTimer(plugin, 1, 1);
 	}
-	
+
 	/**
-	 * Update regions in a task to minimize lag
-	 * @param regions Regions to update
+	 * Update regions in a task to minimize lag.
+	 * @param regions              Regions to update
 	 * @param confirmationReceiver The CommandSender that should be notified at completion
 	 */
 	public void updateRegions(final List<GeneralRegion> regions, final CommandSender confirmationReceiver) {
 		final int regionsPerTick = plugin.getConfig().getInt("update.regionsPerTick");
 		if(confirmationReceiver != null) {
-			plugin.message(confirmationReceiver, "reload-updateStart", regions.size(), regionsPerTick*20);
+			plugin.message(confirmationReceiver, "reload-updateStart", regions.size(), regionsPerTick * 20);
 		}
 		new BukkitRunnable() {
 			private int current = 0;
+
 			@Override
 			public void run() {
-				for(int i=0; i<regionsPerTick; i++) {
+				for(int i = 0; i < regionsPerTick; i++) {
 					if(current < regions.size()) {
 						regions.get(current).update();
 						current++;
-					} 
+					}
 				}
 				if(current >= regions.size()) {
 					if(confirmationReceiver != null) {
@@ -489,43 +577,62 @@ public class FileManager extends Manager {
 			}
 		}.runTaskTimer(plugin, 1, 1);
 	}
+
+	/**
+	 * Update a list of regions
+	 * @param regions The list of regions to update.
+	 */
 	public void updateRegions(List<GeneralRegion> regions) {
 		updateRegions(regions, null);
 	}
+
 	/**
-	 * Update all regions, happens in a task to minimize lag
+	 * Update all regions, happens in a task to minimize lag.
 	 */
 	public void updateAllRegions() {
 		updateRegions(getRegions(), null);
 	}
+
+	/**
+	 * Update all regions.
+	 * @param confirmationReceiver Optional CommandSender that should receive progress messages
+	 */
 	public void updateAllRegions(CommandSender confirmationReceiver) {
 		updateRegions(getRegions(), confirmationReceiver);
 	}
 
-	
+
 	/**
-	 * Save the group file to disk
+	 * Save the group file to disk.
 	 */
 	public void saveGroupsIsRequired() {
 		saveGroupsRequired = true;
 	}
+
+	/**
+	 * Check if saving the groups file is required.
+	 * @return true if changes are made and saving is required, otherwise false
+	 */
 	public boolean isSaveGroupsRequired() {
 		return saveGroupsRequired;
 	}
-	
+
+	/**
+	 * Save the groups file to disk synchronously.
+	 */
 	public void saveGroupsNow() {
 		AreaShop.debug("saveGroupsNow() done");
 		saveGroupsRequired = false;
 		try {
 			groupsConfig.save(groupsPath);
-		} catch (IOException e) {
-			AreaShop.warn("Groups file could not be saved: "+groupsPath);
+		} catch(IOException e) {
+			AreaShop.warn("Groups file could not be saved: " + groupsPath);
 		}
 	}
-	
-	
+
+
 	/**
-	 * Save all region related files spread over time (low load)
+	 * Save all region related files spread over time (low load).
 	 */
 	public void saveRequiredFiles() {
 		if(isSaveGroupsRequired()) {
@@ -536,10 +643,10 @@ public class FileManager extends Manager {
 		final List<GeneralRegion> regions = new ArrayList<>(getRegions());
 		new BukkitRunnable() {
 			private int current = 0;
-			
+
 			@Override
 			public void run() {
-				for(int i=0; i<plugin.getConfig().getInt("saving.regionsPerTick"); i++) {
+				for(int i = 0; i < plugin.getConfig().getInt("saving.regionsPerTick"); i++) {
 					if(current < regions.size()) {
 						if(regions.get(current).isSaveRequired()) {
 							regions.get(current).saveNow();
@@ -553,9 +660,9 @@ public class FileManager extends Manager {
 			}
 		}.runTaskTimer(plugin, 1, 1);
 	}
-	
+
 	/**
-	 * Save all region related files directly (only for cases like onDisable())
+	 * Save all region related files directly (only for cases like onDisable()).
 	 */
 	public void saveRequiredFilesAtOnce() {
 		if(isSaveGroupsRequired()) {
@@ -564,21 +671,21 @@ public class FileManager extends Manager {
 		for(GeneralRegion region : getRegions()) {
 			if(region.isSaveRequired()) {
 				region.saveNow();
-			}						
+			}
 		}
 		this.saveWorldGuardRegions();
 	}
-	
+
 	/**
-	 * Indicates that a/multiple WorldGuard regions need to be saved
+	 * Indicates that a/multiple WorldGuard regions need to be saved.
 	 * @param worldName The world where the regions that should be saved is in
 	 */
 	public void saveIsRequiredForRegionWorld(String worldName) {
 		worldRegionsRequireSaving.add(worldName);
 	}
-	
+
 	/**
-	 * Save all worldGuard regions that need saving
+	 * Save all worldGuard regions that need saving.
 	 */
 	public void saveWorldGuardRegions() {
 		for(String world : worldRegionsRequireSaving) {
@@ -589,27 +696,27 @@ public class FileManager extends Manager {
 					try {
 						if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {
 							manager.save();
-						} else {							
+						} else {
 							manager.saveChanges();
 						}
 					} catch(Exception e) {
-						AreaShop.warn("WorldGuard regions in world "+world+" could not be saved");
+						AreaShop.warn("WorldGuard regions in world " + world + " could not be saved");
 					}
 				}
 			}
 		}
 	}
-	
+
 	/**
-	 * Get the folder the region files are located in
+	 * Get the folder the region files are located in.
 	 * @return The folder where the region.yml files are in
 	 */
 	public String getRegionFolder() {
 		return regionsPath;
 	}
-	
+
 	/**
-	 * Check if a region is on the adding blacklist
+	 * Check if a region is on the adding blacklist.
 	 * @param region The region name to check
 	 * @return true if the region may not be added, otherwise false
 	 */
@@ -623,18 +730,18 @@ public class FileManager extends Manager {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Unrent regions that have no time left, regions to check per tick is in the config
+	 * Unrent regions that have no time left, regions to check per tick is in the config.
 	 */
 	public void checkRents() {
 		final List<RentRegion> regions = new ArrayList<>(getRents());
 		new BukkitRunnable() {
 			private int current = 0;
-			
+
 			@Override
 			public void run() {
-				for(int i=0; i<plugin.getConfig().getInt("expiration.regionsPerTick"); i++) {
+				for(int i = 0; i < plugin.getConfig().getInt("expiration.regionsPerTick"); i++) {
 					if(current < regions.size()) {
 						regions.get(current).checkExpiration();
 						current++;
@@ -646,18 +753,18 @@ public class FileManager extends Manager {
 			}
 		}.runTaskTimer(plugin, 1, 1);
 	}
-	
+
 	/**
-	 * Check all regions and unrent/sell them if the player is inactive for too long
+	 * Check all regions and unrent/sell them if the player is inactive for too long.
 	 */
 	public void checkForInactiveRegions() {
 		final List<GeneralRegion> regions = new ArrayList<>(getRegions());
 		new BukkitRunnable() {
 			private int current = 0;
-			
+
 			@Override
 			public void run() {
-				for(int i=0; i<plugin.getConfig().getInt("inactive.regionsPerTick"); i++) {
+				for(int i = 0; i < plugin.getConfig().getInt("inactive.regionsPerTick"); i++) {
 					if(current < regions.size()) {
 						regions.get(current).checkInactive();
 						current++;
@@ -670,9 +777,9 @@ public class FileManager extends Manager {
 		}.runTaskTimer(plugin, 1, 1);
 	}
 
-	
+
 	/**
-	 * Load the file with the versions, used to check if the other files need conversion
+	 * Load the file with the versions, used to check if the other files need conversion.
 	 */
 	@SuppressWarnings("unchecked")
 	public void loadVersions() {
@@ -681,10 +788,10 @@ public class FileManager extends Manager {
 			// Load versions from the file
 			try {
 				ObjectInputStream input = new ObjectInputStream(new FileInputStream(versionPath));
-				versions = (HashMap<String,Integer>)input.readObject();
+				versions = (HashMap<String, Integer>)input.readObject();
 				input.close();
-			} catch (IOException | ClassNotFoundException | ClassCastException e) {
-				AreaShop.warn("Something went wrong reading file: "+versionPath);
+			} catch(IOException | ClassNotFoundException | ClassCastException e) {
+				AreaShop.warn("Something went wrong reading file: " + versionPath);
 				versions = null;
 			}
 		}
@@ -694,9 +801,9 @@ public class FileManager extends Manager {
 			this.saveVersions();
 		}
 	}
-	
+
 	/**
-	 * Save the versions file to disk
+	 * Save the versions file to disk.
 	 */
 	public void saveVersions() {
 		if(!(new File(versionPath).exists())) {
@@ -706,13 +813,13 @@ public class FileManager extends Manager {
 			ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(versionPath));
 			output.writeObject(versions);
 			output.close();
-		} catch (IOException e) {
-			AreaShop.warn("File could not be saved: "+versionPath);
+		} catch(IOException e) {
+			AreaShop.warn("File could not be saved: " + versionPath);
 		}
 	}
 
 	/**
-	 * Load all files from disk
+	 * Load all files from disk.
 	 * @param thisTick Load files in the current tick or a tick later
 	 * @return true if the files are loaded correctly, otherwise false
 	 */
@@ -732,7 +839,7 @@ public class FileManager extends Manager {
 
 		return result;
 	}
-	
+
 	/**
 	 * Load the default.yml file
 	 * @return true if it has been loaded successfully, otherwise false
@@ -747,15 +854,15 @@ public class FileManager extends Manager {
 					OutputStream output = new FileOutputStream(defaultFile)
 			) {
 				int read;
-				byte[] bytes = new byte[1024];		 
-				while ((read = input.read(bytes)) != -1) {
+				byte[] bytes = new byte[1024];
+				while((read = input.read(bytes)) != -1) {
 					output.write(bytes, 0, read);
-				} 
+				}
 				input.close();
 				output.close();
 				AreaShop.info("File with default region settings has been saved, should only happen on first startup");
 			} catch(IOException e) {
-				AreaShop.warn("Something went wrong saving the default region settings: "+defaultFile.getAbsolutePath());
+				AreaShop.warn("Something went wrong saving the default region settings: " + defaultFile.getAbsolutePath());
 			}
 		}
 		// Load default.yml from the plugin folder, and as backup the default one
@@ -774,7 +881,7 @@ public class FileManager extends Manager {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Load the default.yml file
 	 * @return true if it has been loaded successfully, otherwise false
@@ -789,13 +896,13 @@ public class FileManager extends Manager {
 					OutputStream output = new FileOutputStream(configFile)
 			) {
 				int read;
-				byte[] bytes = new byte[1024];		 
-				while ((read = input.read(bytes)) != -1) {
+				byte[] bytes = new byte[1024];
+				while((read = input.read(bytes)) != -1) {
 					output.write(bytes, 0, read);
 				}
 				AreaShop.info("Default config file has been saved, should only happen on first startup");
 			} catch(IOException e) {
-				AreaShop.warn("Something went wrong saving the config file: "+configFile.getAbsolutePath());
+				AreaShop.warn("Something went wrong saving the config file: " + configFile.getAbsolutePath());
 			}
 		}
 		// Load config.yml from the plugin folder
@@ -822,13 +929,13 @@ public class FileManager extends Manager {
 				}
 			}
 		} catch(IOException e) {
-			AreaShop.warn("Something went wrong while reading the config.yml file: "+configFile.getAbsolutePath());
+			AreaShop.warn("Something went wrong while reading the config.yml file: " + configFile.getAbsolutePath());
 			result = false;
 		}
 		Utils.initialize(config);
 		return result;
 	}
-	
+
 	/**
 	 * Load the groups.yml file from disk
 	 * @return true if succeeded, otherwise false
@@ -842,7 +949,7 @@ public class FileManager extends Manager {
 			) {
 				groupsConfig = YamlConfiguration.loadConfiguration(reader);
 			} catch(IOException e) {
-				AreaShop.warn("Could not load groups.yml file: "+groupFile.getAbsolutePath());
+				AreaShop.warn("Could not load groups.yml file: " + groupFile.getAbsolutePath());
 			}
 		}
 		if(groupsConfig == null) {
@@ -854,9 +961,9 @@ public class FileManager extends Manager {
 		}
 		return result;
 	}
-	
+
 	/**
-	 * Load all region files
+	 * Load all region files.
 	 * @param thisTick Load files in the current tick or a tick later
 	 */
 	public void loadRegionFiles(boolean thisTick) {
@@ -864,7 +971,7 @@ public class FileManager extends Manager {
 		final File file = new File(regionsPath);
 		if(!file.exists()) {
 			if(!file.mkdirs()) {
-				AreaShop.warn("Could not create region files directory: "+file.getAbsolutePath());
+				AreaShop.warn("Could not create region files directory: " + file.getAbsolutePath());
 				return;
 			}
 			plugin.setReady(true);
@@ -905,10 +1012,10 @@ public class FileManager extends Manager {
 				) {
 					config = YamlConfiguration.loadConfiguration(reader);
 					if(config.getKeys(false).size() == 0) {
-						AreaShop.warn("Region file '"+regionFile.getName()+"' is empty, check for errors in the log.");
+						AreaShop.warn("Region file '" + regionFile.getName() + "' is empty, check for errors in the log.");
 					}
 				} catch(IOException e) {
-					AreaShop.warn("Something went wrong reading region file: "+regionFile.getAbsolutePath());
+					AreaShop.warn("Something went wrong reading region file: " + regionFile.getAbsolutePath());
 					continue;
 				}
 
@@ -950,11 +1057,11 @@ public class FileManager extends Manager {
 
 		// All files are loaded, print problems to the console
 		if(!noRegionType.isEmpty()) {
-			AreaShop.warn("The following region files do no have a region type: "+Utils.createCommaSeparatedList(noRegionType));
+			AreaShop.warn("The following region files do no have a region type: " + Utils.createCommaSeparatedList(noRegionType));
 		}
 
 		if(!noNamePaths.isEmpty()) {
-			AreaShop.warn("The following region files do no have a name in their file: "+Utils.createCommaSeparatedList(noNamePaths));
+			AreaShop.warn("The following region files do no have a name in their file: " + Utils.createCommaSeparatedList(noNamePaths));
 		}
 
 		if(!noRegion.isEmpty()) {
@@ -962,7 +1069,7 @@ public class FileManager extends Manager {
 			for(GeneralRegion region : noRegion) {
 				noRegionNames.add(region.getName());
 			}
-			AreaShop.warn("AreaShop regions that are missing their WorldGuard region: "+Utils.createCommaSeparatedList(noRegionNames));
+			AreaShop.warn("AreaShop regions that are missing their WorldGuard region: " + Utils.createCommaSeparatedList(noRegionNames));
 			AreaShop.warn("Remove these regions from AreaShop with '/as del' or recreate their regions in WorldGuard.");
 		}
 
@@ -980,7 +1087,7 @@ public class FileManager extends Manager {
 			for(GeneralRegion region : noRegion) {
 				noWorldNames.add(region.getName());
 			}
-			AreaShop.warn("World "+missingWorld+" is not loaded, the following AreaShop regions are not functional now: "+Utils.createCommaSeparatedList(noWorldNames));
+			AreaShop.warn("World " + missingWorld + " is not loaded, the following AreaShop regions are not functional now: " + Utils.createCommaSeparatedList(noWorldNames));
 			noWorld.removeAll(toDisplay);
 		}
 		if(noWorldRegions) {
@@ -992,26 +1099,26 @@ public class FileManager extends Manager {
 			for(GeneralRegion region : incorrectDuration) {
 				incorrectDurationNames.add(region.getName());
 			}
-			AreaShop.warn("The following regions have an incorrect time format as duration: "+Utils.createCommaSeparatedList(incorrectDurationNames));
+			AreaShop.warn("The following regions have an incorrect time format as duration: " + Utils.createCommaSeparatedList(incorrectDurationNames));
 		}
 		plugin.setReady(true);
 	}
-	
-	
+
+
 	/**
 	 * Checks for old file formats and converts them to the latest format.
-	 * After conversion the region files need to be loaded
+	 * After conversion the region files need to be loaded.
 	 */
 	@SuppressWarnings("unchecked")
 	private void preUpdateFiles() {
 		Integer fileStatus = versions.get(AreaShop.versionFiles);
-		
+
 		// If the the files are already the current version
 		if(fileStatus != null && fileStatus == AreaShop.versionFilesCurrent) {
 			return;
 		}
 		AreaShop.info("Updating AreaShop data to the latest format:");
-		
+
 		// Update to YAML based format
 		if(fileStatus == null || fileStatus < 2) {
 			String rentPath = plugin.getDataFolder() + File.separator + "rents";
@@ -1025,43 +1132,43 @@ public class FileManager extends Manager {
 			if(rentFile.exists()) {
 				rentFileFound = true;
 				if(!oldFolderFile.exists() & !oldFolderFile.mkdirs()) {
-					AreaShop.warn("Could not create directory: "+oldFolderFile.getAbsolutePath());
+					AreaShop.warn("Could not create directory: " + oldFolderFile.getAbsolutePath());
 				}
-				
+
 				if(versions.get("rents") == null) {
 					versions.put("rents", -1);
 				}
-				
+
 				HashMap<String, HashMap<String, String>> rents = null;
 				try {
 					ObjectInputStream input = new ObjectInputStream(new FileInputStream(rentPath));
-			    	rents = (HashMap<String,HashMap<String,String>>)input.readObject();
+					rents = (HashMap<String, HashMap<String, String>>)input.readObject();
 					input.close();
-				} catch (IOException | ClassNotFoundException | ClassCastException e) {
-					AreaShop.warn("  Error: Something went wrong reading file: "+rentPath);
+				} catch(IOException | ClassNotFoundException | ClassCastException e) {
+					AreaShop.warn("  Error: Something went wrong reading file: " + rentPath);
 				}
 				// Delete the file if it is totally wrong
 				if(rents == null) {
 					try {
 						if(!rentFile.delete()) {
-							AreaShop.warn("Could not delete file: "+rentFile.getAbsolutePath());
+							AreaShop.warn("Could not delete file: " + rentFile.getAbsolutePath());
 						}
 					} catch(Exception e) {
-						AreaShop.warn("Could not delete file: "+rentFile.getAbsolutePath());
+						AreaShop.warn("Could not delete file: " + rentFile.getAbsolutePath());
 					}
 				} else {
 					// Move old file
 					try {
 						Files.move(new File(rentPath), new File(oldFolderPath + "rents"));
-					} catch (Exception e) {
-						AreaShop.warn("  Could not create a backup of '"+rentPath+"', check the file permissions (conversion to next version continues)");
+					} catch(Exception e) {
+						AreaShop.warn("  Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
 					}
 					// Check if conversion is needed
 					if(versions.get("rents") < 1) {
 						// Upgrade the rent to the latest version
 						if(versions.get("rents") < 0) {
 							for(String rentName : rents.keySet()) {
-								HashMap<String,String> rent = rents.get(rentName);
+								HashMap<String, String> rent = rents.get(rentName);
 								// Save the rentName in the hashmap and use a small caps rentName as key
 								if(rent.get("name") == null) {
 									rent.put("name", rentName);
@@ -1079,27 +1186,27 @@ public class FileManager extends Manager {
 								// Change to version 0
 								versions.put("rents", 0);
 							}
-							AreaShop.info("  Updated version of '"+buyPath+"' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
+							AreaShop.info("  Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
 						}
 						if(versions.get("rents") < 1) {
 							for(String rentName : rents.keySet()) {
-								HashMap<String,String> rent = rents.get(rentName);
+								HashMap<String, String> rent = rents.get(rentName);
 								if(rent.get("player") != null) {
 									@SuppressWarnings("deprecation")  // Fake deprecation by Bukkit to inform developers, method will stay
-									OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(rent.get("player"));
-									rent.put("playeruuid", offlinePlayer.getUniqueId().toString());		
+											OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(rent.get("player"));
+									rent.put("playeruuid", offlinePlayer.getUniqueId().toString());
 									rent.remove("player");
 								}
 								// Change version to 1
 								versions.put("rents", 1);
 							}
-							AreaShop.info("  Updated version of '"+rentPath+"' from 0 to 1 (switch to UUID's for player identification)");
-						}				
-					}		
+							AreaShop.info("  Updated version of '" + rentPath + "' from 0 to 1 (switch to UUID's for player identification)");
+						}
+					}
 					// Save rents to new format
 					File regionsFile = new File(regionsPath);
 					if(!regionsFile.exists() & !regionsFile.mkdirs()) {
-						AreaShop.warn("Could not create directory: "+regionsFile.getAbsolutePath());
+						AreaShop.warn("Could not create directory: " + regionsFile.getAbsolutePath());
 						return;
 					}
 					for(HashMap<String, String> rent : rents.values()) {
@@ -1134,59 +1241,59 @@ public class FileManager extends Manager {
 						}
 						try {
 							config.save(new File(regionsPath + File.separator + rent.get("name").toLowerCase() + ".yml"));
-						} catch (IOException e) {
-							AreaShop.warn("  Error: Could not save region file while converting: "+regionsPath+File.separator+rent.get("name").toLowerCase()+".yml");
+						} catch(IOException e) {
+							AreaShop.warn("  Error: Could not save region file while converting: " + regionsPath + File.separator + rent.get("name").toLowerCase() + ".yml");
 						}
 					}
 					AreaShop.info("  Updated rent regions to new .yml format (check the /regions folder)");
 				}
-				
+
 				// Change version number
 				versions.remove("rents");
-				versions.put(AreaShop.versionFiles, AreaShop.versionFilesCurrent);			
-				saveVersions();			
+				versions.put(AreaShop.versionFiles, AreaShop.versionFilesCurrent);
+				saveVersions();
 			}
 			if(buyFile.exists()) {
 				buyFileFound = true;
 				if(!oldFolderFile.exists() & !oldFolderFile.mkdirs()) {
-					AreaShop.warn("Could not create directory: "+oldFolderFile.getAbsolutePath());
+					AreaShop.warn("Could not create directory: " + oldFolderFile.getAbsolutePath());
 					return;
 				}
-				
+
 				if(versions.get("buys") == null) {
 					versions.put("buys", -1);
 				}
-				
+
 				HashMap<String, HashMap<String, String>> buys = null;
 				try {
 					ObjectInputStream input = new ObjectInputStream(new FileInputStream(buyPath));
-			    	buys = (HashMap<String,HashMap<String,String>>)input.readObject();
+					buys = (HashMap<String, HashMap<String, String>>)input.readObject();
 					input.close();
-				} catch (IOException | ClassNotFoundException | ClassCastException e) {
-					AreaShop.warn("  Something went wrong reading file: "+buyPath);
+				} catch(IOException | ClassNotFoundException | ClassCastException e) {
+					AreaShop.warn("  Something went wrong reading file: " + buyPath);
 				}
 				// Delete the file if it is totally wrong
 				if(buys == null) {
 					try {
 						if(!buyFile.delete()) {
-							AreaShop.warn("Could not delete file: "+buyFile.getAbsolutePath());
+							AreaShop.warn("Could not delete file: " + buyFile.getAbsolutePath());
 						}
 					} catch(Exception e) {
-						AreaShop.warn("Could not delete file: "+buyFile.getAbsolutePath());
+						AreaShop.warn("Could not delete file: " + buyFile.getAbsolutePath());
 					}
 				} else {
 					// Backup current file
 					try {
 						Files.move(new File(buyPath), new File(oldFolderPath + "buys"));
-					} catch (Exception e) {
-						AreaShop.warn("  Could not create a backup of '"+buyPath+"', check the file permissions (conversion to next version continues)");
+					} catch(Exception e) {
+						AreaShop.warn("  Could not create a backup of '" + buyPath + "', check the file permissions (conversion to next version continues)");
 					}
 					// Check if conversion is needed
 					if(versions.get("buys") < 1) {
 						// Upgrade the buy to the latest version
 						if(versions.get("buys") < 0) {
 							for(String buyName : buys.keySet()) {
-								HashMap<String,String> buy = buys.get(buyName);
+								HashMap<String, String> buy = buys.get(buyName);
 								// Save the buyName in the hashmap and use a small caps buyName as key
 								if(buy.get("name") == null) {
 									buy.put("name", buyName);
@@ -1204,28 +1311,28 @@ public class FileManager extends Manager {
 								// Change to version 0
 								versions.put("buys", 0);
 							}
-							AreaShop.info("  Updated version of '"+buyPath+"' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
+							AreaShop.info("  Updated version of '" + buyPath + "' from -1 to 0 (switch to using lowercase region names, adding default schematic enabling and profile)");
 						}
 						if(versions.get("buys") < 1) {
 							for(String buyName : buys.keySet()) {
-								HashMap<String,String> buy = buys.get(buyName);
+								HashMap<String, String> buy = buys.get(buyName);
 								if(buy.get("player") != null) {
 									@SuppressWarnings("deprecation")  // Fake deprecation by Bukkit to inform developers, method will stay
-									OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(buy.get("player"));
-									buy.put("playeruuid", offlinePlayer.getUniqueId().toString());		
+											OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(buy.get("player"));
+									buy.put("playeruuid", offlinePlayer.getUniqueId().toString());
 									buy.remove("player");
 								}
 								// Change version to 1
 								versions.put("buys", 1);
 							}
-							AreaShop.info("  Updated version of '"+buyPath+"' from 0 to 1 (switch to UUID's for player identification)");
-						}				
-					}		
-				
+							AreaShop.info("  Updated version of '" + buyPath + "' from 0 to 1 (switch to UUID's for player identification)");
+						}
+					}
+
 					// Save buys to new format
 					File regionsFile = new File(regionsPath);
 					if(!regionsFile.exists() & !regionsFile.mkdirs()) {
-						AreaShop.warn("Could not create directory: "+regionsFile.getAbsolutePath());
+						AreaShop.warn("Could not create directory: " + regionsFile.getAbsolutePath());
 					}
 					for(HashMap<String, String> buy : buys.values()) {
 						YamlConfiguration config = new YamlConfiguration();
@@ -1257,15 +1364,15 @@ public class FileManager extends Manager {
 						}
 						try {
 							config.save(new File(regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml"));
-						} catch (IOException e) {
-							AreaShop.warn("  Error: Could not save region file while converting: "+regionsPath+File.separator+buy.get("name").toLowerCase()+".yml");
+						} catch(IOException e) {
+							AreaShop.warn("  Error: Could not save region file while converting: " + regionsPath + File.separator + buy.get("name").toLowerCase() + ".yml");
 						}
 					}
 					AreaShop.info("  Updated buy regions to new .yml format (check the /regions folder)");
 				}
-	
+
 				// Change version number
-				versions.remove("buys");		
+				versions.remove("buys");
 			}
 
 			// Separate try-catch blocks to try them all individually (don't stop after 1 has failed)
@@ -1287,53 +1394,53 @@ public class FileManager extends Manager {
 				}
 			}
 			// Update versions file to 2
-			versions.put(AreaShop.versionFiles, 2);			
+			versions.put(AreaShop.versionFiles, 2);
 			saveVersions();
-			if (buyFileFound || rentFileFound) {
+			if(buyFileFound || rentFileFound) {
 				AreaShop.info("  Updated to YAML based storage (v1 to v2)");
 			}
 		}
 	}
-	
+
 	/**
 	 * Checks for old file formats and converts them to the latest format.
-	 * This is to be triggered after the load of the region files
+	 * This is to be triggered after the load of the region files.
 	 */
 	private void postUpdateFiles() {
 		Integer fileStatus = versions.get(AreaShop.versionFiles);
-		
+
 		// If the the files are already the current version
 		if(fileStatus != null && fileStatus == AreaShop.versionFilesCurrent) {
 			return;
 		}
-		
+
 		// Add 'general.lastActive' to rented/bought regions (initialize at current time)
 		if(fileStatus == null || fileStatus < 3) {
 			for(GeneralRegion region : getRegions()) {
 				region.updateLastActiveTime();
 			}
 			// Update versions file to 3
-			versions.put(AreaShop.versionFiles, 3);			
+			versions.put(AreaShop.versionFiles, 3);
 			saveVersions();
-			if (getRegions().size() > 0) {
+			if(getRegions().size() > 0) {
 				AreaShop.info("  Added last active time to regions (v2 to v3)");
 			}
 		}
 	}
-	
+
 	/**
-	 * Get the settings of a group
+	 * Get the settings of a group.
 	 * @param groupName Name of the group to get the settings from
 	 * @return The settings of the group
 	 */
 	public ConfigurationSection getGroupSettings(String groupName) {
 		return groupsConfig.getConfigurationSection(groupName.toLowerCase());
 	}
-	
+
 	/**
-	 * Set a setting for a group
-	 * @param group The group to set it for
-	 * @param path The path to set
+	 * Set a setting for a group.
+	 * @param group   The group to set it for
+	 * @param path    The path to set
 	 * @param setting The value to set
 	 */
 	public void setGroupSetting(RegionGroup group, String path, Object setting) {

@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SetteleportCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop settp";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.teleportall") || target.hasPermission("areashop.teleport")) {
@@ -27,7 +27,7 @@ public class SetteleportCommand extends CommandAreaShop {
 	}
 
 	/**
-	 * Check if a person can set the teleport location of the region
+	 * Check if a person can set the teleport location of the region.
 	 * @param person The person to check
 	 * @param region The region to check for
 	 * @return true if the person can set the teleport location, otherwise false
@@ -47,7 +47,7 @@ public class SetteleportCommand extends CommandAreaShop {
 			plugin.message(sender, "setteleport-noPermission");
 			return;
 		}
-		if (!(sender instanceof Player)) {
+		if(!(sender instanceof Player)) {
 			plugin.message(sender, "onlyByPlayer");
 			return;
 		}
@@ -55,7 +55,7 @@ public class SetteleportCommand extends CommandAreaShop {
 		GeneralRegion region;
 		if(args.length < 2) {
 			// get the region by location
-			List<GeneralRegion> regions = Utils.getAllApplicableRegions(((Player)sender).getLocation());
+			List<GeneralRegion> regions = Utils.getImportantRegions(((Player)sender).getLocation());
 			if(regions.isEmpty()) {
 				plugin.message(sender, "cmd-noRegionsAtLocation");
 				return;
@@ -70,13 +70,13 @@ public class SetteleportCommand extends CommandAreaShop {
 		}
 
 		boolean owner;
-		
+
 		if(region == null) {
 			plugin.message(player, "setteleport-noRentOrBuy", args[1]);
 			return;
 		}
-        if (region instanceof RentRegion) {
-            owner = player.getUniqueId().equals(((RentRegion)region).getRenter());
+		if(region instanceof RentRegion) {
+			owner = player.getUniqueId().equals(((RentRegion)region).getRenter());
 		} else {
 			owner = player.getUniqueId().equals(((BuyRegion)region).getBuyer());
 		}
@@ -103,7 +103,7 @@ public class SetteleportCommand extends CommandAreaShop {
 		region.update();
 		plugin.message(player, "setteleport-success", region);
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		ArrayList<String> result = new ArrayList<>();

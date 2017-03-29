@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BuyCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop buy";
@@ -22,14 +22,14 @@ public class BuyCommand extends CommandAreaShop {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.buy")) {
 			plugin.message(sender, "buy-noPermission");
 			return;
 		}
-		if (!(sender instanceof Player)) {
+		if(!(sender instanceof Player)) {
 			plugin.message(sender, "cmd-onlyByPlayer");
 			return;
 		}
@@ -43,10 +43,10 @@ public class BuyCommand extends CommandAreaShop {
 			}
 		} else {
 			// get the region by location
-			List<BuyRegion> regions = Utils.getApplicableBuyRegions(((Player) sender).getLocation());
-			if (regions.isEmpty()) {
+			List<BuyRegion> regions = Utils.getImportantBuyRegions(((Player)sender).getLocation());
+			if(regions.isEmpty()) {
 				plugin.message(sender, "cmd-noRegionsAtLocation");
-			} else if (regions.size() > 1) {
+			} else if(regions.size() > 1) {
 				plugin.message(sender, "cmd-moreRegionsAtLocation");
 			} else {
 				regions.get(0).buy(player);

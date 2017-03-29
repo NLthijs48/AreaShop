@@ -14,9 +14,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class SignClickListener implements Listener {
 	private AreaShop plugin;
-	
+
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param plugin The AreaShop plugin
 	 */
 	public SignClickListener(AreaShop plugin) {
@@ -24,7 +24,7 @@ public class SignClickListener implements Listener {
 	}
 
 	/**
-	 * Called when a player interacts
+	 * Called when a player interacts.
 	 * @param event The event
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
@@ -34,7 +34,7 @@ public class SignClickListener implements Listener {
 		}
 		Block block = event.getClickedBlock();
 		// Check for clicking a sign and rightclicking
-		if((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) 
+		if((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK)
 				&& (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN)) {
 			// Check if the rent sign is really the same as a saved rent
 			SignsFeature.RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());

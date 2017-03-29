@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DelsignCommand extends CommandAreaShop {
-	
+
 	@Override
 	public String getCommandStart() {
 		return "areashop delsign";
 	}
-	
+
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.delsign")) {
@@ -31,10 +31,10 @@ public class DelsignCommand extends CommandAreaShop {
 			plugin.message(sender, "delsign-noPermission");
 			return;
 		}
-		if (!(sender instanceof Player)) {
+		if(!(sender instanceof Player)) {
 			plugin.message(sender, "cmd-onlyByPlayer");
 			return;
-		}			
+		}
 		Player player = (Player)sender;
 
 		// Get the sign
@@ -58,7 +58,7 @@ public class DelsignCommand extends CommandAreaShop {
 		plugin.message(sender, "delsign-success", regionSign.getRegion());
 		regionSign.remove();
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		return new ArrayList<>();

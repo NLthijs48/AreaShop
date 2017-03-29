@@ -43,8 +43,8 @@ public class MessageCommand extends CommandAreaShop {
 			return;
 		}
 
-		String[] messageArgs = new String[args.length-2];
-		System.arraycopy(args, 2, messageArgs, 0, args.length-2);
+		String[] messageArgs = new String[args.length - 2];
+		System.arraycopy(args, 2, messageArgs, 0, args.length - 2);
 		String message = StringUtils.join(messageArgs);
 
 		Message.fromString(message).send(player);

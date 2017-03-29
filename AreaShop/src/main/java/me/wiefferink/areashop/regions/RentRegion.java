@@ -25,29 +25,29 @@ import static me.wiefferink.areashop.tools.Utils.millisToHumanFormat;
 
 public class RentRegion extends GeneralRegion {
 	private long warningsDoneUntil = Calendar.getInstance().getTimeInMillis();
-	
+
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param config All settings of this region
 	 */
 	public RentRegion(YamlConfiguration config) {
 		super(config);
 	}
-	
+
 	/**
-	 * Create a new RentRegion
-	 * @param name The name of the region (correct casing)
+	 * Create a new RentRegion.
+	 * @param name  The name of the region (correct casing)
 	 * @param world The world of the WorldGuard region
 	 */
 	public RentRegion(String name, World world) {
 		super(name, world);
 	}
-	
+
 	@Override
 	public RegionType getType() {
 		return RegionType.RENT;
 	}
-	
+
 	@Override
 	public RegionState getState() {
 		if(isRented()) {
@@ -56,14 +56,14 @@ public class RentRegion extends GeneralRegion {
 			return RegionState.FORRENT;
 		}
 	}
-	
+
 	@Override
 	public boolean isAvailable() {
 		return !isRented();
 	}
-	
+
 	/**
-	 * Get the UUID of the player renting the region
+	 * Get the UUID of the player renting the region.
 	 * @return The UUID of the renter
 	 */
 	public UUID getRenter() {
@@ -77,22 +77,23 @@ public class RentRegion extends GeneralRegion {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Check if a player is the renter of this region
+	 * Check if a player is the renter of this region.
 	 * @param player Player to check
 	 * @return true if this player rents this region, otherwise false
 	 */
 	public boolean isRenter(Player player) {
 		return player != null && isRenter(player.getUniqueId());
 	}
+
 	public boolean isRenter(UUID player) {
 		UUID renter = getRenter();
 		return !(player == null || renter == null) && renter.equals(player);
 	}
-	
+
 	/**
-	 * Set the renter of this region
+	 * Set the renter of this region.
 	 * @param renter The UUID of the player that should be set as the renter
 	 */
 	public void setRenter(UUID renter) {
@@ -104,25 +105,25 @@ public class RentRegion extends GeneralRegion {
 			setSetting("rent.renterName", Utils.toName(renter));
 		}
 	}
-	
+
 	/**
-	 * Get the max number of extends of this region
+	 * Get the max number of extends of this region.
 	 * @return -1 if infinite otherwise the maximum number
 	 */
 	public int getMaxExtends() {
 		return getIntegerSetting("rent.maxExtends");
 	}
-	
+
 	/**
-	 * Get how many times the rent has already been extended
+	 * Get how many times the rent has already been extended.
 	 * @return The number of times extended
 	 */
 	public int getTimesExtended() {
 		return config.getInt("rent.timesExtended");
 	}
-	
+
 	/**
-	 * Set the number of times the region has been extended
+	 * Set the number of times the region has been extended.
 	 * @param times The number of times the region has been extended
 	 */
 	public void setTimesExtended(int times) {
@@ -157,13 +158,13 @@ public class RentRegion extends GeneralRegion {
 			case AreaShop.tagRawMoneyBackAmount:
 				return getMoneyBackAmount();
 			case AreaShop.tagMoneyBackPercentage:
-				return getMoneyBackPercentage()%1.0 == 0.0 ? (int)getMoneyBackPercentage() : getMoneyBackPercentage();
+				return getMoneyBackPercentage() % 1.0 == 0.0 ? (int)getMoneyBackPercentage() : getMoneyBackPercentage();
 			case AreaShop.tagTimesExtended:
 				return this.getTimesExtended();
 			case AreaShop.tagMaxExtends:
 				return this.getMaxExtends();
 			case AreaShop.tagExtendsLeft:
-				return getMaxExtends()-getTimesExtended();
+				return getMaxExtends() - getTimesExtended();
 			case AreaShop.tagMaxRentTime:
 				return millisToHumanFormat(getMaxRentTime());
 			case AreaShop.tagMaxInactiveTime:
@@ -173,17 +174,17 @@ public class RentRegion extends GeneralRegion {
 				return super.provideReplacement(variable);
 		}
 	}
-	
+
 	/**
-	 * Check if the region is rented
+	 * Check if the region is rented.
 	 * @return true if the region is rented, otherwise false
 	 */
 	public boolean isRented() {
 		return getRenter() != null;
 	}
-	
+
 	/**
-	 * Get the name of the player renting this region
+	 * Get the name of the player renting this region.
 	 * @return Name of the player renting this region, if unavailable by UUID it will return the old cached name, if that is unavailable it will return &lt;UNKNOWN&gt;
 	 */
 	public String getPlayerName() {
@@ -196,17 +197,17 @@ public class RentRegion extends GeneralRegion {
 		}
 		return result;
 	}
-	
+
 	/**
-	 * Get the time until this region is rented (time from 1970 epoch)
+	 * Get the time until this region is rented (time from 1970 epoch).
 	 * @return The epoch time until which this region is rented
 	 */
 	public long getRentedUntil() {
 		return getLongSetting("rent.rentedUntil");
 	}
-	
+
 	/**
-	 * Set the time until the region is rented (milliseconds from 1970, system time)
+	 * Set the time until the region is rented (milliseconds from 1970, system time).
 	 * @param rentedUntil The time until the region is rented
 	 */
 	public void setRentedUntil(Long rentedUntil) {
@@ -216,17 +217,17 @@ public class RentRegion extends GeneralRegion {
 			setSetting("rent.rentedUntil", rentedUntil);
 		}
 	}
-	
+
 	/**
-	 * Get the price of the region
+	 * Get the price of the region.
 	 * @return The price of the region
 	 */
 	public double getPrice() {
 		return Math.max(0, Utils.evaluateToDouble(getStringSetting("rent.price"), this));
 	}
-	
+
 	/**
-	 * Get the formatted string of the price (includes prefix and suffix)
+	 * Get the formatted string of the price (includes prefix and suffix).
 	 * @return The formatted string of the price
 	 */
 	public String getFormattedPrice() {
@@ -234,23 +235,23 @@ public class RentRegion extends GeneralRegion {
 	}
 
 	/**
-	 * Get the duration of 1 rent period
+	 * Get the duration of 1 rent period.
 	 * @return The duration in milliseconds of 1 rent period
 	 */
 	public long getDuration() {
 		return Utils.durationStringToLong(getDurationString());
 	}
-	
+
 	/**
-	 * Get the duration string, includes 'number indentifier'
+	 * Get the duration string, includes 'number indentifier'.
 	 * @return The duration string
 	 */
 	public String getDurationString() {
 		return getStringSetting("rent.duration");
 	}
-	
+
 	/**
-	 * Get the time that is left on the region
+	 * Get the time that is left on the region.
 	 * @return The time left on the region
 	 */
 	public long getTimeLeft() {
@@ -260,93 +261,93 @@ public class RentRegion extends GeneralRegion {
 			return 0;
 		}
 	}
-	
+
 	/**
-	 * Get a formatted string indicating the rent time that is left
+	 * Get a formatted string indicating the rent time that is left.
 	 * @return Time left on the rent, for example '29 days', '3 months', '1 second'
 	 */
 	public String getTimeLeftString() {
 		return Utils.millisToHumanFormat(getTimeLeft());
 	}
-	
+
 	/**
-	 * Minutes until automatic unrent when player is offline
+	 * Minutes until automatic unrent when player is offline.
 	 * @return The number of milliseconds until the region is unrented while player is offline
 	 */
 	public long getInactiveTimeUntilUnrent() {
 		return Utils.getDurationFromMinutesOrStringInput(getStringSetting("rent.inactiveTimeUntilUnrent"));
 	}
-	
+
 	/**
-	 * Get a human readable string indicating how long the player can be offline until automatic unrent
+	 * Get a human readable string indicating how long the player can be offline until automatic unrent.
 	 * @return String indicating the inactive time until unrent
 	 */
 	public String getFormattedInactiveTimeUntilUnrent() {
 		return Utils.millisToHumanFormat(getInactiveTimeUntilUnrent());
 	}
-	
+
 	/**
-	 * Change the price of the region
+	 * Change the price of the region.
 	 * @param price The price of the region
 	 */
 	public void setPrice(double price) {
 		setSetting("rent.price", price);
 	}
-	
+
 	/**
 	 * Remove the price so that the price will be taken from a group or the default.yml file
 	 */
 	public void removePrice() {
 		setSetting("rent.price", null);
 	}
-	
+
 	/**
-	 * Set the duration of the rent
+	 * Set the duration of the rent.
 	 * @param duration The duration of the rent (as specified on the documentation pages)
 	 */
 	public void setDuration(String duration) {
 		setSetting("rent.duration", duration);
 	}
-	
+
 	/**
-	 * Get the moneyBack percentage
+	 * Get the moneyBack percentage.
 	 * @return The % of money the player will get back when unrenting
 	 */
 	public double getMoneyBackPercentage() {
 		return Utils.evaluateToDouble(getStringSetting("rent.moneyBack"), this);
 	}
-	
+
 	/**
-	 * Get the amount of money that should be paid to the player when unrenting the region
+	 * Get the amount of money that should be paid to the player when unrenting the region.
 	 * @return The amount of money the player should get back
 	 */
 	public double getMoneyBackAmount() {
 		Long currentTime = Calendar.getInstance().getTimeInMillis();
-		Double timeLeft = (double) ((getRentedUntil() - currentTime));
+		Double timeLeft = (double)((getRentedUntil() - currentTime));
 		double percentage = (getMoneyBackPercentage()) / 100.0;
-		Double timePeriod = (double) (getDuration());
+		Double timePeriod = (double)(getDuration());
 		double periods = timeLeft / timePeriod;
-		return Math.max(0, periods*getPrice()*percentage);
+		return Math.max(0, periods * getPrice() * percentage);
 	}
-	
+
 	/**
-	 * Get the formatted string of the amount of the moneyBack amount
+	 * Get the formatted string of the amount of the moneyBack amount.
 	 * @return String with currency symbols and proper fractional part
 	 */
 	public String getFormattedMoneyBackAmount() {
 		return Utils.formatCurrency(getMoneyBackAmount());
 	}
-	
+
 	/**
-	 * Get the maximum time the player can rent the region in advance (milliseconds)
+	 * Get the maximum time the player can rent the region in advance (milliseconds).
 	 * @return The maximum rent time in milliseconds
 	 */
 	public long getMaxRentTime() {
 		return Utils.getDurationFromMinutesOrStringInput(getStringSetting("rent.maxRentTime"));
 	}
-	
+
 	/**
-	 * Check if the rent should expire
+	 * Check if the rent should expire.
 	 * @return true if the rent has expired and has been unrented, false otherwise
 	 */
 	public boolean checkExpiration() {
@@ -363,10 +364,10 @@ public class RentRegion extends GeneralRegion {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Send the expiration warnings from the selected profile which is specified in the config
-	 * Sends all warnings since previous call until (now + normal delay), delay can be found in the config as well
+	 * Send the expiration warnings from the selected profile which is specified in the config.
+	 * Sends all warnings since previous call until (now + normal delay), delay can be found in the config as well.
 	 */
 	public void sendExpirationWarnings() {
 		// Send from warningsDoneUntil to current+delay
@@ -380,13 +381,13 @@ public class RentRegion extends GeneralRegion {
 
 		// Check if a warning needs to be send for each defined point in time
 		Player player = Bukkit.getPlayer(getRenter());
-		long sendUntil = Calendar.getInstance().getTimeInMillis()+(plugin.getConfig().getInt("expireWarning.delay")*60*1000);
+		long sendUntil = Calendar.getInstance().getTimeInMillis() + (plugin.getConfig().getInt("expireWarning.delay") * 60 * 1000);
 		for(String timeBefore : profileSection.getKeys(false)) {
 			long timeBeforeParsed = Utils.durationStringToLong(timeBefore);
 			if(timeBeforeParsed <= 0) {
 				return;
 			}
-			long checkTime = getRentedUntil()-timeBeforeParsed;
+			long checkTime = getRentedUntil() - timeBeforeParsed;
 
 			if(checkTime > warningsDoneUntil && checkTime <= sendUntil) {
 				List<String> commands;
@@ -396,9 +397,9 @@ public class RentRegion extends GeneralRegion {
 					 *     warnPlayer: true
 					 *     commands: ["say hi"]
 					 */
-					commands = profileSection.getStringList(timeBefore+".commands");
+					commands = profileSection.getStringList(timeBefore + ".commands");
 					// Warn player
-					if(profileSection.getBoolean(timeBefore+".warnPlayer") && player != null) {
+					if(profileSection.getBoolean(timeBefore + ".warnPlayer") && player != null) {
 						message(player, "rent-expireWarning", this);
 					}
 				} else {
@@ -409,9 +410,9 @@ public class RentRegion extends GeneralRegion {
 		}
 		warningsDoneUntil = sendUntil;
 	}
-	
+
 	/**
-	 * Rent a region
+	 * Rent a region.
 	 * @param player The player that wants to rent the region
 	 * @return true if it succeeded and false if not
 	 */
@@ -430,7 +431,7 @@ public class RentRegion extends GeneralRegion {
 			if(getRegion() == null) {
 				message(player, "general-noRegion");
 				return false;
-			}			
+			}
 			boolean extend = false;
 			if(getRenter() != null && player.getUniqueId().equals(getRenter())) {
 				extend = true;
@@ -438,7 +439,7 @@ public class RentRegion extends GeneralRegion {
 			// Check if the region is available for renting or if the player wants to extend the rent
 			if(!isRented() || extend) {
 				// Check if the players needs to be in the world or region for buying
-				if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName()) 
+				if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName())
 						|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
 					message(player, "rent-restrictedToRegion");
 					return false;
@@ -446,7 +447,7 @@ public class RentRegion extends GeneralRegion {
 				if(restrictedToWorld() && !player.getWorld().getName().equals(getWorldName())) {
 					message(player, "rent-restrictedToWorld", player.getWorld().getName());
 					return false;
-				}				
+				}
 				// Check region limits if this is not extending
 				if(!(extend && config.getBoolean("allowRegionExtendsWhenAboveLimits"))) {
 
@@ -473,7 +474,7 @@ public class RentRegion extends GeneralRegion {
 						return false;
 					}
 				}
-				
+
 				// Check if the player can still extend this rent
 				if(extend && !player.hasPermission("areashop.rentextendbypass")) {
 					if(getMaxExtends() >= 0 && getTimesExtended() >= getMaxExtends()) {
@@ -481,7 +482,7 @@ public class RentRegion extends GeneralRegion {
 						return false;
 					}
 				}
-				
+
 				// Check if there is enough time left before hitting maxRentTime
 				boolean extendToMax = false;
 				double price = getPrice();
@@ -491,7 +492,7 @@ public class RentRegion extends GeneralRegion {
 				if(isRented()) {
 					timeRented = getRentedUntil() - timeNow;
 				}
-				if((timeRented + getDuration()) > (maxRentTime) 
+				if((timeRented + getDuration()) > (maxRentTime)
 						&& !player.hasPermission("areashop.renttimebypass")
 						&& maxRentTime != -1) {
 					// Extend to the maximum instead of adding a full period
@@ -502,7 +503,7 @@ public class RentRegion extends GeneralRegion {
 						} else {
 							long toRentPart = maxRentTime - timeRented;
 							extendToMax = true;
-							price = ((double)toRentPart)/getDuration()*price;
+							price = ((double)toRentPart) / getDuration() * price;
 						}
 					} else {
 						message(player, "rent-maxRentTime");
@@ -539,10 +540,10 @@ public class RentRegion extends GeneralRegion {
 							r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), price);
 						}
 						if(r == null || !r.transactionSuccess()) {
-							AreaShop.warn("Something went wrong with paying '"+landlordName+"' "+Utils.formatCurrency(price)+" for his rent of region "+getName()+" to "+player.getName());
+							AreaShop.warn("Something went wrong with paying '" + landlordName + "' " + Utils.formatCurrency(price) + " for his rent of region " + getName() + " to " + player.getName());
 						}
 					}
-						
+
 					if(!extend) {
 						// Run commands
 						runEventCommands(RegionEvent.RENTED, true);
@@ -550,13 +551,13 @@ public class RentRegion extends GeneralRegion {
 						// Run commands
 						runEventCommands(RegionEvent.EXTENDED, true);
 					}
-					
+
 					// Get the time until the region will be rented
 					Calendar calendar = Calendar.getInstance();
 					if(extendToMax) {
 						calendar.setTimeInMillis(calendar.getTimeInMillis() + getMaxRentTime());
 					} else if(extend) {
-						calendar.setTimeInMillis(getRentedUntil()+getDuration());
+						calendar.setTimeInMillis(getRentedUntil() + getDuration());
 					} else {
 						calendar.setTimeInMillis(calendar.getTimeInMillis() + getDuration());
 					}
@@ -576,7 +577,7 @@ public class RentRegion extends GeneralRegion {
 
 					// Notify about updates
 					this.notifyAndUpdate(new RentedRegionEvent(this, extend));
-					
+
 					// Send message to the player
 					if(extendToMax) {
 						message(player, "rent-extendedToMax");
@@ -603,17 +604,17 @@ public class RentRegion extends GeneralRegion {
 				}
 			} else {
 				message(player, "rent-someoneElse");
-			}	
+			}
 		} else {
 			message(player, "rent-noPermission");
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Unrent a region, reset to unrented
+	 * Unrent a region, reset to unrented.
 	 * @param giveMoneyBack true if money should be given back to the player, false otherwise
-	 * @param executor The CommandSender that should get the cancelled message if there is any, or null
+	 * @param executor      The CommandSender that should get the cancelled message if there is any, or null
 	 * @return true if unrenting succeeded, othwerwise false
 	 */
 	@SuppressWarnings("deprecation")
@@ -644,7 +645,7 @@ public class RentRegion extends GeneralRegion {
 
 		// Run commands
 		this.runEventCommands(RegionEvent.UNRENTED, true);
-		double moneyBack =  getMoneyBackAmount();
+		double moneyBack = getMoneyBackAmount();
 		if(moneyBack > 0 && giveMoneyBack) {
 			boolean noPayBack = false;
 			OfflinePlayer landlordPlayer = null;
@@ -662,8 +663,8 @@ public class RentRegion extends GeneralRegion {
 				if(r == null || !r.transactionSuccess()) {
 					noPayBack = true;
 				}
-			}			
-			
+			}
+
 			// Give back the money
 			OfflinePlayer player = Bukkit.getOfflinePlayer(getRenter());
 			if(player != null && !noPayBack) {
@@ -679,7 +680,7 @@ public class RentRegion extends GeneralRegion {
 					error = true;
 				}
 				if(error || r == null || !r.transactionSuccess()) {
-					AreaShop.warn("Something went wrong with paying back to "+getPlayerName()+" money while unrenting region "+getName());
+					AreaShop.warn("Something went wrong with paying back to " + getPlayerName() + " money while unrenting region " + getName());
 				}
 			}
 		}
@@ -705,7 +706,7 @@ public class RentRegion extends GeneralRegion {
 		this.runEventCommands(RegionEvent.UNRENTED, false);
 		return true;
 	}
-	
+
 	@Override
 	public boolean checkInactive() {
 		if(isDeleted() || !isRented()) {
@@ -719,8 +720,8 @@ public class RentRegion extends GeneralRegion {
 		long lastPlayed = getLastActiveTime();
 		//AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
 		if(Calendar.getInstance().getTimeInMillis() > (lastPlayed + inactiveSetting)) {
-			AreaShop.info("Region "+getName()+" unrented because of inactivity for player "+getPlayerName());
-			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis()-player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
+			AreaShop.info("Region " + getName() + " unrented because of inactivity for player " + getPlayerName());
+			AreaShop.debug("currentTime=" + Calendar.getInstance().getTimeInMillis() + ", getLastPlayed()=" + lastPlayed + ", timeInactive=" + (Calendar.getInstance().getTimeInMillis() - player.getLastPlayed()) + ", inactiveSetting=" + inactiveSetting);
 			return this.unRent(true, null);
 		}
 		return false;

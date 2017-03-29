@@ -12,7 +12,7 @@ public class BuyingRegionEvent extends CancellableRegionEvent<BuyRegion> {
 	private Player player;
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param region The region that is about to get bought
 	 * @param player The player that tries to buy the region
 	 */
@@ -22,7 +22,7 @@ public class BuyingRegionEvent extends CancellableRegionEvent<BuyRegion> {
 	}
 
 	/**
-	 * Get the player that is trying to buy the region
+	 * Get the player that is trying to buy the region.
 	 * @return The player that is trying to buy the region
 	 */
 	public Player getPlayer() {

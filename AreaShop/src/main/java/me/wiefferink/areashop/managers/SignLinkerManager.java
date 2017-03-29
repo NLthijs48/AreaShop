@@ -19,7 +19,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.material.Sign;
 import org.bukkit.util.BlockIterator;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class SignLinkerManager extends Manager implements Listener {
 	private Map<UUID, SignLinker> signLinkers;
@@ -36,10 +41,10 @@ public class SignLinkerManager extends Manager implements Listener {
 			exitSignLinkMode(Bukkit.getPlayer(uuid));
 		}
 	}
-	
+
 	/**
-	 * Let a player enter sign linking mode
-	 * @param player The player that has to enter sign linking mode
+	 * Let a player enter sign linking mode.
+	 * @param player  The player that has to enter sign linking mode
 	 * @param profile The profile to use for the signs (null for default)
 	 */
 	public void enterSignLinkMode(Player player, String profile) {
@@ -51,9 +56,9 @@ public class SignLinkerManager extends Manager implements Listener {
 			plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		}
 	}
-	
+
 	/**
-	 * Let a player exit sign linking mode
+	 * Let a player exit sign linking mode.
 	 * @param player The player that has to exit sign linking mode
 	 */
 	public void exitSignLinkMode(Player player) {
@@ -64,9 +69,9 @@ public class SignLinkerManager extends Manager implements Listener {
 		}
 		plugin.message(player, "linksigns-stopped");
 	}
-	
+
 	/**
-	 * Check if the player is in sign linking mode
+	 * Check if the player is in sign linking mode.
 	 * @param player The player to check
 	 * @return true if the player is in sign linking mode, otherwise false
 	 */
@@ -75,7 +80,7 @@ public class SignLinkerManager extends Manager implements Listener {
 	}
 
 	/**
-	 * On player interactions
+	 * On player interactions.
 	 * @param event The PlayerInteractEvent
 	 */
 	@EventHandler(priority = EventPriority.HIGH)
@@ -89,7 +94,7 @@ public class SignLinkerManager extends Manager implements Listener {
 				BlockIterator blockIterator = new BlockIterator(player, 100);
 				while(blockIterator.hasNext()) {
 					Block next = blockIterator.next();
-					List<GeneralRegion> regions = Utils.getASRegionsByLocation(next.getLocation());
+					List<GeneralRegion> regions = Utils.getRegions(next.getLocation());
 					if(regions.size() == 1) {
 						linker.setRegion(regions.get(0));
 						return;
@@ -101,7 +106,7 @@ public class SignLinkerManager extends Manager implements Listener {
 						plugin.message(player, "linksigns-multipleRegions", Utils.createCommaSeparatedList(names));
 						plugin.message(player, "linksigns-multipleRegionsAdvice");
 						return;
-					}					
+					}
 				}
 				// No regions found within the maximum range
 				plugin.message(player, "linksigns-noRegions");
@@ -129,37 +134,37 @@ public class SignLinkerManager extends Manager implements Listener {
 			}
 		}
 	}
-	
+
 	/**
-	 * Handle disconnection players
+	 * Handle disconnection players.
 	 * @param event The PlayerQuitEvent
 	 */
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLeave(PlayerQuitEvent event) {
 		exitSignLinkMode(event.getPlayer());
 	}
-	
+
 	/**
-	 * Class to keep track of the signlinking data
+	 * Class to keep track of the signlinking data.
 	 */
 	private class SignLinker {
 		private boolean hasSign = false;
 		private boolean hasRegion = false;
-		
+
 		public Player linker = null;
 		public String profile = null;
-		
+
 		public GeneralRegion region = null;
-		
+
 		public Location location = null;
 		public Material type = null;
 		public BlockFace facing = null;
-				
+
 		public SignLinker(Player linker, String profile) {
 			this.linker = linker;
 			this.profile = profile;
 		}
-		
+
 		public void setRegion(GeneralRegion region) {
 			this.region = region;
 			hasRegion = true;
@@ -168,7 +173,7 @@ public class SignLinkerManager extends Manager implements Listener {
 			}
 			finish();
 		}
-		
+
 		public void setSign(Location location, Material type, BlockFace facing) {
 			this.location = location;
 			this.type = type;
@@ -190,21 +195,21 @@ public class SignLinkerManager extends Manager implements Listener {
 				}
 				region.update();
 				reset();
-				
+
 				plugin.message(linker, "linksigns-next");
 			}
 		}
-		
+
 		public void reset() {
 			hasSign = false;
 			hasRegion = false;
 		}
-		
+
 		public boolean isComplete() {
 			return hasSign && hasRegion;
 		}
 	}
-	
+
 
 }
 

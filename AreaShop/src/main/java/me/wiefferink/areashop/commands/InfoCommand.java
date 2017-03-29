@@ -10,7 +10,14 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class InfoCommand extends CommandAreaShop {
 
@@ -28,17 +35,17 @@ public class InfoCommand extends CommandAreaShop {
 	}
 
 	/**
-	 * Display a page of a list of regions
-	 * @param sender The CommandSender to send the messages to
-	 * @param regions The regions to display
+	 * Display a page of a list of regions.
+	 * @param sender      The CommandSender to send the messages to
+	 * @param regions     The regions to display
 	 * @param filterGroup The group to filter the regions by
-	 * @param keyHeader The header to print above the page
-	 * @param pageInput The page number, if any
+	 * @param keyHeader   The header to print above the page
+	 * @param pageInput   The page number, if any
 	 * @param baseCommand The command to execute for next/previous page
 	 */
 	private void showSortedPagedList(CommandSender sender, List<? extends GeneralRegion> regions, RegionGroup filterGroup, String keyHeader, String pageInput, String baseCommand) {
-		int MAX_ITEMS = 20;
-		int ITEMS_PER_PAGE = MAX_ITEMS-2;
+		int maximumItems = 20;
+		int itemsPerPage = maximumItems - 2;
 		int page = 1;
 		if(pageInput != null && Utils.isNumeric(pageInput)) {
 			try {
@@ -77,14 +84,14 @@ public class InfoCommand extends CommandAreaShop {
 			}
 			plugin.message(sender, keyHeader, limitedToGroup);
 			// Page entries
-			int totalPages = (int)Math.ceil(regions.size()/(double)ITEMS_PER_PAGE); // Clip page to correct boundaries, not much need to tell the user
-			if(regions.size() == ITEMS_PER_PAGE+1) { // 19 total items is mapped to 1 page of 19
-				ITEMS_PER_PAGE++;
+			int totalPages = (int)Math.ceil(regions.size() / (double)itemsPerPage); // Clip page to correct boundaries, not much need to tell the user
+			if(regions.size() == itemsPerPage + 1) { // 19 total items is mapped to 1 page of 19
+				itemsPerPage++;
 				totalPages = 1;
 			}
 			page = Math.max(1, Math.min(totalPages, page));
 			int linesPrinted = 1; // header
-			for(int i = (page-1)*ITEMS_PER_PAGE; i < page*ITEMS_PER_PAGE && i < regions.size(); i++) {
+			for(int i = (page - 1) * itemsPerPage; i < page * itemsPerPage && i < regions.size(); i++) {
 				String state;
 				GeneralRegion region = regions.get(i);
 				if(region.getType() == GeneralRegion.RegionType.RENT) {
@@ -102,30 +109,30 @@ public class InfoCommand extends CommandAreaShop {
 						state = "Reselling";
 					}
 				}
-				plugin.messageNoPrefix(sender, "info-entry"+state, region);
+				plugin.messageNoPrefix(sender, "info-entry" + state, region);
 				linesPrinted++;
 			}
 			Message footer = Message.empty();
 			// Previous button
 			if(page > 1) {
-				footer.append(Message.fromKey("info-pagePrevious").replacements(baseCommand+" "+(page-1)));
+				footer.append(Message.fromKey("info-pagePrevious").replacements(baseCommand + " " + (page - 1)));
 			} else {
 				footer.append(Message.fromKey("info-pageNoPrevious"));
 			}
 			// Page status
 			if(totalPages > 1) {
-				String pageString = ""+page;
-				for(int i = pageString.length(); i < (totalPages+"").length(); i++) {
-					pageString = "0"+pageString;
+				String pageString = "" + page;
+				for(int i = pageString.length(); i < (totalPages + "").length(); i++) {
+					pageString = "0" + pageString;
 				}
 				footer.append(Message.fromKey("info-pageStatus").replacements(page, totalPages));
 				if(page < totalPages) {
-					footer.append(Message.fromKey("info-pageNext").replacements(baseCommand+" "+(page+1)));
+					footer.append(Message.fromKey("info-pageNext").replacements(baseCommand + " " + (page + 1)));
 				} else {
 					footer.append(Message.fromKey("info-pageNoNext"));
 				}
 				// Fill up space if the page is not full (aligns header nicely)
-				for(int i = linesPrinted; i < MAX_ITEMS-1; i++) {
+				for(int i = linesPrinted; i < maximumItems - 1; i++) {
 					sender.sendMessage(" ");
 				}
 				footer.send(sender);
@@ -134,7 +141,7 @@ public class InfoCommand extends CommandAreaShop {
 	}
 
 	/**
-	 * Get an integer to order by type, usable for Comparators
+	 * Get an integer to order by type, usable for Comparators.
 	 * @param region The region to get the order for
 	 * @return An integer for sorting by type
 	 */
@@ -155,7 +162,7 @@ public class InfoCommand extends CommandAreaShop {
 			}
 		}
 	}
-	
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if(!sender.hasPermission("areashop.info")) {
@@ -179,12 +186,12 @@ public class InfoCommand extends CommandAreaShop {
 					}
 				}
 			}
-			
+
 			// All regions
 			if(args[1].equalsIgnoreCase("all")) {
 				showSortedPagedList(sender, plugin.getFileManager().getRegions(), filterGroup, "info-allHeader", (args.length > 2 ? args[2] : null), "/areashop info all");
 			}
-			
+
 			// Rented regions
 			else if(args[1].equalsIgnoreCase("rented")) {
 				List<RentRegion> regions = plugin.getFileManager().getRents();
@@ -258,20 +265,20 @@ public class InfoCommand extends CommandAreaShop {
 						rent = plugin.getFileManager().getRent(args[2]);
 						buy = plugin.getFileManager().getBuy(args[2]);
 					} else {
-						if (sender instanceof Player) {
+						if(sender instanceof Player) {
 							// get the region by location
-							List<GeneralRegion> regions = Utils.getAllApplicableRegions(((Player) sender).getLocation());
-							if (regions.isEmpty()) {
+							List<GeneralRegion> regions = Utils.getImportantRegions(((Player)sender).getLocation());
+							if(regions.isEmpty()) {
 								plugin.message(sender, "cmd-noRegionsAtLocation");
 								return;
-							} else if (regions.size() > 1) {
+							} else if(regions.size() > 1) {
 								plugin.message(sender, "cmd-moreRegionsAtLocation");
 								return;
 							} else {
-                                if (regions.get(0) instanceof RentRegion) {
-                                    rent = (RentRegion)regions.get(0);
-                                } else if (regions.get(0) instanceof BuyRegion) {
-                                    buy = (BuyRegion)regions.get(0);
+								if(regions.get(0) instanceof RentRegion) {
+									rent = (RentRegion)regions.get(0);
+								} else if(regions.get(0) instanceof BuyRegion) {
+									buy = (BuyRegion)regions.get(0);
 								}
 							}
 						} else {
@@ -279,12 +286,12 @@ public class InfoCommand extends CommandAreaShop {
 							return;
 						}
 					}
-					
+
 					if(rent == null && buy == null) {
 						plugin.message(sender, "info-regionNotExisting", args[2]);
 						return;
-					}					
-					
+					}
+
 					if(rent != null) {
 						plugin.message(sender, "info-regionHeaderRent", rent);
 						if(rent.isRented()) {
@@ -320,12 +327,12 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionMaxExtends", rent);
 							}
 						}
-                        // If maxExtends is zero it does not make sense to show this message
-                        if (rent.getMaxRentTime() != -1 && rent.getMaxExtends() != 0) {
-                            plugin.messageNoPrefix(sender, "info-regionMaxRentTime", rent);
+						// If maxExtends is zero it does not make sense to show this message
+						if(rent.getMaxRentTime() != -1 && rent.getMaxExtends() != 0) {
+							plugin.messageNoPrefix(sender, "info-regionMaxRentTime", rent);
 						}
 						if(rent.getInactiveTimeUntilUnrent() != -1) {
-							plugin.messageNoPrefix(sender, "info-regionInactiveUnrent", rent);			
+							plugin.messageNoPrefix(sender, "info-regionInactiveUnrent", rent);
 						}
 						// Teleport
 						Message tp = Message.fromKey("info-prefix");
@@ -400,7 +407,7 @@ public class InfoCommand extends CommandAreaShop {
 							plugin.messageNoPrefix(sender, "info-regionLandlord", buy);
 						}
 						if(buy.getInactiveTimeUntilSell() != -1) {
-							plugin.messageNoPrefix(sender, "info-regionInactiveSell", buy);			
+							plugin.messageNoPrefix(sender, "info-regionInactiveSell", buy);
 						}
 						// Teleport
 						Message tp = Message.fromKey("info-prefix");
@@ -454,9 +461,9 @@ public class InfoCommand extends CommandAreaShop {
 			}
 		} else {
 			plugin.message(sender, "info-help");
-		}	
+		}
 	}
-	
+
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();

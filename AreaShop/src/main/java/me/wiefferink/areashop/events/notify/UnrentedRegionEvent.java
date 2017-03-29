@@ -6,7 +6,7 @@ import me.wiefferink.areashop.regions.RentRegion;
 import java.util.UUID;
 
 /**
- * Broadcasted when a region has been unrented
+ * Broadcasted when a region has been unrented.
  */
 public class UnrentedRegionEvent extends NotifyRegionEvent<RentRegion> {
 
@@ -14,9 +14,9 @@ public class UnrentedRegionEvent extends NotifyRegionEvent<RentRegion> {
 	private double refundedMoney;
 
 	/**
-	 * Constructor
-	 * @param region    The region that has been unrented
-	 * @param oldRenter The player that rented the region before it was unrented
+	 * Constructor.
+	 * @param region        The region that has been unrented
+	 * @param oldRenter     The player that rented the region before it was unrented
 	 * @param refundedMoney The amount of money that has been refunded
 	 */
 	public UnrentedRegionEvent(RentRegion region, UUID oldRenter, double refundedMoney) {
@@ -26,7 +26,7 @@ public class UnrentedRegionEvent extends NotifyRegionEvent<RentRegion> {
 	}
 
 	/**
-	 * Get the player that the region was unrented for
+	 * Get the player that the region was unrented for.
 	 * @return The UUID of the player that the region was unrented for
 	 */
 	public UUID getOldRenter() {
@@ -34,7 +34,7 @@ public class UnrentedRegionEvent extends NotifyRegionEvent<RentRegion> {
 	}
 
 	/**
-	 * Get the amount that is paid back to the player
+	 * Get the amount that is paid back to the player.
 	 * @return The amount of money paid back to the player
 	 */
 	public double getRefundedMoney() {

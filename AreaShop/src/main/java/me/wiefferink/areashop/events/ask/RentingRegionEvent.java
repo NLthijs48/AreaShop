@@ -5,7 +5,7 @@ import me.wiefferink.areashop.regions.RentRegion;
 import org.bukkit.entity.Player;
 
 /**
- * Broadcasted when a player tries to rent a region
+ * Broadcasted when a player tries to rent a region.
  */
 public class RentingRegionEvent extends CancellableRegionEvent<RentRegion> {
 
@@ -13,7 +13,7 @@ public class RentingRegionEvent extends CancellableRegionEvent<RentRegion> {
 	private boolean extending;
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param region    The region that is about to be rented
 	 * @param player    The player that tries to rent the region
 	 * @param extending true if the player is extending the rental of the region, otherwise false
@@ -25,7 +25,7 @@ public class RentingRegionEvent extends CancellableRegionEvent<RentRegion> {
 	}
 
 	/**
-	 * Get the player that is trying to rent the region
+	 * Get the player that is trying to rent the region.
 	 * @return The player that is trying to rent the region
 	 */
 	public Player getPlayer() {
@@ -33,7 +33,7 @@ public class RentingRegionEvent extends CancellableRegionEvent<RentRegion> {
 	}
 
 	/**
-	 * Check if the player is extending the region or renting it for the first time
+	 * Check if the player is extending the region or renting it for the first time.
 	 * @return true if the player tries to extend the region, false if he tries to rent it the first time
 	 */
 	public boolean isExtending() {

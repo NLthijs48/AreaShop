@@ -119,7 +119,9 @@ public class StackCommand extends CommandAreaShop {
 		}
 		AreaShop.debug("  calculated shift vector: " + shift + ", with facing=" + facing);
 		// Create regions and add them to AreaShop
-		final String namePrefix = args[3];
+		final String nameTemplate = args[3];
+
+
 		final int regionsPerTick = plugin.getConfig().getInt("adding.regionsPerTick");
 		final boolean rentRegions = "rent".equalsIgnoreCase(args[4]);
 		final int amount = tempAmount;
@@ -135,7 +137,7 @@ public class StackCommand extends CommandAreaShop {
 		if(group != null) {
 			groupsMessage = Message.fromKey("stack-addToGroup").replacements(group.getName());
 		}
-		plugin.message(player, "stack-accepted", amount, type, gap, namePrefix, groupsMessage);
+		plugin.message(player, "stack-accepted", amount, type, gap, nameTemplate, groupsMessage);
 		plugin.message(player, "stack-addStart", amount, regionsPerTick * 20);
 		new BukkitRunnable() {
 			private int current = -1;
@@ -155,7 +157,12 @@ public class StackCommand extends CommandAreaShop {
 						while(counterName.length() < minimumLength) {
 							counterName = "0" + counterName;
 						}
-						String regionName = namePrefix + counterName;
+						String regionName;
+						if(nameTemplate.contains("#")) {
+							regionName = nameTemplate.replace("#", counterName);
+						} else {
+							regionName = nameTemplate + counterName;
+						}
 						while(manager.getRegion(regionName) != null || AreaShop.getInstance().getFileManager().getRegion(regionName) != null) {
 							counter++;
 							counterName = counter + "";
@@ -163,7 +170,11 @@ public class StackCommand extends CommandAreaShop {
 							while(counterName.length() < minimumLength) {
 								counterName = "0" + counterName;
 							}
-							regionName = namePrefix + counterName;
+							if(nameTemplate.contains("#")) {
+								regionName = nameTemplate.replace("#", counterName);
+							} else {
+								regionName = nameTemplate + counterName;
+							}
 						}
 						// Add the region to WorldGuard (at startposition shifted by the number of this region times the blocks it should shift)
 						BlockVector minimum = new BlockVector(selection.getNativeMinimumPoint().add(finalShift.multiply(current)));

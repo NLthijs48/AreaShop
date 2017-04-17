@@ -381,6 +381,7 @@ groupadd-weFailed: "Were already in group %0%: [gray]%1%."
 
 groupdel-help: "/as groupdel <group> [region], if no region specified all regions from your WorldEdit selection are used."
 groupdel-noPermission: "You don't have permission to remove regions from groups."
+groupdel-wrongGroup: "Group %0% not found, check '/as grouplist' for registered groups."
 groupdel-success: "Region %lang:region% has been removed from group '%0%', this group now has %1% member(s)."
 groupdel-failed: "Region %lang:region% is not a member of group '%0%'."
 groupdel-weSuccess: "Removed from group %0%: [gray]%1%."

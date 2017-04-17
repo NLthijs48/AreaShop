@@ -38,9 +38,10 @@ public class GroupdelCommand extends CommandAreaShop {
 		}
 		RegionGroup group = plugin.getFileManager().getGroup(args[1]);
 		if(group == null) {
-			group = new RegionGroup(plugin, args[1]);
-			plugin.getFileManager().addGroup(group);
+			plugin.message(sender, "groupdel-wrongGroup", args[1]);
+			return;
 		}
+
 		if(args.length == 2) {
 			if(!(sender instanceof Player)) {
 				plugin.message(sender, "cmd-weOnlyByPlayer");

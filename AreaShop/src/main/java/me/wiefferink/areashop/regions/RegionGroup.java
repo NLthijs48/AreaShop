@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// TODO consider switching to saving lowercase regions
 public class RegionGroup {
 
 	private AreaShop plugin;
@@ -38,11 +39,8 @@ public class RegionGroup {
 		}
 		if(newMembers.size() != previousCount) {
 			setSetting("regions", newMembers);
-			AreaShop.debug("group save required because of changed member size");
+			AreaShop.debug("group save required because of changed member size", newMembers);
 			saveRequired();
-		}
-		if(getMembers().size() == 0) {
-			plugin.getFileManager().removeGroup(this);
 		}
 	}
 
@@ -53,7 +51,7 @@ public class RegionGroup {
 	 */
 	public boolean addMember(GeneralRegion region) {
 		List<String> members = getMembers();
-		if(members.contains(region.getLowerCaseName())) {
+		if(members.contains(region.getName())) {
 			return false;
 		} else {
 			members.add(region.getName());
@@ -69,18 +67,15 @@ public class RegionGroup {
 	 * @return true if the region was in the group before, otherwise false
 	 */
 	public boolean removeMember(GeneralRegion region) {
+		if(!isMember(region)) {
+			return false;
+		}
+
 		List<String> members = getMembers();
-		boolean result = isMember(region);
 		members.remove(region.getName());
-		if(members.isEmpty()) {
-			plugin.getFileManager().removeGroup(this);
-		} else {
-			setSetting("regions", members);
-		}
-		if(result) {
-			this.saveRequired();
-		}
-		return result;
+		setSetting("regions", members);
+		this.saveRequired();
+		return true;
 	}
 
 	/**

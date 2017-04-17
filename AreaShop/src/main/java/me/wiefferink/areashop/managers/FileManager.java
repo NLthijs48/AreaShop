@@ -14,32 +14,15 @@ import me.wiefferink.areashop.regions.GeneralRegion.RegionType;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -830,13 +813,26 @@ public class FileManager extends Manager {
 		result &= loadDefaultFile();
 		// Convert old formats to the latest (object saving to .yml saving)
 		preUpdateFiles();
-		// Load region files (regions folder)
-		loadRegionFiles(thisTick);
-		// Convert old formats to the latest (changes in .yml saving format)
-		postUpdateFiles();
-		// Load groups.yml
-		result &= loadGroupsFile();
-
+		if(thisTick) {
+			// Load region files (regions folder)
+			loadRegionFiles();
+			// Convert old formats to the latest (changes in .yml saving format)
+			postUpdateFiles();
+			// Load groups.yml
+			result &= loadGroupsFile();
+		} else {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					// Load region files (regions folder)
+					loadRegionFiles();
+					// Convert old formats to the latest (changes in .yml saving format)
+					postUpdateFiles();
+					// Load groups.yml
+					loadGroupsFile();
+				}
+			}.runTask(plugin);
+		}
 		return result;
 	}
 
@@ -964,9 +960,8 @@ public class FileManager extends Manager {
 
 	/**
 	 * Load all region files.
-	 * @param thisTick Load files in the current tick or a tick later
 	 */
-	public void loadRegionFiles(boolean thisTick) {
+	public void loadRegionFiles() {
 		regions.clear();
 		final File file = new File(regionsPath);
 		if(!file.exists()) {
@@ -976,16 +971,7 @@ public class FileManager extends Manager {
 			}
 			plugin.setReady(true);
 		} else if(file.isDirectory()) {
-			if(thisTick) {
-				loadRegionFilesNow();
-			} else {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						loadRegionFilesNow();
-					}
-				}.runTask(plugin);
-			}
+			loadRegionFilesNow();
 		}
 	}
 

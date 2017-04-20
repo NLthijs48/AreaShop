@@ -43,14 +43,14 @@ public class Utils {
 	}
 
 	private static YamlConfiguration config;
-	private static ArrayList<String> identifiers;
-	private static ArrayList<String> seconds;
-	private static ArrayList<String> minutes;
-	private static ArrayList<String> hours;
-	private static ArrayList<String> days;
-	private static ArrayList<String> weeks;
-	private static ArrayList<String> months;
-	private static ArrayList<String> years;
+	private static Set<String> identifiers;
+	private static Set<String> seconds;
+	private static Set<String> minutes;
+	private static Set<String> hours;
+	private static Set<String> days;
+	private static Set<String> weeks;
+	private static Set<String> months;
+	private static Set<String> years;
 	private static ScriptEngine scriptEngine;
 
 	/**
@@ -61,15 +61,15 @@ public class Utils {
 		config = pluginConfig;
 
 		// Setup individual identifiers
-		seconds = new ArrayList<>(config.getStringList("seconds"));
-		minutes = new ArrayList<>(config.getStringList("minutes"));
-		hours = new ArrayList<>(config.getStringList("hours"));
-		days = new ArrayList<>(config.getStringList("days"));
-		weeks = new ArrayList<>(config.getStringList("weeks"));
-		months = new ArrayList<>(config.getStringList("months"));
-		years = new ArrayList<>(config.getStringList("years"));
+		seconds = getSetAndDefaults("seconds");
+		minutes = getSetAndDefaults("minutes");
+		hours = getSetAndDefaults("hours");
+		days = getSetAndDefaults("days");
+		weeks = getSetAndDefaults("weeks");
+		months = getSetAndDefaults("months");
+		years = getSetAndDefaults("years");
 		// Setup all time identifiers
-		identifiers = new ArrayList<>();
+		identifiers = new HashSet<>();
 		identifiers.addAll(seconds);
 		identifiers.addAll(minutes);
 		identifiers.addAll(hours);
@@ -77,6 +77,20 @@ public class Utils {
 		identifiers.addAll(weeks);
 		identifiers.addAll(months);
 		identifiers.addAll(years);
+	}
+
+	/**
+	 * Get a string list from the config, combined with the entries specified in the default config.
+	 * @param path The path to read the lists from
+	 * @return List with all values defined in the config and the default config combined
+	 */
+	private static Set<String> getSetAndDefaults(String path) {
+		Set<String> result = new HashSet<>(config.getStringList(path));
+		ConfigurationSection defaults = config.getDefaults();
+		if(defaults != null) {
+			result.addAll(defaults.getStringList(path));
+		}
+		return result;
 	}
 
 	/**
@@ -594,6 +608,8 @@ public class Utils {
 			calendar.add(Calendar.MONTH, durationInt);
 		} else if(years.contains(durationString)) {
 			calendar.add(Calendar.YEAR, durationInt);
+		} else {
+			AreaShop.warn("Unknown duration indicator:", durationString, "check if config.yml has the correct time indicators");
 		}
 		return calendar.getTimeInMillis();
 	}

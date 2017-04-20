@@ -577,6 +577,6 @@ greeting-forrent: "%region% can be rented for %price% per %duration%."
 greeting-rented: "%region% is rented by %player% until %until%."
 greeting-forsale: "%region% can be bought for %price%."
 greeting-bought: "%region% is bought by %player%."
-greeting-resale: "%region% can be bought for %resaleprice% from %player%."
+greeting-resale: "%region% can be bought for %resellprice% from %player%."
 
 update-playerNotify: "[darkgreen]Update from AreaShop V%0% to %1% available, get the latest version at https://github.com/NLthijs48/AreaShop/releases."

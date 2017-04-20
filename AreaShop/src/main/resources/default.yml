@@ -124,7 +124,7 @@ general:
     sold:
       members: '%uuid%, %friendsuuid%'
       greeting: '%lang:prefix%%lang:greeting-bought%'
-    resale:
+    resell:
       members: '%uuid%, %friendsuuid%'
       greeting: '%lang:prefix%%lang:greeting-resale%'
 

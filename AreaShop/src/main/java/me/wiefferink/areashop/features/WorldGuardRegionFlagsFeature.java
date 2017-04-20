@@ -44,6 +44,12 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 
 		// Region flags for the current state
 		ConfigurationSection stateFlags = flagProfileSection.getConfigurationSection(region.getState().getValue());
+
+		// If in reselling mode, fallback to 'resale' section if 'resell' is not found (legacy configuration problem: https://github.com/NLthijs48/AreaShop/issues/303)
+		if(stateFlags == null && region.getState() == GeneralRegion.RegionState.RESELL) {
+			stateFlags = flagProfileSection.getConfigurationSection("resale");
+		}
+
 		if(stateFlags != null) {
 			result = result && updateRegionFlags(region, stateFlags);
 		}

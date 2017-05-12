@@ -18,25 +18,26 @@ public abstract class WorldGuardInterface {
 	}
 
 	/**
-	 * Parse an owner(s) string and set the players as owner of the WorldGuard region (set by UUID or name depending on implementation).
-	 * @param region The WorldGuard region to set the owners of
-	 * @param input  The owner(s) string to parse and set
-	 */
-	public abstract void setOwners(ProtectedRegion region, String input);
-
-	/**
-	 * Parse a member(s) string and set the players as member of the WorldGuard region (set by UUID or name depending on implementation).
-	 * @param region The WorldGuard region to set the members of
-	 * @param input  The member(s) string to parse and set
-	 */
-	public abstract void setMembers(ProtectedRegion region, String input);
-
-	/**
 	 * Get a set of ProtectedRegion's that are present on a certain location.
 	 * @param location The location to check
 	 * @return A set containing all regions present at that location
 	 */
 	public abstract Set<ProtectedRegion> getApplicableRegionsSet(Location location);
+
+	// DefaultDomain changed from abstract to non-abstract in version 6, so we need to handle that differently
+	/**
+	 * Parse an owner(s) string and set the players as owner of the WorldGuard region (set by UUID or name depending on implementation).
+	 * @param region The WorldGuard region to set the owners of
+	 * @param regionAccessSet  The owner(s) string to set
+	 */
+	public abstract void setOwners(ProtectedRegion region, RegionAccessSet regionAccessSet);
+
+	/**
+	 * Parse a member(s) string and set the players as member of the WorldGuard region (set by UUID or name depending on implementation).
+	 * @param region The WorldGuard region to set the members of
+	 * @param regionAccessSet  The member(s) string to set
+	 */
+	public abstract void setMembers(ProtectedRegion region, RegionAccessSet regionAccessSet);
 
 	/**
 	 * Check if a player is a member of the WorldGuard region.
@@ -54,6 +55,7 @@ public abstract class WorldGuardInterface {
 	 */
 	public abstract boolean containsOwner(ProtectedRegion region, UUID player);
 
+	// New flag system was introcuded in version 6.1.3, requiring different flag parsing
 	/**
 	 * Get a flag from the name of a flag.
 	 * @param flagName The name of the flag to get

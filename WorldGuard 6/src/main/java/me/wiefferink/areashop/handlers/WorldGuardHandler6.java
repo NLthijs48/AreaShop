@@ -10,6 +10,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
+import me.wiefferink.areashop.interfaces.RegionAccessSet;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
 import org.bukkit.Location;
 
@@ -24,78 +25,6 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 	}
 
 	@Override
-	public void setOwners(ProtectedRegion region, String input) {
-		// Split the string and parse all values
-		String[] names = input.split(", ");
-		DefaultDomain owners = region.getOwners();
-		owners.removeAll();
-		for(String owner : names) {
-			if(owner != null && !owner.isEmpty()) {
-				// Check for groups
-				if(owner.startsWith("g:")) {
-					if(owner.length() > 2) {
-						owners.addGroup(owner.substring(2));
-					}
-				} else if(owner.startsWith("n:")) {
-					if(owner.length() > 2) {
-						owners.addPlayer(owner.substring(2));
-					}
-				} else {
-					UUID uuid;
-					try {
-						uuid = UUID.fromString(owner);
-					} catch(IllegalArgumentException e) {
-						// Don't like this but cannot access main plugin class from this module...
-						System.out.println("[AreaShop] Tried using '" + owner + "' as uuid for a region owner, is your flagProfiles section correct?");
-						uuid = null;
-					}
-					if(uuid != null) {
-						owners.addPlayer(uuid);
-					}
-				}
-			}
-		}
-		region.setOwners(owners);
-		//System.out.println("  Flag " + flagName + " set: " + owners.toUserFriendlyString());		
-	}
-
-	@Override
-	public void setMembers(ProtectedRegion region, String input) {
-		// Split the string and parse all values
-		String[] names = input.split(", ");
-		DefaultDomain members = region.getMembers();
-		members.removeAll();
-		for(String member : names) {
-			if(member != null && !member.isEmpty()) {
-				// Check for groups
-				if(member.startsWith("g:")) {
-					if(member.length() > 2) {
-						members.addGroup(member.substring(2));
-					}
-				} else if(member.startsWith("n:")) {
-					if(member.length() > 2) {
-						members.addPlayer(member.substring(2));
-					}
-				} else {
-					UUID uuid;
-					try {
-						uuid = UUID.fromString(member);
-					} catch(IllegalArgumentException e) {
-						// Don't like this but cannot access main plugin class from this module...
-						System.out.println("[AreaShop] Tried using '" + member + "' as uuid for a region member, is your flagProfiles section correct?");
-						uuid = null;
-					}
-					if(uuid != null) {
-						members.addPlayer(uuid);
-					}
-				}
-			}
-		}
-		region.setMembers(members);
-		//System.out.println("  Flag " + flagName + " set: " + members.toUserFriendlyString());
-	}
-
-	@Override
 	public Set<ProtectedRegion> getApplicableRegionsSet(Location location) {
 		Set<ProtectedRegion> result = new HashSet<>();
 		Vector vector = new Vector(location.getX(), location.getY(), location.getZ());
@@ -105,6 +34,45 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public void setOwners(ProtectedRegion region, RegionAccessSet regionAccessSet) {
+		DefaultDomain defaultDomain = buildDomain(regionAccessSet);
+		if(!region.getOwners().toUserFriendlyString().equals(defaultDomain.toUserFriendlyString())) {
+			region.setOwners(defaultDomain);
+		}
+	}
+
+	@Override
+	public void setMembers(ProtectedRegion region, RegionAccessSet regionAccessSet) {
+		DefaultDomain defaultDomain = buildDomain(regionAccessSet);
+		if(!region.getMembers().toUserFriendlyString().equals(defaultDomain.toUserFriendlyString())) {
+			region.setMembers(defaultDomain);
+		}
+	}
+
+	/**
+	 * Build a DefaultDomain from a RegionAccessSet.
+	 * @param regionAccessSet RegionAccessSet to read
+	 * @return DefaultDomain containing the entities from the RegionAccessSet
+	 */
+	private DefaultDomain buildDomain(RegionAccessSet regionAccessSet) {
+		DefaultDomain owners = new DefaultDomain();
+
+		for(String playerName : regionAccessSet.getPlayerNames()) {
+			owners.addPlayer(playerName);
+		}
+
+		for(UUID uuid : regionAccessSet.getPlayerUniqueIds()) {
+			owners.addPlayer(uuid);
+		}
+
+		for(String group : regionAccessSet.getGroupNames()) {
+			owners.addGroup(group);
+		}
+
+		return owners;
 	}
 
 	@Override

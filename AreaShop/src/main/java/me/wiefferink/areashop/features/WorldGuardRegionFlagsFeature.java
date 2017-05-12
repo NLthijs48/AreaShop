@@ -7,12 +7,15 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
+import me.wiefferink.areashop.interfaces.RegionAccessSet;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.interactivemessenger.processing.Message;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 public class WorldGuardRegionFlagsFeature extends RegionFeature {
 
@@ -83,15 +86,17 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 				value = translateBukkitToWorldGuardColors(value);
 			}
 			if(flagName.equalsIgnoreCase("members")) {
-				plugin.getWorldGuardHandler().setMembers(worldguardRegion, value);
+				plugin.getWorldGuardHandler().setMembers(worldguardRegion, parseAccessSet(value));
 				//AreaShop.debug("  Flag " + flagName + " set: " + members.toUserFriendlyString());
 			} else if(flagName.equalsIgnoreCase("owners")) {
-				plugin.getWorldGuardHandler().setOwners(worldguardRegion, value);
+				plugin.getWorldGuardHandler().setOwners(worldguardRegion, parseAccessSet(value));
 				//AreaShop.debug("  Flag " + flagName + " set: " + owners.toUserFriendlyString());
 			} else if(flagName.equalsIgnoreCase("priority")) {
 				try {
 					int priority = Integer.parseInt(value);
-					worldguardRegion.setPriority(priority);
+					if(worldguardRegion.getPriority() != priority) {
+						worldguardRegion.setPriority(priority);
+					}
 					//AreaShop.debug("  Flag " + flagName + " set: " + value);
 				} catch(NumberFormatException e) {
 					AreaShop.warn("The value of flag " + flagName + " is not a number");
@@ -103,11 +108,13 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 				}
 				ProtectedRegion parentRegion = worldGuard.getRegionManager(region.getWorld()).getRegion(value);
 				if(parentRegion != null) {
-					try {
-						worldguardRegion.setParent(parentRegion);
-						//AreaShop.debug("  Flag " + flagName + " set: " + value);
-					} catch(ProtectedRegion.CircularInheritanceException e) {
-						AreaShop.warn("The parent set in the config is not correct (circular inheritance)");
+					if(!parentRegion.equals(worldguardRegion.getParent())) {
+						try {
+							worldguardRegion.setParent(parentRegion);
+							//AreaShop.debug("  Flag " + flagName + " set: " + value);
+						} catch(ProtectedRegion.CircularInheritanceException e) {
+							AreaShop.warn("The parent set in the config is not correct (circular inheritance)");
+						}
 					}
 				} else {
 					AreaShop.warn("The parent set in the config is not correct (region does not exist)");
@@ -172,7 +179,41 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 			}
 		}
 		// Indicate that the regions needs to be saved
+		// TODO do we still need this? maybe only for old WorldGuard?
 		plugin.getFileManager().saveIsRequiredForRegionWorld(region.getWorldName());
+		return result;
+	}
+
+	/**
+	 * Build an RegionAccessSet from an input that specifies player names, player uuids and groups.
+	 * @param input Input string defining the access set
+	 * @return RegionAccessSet containing the entities parsed from the input
+	 */
+	public RegionAccessSet parseAccessSet(String input) {
+		RegionAccessSet result = new RegionAccessSet();
+
+		String[] inputParts = input.split(", ");
+		for(String access : inputParts) {
+			if(access != null && !access.isEmpty()) {
+				// Check for groups
+				if(access.startsWith("g:")) {
+					if(access.length() > 2) {
+						result.getGroupNames().add(access.substring(2));
+					}
+				} else if(access.startsWith("n:")) {
+					if(access.length() > 2) {
+						result.getPlayerNames().add(access.substring(2));
+					}
+				} else {
+					try {
+						result.getPlayerUniqueIds().add(UUID.fromString(access));
+					} catch(IllegalArgumentException e) {
+						AreaShop.warn("Tried using '" + access + "' as uuid for a region member/owner, is your flagProfiles section correct?");
+					}
+				}
+			}
+		}
+
 		return result;
 	}
 
@@ -185,7 +226,12 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 	 * @throws InvalidFlagFormat When the value of the flag is wrong
 	 */
 	private <V> void setFlag(ProtectedRegion region, Flag<V> flag, String value) throws InvalidFlagFormat {
-		region.setFlag(flag, plugin.getWorldGuardHandler().parseFlagInput(flag, value));
+		V current = region.getFlag(flag);
+		V next = plugin.getWorldGuardHandler().parseFlagInput(flag, value);
+
+		if(!Objects.equals(current, next)) {
+			region.setFlag(flag, next);
+		}
 	}
 
 	/**

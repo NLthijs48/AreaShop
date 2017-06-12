@@ -68,6 +68,7 @@ public class Task {
 	/**
 	 * Run a timer task on the main server thread.
 	 * @param runnable The BukkitRunnable to run
+	 * @param period Time between task runs
 	 */
 	public static void syncTimer(long period, Run runnable) {
 		new BukkitRunnable() {
@@ -81,6 +82,7 @@ public class Task {
 	/**
 	 * Run a timer task on the main server thread.
 	 * @param runnable The BukkitRunnable to run
+	 * @param period Time between task runs
 	 */
 	public static void syncTimer(long period, RunResult<Boolean> runnable) {
 		new BukkitRunnable() {
@@ -96,6 +98,7 @@ public class Task {
 	/**
 	 * Run a timer task on an asynchronous thread.
 	 * @param runnable The BukkitRunnable to run
+	 * @param period Time between task runs
 	 */
 	public static void asyncTimer(long period, Run runnable) {
 		new BukkitRunnable() {
@@ -109,6 +112,7 @@ public class Task {
 	/**
 	 * Run a timer task on an asynchronous thread.
 	 * @param runnable The BukkitRunnable to run
+	 * @param period Time between task runs
 	 */
 	public static void asyncTimer(long period, RunResult<Boolean> runnable) {
 		new BukkitRunnable() {

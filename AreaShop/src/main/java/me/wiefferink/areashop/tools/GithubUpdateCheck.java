@@ -77,6 +77,7 @@ public class GithubUpdateCheck {
 	/**
 	 * Check if an update is available.
 	 * @param callback Callback to execute when the update check is done
+	 * @return GithubUpdateCheck containing the status of the check
 	 */
 	public GithubUpdateCheck checkUpdate(UpdateCallback callback) {
 		checking = true;

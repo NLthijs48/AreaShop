@@ -89,13 +89,14 @@ public class SetownerCommand extends CommandAreaShop {
 			RentRegion rent = (RentRegion)region;
 			if(rent.isRenter(uuid)) {
 				// extend
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTimeInMillis(rent.getRentedUntil() + rent.getDuration());
-				rent.setRentedUntil(calendar.getTimeInMillis());
+				rent.setRentedUntil(rent.getRentedUntil() + rent.getDuration());
 				rent.setRenter(uuid);
 				plugin.message(sender, "setowner-succesRentExtend", region);
 			} else {
 				// change
+				if(!rent.isRented()) {
+					rent.setRentedUntil(Calendar.getInstance().getTimeInMillis() + rent.getDuration());
+				}
 				rent.setRenter(uuid);
 				plugin.message(sender, "setowner-succesRent", region);
 			}

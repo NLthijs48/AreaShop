@@ -5,9 +5,6 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
-import me.wiefferink.areashop.lib.Updater;
-import me.wiefferink.areashop.lib.Updater.UpdateResult;
-import me.wiefferink.areashop.lib.Updater.UpdateType;
 import me.wiefferink.areashop.listeners.PlayerLoginLogoutListener;
 import me.wiefferink.areashop.listeners.SignBreakListener;
 import me.wiefferink.areashop.listeners.SignChangeListener;
@@ -18,6 +15,8 @@ import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.managers.Manager;
 import me.wiefferink.areashop.managers.SignLinkerManager;
 import me.wiefferink.areashop.tools.Analytics;
+import me.wiefferink.areashop.tools.GithubUpdateCheck;
+import me.wiefferink.areashop.tools.Task;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.interactivemessenger.processing.Message;
 import me.wiefferink.interactivemessenger.source.LanguageManager;
@@ -34,7 +33,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -63,9 +61,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	private Set<Manager> managers = null;
 	private boolean debug = false;
 	private List<String> chatprefix = null;
-	private Updater updater = null;
-	private boolean updateAvailable = false;
 	private boolean ready = false;
+	private GithubUpdateCheck githubUpdateCheck = null;
 
 	// Folders and file names
 	public static final String languageFolder = "lang";
@@ -157,7 +154,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		int fixes = 0;
 		Integer build = null;
 		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
-		if(plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+		if(plugin == null || !(plugin instanceof WorldGuardPlugin) || !plugin.isEnabled()) {
 			error("WorldGuard plugin is not present or has not loaded correctly");
 			error = true;
 		} else {
@@ -234,7 +231,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Check if WorldEdit is present
 		String weVersion = null;
 		plugin = getServer().getPluginManager().getPlugin("WorldEdit");
-		if(plugin == null || !(plugin instanceof WorldEditPlugin)) {
+		if(plugin == null || !(plugin instanceof WorldEditPlugin) || !plugin.isEnabled()) {
 			error("WorldEdit plugin is not present or has not loaded correctly");
 			error = true;
 		} else {
@@ -311,35 +308,56 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 			// Don't initialize the updatechecker if disabled in the config
 			if(getConfig().getBoolean("checkForUpdates")) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						try {
-							updater = new Updater(AreaShop.getInstance(), 76518, null, UpdateType.NO_DOWNLOAD, false);
-							AreaShop.debug("Result=" + updater.getResult().toString() + ", Latest=" + updater.getLatestName() + ", Type=" + updater.getLatestType());
-							updateAvailable = updater.getResult() == UpdateResult.UPDATE_AVAILABLE;
-							if(updateAvailable) {
-								AreaShop.info("Update from AreaShop V" + AreaShop.getInstance().getDescription().getVersion() + " to " + updater.getLatestName() + " available, get the latest version at http://dev.bukkit.org/bukkit-plugins/regionbuyandrent/");
-								new BukkitRunnable() {
-									@Override
-									public void run() {
-										for(Player player : Utils.getOnlinePlayers()) {
-											if(player.hasPermission("areashop.notifyupdate")) {
-												AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());
-											}
-										}
-									}
-								}.runTask(AreaShop.getInstance());
-							}
-						} catch(Exception e) {
-							AreaShop.debug("Something went wrong with the Updater:");
-							AreaShop.debug(e.getMessage());
-							updateAvailable = false;
-						}
+				githubUpdateCheck = new GithubUpdateCheck(
+						AreaShop.getInstance(),
+						"NLThijs48",
+						"AreaShop"
+				).withVersionComparator((latestVersion, currentVersion) ->
+						!cleanVersion(latestVersion).equals(cleanVersion(currentVersion))
+				).checkUpdate((result) -> {
+					AreaShop.debug("Update check result:", result);
+					if(!result.hasUpdate()) {
+						return;
 					}
-				}.runTaskAsynchronously(this);
+
+					AreaShop.info("Update from AreaShop V" + cleanVersion(result.getCurrentVersion()) + " to AreaShop V" + cleanVersion(result.getLatestVersion()) + " available, get the latest version at https://www.spigotmc.org/resources/areashop.2991/");
+					for(Player player : Utils.getOnlinePlayers()) {
+						notifyUpdate(player);
+					}
+				});
 			}
 		}
+	}
+
+	/**
+	 * Notify a player about an update if he wants notifications about it and an update is available.
+	 * @param sender CommandSender to notify
+	 */
+	public void notifyUpdate(CommandSender sender) {
+		if(githubUpdateCheck != null && githubUpdateCheck.hasUpdate() && sender.hasPermission("areashop.notifyupdate")) {
+			AreaShop.getInstance().message(sender, "update-playerNotify", cleanVersion(githubUpdateCheck.getCurrentVersion()), cleanVersion(githubUpdateCheck.getLatestVersion()));
+		}
+	}
+
+	/**
+	 * Cleanup a version number.
+	 * @param version Version to clean
+	 * @return Cleaned up version (removed prefixes and suffixes)
+	 */
+	private String cleanVersion(String version) {
+		version = version.toLowerCase();
+
+		// Strip 'v' as used on Github tags
+		if(version.startsWith("v")) {
+			version = version.substring(1);
+		}
+
+		// Strip build number as used by Jenkins
+		if(version.contains("#")) {
+			version = version.substring(0, version.indexOf("#"));
+		}
+
+		return version;
 	}
 
 	/**
@@ -370,7 +388,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		chatprefix = null;
 		debug = false;
 		ready = false;
-		updater = null;
 
 		HandlerList.unregisterAll(this);
 	}
@@ -508,22 +525,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
-	 * Get the updater (check the update result).
-	 * @return The updater
-	 */
-	public Updater getUpdater() {
-		return updater;
-	}
-
-	/**
-	 * Check if an update for AreaShop is available.
-	 * @return true if an update is available, otherwise false
-	 */
-	public boolean updateAvailable() {
-		return updateAvailable;
-	}
-
-	/**
 	 * Register dynamic permissions controlled by config settings.
 	 */
 	private void registerDynamicPermissions() {
@@ -553,87 +554,74 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		long expirationCheck = Utils.millisToTicks(Utils.getDurationFromSecondsOrString("expiration.delay"));
 		final AreaShop finalPlugin = this;
 		if(expirationCheck > 0) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if(isReady()) {
-						finalPlugin.getFileManager().checkRents();
-						AreaShop.debugTask("Checking rent expirations...");
-					} else {
-						AreaShop.debugTask("Skipped checking rent expirations, plugin not ready");
-					}
+			Task.syncTimer(expirationCheck, () -> {
+				if(isReady()) {
+					finalPlugin.getFileManager().checkRents();
+					AreaShop.debugTask("Checking rent expirations...");
+				} else {
+					AreaShop.debugTask("Skipped checking rent expirations, plugin not ready");
 				}
-			}.runTaskTimer(this, 1, expirationCheck);
+			});
 		}
+
 		// Inactive unrenting/selling timer
 		long inactiveCheck = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("inactive.delay"));
 		if(inactiveCheck > 0) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if(isReady()) {
-						finalPlugin.getFileManager().checkForInactiveRegions();
-						AreaShop.debugTask("Checking for regions with players that are inactive too long...");
-					} else {
-						AreaShop.debugTask("Skipped checking for regions of inactive players, plugin not ready");
-					}
+			Task.syncTimer(inactiveCheck, () -> {
+				if(isReady()) {
+					finalPlugin.getFileManager().checkForInactiveRegions();
+					AreaShop.debugTask("Checking for regions with players that are inactive too long...");
+				} else {
+					AreaShop.debugTask("Skipped checking for regions of inactive players, plugin not ready");
 				}
-			}.runTaskTimer(this, inactiveCheck, inactiveCheck);
+			});
 		}
+
 		// Periodic updating of signs for timeleft tags
 		long periodicUpdate = Utils.millisToTicks(Utils.getDurationFromSecondsOrString("signs.delay"));
 		if(periodicUpdate > 0) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if(isReady()) {
-						finalPlugin.getFileManager().performPeriodicSignUpdate();
-						AreaShop.debugTask("Performing periodic sign update...");
-					} else {
-						AreaShop.debugTask("Skipped performing periodic sign update, plugin not ready");
-					}
+			Task.syncTimer(periodicUpdate, () -> {
+				if(isReady()) {
+					finalPlugin.getFileManager().performPeriodicSignUpdate();
+					AreaShop.debugTask("Performing periodic sign update...");
+				} else {
+					AreaShop.debugTask("Skipped performing periodic sign update, plugin not ready");
 				}
-			}.runTaskTimer(this, periodicUpdate, periodicUpdate);
+			});
 		}
+
 		// Saving regions and group settings
 		long saveFiles = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("saving.delay"));
 		if(saveFiles > 0) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if(isReady()) {
-						finalPlugin.getFileManager().saveRequiredFiles();
-						AreaShop.debugTask("Saving required files...");
-					} else {
-						AreaShop.debugTask("Skipped saving required files, plugin not ready");
-					}
+			Task.syncTimer(saveFiles, () -> {
+				if(isReady()) {
+					finalPlugin.getFileManager().saveRequiredFiles();
+					AreaShop.debugTask("Saving required files...");
+				} else {
+					AreaShop.debugTask("Skipped saving required files, plugin not ready");
 				}
-			}.runTaskTimer(this, saveFiles, saveFiles);
+			});
 		}
+
 		// Sending warnings about rent regions to online players
 		long expireWarning = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("expireWarning.delay"));
 		if(expireWarning > 0) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if(isReady()) {
-						finalPlugin.getFileManager().sendRentExpireWarnings();
-						AreaShop.debugTask("Sending rent expire warnings...");
-					} else {
-						AreaShop.debugTask("Skipped sending rent expire warnings, plugin not ready");
-					}
+			Task.syncTimer(expireWarning, () -> {
+				if(isReady()) {
+					finalPlugin.getFileManager().sendRentExpireWarnings();
+					AreaShop.debugTask("Sending rent expire warnings...");
+				} else {
+					AreaShop.debugTask("Skipped sending rent expire warnings, plugin not ready");
 				}
-			}.runTaskTimer(this, expireWarning, expireWarning);
+			});
 		}
+
 		// Update all regions on startup
 		if(getConfig().getBoolean("updateRegionsOnStartup")) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					finalPlugin.getFileManager().updateAllRegions();
-					AreaShop.debugTask("Updating all regions at startup...");
-				}
-			}.runTaskLater(this, 20L);
+			Task.syncLater(20, () -> {
+				finalPlugin.getFileManager().updateAllRegions();
+				AreaShop.debugTask("Updating all regions at startup...");
+			});
 		}
 	}
 

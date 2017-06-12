@@ -579,4 +579,9 @@ greeting-forsale: "%region% can be bought for %price%."
 greeting-bought: "%region% is bought by %player%."
 greeting-resale: "%region% can be bought for %resellprice% from %player%."
 
-update-playerNotify: "[darkgreen]Update from AreaShop V%0% to %1% available, get the latest version at https://github.com/NLthijs48/AreaShop/releases."
+update-playerNotify:
+  - "[darkgreen]Update from AreaShop V%0% to AreaShop V%1% available, get the latest version at "
+  - "[bold]Spigot[/bold]"
+  - "    hover: %lang:action|Go to the Spigot AreaShop page|%"
+  - "    link: https://www.spigotmc.org/resources/areashop.2991/"
+  - " (and leave a review)."

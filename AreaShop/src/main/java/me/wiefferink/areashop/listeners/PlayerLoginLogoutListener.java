@@ -42,10 +42,7 @@ public final class PlayerLoginLogoutListener implements Listener {
 			return;
 		}
 		final Player player = event.getPlayer();
-		// Notify admins for plugin updates
-		if(plugin.updateAvailable() && player.hasPermission("areashop.notifyupdate")) {
-			AreaShop.getInstance().message(player, "update-playerNotify", AreaShop.getInstance().getDescription().getVersion(), AreaShop.getInstance().getUpdater().getLatestName());
-		}
+
 		// Schedule task to check for notifications, prevents a lag spike at login
 		new BukkitRunnable() {
 			@Override
@@ -72,9 +69,14 @@ public final class PlayerLoginLogoutListener implements Listener {
 						}
 					}
 				}
+
+				// Notify admins for plugin updates
+				AreaShop.getInstance().notifyUpdate(player);
+
 				this.cancel();
 			}
 		}.runTaskTimer(plugin, 25, 25);
+
 		// Check if the player has regions that use an old name of him and update them
 		final List<GeneralRegion> regions = new ArrayList<>(plugin.getFileManager().getRegions());
 		new BukkitRunnable() {
@@ -86,6 +88,7 @@ public final class PlayerLoginLogoutListener implements Listener {
 				if(!plugin.isReady()) {
 					return;
 				}
+
 				// Check all regions
 				for(int i = 0; i < plugin.getConfig().getInt("nameupdate.regionsPerTick"); i++) {
 					if(current < regions.size()) {

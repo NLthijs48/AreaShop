@@ -13,6 +13,7 @@ import me.wiefferink.areashop.regions.GeneralRegion.RegionEvent;
 import me.wiefferink.areashop.regions.GeneralRegion.RegionType;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Task;
 import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -735,23 +736,11 @@ public class FileManager extends Manager {
 	 * Unrent regions that have no time left, regions to check per tick is in the config.
 	 */
 	public void checkRents() {
-		final List<RentRegion> regions = new ArrayList<>(getRents());
-		new BukkitRunnable() {
-			private int current = 0;
-
-			@Override
-			public void run() {
-				for(int i = 0; i < plugin.getConfig().getInt("expiration.regionsPerTick"); i++) {
-					if(current < regions.size()) {
-						regions.get(current).checkExpiration();
-						current++;
-					}
-				}
-				if(current >= regions.size()) {
-					this.cancel();
-				}
-			}
-		}.runTaskTimer(plugin, 1, 1);
+		Task.doForAll(
+				plugin.getConfig().getInt("expiration.regionsPerTick"),
+				getRents(),
+				RentRegion::checkExpiration
+		);
 	}
 
 	/**

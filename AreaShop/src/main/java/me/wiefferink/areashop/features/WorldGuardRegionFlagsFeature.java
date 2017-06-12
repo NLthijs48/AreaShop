@@ -131,8 +131,10 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 				}
 				RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
 				if(value == null || value.isEmpty()) {
-					worldguardRegion.setFlag(foundFlag, null);
-					if(groupFlag != null) {
+					if(worldguardRegion.getFlag(foundFlag) != null) {
+						worldguardRegion.setFlag(foundFlag, null);
+					}
+					if(groupFlag != null && worldguardRegion.getFlag(groupFlag) != null) {
 						worldguardRegion.setFlag(groupFlag, null);
 					}
 					//AreaShop.debug("  Flag " + flagName + " reset (+ possible group of flag)");

@@ -37,9 +37,7 @@ public class TeleportFeature extends RegionFeature {
 	 * @return The teleport location, or null if not set
 	 */
 	public Location getTeleportLocation() {
-		Location result;
-		result = Utils.configToLocation(config.getConfigurationSection("general.teleportLocation"));
-		return result;
+		return Utils.configToLocation(region.getConfigurationSectionSetting("general.teleportLocation"));
 	}
 
 	/**
@@ -47,7 +45,7 @@ public class TeleportFeature extends RegionFeature {
 	 * @return true if the region has a teleportlocation, false otherwise
 	 */
 	public boolean hasTeleportLocation() {
-		return config.isSet("general.teleportLocation");
+		return region.getConfigurationSectionSetting("general.teleportLocation") != null;
 	}
 
 	/**

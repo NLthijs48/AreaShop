@@ -593,7 +593,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			case AreaShop.tagDay:
 				return Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 			case AreaShop.tagMonth:
-				return Calendar.getInstance().get(Calendar.MONTH)+1;
+				return Calendar.getInstance().get(Calendar.MONTH) + 1;
 			case AreaShop.tagYear:
 				return Calendar.getInstance().get(Calendar.YEAR);
 			case AreaShop.tagDateTime:

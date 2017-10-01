@@ -10,8 +10,10 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.internal.LocalWorldAdapter;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -24,6 +26,7 @@ import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
+import javax.annotation.Nullable;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -72,11 +75,25 @@ public class WorldEditHandler6 extends WorldEditInterface {
 			ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard, worldData);
 			session.setBlockChangeLimit(pluginInterface.getConfig().getInt("maximumBlocks"));
 			session.setClipboard(clipboardHolder);
-			Operation operation = clipboardHolder
-					.createPaste(editSession, editSession.getWorld().getWorldData())
-					.to(origin)
-					.build();
-			Operations.completeLegacy(operation);
+
+			// Build operation
+			BlockTransformExtent extent = new BlockTransformExtent(clipboardHolder.getClipboard(), clipboardHolder.getTransform(), editSession.getWorld().getWorldData().getBlockRegistry());
+			ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), editSession, origin);
+			copy.setTransform(clipboardHolder.getTransform());
+			// Mask to region (for polygon regions)
+			copy.setSourceMask(new Mask() {
+				@Override
+				public boolean test(Vector vector) {
+					return region.contains(vector);
+				}
+
+				@Nullable
+				@Override
+				public Mask2D toMask2D() {
+					return null;
+				}
+			});
+			Operations.completeLegacy(copy);
 		} catch(MaxChangedBlocksException e) {
 			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;

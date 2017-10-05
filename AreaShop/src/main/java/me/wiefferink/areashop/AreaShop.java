@@ -96,6 +96,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	public static final String tagWidth = "width"; // x-axis
 	public static final String tagHeight = "height"; // y-axis
 	public static final String tagDepth = "depth"; // z-axis
+	public static final String tagVolume = "volume"; // Number of blocks in the region (accounting for polygon regions)
 	public static final String tagTimeLeft = "timeleft";
 	public static final String tagClicker = "clicker";
 	public static final String tagResellPrice = "resellprice";
@@ -514,6 +515,19 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			return null;
 		}
 		return economy.getProvider();
+	}
+
+	/**
+	 * Get the Vault permissions provider.
+	 * @return Vault permissions provider
+	 */
+	public net.milkbowl.vault.permission.Permission getPermissionProvider() {
+		RegisteredServiceProvider<net.milkbowl.vault.permission.Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+		if (permissionProvider == null || permissionProvider.getProvider() == null) {
+			error("There is no permission plugin that supports Vault, make sure you have a Vault-compatible permissions plugin installed");
+			return null;
+		}
+		return permissionProvider.getProvider();
 	}
 
 	/**

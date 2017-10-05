@@ -578,6 +578,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				return getLandlordName();
 			case AreaShop.tagLandlordUUID:
 				return getLandlord();
+			case AreaShop.tagVolume:
+				return getRegion().volume();
 
 			// Date/time
 			case AreaShop.tagEpoch:

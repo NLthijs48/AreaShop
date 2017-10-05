@@ -136,6 +136,7 @@ maximumTries: 50000
 # %untilshort%     The end time of a rent formatted as configured with 'timeFormatSign'.
 # %width%          The width of the region (number of blocks on the x-axis).
 # %depth%          The depth of the region (number of blocks on the z-axis).
+# %volume%         The number of blocks in a region (accounting for polygon shaped regions).
 # %height%         The height of the region (number of blocks on the y-axis).
 # %timeleft%       The time left on the rent (uses the unit of time that fits best, minutes used from 121 seconds till 120 minutes).
 # %clicker%        The name of the player that clicked the sign (only to be used in the signProfiles section).

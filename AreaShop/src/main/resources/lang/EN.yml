@@ -190,14 +190,14 @@ info-pageStatus:
 info-pagePrevious:
   - "    [gold][bold]◄Previous[/bold]    "
   - "    hover: %lang:action|Show previous page|%"
-  - "    command: %0%"
+  - "    command: /areashop %0%"
 info-pageNoPrevious:
   - "    [darkgray][bold]◄Previous[/bold]    "
   - "    hover: This is already the first page"
 info-pageNext:
   - "    [gold][bold]Next►[/bold]"
   - "    hover: %lang:action|Show next page|%"
-  - "    command: %0%"
+  - "    command: /areashop %0%"
 info-pageNoNext:
   - "    [darkgray][bold]Next►[/bold]"
   - "    hover: This is already the last page"

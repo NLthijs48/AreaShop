@@ -10,12 +10,11 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -41,9 +40,9 @@ public class InfoCommand extends CommandAreaShop {
 	 * @param filterGroup The group to filter the regions by
 	 * @param keyHeader   The header to print above the page
 	 * @param pageInput   The page number, if any
-	 * @param baseCommand The command to execute for next/previous page
+	 * @param baseCommand The command to execute for next/previous page (/areashop will be added)
 	 */
-	private void showSortedPagedList(CommandSender sender, List<? extends GeneralRegion> regions, RegionGroup filterGroup, String keyHeader, String pageInput, String baseCommand) {
+	private void showSortedPagedList(@Nonnull CommandSender sender, @Nonnull List<? extends GeneralRegion> regions, @Nullable RegionGroup filterGroup, @Nonnull String keyHeader, @Nullable String pageInput, @Nonnull String baseCommand) {
 		int maximumItems = 20;
 		int itemsPerPage = maximumItems - 2;
 		int page = 1;
@@ -56,25 +55,18 @@ public class InfoCommand extends CommandAreaShop {
 			}
 		}
 		if(filterGroup != null) {
-			for(Iterator<? extends GeneralRegion> it = regions.iterator(); it.hasNext(); ) {
-				if(!filterGroup.isMember(it.next())) {
-					it.remove();
-				}
-			}
+			regions.removeIf(generalRegion -> !filterGroup.isMember(generalRegion));
 		}
 		if(regions.isEmpty()) {
 			plugin.message(sender, "info-noRegions");
 		} else {
 			// First sort by type, then by name
-			Collections.sort(regions, new Comparator<GeneralRegion>() {
-				@Override
-				public int compare(GeneralRegion one, GeneralRegion two) {
-					int typeCompare = getTypeOrder(two).compareTo(getTypeOrder(one));
-					if(typeCompare != 0) {
-						return typeCompare;
-					} else {
-						return one.getName().compareTo(two.getName());
-					}
+			regions.sort((one, two) -> {
+				int typeCompare = getTypeOrder(two).compareTo(getTypeOrder(one));
+				if(typeCompare != 0) {
+					return typeCompare;
+				} else {
+					return one.getName().compareTo(two.getName());
 				}
 			});
 			// Header
@@ -189,58 +181,38 @@ public class InfoCommand extends CommandAreaShop {
 
 			// All regions
 			if(args[1].equalsIgnoreCase("all")) {
-				showSortedPagedList(sender, plugin.getFileManager().getRegions(), filterGroup, "info-allHeader", (args.length > 2 ? args[2] : null), "/areashop info all");
+				showSortedPagedList(sender, plugin.getFileManager().getRegions(), filterGroup, "info-allHeader", (args.length > 2 ? args[2] : null), "info all");
 			}
 
 			// Rented regions
 			else if(args[1].equalsIgnoreCase("rented")) {
 				List<RentRegion> regions = plugin.getFileManager().getRents();
-				for(Iterator<RentRegion> it = regions.iterator(); it.hasNext(); ) {
-					if(!it.next().isRented()) {
-						it.remove();
-					}
-				}
-				showSortedPagedList(sender, regions, filterGroup, "info-rentedHeader", (args.length > 2 ? args[2] : null), "/areashop info rented");
+				regions.removeIf(RentRegion::isAvailable);
+				showSortedPagedList(sender, regions, filterGroup, "info-rentedHeader", (args.length > 2 ? args[2] : null), "info rented");
 			}
 			// Forrent regions
 			else if(args[1].equalsIgnoreCase("forrent")) {
 				List<RentRegion> regions = plugin.getFileManager().getRents();
-				for(Iterator<RentRegion> it = regions.iterator(); it.hasNext(); ) {
-					if(it.next().isRented()) {
-						it.remove();
-					}
-				}
-				showSortedPagedList(sender, regions, filterGroup, "info-forrentHeader", (args.length > 2 ? args[2] : null), "/areashop info forrent");
+				regions.removeIf(RentRegion::isRented);
+				showSortedPagedList(sender, regions, filterGroup, "info-forrentHeader", (args.length > 2 ? args[2] : null), "info forrent");
 			}
 			// Sold regions
 			else if(args[1].equalsIgnoreCase("sold")) {
 				List<BuyRegion> regions = plugin.getFileManager().getBuys();
-				for(Iterator<BuyRegion> it = regions.iterator(); it.hasNext(); ) {
-					if(!it.next().isSold()) {
-						it.remove();
-					}
-				}
-				showSortedPagedList(sender, regions, filterGroup, "info-soldHeader", (args.length > 2 ? args[2] : null), "/areashop info sold");
+				regions.removeIf(BuyRegion::isAvailable);
+				showSortedPagedList(sender, regions, filterGroup, "info-soldHeader", (args.length > 2 ? args[2] : null), "info sold");
 			}
 			// Forsale regions
 			else if(args[1].equalsIgnoreCase("forsale")) {
 				List<BuyRegion> regions = plugin.getFileManager().getBuys();
-				for(Iterator<BuyRegion> it = regions.iterator(); it.hasNext(); ) {
-					if(it.next().isSold()) {
-						it.remove();
-					}
-				}
-				showSortedPagedList(sender, regions, filterGroup, "info-forsaleHeader", (args.length > 2 ? args[2] : null), "/areashop info forsale");
+				regions.removeIf(BuyRegion::isSold);
+				showSortedPagedList(sender, regions, filterGroup, "info-forsaleHeader", (args.length > 2 ? args[2] : null), "info forsale");
 			}
 			// Reselling regions
 			else if(args[1].equalsIgnoreCase("reselling")) {
 				List<BuyRegion> regions = plugin.getFileManager().getBuys();
-				for(Iterator<BuyRegion> it = regions.iterator(); it.hasNext(); ) {
-					if(!it.next().isInResellingMode()) {
-						it.remove();
-					}
-				}
-				showSortedPagedList(sender, regions, filterGroup, "info-resellingHeader", (args.length > 2 ? args[2] : null), "/areashop info reselling");
+				regions.removeIf(region -> !region.isInResellingMode());
+				showSortedPagedList(sender, regions, filterGroup, "info-resellingHeader", (args.length > 2 ? args[2] : null), "info reselling");
 			}
 
 			// List of regions without a group
@@ -252,7 +224,7 @@ public class InfoCommand extends CommandAreaShop {
 				if(regions.isEmpty()) {
 					plugin.message(sender, "info-nogroupNone");
 				} else {
-					showSortedPagedList(sender, regions, filterGroup, "info-nogroupHeader", (args.length > 2 ? args[2] : null), "/areashop info nogroup");
+					showSortedPagedList(sender, regions, filterGroup, "info-nogroupHeader", (args.length > 2 ? args[2] : null), "info nogroup");
 				}
 			}
 

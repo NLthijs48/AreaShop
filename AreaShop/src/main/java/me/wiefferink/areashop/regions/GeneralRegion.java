@@ -1,6 +1,9 @@
 package me.wiefferink.areashop.regions;
 
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.events.NotifyRegionEvent;
@@ -45,6 +48,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	YamlConfiguration config;
 	private boolean saveRequired = false;
 	private boolean deleted = false;
+	private long volume = -1;
 
 	private Map<Class<? extends RegionFeature>, RegionFeature> features;
 
@@ -579,7 +583,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			case AreaShop.tagLandlordUUID:
 				return getLandlord();
 			case AreaShop.tagVolume:
-				return getRegion().volume();
+				return getVolume();
 
 			// Date/time
 			case AreaShop.tagEpoch:
@@ -1458,6 +1462,76 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return;
 		}
 		runCommands(Bukkit.getConsoleSender(), commands);
+	}
+
+	/**
+	 * Get the volume of the region (number of blocks inside it).
+	 * @return Number of blocks in the region
+	 */
+	public long getVolume() {
+		// Cache volume, important for polygon regions
+		if(volume < 0) {
+			volume = calculateVolume();
+		}
+
+		return volume;
+	}
+
+	/**
+	 * Calculate the volume of the region (could be expensive for polygon regions).
+	 * @return Number of blocks in the region
+	 */
+	private long calculateVolume() {
+		// Use own calculation for polygon regions, as WorldGuard does not implement it and returns 0
+		ProtectedRegion region = getRegion();
+		if(region instanceof ProtectedPolygonalRegion) {
+			BlockVector min = region.getMinimumPoint();
+			BlockVector max = region.getMaximumPoint();
+
+			// Exact, but slow algorithm
+			if(getWidth() * getDepth() < 100) {
+				long surface = 0;
+				for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
+					for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
+						if (region.contains(x, min.getBlockY(), z)) {
+							surface++;
+						}
+					}
+				}
+				return surface * getHeight();
+			}
+			// Estimate, but quick algorithm
+			else {
+				List<BlockVector2D> points = region.getPoints();
+				int numPoints = points.size();
+				if(numPoints < 3) {
+					return 0;
+				}
+
+				double area = 0;
+				int x1, x2, z1, z2;
+				for(int i = 0; i <= numPoints - 2; i++) {
+					x1 = points.get(i).getBlockX();
+					z1 = points.get(i).getBlockZ();
+
+					x2 = points.get(i + 1).getBlockX();
+					z2 = points.get(i + 1).getBlockZ();
+
+					area = area + ((z1 + z2) * (x1 - x2));
+				}
+
+				x1 = points.get(numPoints - 1).getBlockX();
+				z1 = points.get(numPoints - 1).getBlockZ();
+				x2 = points.get(0).getBlockX();
+				z2 = points.get(0).getBlockZ();
+
+				area = area + ((z1 + z2) * (x1 - x2));
+				area = Math.ceil(Math.abs(area) / 2);
+				return (long)(area * getHeight());
+			}
+		} else {
+			return region.volume();
+		}
 	}
 }
 

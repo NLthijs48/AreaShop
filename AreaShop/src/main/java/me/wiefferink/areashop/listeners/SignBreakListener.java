@@ -4,7 +4,6 @@ import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.features.SignsFeature;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -58,21 +57,13 @@ public final class SignBreakListener implements Listener {
 	 * Called when the physics of a block change.
 	 * @param event The event
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onIndirectSignBreak(BlockPhysicsEvent event) {
-		Block block = event.getBlock();
-		if(event.isCancelled()) {
-			return;
-		}
-		if(block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN) {
-			Sign sign = (Sign)block.getState();
-			Block attachedTo = block.getRelative(((org.bukkit.material.Sign)sign.getData()).getAttachedFace());
-			if(attachedTo.getType() == Material.AIR) {
-				// Check if the rent sign is really the same as a saved rent
-				SignsFeature.RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
-				if(regionSign != null) {
-					event.setCancelled(true); // Cancel the sign breaking, will create a floating sign but at least it is not disconnected/gone
-				}
+		if(event.getBlock().getType() == Material.SIGN_POST || event.getBlock().getType() == Material.WALL_SIGN) {
+			// Check if the rent sign is really the same as a saved rent
+			if(SignsFeature.getSignByLocation(event.getBlock().getLocation()) != null) {
+				// Cancel the sign breaking, will create a floating sign but at least it is not disconnected/gone
+				event.setCancelled(true);
 			}
 		}
 	}

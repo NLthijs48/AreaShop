@@ -1,6 +1,11 @@
 package me.wiefferink.areashop.interfaces;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,9 +41,25 @@ public class RegionAccessSet {
 
 	/**
 	 * Get the groups.
-	 * @return Set with groups added to this RegionAccessSet
+	 * @return Set with groups added to this RegionAccessSet.
 	 */
 	public Set<String> getGroupNames() {
 		return groupNames;
+	}
+
+	/**
+	 * Get this access set as a list of player UUIDs.
+	 * @return List of player UUIDs, first players already added by UUID, then players added by name, groups are not in the list
+	 */
+	public List<UUID> asUniqueIdList() {
+		List<UUID> result = new ArrayList<>();
+		result.addAll(playerUniqueIds);
+		for(String playerName : playerNames) {
+			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+			if(offlinePlayer != null && offlinePlayer.getUniqueId() != null) {
+				result.add(offlinePlayer.getUniqueId());
+			}
+		}
+		return result;
 	}
 }

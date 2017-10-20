@@ -15,8 +15,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.UUID;
 
 public class AddCommand extends CommandAreaShop {
 
@@ -140,6 +142,9 @@ public class AddCommand extends CommandAreaShop {
 							boolean landlord = (!sender.hasPermission("areashop.create" + type)
 									&& ((sender.hasPermission("areashop.create" + type + ".owner") && isOwner)
 									|| (sender.hasPermission("areashop.create" + type + ".member") && isMember)));
+							List<UUID> existing = new ArrayList<>();
+							existing.addAll(plugin.getWorldGuardHandler().getOwners(region).asUniqueIdList());
+							existing.addAll(plugin.getWorldGuardHandler().getMembers(region).asUniqueIdList());
 							if(isRent) {
 								RentRegion rent = new RentRegion(region.getId(), finalWorld);
 								// Set landlord
@@ -155,6 +160,33 @@ public class AddCommand extends CommandAreaShop {
 
 								// Run commands
 								rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
+
+								// Add existing owners/members if any
+								if(!landlord && !existing.isEmpty()) {
+									// TODO also execute rent events to notify other plugins?
+
+									// Run commands
+									rent.runEventCommands(GeneralRegion.RegionEvent.RENTED, true);
+
+									// Add values to the rent and send it to FileManager
+									rent.setRentedUntil(Calendar.getInstance().getTimeInMillis() + rent.getDuration());
+									rent.setRenter(existing.remove(0));
+									rent.updateLastActiveTime();
+
+									// Add others as friends
+									for(UUID friend : existing) {
+										rent.getFriendsFeature().addFriend(friend, null);
+									}
+
+									// Fire schematic event and updated times extended
+									rent.handleSchematicEvent(GeneralRegion.RegionEvent.RENTED);
+
+									// Notify about updates
+									rent.update();
+
+									rent.runEventCommands(GeneralRegion.RegionEvent.RENTED, false);
+								}
+
 								regionsSuccess.add(rent);
 							} else {
 								BuyRegion buy = new BuyRegion(region.getId(), finalWorld);
@@ -172,6 +204,32 @@ public class AddCommand extends CommandAreaShop {
 
 								// Run commands
 								buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
+
+								// Add existing owners/members if any
+								if(!landlord && !existing.isEmpty()) {
+									// TODO also execute buy events to notify for other plugins?
+
+									// Run commands
+									buy.runEventCommands(GeneralRegion.RegionEvent.BOUGHT, true);
+
+									// Set the owner
+									buy.setBuyer(existing.remove(0));
+									buy.updateLastActiveTime();
+									// Add others as friends
+									for(UUID friend : existing) {
+										buy.getFriendsFeature().addFriend(friend, null);
+									}
+
+									// Notify about updates
+									buy.update();
+
+									// Update everything
+									buy.handleSchematicEvent(GeneralRegion.RegionEvent.BOUGHT);
+
+									// Run commands
+									buy.runEventCommands(GeneralRegion.RegionEvent.BOUGHT, false);
+								}
+
 								regionsSuccess.add(buy);
 							}
 						}

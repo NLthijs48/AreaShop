@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// TODO fix '/as info' help message hitting replacement limit (improve depth tracking?)
+// TODO add info about autoExtend
 public class InfoCommand extends CommandAreaShop {
 
 	@Override

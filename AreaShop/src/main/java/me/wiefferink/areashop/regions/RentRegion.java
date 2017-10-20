@@ -158,7 +158,7 @@ public class RentRegion extends GeneralRegion {
 			case AreaShop.tagRawMoneyBackAmount:
 				return getMoneyBackAmount();
 			case AreaShop.tagMoneyBackPercentage:
-				return getMoneyBackPercentage() % 1.0 == 0.0 ? (int)getMoneyBackPercentage() : getMoneyBackPercentage();
+				return (getMoneyBackPercentage() % 1.0) == 0.0 ? (int)getMoneyBackPercentage() : getMoneyBackPercentage();
 			case AreaShop.tagTimesExtended:
 				return this.getTimesExtended();
 			case AreaShop.tagMaxExtends:
@@ -290,15 +290,8 @@ public class RentRegion extends GeneralRegion {
 	 * Change the price of the region.
 	 * @param price The price of the region
 	 */
-	public void setPrice(double price) {
+	public void setPrice(Double price) {
 		setSetting("rent.price", price);
-	}
-
-	/**
-	 * Remove the price so that the price will be taken from a group or the default.yml file
-	 */
-	public void removePrice() {
-		setSetting("rent.price", null);
 	}
 
 	/**
@@ -353,6 +346,13 @@ public class RentRegion extends GeneralRegion {
 	public boolean checkExpiration() {
 		long now = Calendar.getInstance().getTimeInMillis();
 		if(!isDeleted() && isRented() && now > getRentedUntil()) {
+			// Extend rent if configured for that
+			if(getBooleanSetting("rent.autoExtend")) {
+				if(extend()) {
+					return false;
+				}
+			}
+
 			// Send message to the player if online
 			Player player = Bukkit.getPlayer(getRenter());
 			if(unRent(false, null)) {
@@ -412,63 +412,82 @@ public class RentRegion extends GeneralRegion {
 	}
 
 	/**
+	 * Try to extend the rent for the current owner, respecting all restrictions.
+	 * @return true if successful, otherwise false
+	 */
+	public boolean extend() {
+		if(!isRented()) {
+			return false;
+		}
+
+		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(getRenter());
+		return offlinePlayer != null && rent(offlinePlayer);
+	}
+
+	/**
 	 * Rent a region.
-	 * @param player The player that wants to rent the region
+	 * @param offlinePlayer The player that wants to rent the region
 	 * @return true if it succeeded and false if not
 	 */
-	@SuppressWarnings("deprecation")
-	public boolean rent(Player player) {
+	public boolean rent(OfflinePlayer offlinePlayer) {
 		if(plugin.getEconomy() == null) {
-			message(player, "general-noEconomy");
+			message(offlinePlayer, "general-noEconomy");
 			return false;
 		}
 		//Check if the player has permission
-		if(player.hasPermission("areashop.rent")) {
+		if(plugin.hasPermission(offlinePlayer, "areashop.rent")) {
 			if(getWorld() == null) {
-				message(player, "general-noWorld");
+				message(offlinePlayer, "general-noWorld");
 				return false;
 			}
 			if(getRegion() == null) {
-				message(player, "general-noRegion");
+				message(offlinePlayer, "general-noRegion");
 				return false;
 			}
 			boolean extend = false;
-			if(getRenter() != null && player.getUniqueId().equals(getRenter())) {
+			if(getRenter() != null && offlinePlayer.getUniqueId().equals(getRenter())) {
 				extend = true;
 			}
 			// Check if the region is available for renting or if the player wants to extend the rent
 			if(!isRented() || extend) {
-				// Check if the players needs to be in the world or region for buying
-				if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName())
-						|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
-					message(player, "rent-restrictedToRegion");
-					return false;
+				// These checks are only relevant for online players doing the renting/buying themselves
+				Player player = offlinePlayer.getPlayer();
+				if(player != null) {
+					// Check if the players needs to be in the region for renting
+					if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName())
+							|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
+						message(offlinePlayer, "rent-restrictedToRegion");
+						return false;
+					}
+
+					// Check if the players needs to be in the world for renting
+					if(restrictedToWorld() && !player.getWorld().getName().equals(getWorldName())) {
+						message(offlinePlayer, "rent-restrictedToWorld", player.getWorld().getName());
+						return false;
+					}
 				}
-				if(restrictedToWorld() && !player.getWorld().getName().equals(getWorldName())) {
-					message(player, "rent-restrictedToWorld", player.getWorld().getName());
-					return false;
-				}
+
 				// Check region limits if this is not extending
 				if(!(extend && config.getBoolean("allowRegionExtendsWhenAboveLimits"))) {
 
 					LimitResult limitResult;
 					if(extend) {
-						limitResult = this.limitsAllow(RegionType.RENT, player, true);
+						limitResult = this.limitsAllow(RegionType.RENT, offlinePlayer, true);
 					} else {
-						limitResult = this.limitsAllow(RegionType.RENT, player);
+						limitResult = this.limitsAllow(RegionType.RENT, offlinePlayer);
 					}
 					AreaShop.debug("LimitResult: " + limitResult.toString());
 					if(!limitResult.actionAllowed()) {
 						if(limitResult.getLimitingFactor() == LimitType.TOTAL) {
-							message(player, "total-maximum", limitResult.getMaximum(), limitResult.getCurrent(), limitResult.getLimitingGroup());
+							message(offlinePlayer, "total-maximum", limitResult.getMaximum(), limitResult.getCurrent(), limitResult.getLimitingGroup());
 							return false;
 						}
 						if(limitResult.getLimitingFactor() == LimitType.RENTS) {
-							message(player, "rent-maximum", limitResult.getMaximum(), limitResult.getCurrent(), limitResult.getLimitingGroup());
+							message(offlinePlayer, "rent-maximum", limitResult.getMaximum(), limitResult.getCurrent(), limitResult.getLimitingGroup());
 							return false;
 						}
 						if(limitResult.getLimitingFactor() == LimitType.EXTEND) {
-							message(player, "rent-maximumExtend", limitResult.getMaximum(), limitResult.getCurrent() + 1, limitResult.getLimitingGroup());
+							message(offlinePlayer, "rent-maximumExtend", limitResult.getMaximum(), limitResult.getCurrent() + 1, limitResult.getLimitingGroup());
 							return false;
 						}
 						return false;
@@ -476,9 +495,9 @@ public class RentRegion extends GeneralRegion {
 				}
 
 				// Check if the player can still extend this rent
-				if(extend && !player.hasPermission("areashop.rentextendbypass")) {
+				if(extend && !plugin.hasPermission(offlinePlayer, "areashop.rentextendbypass")) {
 					if(getMaxExtends() >= 0 && getTimesExtended() >= getMaxExtends()) {
-						message(player, "rent-maxExtends");
+						message(offlinePlayer, "rent-maxExtends");
 						return false;
 					}
 				}
@@ -493,12 +512,12 @@ public class RentRegion extends GeneralRegion {
 					timeRented = getRentedUntil() - timeNow;
 				}
 				if((timeRented + getDuration()) > (maxRentTime)
-						&& !player.hasPermission("areashop.renttimebypass")
+						&& !plugin.hasPermission(offlinePlayer, "areashop.renttimebypass")
 						&& maxRentTime != -1) {
 					// Extend to the maximum instead of adding a full period
 					if(getBooleanSetting("rent.extendToFullWhenAboveMaxRentTime")) {
 						if(timeRented >= maxRentTime) {
-							message(player, "rent-alreadyAtFull");
+							message(offlinePlayer, "rent-alreadyAtFull");
 							return false;
 						} else {
 							long toRentPart = maxRentTime - timeRented;
@@ -506,25 +525,25 @@ public class RentRegion extends GeneralRegion {
 							price = ((double)toRentPart) / getDuration() * price;
 						}
 					} else {
-						message(player, "rent-maxRentTime");
+						message(offlinePlayer, "rent-maxRentTime");
 						return false;
 					}
 				}
 
-				if(plugin.getEconomy().has(player, getWorldName(), price)) {
+				if(plugin.getEconomy().has(offlinePlayer, getWorldName(), price)) {
 					// Broadcast and check event
-					RentingRegionEvent event = new RentingRegionEvent(this, player, extend);
+					RentingRegionEvent event = new RentingRegionEvent(this, offlinePlayer, extend);
 					Bukkit.getPluginManager().callEvent(event);
 					if(event.isCancelled()) {
-						message(player, "general-cancelled", event.getReason());
+						message(offlinePlayer, "general-cancelled", event.getReason());
 						return false;
 					}
 
 					// Substract the money from the players balance
-					EconomyResponse r = plugin.getEconomy().withdrawPlayer(player, getWorldName(), price);
+					EconomyResponse r = plugin.getEconomy().withdrawPlayer(offlinePlayer, getWorldName(), price);
 					if(!r.transactionSuccess()) {
-						message(player, "rent-payError");
-						AreaShop.debug("Something went wrong with getting money from " + player.getName() + " while renting " + getName() + ": " + r.errorMessage);
+						message(offlinePlayer, "rent-payError");
+						AreaShop.debug("Something went wrong with getting money from " + offlinePlayer.getName() + " while renting " + getName() + ": " + r.errorMessage);
 						return false;
 					}
 					// Optionally give money to the landlord
@@ -540,7 +559,7 @@ public class RentRegion extends GeneralRegion {
 							r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), price);
 						}
 						if(r == null || !r.transactionSuccess()) {
-							AreaShop.warn("Something went wrong with paying '" + landlordName + "' " + Utils.formatCurrency(price) + " for his rent of region " + getName() + " to " + player.getName());
+							AreaShop.warn("Something went wrong with paying '" + landlordName + "' " + Utils.formatCurrency(price) + " for his rent of region " + getName() + " to " + offlinePlayer.getName());
 						}
 					}
 
@@ -564,7 +583,7 @@ public class RentRegion extends GeneralRegion {
 
 					// Add values to the rent and send it to FileManager
 					setRentedUntil(calendar.getTimeInMillis());
-					setRenter(player.getUniqueId());
+					setRenter(offlinePlayer.getUniqueId());
 					updateLastActiveTime();
 
 					// Fire schematic event and updated times extended
@@ -580,11 +599,11 @@ public class RentRegion extends GeneralRegion {
 
 					// Send message to the player
 					if(extendToMax) {
-						message(player, "rent-extendedToMax");
+						message(offlinePlayer, "rent-extendedToMax");
 					} else if(extend) {
-						message(player, "rent-extended");
+						message(offlinePlayer, "rent-extended");
 					} else {
-						message(player, "rent-rented");
+						message(offlinePlayer, "rent-rented");
 					}
 					if(!extend) {
 						// Run commands
@@ -597,16 +616,16 @@ public class RentRegion extends GeneralRegion {
 				} else {
 					// Player has not enough money
 					if(extend) {
-						message(player, "rent-lowMoneyExtend", Utils.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
+						message(offlinePlayer, "rent-lowMoneyExtend", Utils.formatCurrency(plugin.getEconomy().getBalance(offlinePlayer, getWorldName())));
 					} else {
-						message(player, "rent-lowMoneyRent", Utils.formatCurrency(plugin.getEconomy().getBalance(player, getWorldName())));
+						message(offlinePlayer, "rent-lowMoneyRent", Utils.formatCurrency(plugin.getEconomy().getBalance(offlinePlayer, getWorldName())));
 					}
 				}
 			} else {
-				message(player, "rent-someoneElse");
+				message(offlinePlayer, "rent-someoneElse");
 			}
 		} else {
-			message(player, "rent-noPermission");
+			message(offlinePlayer, "rent-noPermission");
 		}
 		return false;
 	}

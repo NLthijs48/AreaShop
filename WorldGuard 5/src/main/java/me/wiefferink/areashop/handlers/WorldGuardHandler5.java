@@ -54,6 +54,22 @@ public class WorldGuardHandler5 extends WorldGuardInterface {
 		}
 	}
 
+	@Override
+	public RegionAccessSet getMembers(ProtectedRegion region) {
+		RegionAccessSet result = new RegionAccessSet();
+		result.getGroupNames().addAll(region.getMembers().getGroups());
+		result.getPlayerNames().addAll(region.getMembers().getPlayers());
+		return result;
+	}
+
+	@Override
+	public RegionAccessSet getOwners(ProtectedRegion region) {
+		RegionAccessSet result = new RegionAccessSet();
+		result.getGroupNames().addAll(region.getOwners().getGroups());
+		result.getPlayerNames().addAll(region.getOwners().getPlayers());
+		return result;
+	}
+
 	/**
 	 * Build a DefaultDomain from a RegionAccessSet.
 	 * @param regionAccessSet RegionAccessSet to read

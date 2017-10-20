@@ -2,21 +2,21 @@ package me.wiefferink.areashop.events.ask;
 
 import me.wiefferink.areashop.events.CancellableRegionEvent;
 import me.wiefferink.areashop.regions.BuyRegion;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 
 /**
  * Broadcasted when a player tries to resell a region.
  */
 public class ResellingRegionEvent extends CancellableRegionEvent<BuyRegion> {
 
-	private Player player;
+	private OfflinePlayer player;
 
 	/**
 	 * Contructor.
 	 * @param region The region that the player is trying to resell
 	 * @param player The player that is trying to buy this region from the current owner
 	 */
-	public ResellingRegionEvent(BuyRegion region, Player player) {
+	public ResellingRegionEvent(BuyRegion region, OfflinePlayer player) {
 		super(region);
 		this.player = player;
 	}
@@ -25,7 +25,7 @@ public class ResellingRegionEvent extends CancellableRegionEvent<BuyRegion> {
 	 * Get the player that is trying to buy the region.
 	 * @return The player that is trying to buy the region
 	 */
-	public Player getBuyer() {
+	public OfflinePlayer getBuyer() {
 		return player;
 	}
 }

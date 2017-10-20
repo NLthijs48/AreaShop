@@ -108,6 +108,7 @@ general:
   flagProfile:
     ALL: # Flags that should always be applied
       priority: 10
+      owners: ''
       members: ''
       interact: 'deny g:non_members' # Only allow region members/owners to use things in the region (chests, furnace, animals, etc.)
       use: 'deny g:non_members'
@@ -196,6 +197,8 @@ rent:
   price: 1000
   # The default duration of a rental region, you can find all time indicators in config.yml below the RENTING header.
   duration: '1 day'
+  # Automatically extend the rental when it is running out (if the player meets the criteria)
+  autoExtend: false
   # The percentage of the rent price you get back if you unrent the region (only the time that is unused is given back).
   # (variables, mathematical expressions and JavaScript can be used)
   moneyBack: 100

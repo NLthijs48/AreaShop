@@ -28,14 +28,14 @@ public abstract class WorldGuardInterface {
 	/**
 	 * Parse an owner(s) string and set the players as owner of the WorldGuard region (set by UUID or name depending on implementation).
 	 * @param region The WorldGuard region to set the owners of
-	 * @param regionAccessSet  The owner(s) string to set
+	 * @param regionAccessSet  The owner(s) to set
 	 */
 	public abstract void setOwners(ProtectedRegion region, RegionAccessSet regionAccessSet);
 
 	/**
 	 * Parse a member(s) string and set the players as member of the WorldGuard region (set by UUID or name depending on implementation).
 	 * @param region The WorldGuard region to set the members of
-	 * @param regionAccessSet  The member(s) string to set
+	 * @param regionAccessSet  The member(s) to set
 	 */
 	public abstract void setMembers(ProtectedRegion region, RegionAccessSet regionAccessSet);
 
@@ -54,6 +54,20 @@ public abstract class WorldGuardInterface {
 	 * @return true if the player is an owner of the region, otherwise false
 	 */
 	public abstract boolean containsOwner(ProtectedRegion region, UUID player);
+
+	/**
+	 * Get the members of a region.
+	 * @param region to get the members of
+	 * @return RegionAccessSet with all members (by uuid and name) and groups of the given region
+	 */
+	public abstract RegionAccessSet getMembers(ProtectedRegion region);
+
+	/**
+	 * Get the owners of a region.
+	 * @param region to get the owners of
+	 * @return RegionAccessSet with all owners (by uuid and name) and groups of the given region
+	 */
+	public abstract RegionAccessSet getOwners(ProtectedRegion region);
 
 	// New flag system was introcuded in version 6.1.3, requiring different flag parsing
 	/**

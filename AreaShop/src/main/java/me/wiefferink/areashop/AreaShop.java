@@ -24,6 +24,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -34,6 +35,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -521,13 +523,35 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Get the Vault permissions provider.
 	 * @return Vault permissions provider
 	 */
-	public net.milkbowl.vault.permission.Permission getPermissionProvider() {
+	public @Nullable net.milkbowl.vault.permission.Permission getPermissionProvider() {
 		RegisteredServiceProvider<net.milkbowl.vault.permission.Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
 		if (permissionProvider == null || permissionProvider.getProvider() == null) {
-			error("There is no permission plugin that supports Vault, make sure you have a Vault-compatible permissions plugin installed");
 			return null;
 		}
 		return permissionProvider.getProvider();
+	}
+
+	/**
+	 * Check for a permission of a (possibly offline) player.
+	 * @param offlinePlayer OfflinePlayer to check
+	 * @param permission Permission to check
+	 * @return true if the player has the permission, false if the player does not have permission or, is offline and there is not Vault-compatible permission plugin
+	 */
+	public boolean hasPermission(OfflinePlayer offlinePlayer, String permission) {
+		// Online, return through Bukkit
+		if(offlinePlayer.getPlayer() != null) {
+			return offlinePlayer.getPlayer().hasPermission(permission);
+		}
+
+		// Resolve while offline if possible
+		net.milkbowl.vault.permission.Permission permissionProvider = getPermissionProvider();
+		if(permissionProvider != null) {
+			// TODO: Should we provide a world here?
+			return permissionProvider.playerHas(null, offlinePlayer, permission);
+		}
+
+		// Player offline and no offline permission provider available, safely say that there is no permission
+		return false;
 	}
 
 	/**

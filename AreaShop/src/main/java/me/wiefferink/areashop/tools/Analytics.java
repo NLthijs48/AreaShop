@@ -104,6 +104,8 @@ public class Analytics {
 				}
 			});
 
+			// TODO track rent/buy/unrent/sell/resell actions (so that it can be reported per collection interval)
+
 			AreaShop.debug("Started bstats.org statistics service");
 		} catch(Exception e) {
 			AreaShop.debug("Could not start bstats.org statistics service");

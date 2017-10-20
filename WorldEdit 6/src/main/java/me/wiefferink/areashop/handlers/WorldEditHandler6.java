@@ -21,6 +21,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.io.Closer;
 import com.sk89q.worldedit.world.registry.WorldData;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionType;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
@@ -80,19 +81,22 @@ public class WorldEditHandler6 extends WorldEditInterface {
 			BlockTransformExtent extent = new BlockTransformExtent(clipboardHolder.getClipboard(), clipboardHolder.getTransform(), editSession.getWorld().getWorldData().getBlockRegistry());
 			ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), editSession, origin);
 			copy.setTransform(clipboardHolder.getTransform());
-			// Mask to region (for polygon regions)
-			copy.setSourceMask(new Mask() {
-				@Override
-				public boolean test(Vector vector) {
-					return region.contains(vector);
-				}
+			// Mask to region (for polygon and other weird shaped regions)
+			// TODO make this more efficient (especially for polygon regions)
+			if(region.getType() != RegionType.CUBOID) {
+				copy.setSourceMask(new Mask() {
+					@Override
+					public boolean test(Vector vector) {
+						return region.contains(vector);
+					}
 
-				@Nullable
-				@Override
-				public Mask2D toMask2D() {
-					return null;
-				}
-			});
+					@Nullable
+					@Override
+					public Mask2D toMask2D() {
+						return null;
+					}
+				});
+			}
 			Operations.completeLegacy(copy);
 		} catch(MaxChangedBlocksException e) {
 			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));

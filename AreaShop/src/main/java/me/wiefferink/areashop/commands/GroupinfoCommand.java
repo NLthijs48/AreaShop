@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class GroupinfoCommand extends CommandAreaShop {
 
@@ -38,7 +39,7 @@ public class GroupinfoCommand extends CommandAreaShop {
 			plugin.message(sender, "groupinfo-noGroup", args[1]);
 			return;
 		}
-		List<String> members = group.getMembers();
+		Set<String> members = group.getMembers();
 		if(members.size() == 0) {
 			plugin.message(sender, "groupinfo-noMembers", group.getName());
 		} else {

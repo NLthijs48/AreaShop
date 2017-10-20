@@ -14,6 +14,7 @@ import me.wiefferink.areashop.commands.GroupdelCommand;
 import me.wiefferink.areashop.commands.GroupinfoCommand;
 import me.wiefferink.areashop.commands.GrouplistCommand;
 import me.wiefferink.areashop.commands.HelpCommand;
+import me.wiefferink.areashop.commands.ImportCommand;
 import me.wiefferink.areashop.commands.InfoCommand;
 import me.wiefferink.areashop.commands.LinksignsCommand;
 import me.wiefferink.areashop.commands.MeCommand;
@@ -83,6 +84,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 		commands.add(new StackCommand());
 		commands.add(new SetlandlordCommand());
 		commands.add(new MessageCommand());
+		commands.add(new ImportCommand());
 
 		// Register commands in bukkit
 		plugin.getCommand("AreaShop").setExecutor(this);

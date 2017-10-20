@@ -2,10 +2,10 @@ package me.wiefferink.areashop.regions;
 
 import me.wiefferink.areashop.AreaShop;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 // TODO consider switching to saving lowercase regions
@@ -13,35 +13,86 @@ public class RegionGroup {
 
 	private AreaShop plugin;
 	private String name;
+	private Set<String> regions;
+	private Set<String> autoRegions;
+	private boolean autoDirty;
+	private Set<String> worlds;
 
 	/**
-	 * Constructor, used when creating new groups or restoring them from groups.yml at server boot
+	 * Constructor, used when creating new groups or restoring them from groups.yml at server boot.
 	 * @param plugin The AreaShop plugin
 	 * @param name   Name of the group, has to be unique
 	 */
 	public RegionGroup(AreaShop plugin, String name) {
 		this.plugin = plugin;
 		this.name = name;
+		this.autoDirty = true;
 		setSetting("name", name);
-		// Delete duplicates
-		List<String> members = getMembers();
-		int previousCount = members.size();
-		List<String> newMembers = new ArrayList<>();
-		while(!members.isEmpty()) {
-			String member = members.remove(0);
-			// If the region has been deleted also clean it from the group
-			if(plugin.getFileManager().getRegion(member) != null) {
-				newMembers.add(member);
+
+		// Load regions and worlds
+		regions = new HashSet<>(getSettings().getStringList("regions"));
+		worlds = new HashSet<>(getSettings().getStringList("worlds"));
+	}
+
+	/**
+	 * Get automatically added regions.
+	 */
+	public Set<String> getAutoRegions() {
+		if(autoDirty) {
+			autoRegions = new HashSet<>();
+			for(GeneralRegion region : plugin.getFileManager().getRegions()) {
+				if(worlds.contains(region.getWorldName())) {
+					autoRegions.add(region.getName());
+				}
 			}
-			while(members.contains(member)) {
-				members.remove(member);
-			}
+			autoDirty = false;
 		}
-		if(newMembers.size() != previousCount) {
-			setSetting("regions", newMembers);
-			AreaShop.debug("group save required because of changed member size", newMembers);
+		return autoRegions;
+	}
+
+	/**
+	 * Mark that automatically added regions should be regenerated.
+	 */
+	public void autoDirty() {
+		autoDirty = true;
+	}
+
+	/**
+	 * Adds a world from which all regions should be added to the group.
+	 * @param world World from which all regions should be added
+	 * @return true if the region was not already added, otherwise false
+	 */
+	public boolean addWorld(String world) {
+		if(worlds.add(world)) {
+			setSetting("regionsFromWorlds", new ArrayList<>(worlds));
 			saveRequired();
+			autoDirty();
+			return true;
 		}
+		return false;
+	}
+
+	/**
+	 * Remove a member from the group.
+	 * @param world World to remove
+	 * @return true if the region was in the group before, otherwise false
+	 */
+	public boolean removeWorld(String world) {
+		if(worlds.remove(world)) {
+			setSetting("regionsFromWorlds", new ArrayList<>(worlds));
+			saveRequired();
+			autoDirty();
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Get all worlds from which regions are added automatically.
+	 * @return A list with the names of all worlds (immutable)
+	 */
+	public Set<String> getWorlds() {
+		return new HashSet<>(worlds);
 	}
 
 	/**
@@ -50,15 +101,12 @@ public class RegionGroup {
 	 * @return true if the region was not already added, otherwise false
 	 */
 	public boolean addMember(GeneralRegion region) {
-		List<String> members = getMembers();
-		if(members.contains(region.getName())) {
-			return false;
-		} else {
-			members.add(region.getName());
-			setSetting("regions", members);
-			this.saveRequired();
+		if(regions.add(region.getName())) {
+			setSetting("regions", new ArrayList<>(regions));
+			saveRequired();
 			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -67,26 +115,30 @@ public class RegionGroup {
 	 * @return true if the region was in the group before, otherwise false
 	 */
 	public boolean removeMember(GeneralRegion region) {
-		if(!isMember(region)) {
-			return false;
+		if(regions.remove(region.getName())) {
+			setSetting("regions", new ArrayList<>(regions));
+			saveRequired();
+			return true;
 		}
-
-		List<String> members = getMembers();
-		members.remove(region.getName());
-		setSetting("regions", members);
-		this.saveRequired();
-		return true;
+		return false;
 	}
 
 	/**
 	 * Get all members of the group.
-	 * @return A list with the names of all members of the group
+	 * @return A list with the names of all members of the group (immutable)
 	 */
-	public List<String> getMembers() {
-		if(getSettings() == null || getSettings().getStringList("regions") == null) {
-			return new ArrayList<>();
-		}
-		return getSettings().getStringList("regions");
+	public Set<String> getMembers() {
+		HashSet<String> result = new HashSet<>(regions);
+		result.addAll(getAutoRegions());
+		return result;
+	}
+
+	/**
+	 * Get all manually added members of the group.
+	 * @return A list with the names of all members of the group (immutable)
+	 */
+	public Set<String> getManualMembers() {
+		return new HashSet<>(regions);
 	}
 
 	/**
@@ -139,7 +191,12 @@ public class RegionGroup {
 	 * @return The ConfigurationSection with the settings of the group
 	 */
 	public ConfigurationSection getSettings() {
-		return plugin.getFileManager().getGroupSettings(name);
+		ConfigurationSection result =  plugin.getFileManager().getGroupSettings(name);
+		if(result != null) {
+			return result;
+		} else {
+			return new YamlConfiguration();
+		}
 	}
 
 	/**

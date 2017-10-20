@@ -307,10 +307,20 @@ public class FileManager extends Manager {
 	public void addRent(RentRegion rent) {
 		addRentNoSave(rent);
 		rent.saveRequired();
+		markGroupsAutoDirty();
 	}
 
 	/**
-	 * Add a buy to the list without saving it to disk (useful for laoding at startup).
+	 * Mark all RegionGroups that they should regenerate regions.
+	 */
+	public void markGroupsAutoDirty() {
+		for(RegionGroup group : getGroups()) {
+			group.autoDirty();
+		}
+	}
+
+	/**
+	 * Add a buy to the list without saving it to disk (useful for loading at startup).
 	 * @param buy The buy region to add
 	 */
 	public void addBuyNoSave(BuyRegion buy) {
@@ -329,6 +339,7 @@ public class FileManager extends Manager {
 	public void addBuy(BuyRegion buy) {
 		addBuyNoSave(buy);
 		buy.saveRequired();
+		markGroupsAutoDirty();
 	}
 
 	/**

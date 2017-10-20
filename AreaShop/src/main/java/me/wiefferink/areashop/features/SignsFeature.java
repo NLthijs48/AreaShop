@@ -138,8 +138,8 @@ public class SignsFeature extends RegionFeature {
 		}
 		String signPath = "general.signs." + i + ".";
 		region.setSetting(signPath + "location", Utils.locationToConfig(location));
-		region.setSetting(signPath + "facing", facing.name());
-		region.setSetting(signPath + "signType", signType.name());
+		region.setSetting(signPath + "facing", facing != null ? facing.name() : null);
+		region.setSetting(signPath + "signType", signType != null ? signType.name() : null);
 		if(profile != null && profile.length() != 0) {
 			region.setSetting(signPath + "profile", profile);
 		}

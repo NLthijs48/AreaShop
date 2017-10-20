@@ -57,6 +57,7 @@ permissions:
       areashop.setlandlord: true
       areashop.linksigns: true
       areashop.message: true
+      areashop.import: true
   areashop.landlord.*:
     description: Give access to all landlord features
     children:
@@ -263,4 +264,7 @@ permissions:
     default: op
   areashop.message:
     description: Allows you to send AreaShop messages to players
+    default: op
+  areashop.import:
+    description: Allows importing regions from other plugins
     default: op

@@ -66,9 +66,9 @@ public class SetpriceCommand extends CommandAreaShop {
 		}
 		if("default".equalsIgnoreCase(args[1]) || "reset".equalsIgnoreCase(args[1])) {
 			if(region instanceof RentRegion) {
-				((RentRegion)region).removePrice();
+				((RentRegion)region).setPrice(null);
 			} else if(region instanceof BuyRegion) {
-				((BuyRegion)region).removePrice();
+				((BuyRegion)region).setPrice(null);
 			}
 			region.update();
 			plugin.message(sender, "setprice-successRemoved", region);

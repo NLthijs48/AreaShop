@@ -36,6 +36,7 @@ public class RegionGroup {
 
 	/**
 	 * Get automatically added regions.
+	 * @return Set of regions automatically added by the configuration
 	 */
 	public Set<String> getAutoRegions() {
 		if(autoDirty) {

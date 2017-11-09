@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.features;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.GeneralRegion;
@@ -11,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -356,9 +356,18 @@ public class TeleportFeature extends RegionFeature {
 		if(done && isSafe(safeLocation)) {
 			if(toSign) {
 				region.message(player, "teleport-successSign");
+
+				// Let the player look at the sign
+				Vector playerVector = safeLocation.toVector();
+				playerVector.setY(playerVector.getY() + player.getEyeHeight(true));
+				Vector signVector = region.getSignsFeature().getSigns().get(0).getLocation().toVector().add(new Vector(0.5, 0.5, 0.5));
+				Vector direction = playerVector.clone().subtract(signVector).normalize();
+				safeLocation.setYaw(180 - (float)Math.toDegrees(Math.atan2(direction.getX(), direction.getZ())));
+				safeLocation.setPitch(90 - (float)Math.toDegrees(Math.acos(direction.getY())));
 			} else {
 				region.message(player, "teleport-success");
 			}
+
 			player.teleport(safeLocation);
 			AreaShop.debug("Found location: " + safeLocation.toString() + " Tries: " + (checked - 1));
 			return true;
@@ -444,15 +453,27 @@ public class TeleportFeature extends RegionFeature {
 		Location startLocation = null;
 		ProtectedRegion worldguardRegion = region.getRegion();
 
-		// Handle teleporting to a sign
-		List<Location> signs = region.getSignsFeature().getSignLocations();
+		// Try to get sign location
+		List<SignsFeature.RegionSign> signs = region.getSignsFeature().getSigns();
 		boolean signAvailable = !signs.isEmpty();
 		if(toSign.get()) {
 			if(signAvailable) {
 				// Use the location 1 below the sign to prevent weird spawing above the sign
-				startLocation = signs.get(0).subtract(0.0, 1.0, 0.0);
+				startLocation = signs.get(0).getLocation(); //.subtract(0.0, 1.0, 0.0);
 				startLocation.setPitch(player.getLocation().getPitch());
 				startLocation.setYaw(player.getLocation().getYaw());
+
+				// Move player x blocks away from the sign
+				double distance = region.getDoubleSetting("general.teleportSignDistance");
+				if(distance > 0) {
+					BlockFace facing = region.getSignsFeature().getSigns().get(0).getFacing();
+					Vector facingVector = new Vector(facing.getModX(), facing.getModY(), facing.getModZ())
+							.normalize()
+							.multiply(distance);
+					startLocation.setX(startLocation.getBlockX() + 0.5);
+					startLocation.setZ(startLocation.getBlockZ() + 0.5);
+					startLocation.add(facingVector);
+				}
 			} else {
 				// No sign available
 				region.message(player, "teleport-changedToNoSign");
@@ -468,7 +489,7 @@ public class TeleportFeature extends RegionFeature {
 		// Calculate a default location
 		if(startLocation == null) {
 			// Set to block in the middle, y configured in the config
-			Vector middle = Vector.getMidpoint(worldguardRegion.getMaximumPoint(), worldguardRegion.getMinimumPoint());
+			com.sk89q.worldedit.Vector middle = com.sk89q.worldedit.Vector.getMidpoint(worldguardRegion.getMaximumPoint(), worldguardRegion.getMinimumPoint());
 			String configSetting = region.getStringSetting("general.teleportLocationY");
 			if("bottom".equalsIgnoreCase(configSetting)) {
 				middle = middle.setY(worldguardRegion.getMinimumPoint().getBlockY());

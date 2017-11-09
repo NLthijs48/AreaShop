@@ -17,6 +17,8 @@ general:
   teleportToSignIntoRegion: false
   # Allow teleporting to the region from another world with `/as tp`
   teleportCrossWorld: true
+  # When teleporting to a sign, the number of blocks the player should get teleported away from the sign
+  teleportSignDistance: 1
   # Should '/as find' find this region while the player is in another world? (prevents cross-world teleport if turned off)
   findCrossWorld: true
   # Set where the '/as find' command should teleport the player to, set to true for the first sign of the region and set to

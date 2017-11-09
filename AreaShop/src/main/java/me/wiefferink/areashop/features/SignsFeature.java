@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +111,14 @@ public class SignsFeature extends RegionFeature {
 			result = result | sign.needsPeriodicUpdate();
 		}
 		return result;
+	}
+
+	/**
+	 * Get the signs of this region.
+	 * @return List of signs
+	 */
+	public List<RegionSign> getSigns() {
+		return Collections.unmodifiableList(new ArrayList<>(signs.values()));
 	}
 
 	/**
@@ -230,6 +239,30 @@ public class SignsFeature extends RegionFeature {
 		}
 
 		/**
+		 * Get the facing of the sign.
+		 * @return BlockFace the sign faces, or null if unknown
+		 */
+		public BlockFace getFacing() {
+			try {
+				return BlockFace.valueOf(region.getConfig().getString("general.signs." + key + ".facing"));
+			} catch(NullPointerException | IllegalArgumentException e) {
+				return null;
+			}
+		}
+
+		/**
+		 * Get the material of the sign
+		 * @return Material of the sign, normally {@link Material#WALL_SIGN} or {@link Material#SIGN_POST}, but could be something else or null.
+		 */
+		public Material getMaterial() {
+			try {
+				return Material.valueOf(region.getConfig().getString("general.signs." + key + ".signType"));
+			} catch(NullPointerException | IllegalArgumentException e) {
+				return null;
+			}
+		}
+
+		/**
 		 * Update this sign.
 		 * @return true if the update was successful, otherwise false
 		 */
@@ -263,12 +296,7 @@ public class SignsFeature extends RegionFeature {
 			Sign signState = null;
 			// Place the sign back (with proper rotation and type) after it has been hidden or (indirectly) destroyed
 			if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
-				Material signType;
-				try {
-					signType = Material.valueOf(regionConfig.getString("general.signs." + key + ".signType"));
-				} catch(NullPointerException | IllegalArgumentException e) {
-					signType = null;
-				}
+				Material signType = getMaterial();
 				if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
 					AreaShop.debug("Setting sign", key, "of region", region.getName(), "failed, could not set sign block back");
 					return false;
@@ -276,12 +304,7 @@ public class SignsFeature extends RegionFeature {
 				block.setType(signType);
 				signState = (Sign)block.getState();
 				org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
-				BlockFace signFace;
-				try {
-					signFace = BlockFace.valueOf(regionConfig.getString("general.signs." + key + ".facing"));
-				} catch(NullPointerException | IllegalArgumentException e) {
-					signFace = null;
-				}
+				BlockFace signFace = getFacing();
 				if(signFace != null) {
 					signData.setFacingDirection(signFace);
 					signState.setData(signData);

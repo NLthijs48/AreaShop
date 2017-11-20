@@ -2,6 +2,7 @@ package me.wiefferink.areashop.commands;
 
 import me.wiefferink.interactivemessenger.processing.Message;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -42,17 +43,20 @@ public class LinksignsCommand extends CommandAreaShop {
 			String profile = null;
 			if(args.length > 1) {
 				profile = args[1];
-				Set<String> profiles = plugin.getConfig().getConfigurationSection("signProfiles").getKeys(false);
-				if(!profiles.contains(profile)) {
-					ArrayList<String> message = new ArrayList<>();
-					for(String p : profiles) {
-						if(!message.isEmpty()) {
-							message.add(", ");
+				ConfigurationSection signProfilesSection = plugin.getConfig().getConfigurationSection("signProfiles");
+				if(signProfilesSection != null) {
+					Set<String> profiles = signProfilesSection.getKeys(false);
+					if(!profiles.contains(profile)) {
+						ArrayList<String> message = new ArrayList<>();
+						for(String p : profiles) {
+							if(!message.isEmpty()) {
+								message.add(", ");
+							}
+							message.addAll(Message.fromKey("addsign-profile").replacements(p).get());
 						}
-						message.addAll(Message.fromKey("addsign-profile").replacements(p).get());
+						plugin.message(sender, "addsign-wrongProfile", Message.fromList(message));
+						return;
 					}
-					plugin.message(sender, "addsign-wrongProfile", Message.fromList(message));
-					return;
 				}
 			}
 			plugin.getSignlinkerManager().enterSignLinkMode(player, profile);

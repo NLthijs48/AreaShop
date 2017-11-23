@@ -77,6 +77,7 @@ public class ImportJob {
 		YamlConfiguration regionForSaleConfig = loadConfiguration(regionForSaleConfigFile);
 		if(regionForSaleConfig == null) {
 			messageNoPrefix("import-loadConfigFailed", regionForSaleConfigFile.getAbsolutePath());
+			regionForSaleConfig = new YamlConfiguration();
 		} else {
 			importRegionSettings(regionForSaleConfig, regionForSaleGroup.getSettings(), null);
 			regionForSaleGroup.setSetting("priority", 0);
@@ -144,6 +145,7 @@ public class ImportJob {
 			if(worldConfig == null) {
 				messageNoPrefix("import-loadWorldConfigFailed", worldConfigFile.getAbsolutePath());
 				// Simply skip importing the settings, since this is not really fatal
+				worldConfig = new YamlConfiguration();
 			} else {
 				// RegionGroup with all world settings
 				RegionGroup worldGroup = new RegionGroup(plugin, "RegionForSale-" + worldFolder.getName());
@@ -219,8 +221,9 @@ public class ImportJob {
 
 				String owner = regionSection.getString("info.owner", null);
 				boolean isBought = regionSection.getBoolean("info.is-bought");
-				boolean rentable = regionSection.getBoolean("economic-settings.rentable");
-				boolean buyable = regionSection.getBoolean("economic-settings.buyable");
+				// TODO: should also take into config settings of parent regions
+				boolean rentable = regionSection.getBoolean("economic-settings.rentable", worldConfig.getBoolean("economic-settings.rentable", regionForSaleConfig.getBoolean("economic-settings.rentable")));
+				boolean buyable = regionSection.getBoolean("economic-settings.buyable", worldConfig.getBoolean("economic-settings.buyable", regionForSaleConfig.getBoolean("economic-settings.buyable")));
 
 				// Can be bought and rented, import as buy
 				if(buyable && rentable) {

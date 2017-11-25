@@ -82,6 +82,3 @@ This information will give me an indication how much the plugin is used and enco
 Help translating the plugin into different languages and to keep the translations up to date. Go to [this page](https://github.com/NLthijs48/AreaShop/wiki/Language-support#translating-on-transifex) for more information. Translating goes through the [Transifex](https://www.transifex.com/projects/p/areashop/) website and is very easy, sending files back and forth is not needed, you can translate lines online and whenever you want. Every line you translate will be saved, no need to do it all at once (this also allows for easy collaboration).
 
 ![Transifex-translation-progress](https://transifex.com/projects/p/areashop/resource/enyml/chart/image_png)
-
-[![Donate through PayPal to support development](https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?return=http%3A%2F%2Fdev.bukkit.org%2Fbukkit-plugins%2Fregionbuyandrent%2F&cn=Add+special+instructions+to+the+addon+author%28s%29&business=nlthijs48%40gmail.com&bn=PP-DonationsBF%3Abtn_donateCC_LG.gif%3ANonHosted&cancel_return=http%3A%2F%2Fdev.bukkit.org%2Fbukkit-plugins%2Fregionbuyandrent%2F&lc=US&item_name=AreaShop+%28from+Bukkit.org%29&cmd=_donations&rm=1&no_shipping=1&currency_code=USD)
-

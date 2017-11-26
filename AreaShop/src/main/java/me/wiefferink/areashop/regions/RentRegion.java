@@ -400,7 +400,7 @@ public class RentRegion extends GeneralRegion {
 					commands = profileSection.getStringList(timeBefore + ".commands");
 					// Warn player
 					if(profileSection.getBoolean(timeBefore + ".warnPlayer") && player != null) {
-						message(player, "rent-expireWarning", this);
+						message(player, "rent-expireWarning");
 					}
 				} else {
 					commands = profileSection.getStringList(timeBefore);

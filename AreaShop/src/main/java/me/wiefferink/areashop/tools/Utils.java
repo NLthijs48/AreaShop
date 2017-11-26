@@ -203,23 +203,23 @@ public class Utils {
 
 	/**
 	 * Create a comma-separated list.
-	 * @param input Collection of object which should be concatenated with comma's in between
+	 * @param input Collection of object which should be concatenated with comma's in between (skipping null values)
 	 * @return Innput object concatenated with comma's in between
 	 */
 	public static String createCommaSeparatedList(Collection<?> input) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		boolean first = true;
 		for(Object object : input) {
 			if(object != null) {
 				if(first) {
 					first = false;
-					result += object.toString();
+					result.append(object.toString());
 				} else {
-					result += ", " + object.toString();
+					result.append(", ").append(object.toString());
 				}
 			}
 		}
-		return result;
+		return result.toString();
 	}
 
 	/**

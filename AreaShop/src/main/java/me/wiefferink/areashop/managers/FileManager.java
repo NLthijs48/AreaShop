@@ -1081,9 +1081,7 @@ public class FileManager extends Manager {
 					AreaShop.warn("Could not create directory: " + oldFolderFile.getAbsolutePath());
 				}
 
-				if(versions.get("rents") == null) {
-					versions.put("rents", -1);
-				}
+				versions.putIfAbsent("rents", -1);
 
 				HashMap<String, HashMap<String, String>> rents = null;
 				try {
@@ -1122,13 +1120,9 @@ public class FileManager extends Manager {
 									rents.put(rentName.toLowerCase(), rent);
 								}
 								// Save the default setting for region restoring
-								if(rent.get("restore") == null) {
-									rent.put("restore", "general");
-								}
+								rent.putIfAbsent("restore", "general");
 								// Save the default setting for the region restore profile
-								if(rent.get("profile") == null) {
-									rent.put("profile", "default");
-								}
+								rent.putIfAbsent("profile", "default");
 								// Change to version 0
 								versions.put("rents", 0);
 							}
@@ -1206,9 +1200,7 @@ public class FileManager extends Manager {
 					return;
 				}
 
-				if(versions.get("buys") == null) {
-					versions.put("buys", -1);
-				}
+				versions.putIfAbsent("buys", -1);
 
 				HashMap<String, HashMap<String, String>> buys = null;
 				try {
@@ -1247,13 +1239,9 @@ public class FileManager extends Manager {
 									buys.put(buyName.toLowerCase(), buy);
 								}
 								// Save the default setting for region restoring
-								if(buy.get("restore") == null) {
-									buy.put("restore", "general");
-								}
+								buy.putIfAbsent("restore", "general");
 								// Save the default setting for the region restore profile
-								if(buy.get("profile") == null) {
-									buy.put("profile", "default");
-								}
+								buy.putIfAbsent("profile", "default");
 								// Change to version 0
 								versions.put("buys", 0);
 							}

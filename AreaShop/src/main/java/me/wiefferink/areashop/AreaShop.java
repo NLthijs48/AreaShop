@@ -16,8 +16,8 @@ import me.wiefferink.areashop.managers.Manager;
 import me.wiefferink.areashop.managers.SignLinkerManager;
 import me.wiefferink.areashop.tools.Analytics;
 import me.wiefferink.areashop.tools.GithubUpdateCheck;
-import me.wiefferink.areashop.tools.Task;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.bukkitdo.Do;
 import me.wiefferink.interactivemessenger.processing.Message;
 import me.wiefferink.interactivemessenger.source.LanguageManager;
 import net.milkbowl.vault.economy.Economy;
@@ -592,7 +592,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		long expirationCheck = Utils.millisToTicks(Utils.getDurationFromSecondsOrString("expiration.delay"));
 		final AreaShop finalPlugin = this;
 		if(expirationCheck > 0) {
-			Task.syncTimer(expirationCheck, () -> {
+			Do.syncTimer(expirationCheck, () -> {
 				if(isReady()) {
 					finalPlugin.getFileManager().checkRents();
 					AreaShop.debugTask("Checking rent expirations...");
@@ -605,7 +605,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Inactive unrenting/selling timer
 		long inactiveCheck = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("inactive.delay"));
 		if(inactiveCheck > 0) {
-			Task.syncTimer(inactiveCheck, () -> {
+			Do.syncTimer(inactiveCheck, () -> {
 				if(isReady()) {
 					finalPlugin.getFileManager().checkForInactiveRegions();
 					AreaShop.debugTask("Checking for regions with players that are inactive too long...");
@@ -618,7 +618,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Periodic updating of signs for timeleft tags
 		long periodicUpdate = Utils.millisToTicks(Utils.getDurationFromSecondsOrString("signs.delay"));
 		if(periodicUpdate > 0) {
-			Task.syncTimer(periodicUpdate, () -> {
+			Do.syncTimer(periodicUpdate, () -> {
 				if(isReady()) {
 					finalPlugin.getFileManager().performPeriodicSignUpdate();
 					AreaShop.debugTask("Performing periodic sign update...");
@@ -631,7 +631,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Saving regions and group settings
 		long saveFiles = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("saving.delay"));
 		if(saveFiles > 0) {
-			Task.syncTimer(saveFiles, () -> {
+			Do.syncTimer(saveFiles, () -> {
 				if(isReady()) {
 					finalPlugin.getFileManager().saveRequiredFiles();
 					AreaShop.debugTask("Saving required files...");
@@ -644,7 +644,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Sending warnings about rent regions to online players
 		long expireWarning = Utils.millisToTicks(Utils.getDurationFromMinutesOrString("expireWarning.delay"));
 		if(expireWarning > 0) {
-			Task.syncTimer(expireWarning, () -> {
+			Do.syncTimer(expireWarning, () -> {
 				if(isReady()) {
 					finalPlugin.getFileManager().sendRentExpireWarnings();
 					AreaShop.debugTask("Sending rent expire warnings...");
@@ -656,7 +656,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Update all regions on startup
 		if(getConfig().getBoolean("updateRegionsOnStartup")) {
-			Task.syncLater(20, () -> {
+			Do.syncLater(20, () -> {
 				finalPlugin.getFileManager().updateAllRegions();
 				AreaShop.debugTask("Updating all regions at startup...");
 			});

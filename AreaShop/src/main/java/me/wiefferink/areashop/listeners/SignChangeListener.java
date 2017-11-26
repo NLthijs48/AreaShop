@@ -9,13 +9,13 @@ import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.bukkitdo.Do;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.material.Sign;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 import java.util.Set;
@@ -156,12 +156,7 @@ public final class SignChangeListener implements Listener {
 				rent.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
 				plugin.message(player, "setup-rentSuccess", rent);
 				// Update the region after the event has written its lines
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						rent.update();
-					}
-				}.runTaskLater(plugin, 1);
+				Do.sync(rent::update);
 				// Run commands
 				rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 			}
@@ -263,12 +258,7 @@ public final class SignChangeListener implements Listener {
 				buy.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
 				plugin.message(player, "setup-buySuccess", buy);
 				// Update the region after the event has written its lines
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						buy.update();
-					}
-				}.runTaskLater(plugin, 1);
+				Do.sync(buy::update);
 
 				// Run commands
 				buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
@@ -314,13 +304,7 @@ public final class SignChangeListener implements Listener {
 			}
 
 			// Update the region later because this event will do it first
-			final GeneralRegion regionUpdate = region;
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					regionUpdate.update();
-				}
-			}.runTaskLater(plugin, 1);
+			Do.sync(region::update);
 		}
 	}
 }

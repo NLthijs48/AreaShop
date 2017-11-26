@@ -5,6 +5,7 @@ import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.bukkitdo.Do;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,7 +14,6 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,76 +44,66 @@ public final class PlayerLoginLogoutListener implements Listener {
 		final Player player = event.getPlayer();
 
 		// Schedule task to check for notifications, prevents a lag spike at login
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				// Delay until all regions are loaded
-				if(!plugin.isReady()) {
-					return;
-				}
-				if(!player.isOnline()) {
-					this.cancel();
-					return;
-				}
-				// Notify for rents that almost run out
-				for(RentRegion region : plugin.getFileManager().getRents()) {
-					if(region.isRenter(player)) {
-						String warningSetting = region.getStringSetting("rent.warningOnLoginTime");
-						if(warningSetting == null || warningSetting.isEmpty()) {
-							continue;
-						}
-						long warningTime = Utils.durationStringToLong(warningSetting);
-						if(region.getTimeLeft() < warningTime) {
-							// Send the warning message later to let it appear after general MOTD messages
-							AreaShop.getInstance().message(player, "rent-expireWarning", region);
-						}
+		Do.syncTimerLater(25, 25, () -> {
+			// Delay until all regions are loaded
+			if(!plugin.isReady()) {
+				return true;
+			}
+			if(!player.isOnline()) {
+				return false;
+			}
+			// Notify for rents that almost run out
+			for(RentRegion region : plugin.getFileManager().getRents()) {
+				if(region.isRenter(player)) {
+					String warningSetting = region.getStringSetting("rent.warningOnLoginTime");
+					if(warningSetting == null || warningSetting.isEmpty()) {
+						continue;
+					}
+					long warningTime = Utils.durationStringToLong(warningSetting);
+					if(region.getTimeLeft() < warningTime) {
+						// Send the warning message later to let it appear after general MOTD messages
+						AreaShop.getInstance().message(player, "rent-expireWarning", region);
 					}
 				}
-
-				// Notify admins for plugin updates
-				AreaShop.getInstance().notifyUpdate(player);
-
-				this.cancel();
 			}
-		}.runTaskTimer(plugin, 25, 25);
+
+			// Notify admins for plugin updates
+			AreaShop.getInstance().notifyUpdate(player);
+			return false;
+		});
 
 		// Check if the player has regions that use an old name of him and update them
-		final List<GeneralRegion> regions = new ArrayList<>(plugin.getFileManager().getRegions());
-		new BukkitRunnable() {
-			private int current = 0;
+		Do.syncTimerLater(22, 10, () -> {
+			if(!plugin.isReady()) {
+				return true;
+			}
 
-			@Override
-			public void run() {
-				// Delay until all regions are loaded
-				if(!plugin.isReady()) {
-					return;
-				}
-
-				// Check all regions
-				for(int i = 0; i < plugin.getConfig().getInt("nameupdate.regionsPerTick"); i++) {
-					if(current < regions.size()) {
-						GeneralRegion region = regions.get(current);
-						if(region.isOwner(player)) {
-							if(region instanceof BuyRegion) {
-								if(!player.getName().equals(region.getStringSetting("buy.buyerName"))) {
-									region.setSetting("buy.buyerName", player.getName());
-									region.update();
-								}
-							} else if(region instanceof RentRegion) {
-								if(!player.getName().equals(region.getStringSetting("rent.renterName"))) {
-									region.setSetting("rent.renterName", player.getName());
-									region.update();
-								}
-							}
-						}
-						current++;
-					}
-				}
-				if(current >= regions.size()) {
-					this.cancel();
+			List<GeneralRegion> regions = new ArrayList<>();
+			for(GeneralRegion region : plugin.getFileManager().getRegions()) {
+				if(region.isOwner(player)) {
+					regions.add(region);
 				}
 			}
-		}.runTaskTimer(plugin, 22, 1); // Wait a bit before starting to prevent a lot of stress on the server when a player joins (a lot of plugins already do stuff then)
+
+			Do.forAll(
+				plugin.getConfig().getInt("nameupdate.regionsPerTick"),
+				regions,
+				region -> {
+					if(region instanceof BuyRegion) {
+						if(!player.getName().equals(region.getStringSetting("buy.buyerName"))) {
+							region.setSetting("buy.buyerName", player.getName());
+							region.update();
+						}
+					} else if(region instanceof RentRegion) {
+						if(!player.getName().equals(region.getStringSetting("rent.renterName"))) {
+							region.setSetting("rent.renterName", player.getName());
+							region.update();
+						}
+					}
+				}
+			);
+			return false;
+		});
 	}
 
 	// Active time updates

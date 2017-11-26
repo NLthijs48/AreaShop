@@ -13,8 +13,8 @@ import me.wiefferink.areashop.regions.GeneralRegion.RegionEvent;
 import me.wiefferink.areashop.regions.GeneralRegion.RegionType;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.regions.RentRegion;
-import me.wiefferink.areashop.tools.Task;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.bukkitdo.Do;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,7 +24,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -515,48 +514,26 @@ public class FileManager extends Manager {
 	 * Update all signs that need periodic updating.
 	 */
 	public void performPeriodicSignUpdate() {
-		final List<RentRegion> regions = new ArrayList<>(getRents());
-		new BukkitRunnable() {
-			private int current = 0;
-
-			@Override
-			public void run() {
-				for(int i = 0; i < plugin.getConfig().getInt("signs.regionsPerTick"); i++) {
-					if(current < regions.size()) {
-						if(regions.get(current).needsPeriodicUpdate()) {
-							regions.get(current).update();
-						}
-						current++;
-					}
-				}
-				if(current >= regions.size()) {
-					this.cancel();
+		Do.forAll(
+			plugin.getConfig().getInt("signs.regionsPerTick"),
+			getRents(),
+			region -> {
+				if(region.needsPeriodicUpdate()) {
+					region.update();
 				}
 			}
-		}.runTaskTimer(plugin, 1, 1);
+		);
 	}
 
 	/**
 	 * Send out rent expire warnings.
 	 */
 	public void sendRentExpireWarnings() {
-		final List<RentRegion> regions = new ArrayList<>(getRents());
-		new BukkitRunnable() {
-			private int current = 0;
-
-			@Override
-			public void run() {
-				for(int i = 0; i < plugin.getConfig().getInt("expireWarning.regionsPerTick"); i++) {
-					if(current < regions.size()) {
-						regions.get(current).sendExpirationWarnings();
-						current++;
-					}
-				}
-				if(current >= regions.size()) {
-					this.cancel();
-				}
-			}
-		}.runTaskTimer(plugin, 1, 1);
+		Do.forAll(
+			plugin.getConfig().getInt("expireWarning.regionsPerTick"),
+			getRents(),
+			RentRegion::sendExpirationWarnings
+		);
 	}
 
 	/**
@@ -569,25 +546,16 @@ public class FileManager extends Manager {
 		if(confirmationReceiver != null) {
 			plugin.message(confirmationReceiver, "reload-updateStart", regions.size(), regionsPerTick * 20);
 		}
-		new BukkitRunnable() {
-			private int current = 0;
-
-			@Override
-			public void run() {
-				for(int i = 0; i < regionsPerTick; i++) {
-					if(current < regions.size()) {
-						regions.get(current).update();
-						current++;
-					}
-				}
-				if(current >= regions.size()) {
-					if(confirmationReceiver != null) {
-						plugin.message(confirmationReceiver, "reload-updateComplete");
-					}
-					this.cancel();
+		Do.forAll(
+			regionsPerTick,
+			regions,
+			GeneralRegion::update,
+			() -> {
+				if(confirmationReceiver != null) {
+					plugin.message(confirmationReceiver, "reload-updateComplete");
 				}
 			}
-		}.runTaskTimer(plugin, 1, 1);
+		);
 	}
 
 	/**
@@ -652,25 +620,15 @@ public class FileManager extends Manager {
 		}
 		this.saveWorldGuardRegions();
 
-		final List<GeneralRegion> regions = new ArrayList<>(getRegions());
-		new BukkitRunnable() {
-			private int current = 0;
-
-			@Override
-			public void run() {
-				for(int i = 0; i < plugin.getConfig().getInt("saving.regionsPerTick"); i++) {
-					if(current < regions.size()) {
-						if(regions.get(current).isSaveRequired()) {
-							regions.get(current).saveNow();
-						}
-						current++;
-					}
-				}
-				if(current >= regions.size()) {
-					this.cancel();
+		Do.forAll(
+			plugin.getConfig().getInt("saving.regionsPerTick"),
+			getRegions(),
+			region -> {
+				if(region.isSaveRequired()) {
+					region.saveNow();
 				}
 			}
-		}.runTaskTimer(plugin, 1, 1);
+		);
 	}
 
 	/**
@@ -747,10 +705,10 @@ public class FileManager extends Manager {
 	 * Unrent regions that have no time left, regions to check per tick is in the config.
 	 */
 	public void checkRents() {
-		Task.doForAll(
-				plugin.getConfig().getInt("expiration.regionsPerTick"),
-				getRents(),
-				RentRegion::checkExpiration
+		Do.forAll(
+			plugin.getConfig().getInt("expiration.regionsPerTick"),
+			getRents(),
+			RentRegion::checkExpiration
 		);
 	}
 
@@ -758,23 +716,11 @@ public class FileManager extends Manager {
 	 * Check all regions and unrent/sell them if the player is inactive for too long.
 	 */
 	public void checkForInactiveRegions() {
-		final List<GeneralRegion> regions = new ArrayList<>(getRegions());
-		new BukkitRunnable() {
-			private int current = 0;
-
-			@Override
-			public void run() {
-				for(int i = 0; i < plugin.getConfig().getInt("inactive.regionsPerTick"); i++) {
-					if(current < regions.size()) {
-						regions.get(current).checkInactive();
-						current++;
-					}
-				}
-				if(current >= regions.size()) {
-					this.cancel();
-				}
-			}
-		}.runTaskTimer(plugin, 1, 1);
+		Do.forAll(
+			plugin.getConfig().getInt("inactive.regionsPerTick"),
+			getRegions(),
+			GeneralRegion::checkInactive
+		);
 	}
 
 
@@ -838,17 +784,14 @@ public class FileManager extends Manager {
 			// Load groups.yml
 			result &= loadGroupsFile();
 		} else {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					// Load region files (regions folder)
-					loadRegionFiles();
-					// Convert old formats to the latest (changes in .yml saving format)
-					postUpdateFiles();
-					// Load groups.yml
-					loadGroupsFile();
-				}
-			}.runTask(plugin);
+			Do.sync(() -> {
+				// Load region files (regions folder)
+				loadRegionFiles();
+				// Convert old formats to the latest (changes in .yml saving format)
+				postUpdateFiles();
+				// Load groups.yml
+				loadGroupsFile();
+			});
 		}
 		return result;
 	}
@@ -1196,7 +1139,7 @@ public class FileManager extends Manager {
 								HashMap<String, String> rent = rents.get(rentName);
 								if(rent.get("player") != null) {
 									@SuppressWarnings("deprecation")  // Fake deprecation by Bukkit to inform developers, method will stay
-											OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(rent.get("player"));
+									OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(rent.get("player"));
 									rent.put("playeruuid", offlinePlayer.getUniqueId().toString());
 									rent.remove("player");
 								}

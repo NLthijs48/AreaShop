@@ -15,6 +15,7 @@ import me.wiefferink.areashop.features.TeleportFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.bukkitdo.Do;
 import me.wiefferink.interactivemessenger.processing.Message;
 import me.wiefferink.interactivemessenger.processing.ReplacementProvider;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -27,7 +28,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -773,12 +773,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			AreaShop.debug("Restored schematic for region " + getName());
 
 			// Workaround for signs inside the region in combination with async restore of plugins like AsyncWorldEdit and FastAsyncWorldEdit
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					getSignsFeature().update();
-				}
-			}.runTaskLater(plugin, 10L);
+			Do.syncLater(10, getSignsFeature()::update);
 		}
 		return result;
 	}

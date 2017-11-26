@@ -8,11 +8,11 @@ import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.bukkitdo.Do;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -109,151 +109,144 @@ public class AddCommand extends CommandAreaShop {
 		final Player finalPlayer = player;
 		final World finalWorld = world;
 		AreaShop.debug("Starting add task with " + regions.size() + " regions");
-		new BukkitRunnable() {
-			private int current = 0;
-			private TreeSet<GeneralRegion> regionsSuccess = new TreeSet<>();
-			private TreeSet<GeneralRegion> regionsAlready = new TreeSet<>();
-			private TreeSet<String> namesBlacklisted = new TreeSet<>();
-			private TreeSet<String> namesNoPermission = new TreeSet<>();
 
-			@Override
-			public void run() {
-				for(int i = 0; i < plugin.getConfig().getInt("adding.regionsPerTick"); i++) {
-					if(current < finalRegions.size()) {
-						ProtectedRegion region = finalRegions.get(current);
-						// Determine if the player is an owner or member of the region
-						boolean isMember = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
-						boolean isOwner = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
-						String type;
-						if(isRent) {
-							type = "rent";
-						} else {
-							type = "buy";
+		TreeSet<GeneralRegion> regionsSuccess = new TreeSet<>();
+		TreeSet<GeneralRegion> regionsAlready = new TreeSet<>();
+		TreeSet<String> namesBlacklisted = new TreeSet<>();
+		TreeSet<String> namesNoPermission = new TreeSet<>();
+		Do.forAll(
+			plugin.getConfig().getInt("adding.regionsPerTick"),
+			regions,
+			region -> {
+				// Determine if the player is an owner or member of the region
+				boolean isMember = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
+				boolean isOwner = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
+				String type;
+				if(isRent) {
+					type = "rent";
+				} else {
+					type = "buy";
+				}
+				FileManager.AddResult result = plugin.getFileManager().checkRegionAdd(sender, region, isRent ? GeneralRegion.RegionType.RENT : GeneralRegion.RegionType.BUY);
+				if(result == FileManager.AddResult.ALREADYADDED) {
+					regionsAlready.add(plugin.getFileManager().getRegion(region.getId()));
+				} else if(result == FileManager.AddResult.BLACKLISTED) {
+					namesBlacklisted.add(region.getId());
+				} else if(result == FileManager.AddResult.NOPERMISSION) {
+					namesNoPermission.add(region.getId());
+				} else {
+					// Check if the player should be landlord
+					boolean landlord = (!sender.hasPermission("areashop.create" + type)
+							&& ((sender.hasPermission("areashop.create" + type + ".owner") && isOwner)
+							|| (sender.hasPermission("areashop.create" + type + ".member") && isMember)));
+					List<UUID> existing = new ArrayList<>();
+					existing.addAll(plugin.getWorldGuardHandler().getOwners(region).asUniqueIdList());
+					existing.addAll(plugin.getWorldGuardHandler().getMembers(region).asUniqueIdList());
+					if(isRent) {
+						RentRegion rent = new RentRegion(region.getId(), finalWorld);
+						// Set landlord
+						if(landlord) {
+							rent.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
 						}
-						FileManager.AddResult result = plugin.getFileManager().checkRegionAdd(sender, region, isRent ? GeneralRegion.RegionType.RENT : GeneralRegion.RegionType.BUY);
-						if(result == FileManager.AddResult.ALREADYADDED) {
-							regionsAlready.add(plugin.getFileManager().getRegion(region.getId()));
-						} else if(result == FileManager.AddResult.BLACKLISTED) {
-							namesBlacklisted.add(region.getId());
-						} else if(result == FileManager.AddResult.NOPERMISSION) {
-							namesNoPermission.add(region.getId());
-						} else {
-							// Check if the player should be landlord
-							boolean landlord = (!sender.hasPermission("areashop.create" + type)
-									&& ((sender.hasPermission("areashop.create" + type + ".owner") && isOwner)
-									|| (sender.hasPermission("areashop.create" + type + ".member") && isMember)));
-							List<UUID> existing = new ArrayList<>();
-							existing.addAll(plugin.getWorldGuardHandler().getOwners(region).asUniqueIdList());
-							existing.addAll(plugin.getWorldGuardHandler().getMembers(region).asUniqueIdList());
-							if(isRent) {
-								RentRegion rent = new RentRegion(region.getId(), finalWorld);
-								// Set landlord
-								if(landlord) {
-									rent.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
-								}
-								// Run commands
-								rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
-								plugin.getFileManager().addRent(rent);
-								rent.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
+						// Run commands
+						rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
+						plugin.getFileManager().addRent(rent);
+						rent.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
 
-								rent.update();
+						rent.update();
 
-								// Run commands
-								rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
+						// Run commands
+						rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 
-								// Add existing owners/members if any
-								if(!landlord && !existing.isEmpty()) {
-									// TODO also execute rent events to notify other plugins?
+						// Add existing owners/members if any
+						if(!landlord && !existing.isEmpty()) {
+							// TODO also execute rent events to notify other plugins?
 
-									// Run commands
-									rent.runEventCommands(GeneralRegion.RegionEvent.RENTED, true);
+							// Run commands
+							rent.runEventCommands(GeneralRegion.RegionEvent.RENTED, true);
 
-									// Add values to the rent and send it to FileManager
-									rent.setRentedUntil(Calendar.getInstance().getTimeInMillis() + rent.getDuration());
-									rent.setRenter(existing.remove(0));
-									rent.updateLastActiveTime();
+							// Add values to the rent and send it to FileManager
+							rent.setRentedUntil(Calendar.getInstance().getTimeInMillis() + rent.getDuration());
+							rent.setRenter(existing.remove(0));
+							rent.updateLastActiveTime();
 
-									// Add others as friends
-									for(UUID friend : existing) {
-										rent.getFriendsFeature().addFriend(friend, null);
-									}
-
-									// Fire schematic event and updated times extended
-									rent.handleSchematicEvent(GeneralRegion.RegionEvent.RENTED);
-
-									// Notify about updates
-									rent.update();
-
-									rent.runEventCommands(GeneralRegion.RegionEvent.RENTED, false);
-								}
-
-								regionsSuccess.add(rent);
-							} else {
-								BuyRegion buy = new BuyRegion(region.getId(), finalWorld);
-								// Set landlord
-								if(landlord) {
-									buy.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
-								}
-								// Run commands
-								buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
-
-								plugin.getFileManager().addBuy(buy);
-								buy.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
-
-								buy.update();
-
-								// Run commands
-								buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
-
-								// Add existing owners/members if any
-								if(!landlord && !existing.isEmpty()) {
-									// TODO also execute buy events to notify for other plugins?
-
-									// Run commands
-									buy.runEventCommands(GeneralRegion.RegionEvent.BOUGHT, true);
-
-									// Set the owner
-									buy.setBuyer(existing.remove(0));
-									buy.updateLastActiveTime();
-									// Add others as friends
-									for(UUID friend : existing) {
-										buy.getFriendsFeature().addFriend(friend, null);
-									}
-
-									// Notify about updates
-									buy.update();
-
-									// Update everything
-									buy.handleSchematicEvent(GeneralRegion.RegionEvent.BOUGHT);
-
-									// Run commands
-									buy.runEventCommands(GeneralRegion.RegionEvent.BOUGHT, false);
-								}
-
-								regionsSuccess.add(buy);
+							// Add others as friends
+							for(UUID friend : existing) {
+								rent.getFriendsFeature().addFriend(friend, null);
 							}
+
+							// Fire schematic event and updated times extended
+							rent.handleSchematicEvent(GeneralRegion.RegionEvent.RENTED);
+
+							// Notify about updates
+							rent.update();
+
+							rent.runEventCommands(GeneralRegion.RegionEvent.RENTED, false);
 						}
-						current++;
+
+						regionsSuccess.add(rent);
+					} else {
+						BuyRegion buy = new BuyRegion(region.getId(), finalWorld);
+						// Set landlord
+						if(landlord) {
+							buy.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
+						}
+						// Run commands
+						buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
+
+						plugin.getFileManager().addBuy(buy);
+						buy.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
+
+						buy.update();
+
+						// Run commands
+						buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
+
+						// Add existing owners/members if any
+						if(!landlord && !existing.isEmpty()) {
+							// TODO also execute buy events to notify for other plugins?
+
+							// Run commands
+							buy.runEventCommands(GeneralRegion.RegionEvent.BOUGHT, true);
+
+							// Set the owner
+							buy.setBuyer(existing.remove(0));
+							buy.updateLastActiveTime();
+							// Add others as friends
+							for(UUID friend : existing) {
+								buy.getFriendsFeature().addFriend(friend, null);
+							}
+
+							// Notify about updates
+							buy.update();
+
+							// Update everything
+							buy.handleSchematicEvent(GeneralRegion.RegionEvent.BOUGHT);
+
+							// Run commands
+							buy.runEventCommands(GeneralRegion.RegionEvent.BOUGHT, false);
+						}
+
+						regionsSuccess.add(buy);
 					}
 				}
-				if(current >= finalRegions.size()) {
-					if(!regionsSuccess.isEmpty()) {
-						plugin.message(sender, "add-success", args[1], Utils.combinedMessage(regionsSuccess, "region"));
-					}
-					if(!regionsAlready.isEmpty()) {
-						plugin.message(sender, "add-failed", Utils.combinedMessage(regionsAlready, "region"));
-					}
-					if(!namesBlacklisted.isEmpty()) {
-						plugin.message(sender, "add-blacklisted", Utils.createCommaSeparatedList(namesBlacklisted));
-					}
-					if(!namesNoPermission.isEmpty()) {
-						plugin.message(sender, "add-noPermissionRegions", Utils.createCommaSeparatedList(namesNoPermission));
-						plugin.message(sender, "add-noPermissionOwnerMember");
-					}
-					this.cancel();
+			},
+			() -> {
+				if(!regionsSuccess.isEmpty()) {
+					plugin.message(sender, "add-success", args[1], Utils.combinedMessage(regionsSuccess, "region"));
+				}
+				if(!regionsAlready.isEmpty()) {
+					plugin.message(sender, "add-failed", Utils.combinedMessage(regionsAlready, "region"));
+				}
+				if(!namesBlacklisted.isEmpty()) {
+					plugin.message(sender, "add-blacklisted", Utils.createCommaSeparatedList(namesBlacklisted));
+				}
+				if(!namesNoPermission.isEmpty()) {
+					plugin.message(sender, "add-noPermissionRegions", Utils.createCommaSeparatedList(namesNoPermission));
+					plugin.message(sender, "add-noPermissionOwnerMember");
 				}
 			}
-		}.runTaskTimer(plugin, 1, 1);
+		);
 	}
 
 	@Override

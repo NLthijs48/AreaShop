@@ -146,6 +146,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public void onEnable() {
 		AreaShop.instance = this;
+		Do.init(this);
 		managers = new HashSet<>();
 		boolean error = false;
 

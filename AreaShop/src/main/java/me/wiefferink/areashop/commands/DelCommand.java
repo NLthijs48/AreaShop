@@ -93,17 +93,17 @@ public class DelCommand extends CommandAreaShop {
 				// Remove the rent if the player has permission
 				if(sender.hasPermission("areashop.destroyrent") || (isLandlord && sender.hasPermission("areashop.destroyrent.landlord"))) {
 					plugin.getFileManager().removeRent((RentRegion)region, true);
-					plugin.message(sender, "shutdown-successRent", region);
+					plugin.message(sender, "destroy-successRent", region);
 				} else {
-					plugin.message(sender, "shutdown-noPermissionRent", region);
+					plugin.message(sender, "destroy-noPermissionRent", region);
 				}
 			} else if(region instanceof BuyRegion) {
 				// Remove the buy if the player has permission
 				if(sender.hasPermission("areashop.destroybuy") || (isLandlord && sender.hasPermission("areashop.destroybuy.landlord"))) {
 					plugin.getFileManager().removeBuy((BuyRegion)region, true);
-					plugin.message(sender, "shutdown-successBuy", region);
+					plugin.message(sender, "destroy-successBuy", region);
 				} else {
-					plugin.message(sender, "shutdown-noPermissionBuy", region);
+					plugin.message(sender, "destroy-noPermissionBuy", region);
 				}
 			}
 		}

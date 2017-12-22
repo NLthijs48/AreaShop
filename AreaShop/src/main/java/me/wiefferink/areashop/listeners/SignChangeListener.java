@@ -97,7 +97,7 @@ public final class SignChangeListener implements Listener {
 
 			boolean priceSet = fourthLine != null && fourthLine.length() != 0;
 			boolean durationSet = thirdLine != null && thirdLine.length() != 0;
-			// check if all the lines are correct			
+			// check if all the lines are correct
 			if(secondLine == null || secondLine.length() == 0) {
 				plugin.message(player, "setup-noRegion");
 				return;
@@ -206,7 +206,7 @@ public final class SignChangeListener implements Listener {
 			}
 
 			boolean priceSet = thirdLine != null && thirdLine.length() != 0;
-			// Check if all the lines are correct			
+			// Check if all the lines are correct
 			if(secondLine == null || secondLine.length() == 0) {
 				plugin.message(player, "setup-noRegion");
 				return;
@@ -279,7 +279,7 @@ public final class SignChangeListener implements Listener {
 				// Get region by secondLine of the sign
 				region = plugin.getFileManager().getRegion(secondLine);
 				if(region == null) {
-					plugin.message(player, "cmd-noRegion", secondLine);
+					plugin.message(player, "addSign-notRegistered", secondLine);
 					return;
 				}
 			} else {

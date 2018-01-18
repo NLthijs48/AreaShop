@@ -82,3 +82,5 @@ This information will give me an indication how much the plugin is used and enco
 Help translating the plugin into different languages and to keep the translations up to date. Go to [this page](https://github.com/NLthijs48/AreaShop/wiki/Language-support#translating-on-transifex) for more information. Translating goes through the [Transifex](https://www.transifex.com/projects/p/areashop/) website and is very easy, sending files back and forth is not needed, you can translate lines online and whenever you want. Every line you translate will be saved, no need to do it all at once (this also allows for easy collaboration).
 
 ![Transifex-translation-progress](https://transifex.com/projects/p/areashop/resource/enyml/chart/image_png)
+
+[![Live-support-chat](https://user-images.githubusercontent.com/6951068/35104778-2a5e6e18-fc6a-11e7-8ffc-fd63adf3a24a.png)](https://areashop.99ms.gs)

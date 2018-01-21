@@ -83,4 +83,4 @@ Help translating the plugin into different languages and to keep the translation
 
 ![Transifex-translation-progress](https://transifex.com/projects/p/areashop/resource/enyml/chart/image_png)
 
-[![Live-support-chat](https://user-images.githubusercontent.com/6951068/35104778-2a5e6e18-fc6a-11e7-8ffc-fd63adf3a24a.png)](https://areashop.99ms.gs)
+[![Live-support-chat](https://user-images.githubusercontent.com/6951068/35104778-2a5e6e18-fc6a-11e7-8ffc-fd63adf3a24a.png)](https://99ms.gs/areashop)

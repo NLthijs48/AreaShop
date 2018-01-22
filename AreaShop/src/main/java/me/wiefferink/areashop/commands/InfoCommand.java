@@ -332,7 +332,7 @@ public class InfoCommand extends CommandAreaShop {
 							signLocations.add(Message.fromKey("info-regionSignLocation").replacements(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()).getPlain());
 						}
 						if(!signLocations.isEmpty()) {
-							plugin.messageNoPrefix(sender, "info-regionSigns", signLocations.toArray());
+							plugin.messageNoPrefix(sender, "info-regionSigns", Utils.createCommaSeparatedList(signLocations));
 						}
 						// Groups
 						if(sender.hasPermission("areashop.groupinfo") && !rent.getGroupNames().isEmpty()) {
@@ -407,7 +407,7 @@ public class InfoCommand extends CommandAreaShop {
 							signLocations.add(Message.fromKey("info-regionSignLocation").replacements(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()).getPlain());
 						}
 						if(!signLocations.isEmpty()) {
-							plugin.messageNoPrefix(sender, "info-regionSigns", signLocations.toArray());
+							plugin.messageNoPrefix(sender, "info-regionSigns", Utils.createCommaSeparatedList(signLocations));
 						}
 						// Groups
 						if(sender.hasPermission("areashop.groupinfo") && !buy.getGroupNames().isEmpty()) {

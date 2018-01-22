@@ -98,7 +98,7 @@ help-delFriend: "%lang:helpCommand|/as delfriend|% Delete a friend from a region
 help-linksigns: "%lang:helpCommand|/as linksigns|% Use bulk sign linking mode."
 help-stack: "%lang:helpCommand|/as stack|% Create multiple regions and add them."
 help-setlandlord: "%lang:helpCommand|/as setlandlord|% Set the landlord of a region."
-help-import: "%lang:helpCommand|/as import|% Import region from RegionForSale.%"
+help-import: "%lang:helpCommand|/as import|% Import region from RegionForSale."
 
 rent-help: "/as rent [region], the region you stand in will be used if not specified."
 rent-noPermission: "You don't have permission to rent a region."

@@ -1,13 +1,14 @@
-﻿# ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-# ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop    ║
-# ║ Language: English, Version: V2.4.0, Percentage translated: 100% (source), author: NLThijs48                                ║
-# ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:  ║
-# ║ 1: Make a copy of this file                                                                                                ║
-# ║ 2: Rename it to <servername>.yml (don't use a language code as filename, could otherwise be overwritten in future updates) ║
-# ║ 3: Change the 'language' setting in config.yml to '<servername>', do not include '.yml'                                    ║
-# ║ 4: Change the strings in the new file to your liking and save the file                                                     ║
-# ║ 5: Use '/as reload' or reload/restart your server to see the changes                                                       ║
-# ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+﻿# ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
+# ║ English language file, plugin version 2.5.0
+# ║
+# ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
+# ║   1: Make a copy of this file
+# ║   2: Rename it to `servername.yml`
+# ║   3: Change the `language` setting in config.yml to `servername`, do not include `.yml`
+# ║   4: Change the messages in the new file to your liking
+# ║   5: Use `/as reload`or reload/restart your server to see the changes
+# ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 action: "[gold][bold]<%0%>[/bold]"
 
 button: "[bold]<%0%>[/bold]"

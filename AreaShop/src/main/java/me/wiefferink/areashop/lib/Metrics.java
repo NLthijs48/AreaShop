@@ -270,6 +270,7 @@ public class Metrics {
 
 	/**
 	 * Enables metrics for the server by setting "opt-out" to false in the config file and starting the metrics task.
+	 * @throws IOException when saving the config file fails
 	 */
 	public void enable() throws IOException {
 		// This has to be synchronized or it can collide with the check in the task.
@@ -289,6 +290,7 @@ public class Metrics {
 
 	/**
 	 * Disables metrics for the server by setting "opt-out" to true in the config file and canceling the metrics task.
+	 * @throws IOException when saving the config file fails
 	 */
 	public void disable() throws IOException {
 		// This has to be synchronized or it can collide with the check in the task.
@@ -508,6 +510,8 @@ public class Metrics {
 
 	/**
 	 * GZip compress a string of bytes.
+	 * @param input Content to gzip
+	 * @return byte[] of the gzipped input
 	 */
 	public static byte[] gzip(String input) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -81,7 +81,9 @@ public abstract class WorldGuardInterface {
 	 * Convert string input to a region group flag value.
 	 * @param flag  The flag to parse the input for
 	 * @param input The input
+	 * @param <V> Flag type
 	 * @return The RegionGroup denoted by the input
+	 * @throws InvalidFlagFormat When the input for the flag is incorrect
 	 */
 	public abstract <V> V parseFlagInput(Flag<V> flag, String input) throws InvalidFlagFormat;
 
@@ -90,6 +92,7 @@ public abstract class WorldGuardInterface {
 	 * @param flag  The flag to parse the input for
 	 * @param input The input
 	 * @return The RegionGroup denoted by the input
+	 * @throws InvalidFlagFormat When the input for the flag is incorrect
 	 */
 	public abstract RegionGroup parseFlagGroupInput(RegionGroupFlag flag, String input) throws InvalidFlagFormat;
 }

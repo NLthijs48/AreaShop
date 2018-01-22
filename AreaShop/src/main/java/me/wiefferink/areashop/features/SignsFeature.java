@@ -4,8 +4,10 @@ import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Utils;
+import me.wiefferink.bukkitdo.Do;
 import me.wiefferink.interactivemessenger.processing.Message;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,6 +17,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +30,8 @@ import java.util.Set;
 
 public class SignsFeature extends RegionFeature {
 
-	private static Map<String, RegionSign> allSigns = new HashMap<>();
+	private static Map<String, RegionSign> allSigns = Collections.synchronizedMap(new HashMap<>());
+	private static Map<String, List<RegionSign>> signsByChunk = Collections.synchronizedMap(new HashMap<>());
 
 	private Map<String, RegionSign> signs;
 
@@ -51,6 +57,8 @@ public class SignsFeature extends RegionFeature {
 					continue;
 				}
 				signs.put(sign.getStringLocation(), sign);
+				signsByChunk.computeIfAbsent(sign.getStringChunk(), key -> new ArrayList<>())
+						.add(sign);
 			}
 			allSigns.putAll(signs);
 		}
@@ -76,6 +84,25 @@ public class SignsFeature extends RegionFeature {
 	}
 
 	/**
+	 * Convert a chunk to a string to use as map key.
+	 * @param location The location to get the key for
+	 * @return A string to use in a map for a chunk
+	 */
+	private static String chunkToString(Location location) {
+		return location.getWorld().getName() + ";" + (location.getBlockX() >> 4) + ";" + (location.getBlockZ() >> 4);
+	}
+
+	/**
+	 * Convert a chunk to a string to use as map key.
+	 * Use a Location argument to prevent chunk loading!
+	 * @param chunk The location to get the key for
+	 * @return A string to use in a map for a chunk
+	 */
+	private static String chunkToString(Chunk chunk) {
+		return chunk.getWorld().getName() + ";" + chunk.getX() + ";" + chunk.getZ();
+	}
+
+	/**
 	 * Get a sign by a location.
 	 * @param location The location to get the sign for
 	 * @return The RegionSign that is at the location, or null if none
@@ -87,6 +114,21 @@ public class SignsFeature extends RegionFeature {
 	@EventHandler
 	public void regionUpdate(UpdateRegionEvent event) {
 		event.getRegion().getSignsFeature().update();
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onChunkLoad(ChunkLoadEvent event) {
+		List<RegionSign> chunkSigns = signsByChunk.get(chunkToString(event.getChunk()));
+		if(chunkSigns == null) {
+			return;
+		}
+
+		Do.forAll(chunkSigns, RegionSign::update);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onChunkUnload(ChunkUnloadEvent event) {
+		List<RegionSign> chunkSigns = signsByChunk.get(chunkToString(event.getChunk()));
 	}
 
 	/**
@@ -156,6 +198,8 @@ public class SignsFeature extends RegionFeature {
 		RegionSign sign = new RegionSign(region, i + "");
 		signs.put(sign.getStringLocation(), sign);
 		allSigns.put(sign.getStringLocation(), sign);
+		signsByChunk.computeIfAbsent(sign.getStringChunk(), key -> new ArrayList<>())
+				.add(sign);
 	}
 
 	/**
@@ -213,6 +257,14 @@ public class SignsFeature extends RegionFeature {
 		}
 
 		/**
+		 * Chunk string to be used as key in maps.
+		 * @return Chunk string
+		 */
+		public String getStringChunk() {
+			return chunkToString(getLocation());
+		}
+
+		/**
 		 * Get the region this sign is linked to.
 		 * @return The region this sign is linked to
 		 */
@@ -267,13 +319,19 @@ public class SignsFeature extends RegionFeature {
 		 * @return true if the update was successful, otherwise false
 		 */
 		public boolean update() {
+			// Ignore updates of signs in chunks that are not loaded
+			Location signLocation = getLocation();
+			if(!signLocation.getWorld().isChunkLoaded(signLocation.getBlockX() >> 4, signLocation.getBlockZ() >> 4)) {
+				return false;
+			}
+
 			if(region.isDeleted()) {
 				return false;
 			}
 
 			YamlConfiguration regionConfig = region.getConfig();
 			ConfigurationSection signConfig = getProfile();
-			Block block = getLocation().getBlock();
+			Block block = signLocation.getBlock();
 			if(signConfig == null || !signConfig.isSet(region.getState().getValue())) {
 				block.setType(Material.AIR);
 				return true;

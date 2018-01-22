@@ -181,11 +181,8 @@
         </module>
         <module name="JavadocMethod">
             <property name="scope" value="protected"/>
-            <property name="allowMissingParamTags" value="true"/>
-            <property name="allowMissingThrowsTags" value="true"/>
-            <property name="allowMissingReturnTag" value="true"/>
             <property name="minLineCount" value="2"/>
-            <property name="allowedAnnotations" value="Override, Test"/>
+            <property name="allowedAnnotations" value="Override, Test, EventHandler"/>
             <property name="allowThrowsTagsForSubclasses" value="true"/>
         </module>
         <module name="MethodName">

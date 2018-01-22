@@ -705,6 +705,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 	/**
 	 * Non-static debug to use as implementation of the interface.
+	 * @param message Object parts of the message that should be logged, toString() will be used
 	 */
 	public void debugI(Object... message) {
 		AreaShop.debug(StringUtils.join(message, " "));

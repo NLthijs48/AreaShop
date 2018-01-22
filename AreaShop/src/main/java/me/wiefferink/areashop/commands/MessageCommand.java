@@ -20,7 +20,7 @@ public class MessageCommand extends CommandAreaShop {
 	@Override
 	public String getHelp(CommandSender target) {
 		if(target.hasPermission("areashop.message")) {
-			return "help-message";
+			return null; // Internal command, no need to show in the help list
 		}
 		return null;
 	}

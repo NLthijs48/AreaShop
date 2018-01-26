@@ -2,6 +2,7 @@ package me.wiefferink.areashop.features;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.features.signs.RegionSign;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.areashop.tools.Value;
@@ -29,7 +30,7 @@ public class TeleportFeature extends RegionFeature {
 
 
 	public TeleportFeature(GeneralRegion region) {
-		this.region = region;
+		setRegion(region);
 	}
 
 	/**
@@ -37,7 +38,7 @@ public class TeleportFeature extends RegionFeature {
 	 * @return The teleport location, or null if not set
 	 */
 	public Location getTeleportLocation() {
-		return Utils.configToLocation(region.getConfigurationSectionSetting("general.teleportLocation"));
+		return Utils.configToLocation(getRegion().getConfigurationSectionSetting("general.teleportLocation"));
 	}
 
 	/**
@@ -45,7 +46,7 @@ public class TeleportFeature extends RegionFeature {
 	 * @return true if the region has a teleportlocation, false otherwise
 	 */
 	public boolean hasTeleportLocation() {
-		return region.getConfigurationSectionSetting("general.teleportLocation") != null;
+		return getRegion().getConfigurationSectionSetting("general.teleportLocation") != null;
 	}
 
 	/**
@@ -54,9 +55,9 @@ public class TeleportFeature extends RegionFeature {
 	 */
 	public void setTeleport(Location location) {
 		if(location == null) {
-			region.setSetting("general.teleportLocation", null);
+			getRegion().setSetting("general.teleportLocation", null);
 		} else {
-			region.setSetting("general.teleportLocation", Utils.locationToConfig(location, true));
+			getRegion().setSetting("general.teleportLocation", Utils.locationToConfig(location, true));
 		}
 	}
 
@@ -70,57 +71,57 @@ public class TeleportFeature extends RegionFeature {
 	public boolean teleportPlayer(Player player, boolean toSign, boolean checkRestrictions) {
 
 		// Check basics
-		if(region.getWorld() == null) {
-			region.message(player, "general-noWorld");
+		if(getRegion().getWorld() == null) {
+			getRegion().message(player, "general-noWorld");
 			return false;
 		}
-		if(region.getRegion() == null) {
-			region.message(player, "general-noRegion");
+		if(getRegion().getRegion() == null) {
+			getRegion().message(player, "general-noRegion");
 			return false;
 		}
 
 		if(checkRestrictions) {
 			// Check correct world
-			if(!region.getBooleanSetting("general.teleportCrossWorld") && !player.getWorld().equals(region.getWorld())) {
-				region.message(player, "teleport-wrongWorld", player.getWorld().getName());
+			if(!getRegion().getBooleanSetting("general.teleportCrossWorld") && !player.getWorld().equals(getRegion().getWorld())) {
+				getRegion().message(player, "teleport-wrongWorld", player.getWorld().getName());
 				return false;
 			}
 
-			boolean owner = player.getUniqueId().equals(region.getOwner());
-			boolean friend = region.getFriendsFeature().getFriends().contains(player.getUniqueId());
-			boolean available = region.isAvailable();
+			boolean owner = player.getUniqueId().equals(getRegion().getOwner());
+			boolean friend = getRegion().getFriendsFeature().getFriends().contains(player.getUniqueId());
+			boolean available = getRegion().isAvailable();
 			// Teleport to sign instead if they dont have permission for teleporting to region
 			if((!toSign && owner && !player.hasPermission("areashop.teleport") && player.hasPermission("areashop.teleportsign")
 					|| !toSign && !owner && !friend && !player.hasPermission("areashop.teleportall") && player.hasPermission("areashop.teleportsignall")
 					|| !toSign && !owner && friend && !player.hasPermission("areashop.teleportfriend") && player.hasPermission("areashop.teleportfriendsign")
 					|| !toSign && !owner && !friend && available && !player.hasPermission("areashop.teleportavailable") && player.hasPermission("areashop.teleportavailablesign"))) {
-				region.message(player, "teleport-changedToSign");
+				getRegion().message(player, "teleport-changedToSign");
 				toSign = true;
 			}
 			// Check permissions
 			if(owner && !available && !player.hasPermission("areashop.teleport") && !toSign) {
-				region.message(player, "teleport-noPermission");
+				getRegion().message(player, "teleport-noPermission");
 				return false;
 			} else if(!owner && !available && !player.hasPermission("areashop.teleportall") && !toSign && !friend) {
-				region.message(player, "teleport-noPermissionOther");
+				getRegion().message(player, "teleport-noPermissionOther");
 				return false;
 			} else if(!owner && !available && !player.hasPermission("areashop.teleportfriend") && !toSign && friend) {
-				region.message(player, "teleport-noPermissionFriend");
+				getRegion().message(player, "teleport-noPermissionFriend");
 				return false;
 			} else if(available && !player.hasPermission("areashop.teleportavailable") && !toSign) {
-				region.message(player, "teleport-noPermissionAvailable");
+				getRegion().message(player, "teleport-noPermissionAvailable");
 				return false;
 			} else if(owner && !available && !player.hasPermission("areashop.teleportsign") && toSign) {
-				region.message(player, "teleport-noPermissionSign");
+				getRegion().message(player, "teleport-noPermissionSign");
 				return false;
 			} else if(!owner && !available && !player.hasPermission("areashop.teleportsignall") && toSign && !friend) {
-				region.message(player, "teleport-noPermissionOtherSign");
+				getRegion().message(player, "teleport-noPermissionOtherSign");
 				return false;
 			} else if(!owner && !available && !player.hasPermission("areashop.teleportfriendsign") && toSign && friend) {
-				region.message(player, "teleport-noPermissionFriendSign");
+				getRegion().message(player, "teleport-noPermissionFriendSign");
 				return false;
 			} else if(available && !player.hasPermission("areashop.teleportavailablesign") && toSign) {
-				region.message(player, "teleport-noPermissionAvailableSign");
+				getRegion().message(player, "teleport-noPermissionAvailableSign");
 				return false;
 			}
 		}
@@ -132,18 +133,18 @@ public class TeleportFeature extends RegionFeature {
 
 		boolean insideRegion;
 		if(toSign) {
-			insideRegion = region.getBooleanSetting("general.teleportToSignIntoRegion");
+			insideRegion = getRegion().getBooleanSetting("general.teleportToSignIntoRegion");
 		} else {
-			insideRegion = region.getBooleanSetting("general.teleportIntoRegion");
+			insideRegion = getRegion().getBooleanSetting("general.teleportIntoRegion");
 		}
 
 		// Check locations starting from startLocation and then a cube that increases
 		// radius around that (until no block in the region is found at all cube sides)
 		Location safeLocation = startLocation;
-		ProtectedRegion worldguardRegion = region.getRegion();
+		ProtectedRegion worldguardRegion = getRegion().getRegion();
 		boolean blocksInRegion = worldguardRegion.contains(startLocation.getBlockX(), startLocation.getBlockY(), startLocation.getBlockZ());
 		if(!blocksInRegion && insideRegion) {
-			region.message(player, "teleport-blocked");
+			getRegion().message(player, "teleport-blocked");
 			return false;
 		}
 
@@ -355,24 +356,24 @@ public class TeleportFeature extends RegionFeature {
 		}
 		if(done && isSafe(safeLocation)) {
 			if(toSign) {
-				region.message(player, "teleport-successSign");
+				getRegion().message(player, "teleport-successSign");
 
 				// Let the player look at the sign
 				Vector playerVector = safeLocation.toVector();
 				playerVector.setY(playerVector.getY() + player.getEyeHeight(true));
-				Vector signVector = region.getSignsFeature().getSigns().get(0).getLocation().toVector().add(new Vector(0.5, 0.5, 0.5));
+				Vector signVector = getRegion().getSignsFeature().getSigns().get(0).getLocation().toVector().add(new Vector(0.5, 0.5, 0.5));
 				Vector direction = playerVector.clone().subtract(signVector).normalize();
 				safeLocation.setYaw(180 - (float)Math.toDegrees(Math.atan2(direction.getX(), direction.getZ())));
 				safeLocation.setPitch(90 - (float)Math.toDegrees(Math.acos(direction.getY())));
 			} else {
-				region.message(player, "teleport-success");
+				getRegion().message(player, "teleport-success");
 			}
 
 			player.teleport(safeLocation);
 			AreaShop.debug("Found location: " + safeLocation.toString() + " Tries: " + (checked - 1));
 			return true;
 		} else {
-			region.message(player, "teleport-noSafe", checked - 1, maxTries);
+			getRegion().message(player, "teleport-noSafe", checked - 1, maxTries);
 			AreaShop.debug("No location found, checked " + (checked - 1) + " spots of max " + maxTries);
 			return false;
 		}
@@ -451,10 +452,10 @@ public class TeleportFeature extends RegionFeature {
 	 */
 	private Location getStartLocation(Player player, Value<Boolean> toSign) {
 		Location startLocation = null;
-		ProtectedRegion worldguardRegion = region.getRegion();
+		ProtectedRegion worldguardRegion = getRegion().getRegion();
 
 		// Try to get sign location
-		List<SignsFeature.RegionSign> signs = region.getSignsFeature().getSigns();
+		List<RegionSign> signs = getRegion().getSignsFeature().getSigns();
 		boolean signAvailable = !signs.isEmpty();
 		if(toSign.get()) {
 			if(signAvailable) {
@@ -464,9 +465,9 @@ public class TeleportFeature extends RegionFeature {
 				startLocation.setYaw(player.getLocation().getYaw());
 
 				// Move player x blocks away from the sign
-				double distance = region.getDoubleSetting("general.teleportSignDistance");
+				double distance = getRegion().getDoubleSetting("general.teleportSignDistance");
 				if(distance > 0) {
-					BlockFace facing = region.getSignsFeature().getSigns().get(0).getFacing();
+					BlockFace facing = getRegion().getSignsFeature().getSigns().get(0).getFacing();
 					Vector facingVector = new Vector(facing.getModX(), facing.getModY(), facing.getModZ())
 							.normalize()
 							.multiply(distance);
@@ -476,7 +477,7 @@ public class TeleportFeature extends RegionFeature {
 				}
 			} else {
 				// No sign available
-				region.message(player, "teleport-changedToNoSign");
+				getRegion().message(player, "teleport-changedToNoSign");
 				toSign.set(false);
 			}
 		}
@@ -490,7 +491,7 @@ public class TeleportFeature extends RegionFeature {
 		if(startLocation == null) {
 			// Set to block in the middle, y configured in the config
 			com.sk89q.worldedit.Vector middle = com.sk89q.worldedit.Vector.getMidpoint(worldguardRegion.getMaximumPoint(), worldguardRegion.getMinimumPoint());
-			String configSetting = region.getStringSetting("general.teleportLocationY");
+			String configSetting = getRegion().getStringSetting("general.teleportLocationY");
 			if("bottom".equalsIgnoreCase(configSetting)) {
 				middle = middle.setY(worldguardRegion.getMinimumPoint().getBlockY());
 			} else if("top".equalsIgnoreCase(configSetting)) {
@@ -505,7 +506,7 @@ public class TeleportFeature extends RegionFeature {
 					AreaShop.warn("Could not parse general.teleportLocationY: '" + configSetting + "'");
 				}
 			}
-			startLocation = new Location(region.getWorld(), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
+			startLocation = new Location(getRegion().getWorld(), middle.getX(), middle.getY(), middle.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
 		}
 
 		// Set location in the center of the block

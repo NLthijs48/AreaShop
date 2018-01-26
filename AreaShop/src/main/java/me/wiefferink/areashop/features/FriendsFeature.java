@@ -16,7 +16,7 @@ import java.util.UUID;
 public class FriendsFeature extends RegionFeature {
 
 	public FriendsFeature(GeneralRegion region) {
-		this.region = region;
+		setRegion(region);
 	}
 
 	/**
@@ -27,17 +27,17 @@ public class FriendsFeature extends RegionFeature {
 	 */
 	public boolean addFriend(UUID player, CommandSender by) {
 		// Fire and check event
-		AddedFriendEvent event = new AddedFriendEvent(region, Bukkit.getOfflinePlayer(player), by);
+		AddedFriendEvent event = new AddedFriendEvent(getRegion(), Bukkit.getOfflinePlayer(player), by);
 		Bukkit.getPluginManager().callEvent(event);
 		if(event.isCancelled()) {
 			plugin.message(by, "general-cancelled", event.getReason(), this);
 			return false;
 		}
 
-		Set<String> friends = new HashSet<>(region.getConfig().getStringList("general.friends"));
+		Set<String> friends = new HashSet<>(getRegion().getConfig().getStringList("general.friends"));
 		friends.add(player.toString());
 		List<String> list = new ArrayList<>(friends);
-		region.setSetting("general.friends", list);
+		getRegion().setSetting("general.friends", list);
 		return true;
 	}
 
@@ -49,20 +49,20 @@ public class FriendsFeature extends RegionFeature {
 	 */
 	public boolean deleteFriend(UUID player, CommandSender by) {
 		// Fire and check event
-		DeletedFriendEvent event = new DeletedFriendEvent(region, Bukkit.getOfflinePlayer(player), by);
+		DeletedFriendEvent event = new DeletedFriendEvent(getRegion(), Bukkit.getOfflinePlayer(player), by);
 		Bukkit.getPluginManager().callEvent(event);
 		if(event.isCancelled()) {
 			plugin.message(by, "general-cancelled", event.getReason(), this);
 			return false;
 		}
 
-		Set<String> friends = new HashSet<>(region.getConfig().getStringList("general.friends"));
+		Set<String> friends = new HashSet<>(getRegion().getConfig().getStringList("general.friends"));
 		friends.remove(player.toString());
 		List<String> list = new ArrayList<>(friends);
 		if(list.isEmpty()) {
-			region.setSetting("general.friends", null);
+			getRegion().setSetting("general.friends", null);
 		} else {
-			region.setSetting("general.friends", list);
+			getRegion().setSetting("general.friends", list);
 		}
 		return true;
 	}
@@ -73,7 +73,7 @@ public class FriendsFeature extends RegionFeature {
 	 */
 	public Set<UUID> getFriends() {
 		HashSet<UUID> result = new HashSet<>();
-		for(String friend : region.getConfig().getStringList("general.friends")) {
+		for(String friend : getRegion().getConfig().getStringList("general.friends")) {
 			try {
 				UUID id = UUID.fromString(friend);
 				result.add(id);
@@ -103,7 +103,7 @@ public class FriendsFeature extends RegionFeature {
 	 * Remove all friends that are added to this region.
 	 */
 	public void clearFriends() {
-		region.setSetting("general.friends", null);
+		getRegion().setSetting("general.friends", null);
 	}
 
 }

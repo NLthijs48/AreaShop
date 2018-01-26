@@ -1,43 +1,159 @@
-package me.wiefferink.areashop.listeners;
+package me.wiefferink.areashop.features.signs;
 
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
+import me.wiefferink.areashop.features.RegionFeature;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.bukkitdo.Do;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.material.Sign;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-/**
- * Checks for placement of signs.
- */
-public final class SignChangeListener implements Listener {
-	private AreaShop plugin;
+public class SignsFeature extends RegionFeature {
 
-	/**
-	 * Constructor.
-	 * @param plugin The AreaShop plugin
-	 */
-	public SignChangeListener(AreaShop plugin) {
-		this.plugin = plugin;
+	private static Map<String, RegionSign> allSigns = Collections.synchronizedMap(new HashMap<>());
+	private static Map<String, List<RegionSign>> signsByChunk = Collections.synchronizedMap(new HashMap<>());
+
+	private Map<String, RegionSign> signs;
+
+	public SignsFeature() {
+
 	}
 
 	/**
-	 * Called when a sign is changed.
-	 * @param event The event
+	 * Constructor.
+	 * @param region The region to bind to
 	 */
+	public SignsFeature(GeneralRegion region) {
+		setRegion(region);
+		signs = new HashMap<>();
+		// Setup current signs
+		ConfigurationSection signSection = region.getConfig().getConfigurationSection("general.signs");
+		if(signSection != null) {
+			for(String signKey : signSection.getKeys(false)) {
+				RegionSign sign = new RegionSign(this, signKey);
+				Location location = sign.getLocation();
+				if(location == null) {
+					AreaShop.warn("Sign with key " + signKey + " of region " + region.getName() + " does not have a proper location");
+					continue;
+				}
+				signs.put(sign.getStringLocation(), sign);
+				signsByChunk.computeIfAbsent(sign.getStringChunk(), key -> new ArrayList<>())
+						.add(sign);
+			}
+			allSigns.putAll(signs);
+		}
+	}
+
+	@Override
+	public void shutdown() {
+		// Deregister signs from the registry
+		if(signs != null) {
+			for(Map.Entry<String, RegionSign> entry : signs.entrySet()) {
+				allSigns.remove(entry.getKey());
+				signsByChunk.get(entry.getValue().getStringChunk()).remove(entry.getValue());
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onSignBreak(BlockBreakEvent event) {
+		if(event.isCancelled()) {
+			return;
+		}
+		Block block = event.getBlock();
+		// Check if it is a sign
+		if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
+			// Check if the rent sign is really the same as a saved rent
+			RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
+			if(regionSign == null) {
+				return;
+			}
+			// Remove the sign of the rental region if the player has permission
+			if(event.getPlayer().hasPermission("areashop.delsign")) {
+				regionSign.remove();
+				plugin.message(event.getPlayer(), "delsign-success", regionSign.getRegion());
+			} else { // Cancel the breaking of the sign
+				event.setCancelled(true);
+				plugin.message(event.getPlayer(), "delsign-noPermission", regionSign.getRegion());
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onIndirectSignBreak(BlockPhysicsEvent event) {
+		if(event.getBlock().getType() == Material.SIGN_POST || event.getBlock().getType() == Material.WALL_SIGN) {
+			// Check if the rent sign is really the same as a saved rent
+			if(SignsFeature.getSignByLocation(event.getBlock().getLocation()) != null) {
+				// Cancel the sign breaking, will create a floating sign but at least it is not disconnected/gone
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onSignClick(PlayerInteractEvent event) {
+		if(event.isCancelled()) {
+			return;
+		}
+		Block block = event.getClickedBlock();
+		// Check for clicking a sign and rightclicking
+		if((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK)
+				&& (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN)) {
+			// Check if the rent sign is really the same as a saved rent
+			RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
+			if(regionSign == null) {
+				return;
+			}
+			Player player = event.getPlayer();
+			if(plugin.getSignlinkerManager().isInSignLinkMode(player)) {
+				return;
+			}
+			// Get the clicktype
+			GeneralRegion.ClickType clickType = null;
+			if(player.isSneaking() && event.getAction() == Action.LEFT_CLICK_BLOCK) {
+				clickType = GeneralRegion.ClickType.SHIFTLEFTCLICK;
+			} else if(!player.isSneaking() && event.getAction() == Action.LEFT_CLICK_BLOCK) {
+				clickType = GeneralRegion.ClickType.LEFTCLICK;
+			} else if(player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+				clickType = GeneralRegion.ClickType.SHIFTRIGHTCLICK;
+			} else if(!player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+				clickType = GeneralRegion.ClickType.RIGHTCLICK;
+			}
+			// Run the commands
+			boolean ran = regionSign.runSignCommands(player, clickType);
+			// Only cancel event if at least one command has been executed
+			event.setCancelled(ran);
+		}
+	}
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onSignChange(SignChangeEvent event) {
 		if(event.isCancelled()) {
@@ -146,7 +262,7 @@ public final class SignChangeListener implements Listener {
 				if(durationSet) {
 					rent.setDuration(thirdLine);
 				}
-				Sign sign = (Sign)event.getBlock().getState().getData();
+				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
 				rent.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
 
 				// Run commands
@@ -249,7 +365,7 @@ public final class SignChangeListener implements Listener {
 				if(priceSet) {
 					buy.setPrice(price);
 				}
-				Sign sign = (Sign)event.getBlock().getState().getData();
+				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
 				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
 				// Run commands
 				buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
@@ -294,7 +410,7 @@ public final class SignChangeListener implements Listener {
 				}
 				region = regions.get(0);
 			}
-			Sign sign = (Sign)event.getBlock().getState().getData();
+			org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
 			if(thirdLine == null || thirdLine.length() == 0) {
 				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
 				plugin.message(player, "addsign-success", region);
@@ -307,36 +423,181 @@ public final class SignChangeListener implements Listener {
 			Do.sync(region::update);
 		}
 	}
+
+	/**
+	 * Convert a location to a string to use as map key.
+	 * @param location The location to get the key for
+	 * @return A string to use in a map for a location
+	 */
+	public static String locationToString(Location location) {
+		return location.getWorld().getName() + ";" + location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ();
+	}
+
+	/**
+	 * Convert a chunk to a string to use as map key.
+	 * @param location The location to get the key for
+	 * @return A string to use in a map for a chunk
+	 */
+	public static String chunkToString(Location location) {
+		return location.getWorld().getName() + ";" + (location.getBlockX() >> 4) + ";" + (location.getBlockZ() >> 4);
+	}
+
+	/**
+	 * Convert a chunk to a string to use as map key.
+	 * Use a Location argument to prevent chunk loading!
+	 * @param chunk The location to get the key for
+	 * @return A string to use in a map for a chunk
+	 */
+	public static String chunkToString(Chunk chunk) {
+		return chunk.getWorld().getName() + ";" + chunk.getX() + ";" + chunk.getZ();
+	}
+
+	/**
+	 * Get a sign by a location.
+	 * @param location The location to get the sign for
+	 * @return The RegionSign that is at the location, or null if none
+	 */
+	public static RegionSign getSignByLocation(Location location) {
+		return allSigns.get(locationToString(location));
+	}
+
+	/**
+	 * Get the map with all signs.
+	 * @return Map with all signs: locationString -> RegionSign
+	 */
+	public static Map<String, RegionSign> getAllSigns() {
+		return allSigns;
+	}
+
+	/**
+	 * Get the map with signs by chunk.
+	 * @return Map with signs by chunk: chunkString -> List of RegionSign
+	 */
+	public static Map<String, List<RegionSign>> getSignsByChunk() {
+		return signsByChunk;
+	}
+
+	@EventHandler
+	public void regionUpdate(UpdateRegionEvent event) {
+		event.getRegion().getSignsFeature().update();
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onChunkLoad(ChunkLoadEvent event) {
+		List<RegionSign> chunkSigns = signsByChunk.get(chunkToString(event.getChunk()));
+		if(chunkSigns == null) {
+			return;
+		}
+
+		Do.forAll(chunkSigns, RegionSign::update);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onChunkUnload(ChunkUnloadEvent event) {
+		List<RegionSign> chunkSigns = signsByChunk.get(chunkToString(event.getChunk()));
+	}
+
+	/**
+	 * Update all signs connected to this region.
+	 * @return true if all signs are updated correctly, false if one or more updates failed
+	 */
+	public boolean update() {
+		boolean result = true;
+		for(RegionSign sign : signs.values()) {
+			result = result & sign.update();
+		}
+		return result;
+	}
+
+	/**
+	 * Check if any of the signs need periodic updating.
+	 * @return true if one or more of the signs need periodic updating, otherwise false
+	 */
+	public boolean needsPeriodicUpdate() {
+		boolean result = false;
+		for(RegionSign sign : signs.values()) {
+			result = result | sign.needsPeriodicUpdate();
+		}
+		return result;
+	}
+
+	/**
+	 * Get the signs of this region.
+	 * @return List of signs
+	 */
+	public List<RegionSign> getSigns() {
+		return Collections.unmodifiableList(new ArrayList<>(signs.values()));
+	}
+
+	/**
+	 * Get the signs of this region.
+	 * @return Map with signs: locationString -> RegionSign
+	 */
+	Map<String, RegionSign> getSignsRef() {
+		return signs;
+	}
+
+	/**
+	 * Get a list with all sign locations.
+	 * @return A List with all sign locations
+	 */
+	public List<Location> getSignLocations() {
+		List<Location> result = new ArrayList<>();
+		for(RegionSign sign : signs.values()) {
+			result.add(sign.getLocation());
+		}
+		return result;
+	}
+
+	/**
+	 * Add a sign to this region.
+	 * @param location The location of the sign
+	 * @param signType The type of the sign (WALL_SIGN or SIGN_POST)
+	 * @param facing   The orientation of the sign
+	 * @param profile  The profile to use with this sign (null for default)
+	 */
+	public void addSign(Location location, Material signType, BlockFace facing, String profile) {
+		int i = 0;
+		while(getRegion().getConfig().isSet("general.signs." + i)) {
+			i++;
+		}
+		String signPath = "general.signs." + i + ".";
+		getRegion().setSetting(signPath + "location", Utils.locationToConfig(location));
+		getRegion().setSetting(signPath + "facing", facing != null ? facing.name() : null);
+		getRegion().setSetting(signPath + "signType", signType != null ? signType.name() : null);
+		if(profile != null && profile.length() != 0) {
+			getRegion().setSetting(signPath + "profile", profile);
+		}
+		// Add to the map
+		RegionSign sign = new RegionSign(this, i + "");
+		signs.put(sign.getStringLocation(), sign);
+		allSigns.put(sign.getStringLocation(), sign);
+		signsByChunk.computeIfAbsent(sign.getStringChunk(), key -> new ArrayList<>())
+				.add(sign);
+	}
+
+	/**
+	 * Checks if there is a sign from this region at the specified location.
+	 * @param location Location to check
+	 * @return true if this region has a sign at the location, otherwise false
+	 */
+	public boolean isSignOfRegion(Location location) {
+		Set<String> signs;
+		if(getRegion().getConfig().getConfigurationSection("general.signs") == null) {
+			return false;
+		}
+		signs = getRegion().getConfig().getConfigurationSection("general.signs").getKeys(false);
+		for(String sign : signs) {
+			Location signLocation = Utils.configToLocation(getRegion().getConfig().getConfigurationSection("general.signs." + sign + ".location"));
+			if(signLocation != null
+					&& signLocation.getWorld().equals(location.getWorld())
+					&& signLocation.getBlockX() == location.getBlockX()
+					&& signLocation.getBlockY() == location.getBlockY()
+					&& signLocation.getBlockZ() == location.getBlockZ()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

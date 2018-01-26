@@ -4,9 +4,9 @@ import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.features.DebugFeature;
 import me.wiefferink.areashop.features.FriendsFeature;
 import me.wiefferink.areashop.features.RegionFeature;
-import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.features.TeleportFeature;
 import me.wiefferink.areashop.features.WorldGuardRegionFlagsFeature;
+import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
 
 import java.lang.reflect.Constructor;
@@ -45,7 +45,7 @@ public class FeatureManager extends Manager {
 					feature.listen();
 					globalFeatures.add(feature);
 				} catch(InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
-					AreaShop.error("Failed to instantiate global feature:", clazz);
+					AreaShop.error("Failed to instantiate global feature:", clazz, e);
 				}
 			} catch(NoSuchMethodException e) {
 				// Feature does not have a global part
@@ -80,7 +80,7 @@ public class FeatureManager extends Manager {
 		try {
 			return regionFeatureConstructors.get(featureClazz).newInstance(region);
 		} catch(InstantiationException | InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
-			AreaShop.error("Failed to instanciate feature", featureClazz, "for region", region);
+			AreaShop.error("Failed to instanciate feature", featureClazz, "for region", region, e, e.getCause());
 		}
 		return null;
 	}

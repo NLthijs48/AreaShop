@@ -1,6 +1,7 @@
 package me.wiefferink.areashop.commands;
 
-import me.wiefferink.areashop.features.SignsFeature;
+import me.wiefferink.areashop.features.signs.RegionSign;
+import me.wiefferink.areashop.features.signs.SignsFeature;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -50,7 +51,7 @@ public class DelsignCommand extends CommandAreaShop {
 			plugin.message(sender, "delsign-noSign");
 			return;
 		}
-		SignsFeature.RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
+		RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
 		if(regionSign == null) {
 			plugin.message(sender, "delsign-noRegion");
 			return;

@@ -1,7 +1,8 @@
 package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
-import me.wiefferink.areashop.features.SignsFeature;
+import me.wiefferink.areashop.features.signs.RegionSign;
+import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Material;
@@ -86,7 +87,7 @@ public class AddsignCommand extends CommandAreaShop {
 				return;
 			}
 		}
-		SignsFeature.RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
+		RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
 		if(regionSign != null) {
 			plugin.message(sender, "addsign-alreadyRegistered", regionSign.getRegion());
 			return;

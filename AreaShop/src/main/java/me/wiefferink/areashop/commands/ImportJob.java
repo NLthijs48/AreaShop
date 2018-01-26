@@ -5,7 +5,8 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import javafx.util.Pair;
 import me.wiefferink.areashop.AreaShop;
-import me.wiefferink.areashop.features.SignsFeature;
+import me.wiefferink.areashop.features.signs.RegionSign;
+import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RegionGroup;
@@ -253,6 +254,7 @@ public class ImportJob {
 				// Get existing owners and members
 				List<UUID> existing = new ArrayList<>();
 				if(owner != null) {
+					@SuppressWarnings("deprecation")
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
 					if(offlinePlayer != null) {
 						existing.add(offlinePlayer.getUniqueId());
@@ -387,7 +389,7 @@ public class ImportJob {
 				}
 
 				// Check if this location is already added to a region
-				SignsFeature.RegionSign regionSign = SignsFeature.getSignByLocation(location);
+				RegionSign regionSign = SignsFeature.getSignByLocation(location);
 				if(regionSign != null) {
 					if(!regionSign.getRegion().equals(region)) {
 						message("import-signAlreadyAdded", region.getName(), signLocation, regionSign.getRegion().getName());

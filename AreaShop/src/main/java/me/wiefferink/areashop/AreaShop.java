@@ -6,9 +6,6 @@ import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
 import me.wiefferink.areashop.listeners.PlayerLoginLogoutListener;
-import me.wiefferink.areashop.listeners.SignBreakListener;
-import me.wiefferink.areashop.listeners.SignChangeListener;
-import me.wiefferink.areashop.listeners.SignClickListener;
 import me.wiefferink.areashop.managers.CommandManager;
 import me.wiefferink.areashop.managers.FeatureManager;
 import me.wiefferink.areashop.managers.FileManager;
@@ -287,9 +284,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			managers.add(featureManager);
 
 			// Register the event listeners
-			getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
-			getServer().getPluginManager().registerEvents(new SignBreakListener(this), this);
-			getServer().getPluginManager().registerEvents(new SignClickListener(this), this);
 			getServer().getPluginManager().registerEvents(new PlayerLoginLogoutListener(this), this);
 
 			setupTasks();

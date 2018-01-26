@@ -7,10 +7,26 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 public abstract class RegionFeature implements Listener {
-	static final AreaShop plugin = AreaShop.getInstance();
+	public static final AreaShop plugin = AreaShop.getInstance();
 
 	public YamlConfiguration config = plugin.getConfig();
-	GeneralRegion region;
+	private GeneralRegion region;
+
+	/**
+	 * Set the region for this feature.
+	 * @param region Feature region
+	 */
+	public void setRegion(GeneralRegion region) {
+		this.region = region;
+	}
+
+	/**
+	 * Get the region of this feature.
+	 * @return region of this feature, or null if generic
+	 */
+	public GeneralRegion getRegion() {
+		return region;
+	}
 
 	/**
 	 * Start listening to events.

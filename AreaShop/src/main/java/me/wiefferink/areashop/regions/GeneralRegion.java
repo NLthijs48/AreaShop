@@ -10,8 +10,8 @@ import me.wiefferink.areashop.events.NotifyRegionEvent;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
 import me.wiefferink.areashop.features.FriendsFeature;
 import me.wiefferink.areashop.features.RegionFeature;
-import me.wiefferink.areashop.features.SignsFeature;
 import me.wiefferink.areashop.features.TeleportFeature;
+import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.tools.Utils;
@@ -257,6 +257,11 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		return region instanceof GeneralRegion && ((GeneralRegion)region).getName().equals(getName());
 	}
 
+	@Override
+	public int hashCode() {
+		return getName().hashCode();
+	}
+
 	/**
 	 * Get the config file that is used to store the region information.
 	 * @return The config file that stores the region information
@@ -440,6 +445,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 		String landlordName = getStringSetting("general.landlordName");
 		if(landlordName != null && !landlordName.isEmpty()) {
+			@SuppressWarnings("deprecation")
 			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(landlordName);
 			if(offlinePlayer != null) {
 				return offlinePlayer.getUniqueId();

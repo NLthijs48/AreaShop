@@ -463,7 +463,7 @@ public class SignsFeature extends RegionFeature {
 
 	/**
 	 * Get the map with all signs.
-	 * @return Map with all signs: locationString -> RegionSign
+	 * @return Map with all signs: locationString -&gt; RegionSign
 	 */
 	public static Map<String, RegionSign> getAllSigns() {
 		return allSigns;
@@ -471,7 +471,7 @@ public class SignsFeature extends RegionFeature {
 
 	/**
 	 * Get the map with signs by chunk.
-	 * @return Map with signs by chunk: chunkString -> List of RegionSign
+	 * @return Map with signs by chunk: chunkString -&gt; List&lt;RegionSign&gt;
 	 */
 	public static Map<String, List<RegionSign>> getSignsByChunk() {
 		return signsByChunk;
@@ -531,7 +531,7 @@ public class SignsFeature extends RegionFeature {
 
 	/**
 	 * Get the signs of this region.
-	 * @return Map with signs: locationString -> RegionSign
+	 * @return Map with signs: locationString -&gt; RegionSign
 	 */
 	Map<String, RegionSign> getSignsRef() {
 		return signs;

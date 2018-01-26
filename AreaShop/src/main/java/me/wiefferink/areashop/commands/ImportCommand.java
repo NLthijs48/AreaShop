@@ -1,5 +1,6 @@
 package me.wiefferink.areashop.commands;
 
+import me.wiefferink.interactivemessenger.processing.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -46,6 +47,10 @@ public class ImportCommand extends CommandAreaShop {
 
 		if(!"RegionForSale".equalsIgnoreCase(args[1])) {
 			plugin.message(sender, "import-wrongSource");
+			return;
+		}
+
+		if(!confirm(sender, args, Message.fromKey("import-confirm"))) {
 			return;
 		}
 

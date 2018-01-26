@@ -1,10 +1,14 @@
 package me.wiefferink.areashop.commands;
 
+import javafx.util.Pair;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.interactivemessenger.processing.Message;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +19,11 @@ public abstract class CommandAreaShop {
 
 	AreaShop plugin = AreaShop.getInstance();
 
-	private Map<String, Long> confirmed;
+	private Map<String, Pair<String, Long>> lastUsed;
+
+	public CommandAreaShop() {
+		lastUsed = new HashMap<>();
+	}
 
 	/**
 	 * Check if this Command instance can execute the given command and arguments.
@@ -24,10 +32,7 @@ public abstract class CommandAreaShop {
 	 * @return true if it can execute the command, false otherwise
 	 */
 	public boolean canExecute(Command command, String[] args) {
-		String commandString = command.getName();
-		for(String argument : args) {
-			commandString += " " + argument;
-		}
+		String commandString = command.getName() + " " + StringUtils.join(args, " ");
 		if(commandString.length() > getCommandStart().length()) {
 			return commandString.toLowerCase().startsWith(getCommandStart().toLowerCase() + " ");
 		}
@@ -65,5 +70,24 @@ public abstract class CommandAreaShop {
 	 */
 	public abstract void execute(CommandSender sender, String[] args);
 
+	/**
+	 * Confirm a command.
+	 * @param sender To confirm it for, or send a message to confirm
+	 * @param args Command args
+	 * @param message Message to send when confirmation is required
+	 * @return true if confirmed, false if confirmation is required
+	 */
+	public boolean confirm(CommandSender sender, String[] args, Message message) {
+		String command = "/" + getCommandStart() + " " + StringUtils.join(args, " ", 1, args.length);
+		long now = System.currentTimeMillis();
+		Pair<String, Long> last = lastUsed.get(sender.getName());
+		if(last != null && last.getKey().equalsIgnoreCase(command) && last.getValue() > (now - 1000 * 60)) {
+			return true;
+		}
+
+		message.prefix().append(Message.fromKey("confirm-yes").replacements(command)).send(sender);
+		lastUsed.put(sender.getName(), new Pair<>(command, now));
+		return false;
+	}
 
 }

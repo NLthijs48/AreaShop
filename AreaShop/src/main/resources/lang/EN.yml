@@ -47,6 +47,8 @@ landlord:
 
 total-maximum: "You can't rent and buy more than %0% region(s) in total (you already have %1% in group '%2%')."
 
+confirm-yes: " [gray]Click to %lang:command|Confirm|%0%|%[gray], or repeat the command."
+
 general-notReady: "AreaShop has not fully loaded yet, please wait."
 general-noWorld: "You cannot do that, the world of %lang:region% is currently unavailable (world '%world%')."
 general-noRegion: "You cannot do that, the WorldGuard region is currently unavailable (region %lang:region%)."
@@ -545,6 +547,7 @@ import-help: "/as import RegionForSale"
 import-wrongSource: "Specify from where you want to import data, options: RegionForSale."
 import-noPluginFolder: "Could not find the %0% folder, are you sure you are importing from the correct source?"
 import-noWorldsFolder: "There is no 'plugins/RegionForSale/worlds' folder, therefore nothing could be imported."
+import-confirm: "Are you sure you want to import all regions from RegionForSale?"
 import-start: "Starting import of RegionForSale data:"
 import-doWorld: "[darkgreen][bold]► World %0%:"
 import-noBukkitWorld: "[red]Could not find world in Bukkit."

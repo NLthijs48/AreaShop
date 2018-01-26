@@ -191,7 +191,7 @@ public class StackCommand extends CommandAreaShop {
 						manager.addRegion(region);
 						// Add the region to AreaShop
 						if(rentRegions) {
-							RentRegion rent = new RentRegion(region.getId(), selection.getWorld());
+							RentRegion rent = new RentRegion(regionName, selection.getWorld());
 							if(finalGroup != null) {
 								finalGroup.addMember(rent);
 							}
@@ -201,7 +201,7 @@ public class StackCommand extends CommandAreaShop {
 							rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 							rent.update();
 						} else {
-							BuyRegion buy = new BuyRegion(region.getId(), selection.getWorld());
+							BuyRegion buy = new BuyRegion(regionName, selection.getWorld());
 							if(finalGroup != null) {
 								finalGroup.addMember(buy);
 							}

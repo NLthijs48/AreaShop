@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract class for generalising command classes.
@@ -13,6 +14,8 @@ import java.util.List;
 public abstract class CommandAreaShop {
 
 	AreaShop plugin = AreaShop.getInstance();
+
+	private Map<String, Long> confirmed;
 
 	/**
 	 * Check if this Command instance can execute the given command and arguments.

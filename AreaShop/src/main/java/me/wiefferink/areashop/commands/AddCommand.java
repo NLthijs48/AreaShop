@@ -16,9 +16,12 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class AddCommand extends CommandAreaShop {
 
@@ -52,7 +55,7 @@ public class AddCommand extends CommandAreaShop {
 			plugin.message(sender, "add-help");
 			return;
 		}
-		List<ProtectedRegion> regions = new ArrayList<>();
+		Map<String, ProtectedRegion> regions = new HashMap<>();
 		World world;
 		Player player = null;
 		if(sender instanceof Player) {
@@ -69,7 +72,7 @@ public class AddCommand extends CommandAreaShop {
 				return;
 			}
 			world = selection.getWorld();
-			regions = Utils.getWorldEditRegionsInSelection(selection);
+			regions = Utils.getWorldEditRegionsInSelection(selection).stream().collect(Collectors.toMap(ProtectedRegion::getId, region -> region));
 			if(regions.size() == 0) {
 				plugin.message(player, "cmd-noWERegionsFound");
 				return;
@@ -102,10 +105,10 @@ public class AddCommand extends CommandAreaShop {
 				plugin.message(sender, "cmd-noRegion", args[2]);
 				return;
 			}
-			regions.add(region);
+			regions.put(args[2], region);
 		}
 		final boolean isRent = "rent".equals(args[1].toLowerCase());
-		final List<ProtectedRegion> finalRegions = regions;
+		final Map<String, ProtectedRegion> finalRegions = regions;
 		final Player finalPlayer = player;
 		final World finalWorld = world;
 		AreaShop.debug("Starting add task with " + regions.size() + " regions");
@@ -116,8 +119,10 @@ public class AddCommand extends CommandAreaShop {
 		TreeSet<String> namesNoPermission = new TreeSet<>();
 		Do.forAll(
 			plugin.getConfig().getInt("adding.regionsPerTick"),
-			regions,
-			region -> {
+			regions.entrySet(),
+			regionEntry -> {
+				String regionName = regionEntry.getKey();
+				ProtectedRegion region = regionEntry.getValue();
 				// Determine if the player is an owner or member of the region
 				boolean isMember = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
 				boolean isOwner = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
@@ -129,11 +134,11 @@ public class AddCommand extends CommandAreaShop {
 				}
 				FileManager.AddResult result = plugin.getFileManager().checkRegionAdd(sender, region, isRent ? GeneralRegion.RegionType.RENT : GeneralRegion.RegionType.BUY);
 				if(result == FileManager.AddResult.ALREADYADDED) {
-					regionsAlready.add(plugin.getFileManager().getRegion(region.getId()));
+					regionsAlready.add(plugin.getFileManager().getRegion(regionName));
 				} else if(result == FileManager.AddResult.BLACKLISTED) {
-					namesBlacklisted.add(region.getId());
+					namesBlacklisted.add(regionName);
 				} else if(result == FileManager.AddResult.NOPERMISSION) {
-					namesNoPermission.add(region.getId());
+					namesNoPermission.add(regionName);
 				} else {
 					// Check if the player should be landlord
 					boolean landlord = (!sender.hasPermission("areashop.create" + type)
@@ -143,7 +148,7 @@ public class AddCommand extends CommandAreaShop {
 					existing.addAll(plugin.getWorldGuardHandler().getOwners(region).asUniqueIdList());
 					existing.addAll(plugin.getWorldGuardHandler().getMembers(region).asUniqueIdList());
 					if(isRent) {
-						RentRegion rent = new RentRegion(region.getId(), finalWorld);
+						RentRegion rent = new RentRegion(regionName, finalWorld);
 						// Set landlord
 						if(landlord) {
 							rent.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
@@ -186,7 +191,7 @@ public class AddCommand extends CommandAreaShop {
 
 						regionsSuccess.add(rent);
 					} else {
-						BuyRegion buy = new BuyRegion(region.getId(), finalWorld);
+						BuyRegion buy = new BuyRegion(regionName, finalWorld);
 						// Set landlord
 						if(landlord) {
 							buy.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());

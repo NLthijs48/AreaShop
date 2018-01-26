@@ -1,5 +1,6 @@
 package me.wiefferink.areashop.features.signs;
 
+import com.google.common.base.Objects;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Utils;
@@ -244,6 +245,6 @@ public class RegionSign {
 
 	@Override
 	public int hashCode() {
-		return key.hashCode();
+		return Objects.hashCode(key, getRegion().getName());
 	}
 }

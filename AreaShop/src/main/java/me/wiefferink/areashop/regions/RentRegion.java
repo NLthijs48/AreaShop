@@ -704,11 +704,11 @@ public class RentRegion extends GeneralRegion {
 			}
 		}
 
-		// Update the signs and region flags
-		handleSchematicEvent(RegionEvent.UNRENTED);
-
 		// Send messages
 		message(executor, "unrent-unrented");
+
+		// Handle schematic save/restore (while %uuid% is still available)
+		handleSchematicEvent(RegionEvent.UNRENTED);
 
 		// Remove friends, the owner and renteduntil values
 		getFriendsFeature().clearFriends();

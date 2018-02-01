@@ -523,6 +523,9 @@ public class BuyRegion extends GeneralRegion {
 
 		message(executor, "sell-sold");
 
+		// Handle schematic save/restore (while %uuid% is still available)
+		handleSchematicEvent(RegionEvent.SOLD);
+
 		// Remove friends and the owner
 		getFriendsFeature().clearFriends();
 		UUID oldBuyer = getBuyer();
@@ -531,9 +534,6 @@ public class BuyRegion extends GeneralRegion {
 
 		// Notify about updates
 		this.notifyAndUpdate(new SoldRegionEvent(this, oldBuyer, Math.max(moneyBack, 0)));
-
-		// Update everything
-		handleSchematicEvent(RegionEvent.SOLD);
 
 		// Run commands
 		this.runEventCommands(RegionEvent.SOLD, false);

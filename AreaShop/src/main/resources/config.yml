@@ -33,15 +33,24 @@ signTags:
 moneyCharacter: '$'
 # The characters displayed after a price.
 moneyCharacterAfter: ''
-# How many numbers behind the dot should be shown (2 will make numbers like '8.55', '9.01', '5.20').
-fractionalNumbers: 2
-# Set this to true if you want to hide '.0' for a number like '15.0' ('4.50' will still stay '4.50').
-hideEmptyFractionalPart: true
-# Use metric suffixes if the price is above this number (use 1.00M instead of 1000000.00 etc.), use -1 to disable.
-# Indications are used as defined on: http://en.wikipedia.org/wiki/Metric_prefix, implemented from 'k' to 'Y'.
-metricSuffixesAbove: 1000000.0
 # The character(s) to use as decimal mark.
 decimalMark: '.'
+# How many numbers behind the dot should be shown (2 will make numbers like '8.55', '9.01', '5.20').
+fractionalNumbers: 2
+# How many numbers behind the dot should be shown when using a metric symbol suffix.
+fractionalNumbersShort: 3
+# Set this to true if you want to hide '.0' for a number like '15.0' ('4.50' will still stay '4.50').
+hideEmptyFractionalPart: true
+# Use a suffix if the price is above a certain number (use 1.00M instead of 1000000.00 etc.)
+metricSymbols:
+  #1000: "k"
+  1000000: "M"
+  1000000000: "G"
+  1000000000000: "T"
+  1000000000000000: "P"
+  1000000000000000000: "E"
+  1000000000000000000000: "Z"
+  1000000000000000000000000: "Y"
 
 
 # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

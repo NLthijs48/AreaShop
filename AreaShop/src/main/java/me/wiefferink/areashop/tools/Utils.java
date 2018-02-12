@@ -9,6 +9,7 @@ import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.interactivemessenger.Log;
 import me.wiefferink.interactivemessenger.processing.Message;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
@@ -17,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -31,8 +33,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -52,6 +56,7 @@ public class Utils {
 	private static Set<String> months;
 	private static Set<String> years;
 	private static ScriptEngine scriptEngine;
+	private static Map<Double, String> suffixes;
 
 	/**
 	 * Initialize the utilities class with constants.
@@ -77,6 +82,28 @@ public class Utils {
 		identifiers.addAll(weeks);
 		identifiers.addAll(months);
 		identifiers.addAll(years);
+
+		suffixes = new HashMap<>();
+		// This stuff should not be necessary, but it is, getConfigurationSection() does not do proper fallback to defaults!
+		// TODO: Create a custom configuration that fixes this behavior
+		ConfigurationSection suffixesSection = null;
+		if(config.isSet("metricSymbols")) {
+			suffixesSection = config.getConfigurationSection("metricSymbols");
+		} else {
+			Configuration defaults = config.getDefaults();
+			if(defaults != null) {
+				suffixesSection = defaults.getConfigurationSection("metricSymbols");
+			}
+		}
+		if(suffixesSection != null) {
+			for(String key : suffixesSection.getKeys(false)) {
+				try {
+					suffixes.put(Double.parseDouble(key), suffixesSection.getString(key));
+				} catch(NumberFormatException e) {
+					Log.warn("Key '" + key + "' in the metricSymbols section of config.yml is not a number!");
+				}
+			}
+		}
 	}
 
 	/**
@@ -499,47 +526,40 @@ public class Utils {
 		} else if(Double.isNaN(amount)) {
 			result = "NaN";
 		} else {
-			// Add metric
-			double metricAbove = config.getDouble("metricSuffixesAbove");
-			if(metricAbove != -1 && amount >= metricAbove) {
-				if(amount >= 1000000000000000000000000.0) {
-					amount = amount / 1000000000000000000000000.0;
-					after = "Y" + after;
-				} else if(amount >= 1000000000000000000000.0) {
-					amount = amount / 1000000000000000000000.0;
-					after = "Z" + after;
-				} else if(amount >= 1000000000000000000.0) {
-					amount = amount / 1000000000000000000.0;
-					after = "E" + after;
-				} else if(amount >= 1000000000000000.0) {
-					amount = amount / 1000000000000000.0;
-					after = "P" + after;
-				} else if(amount >= 1000000000000.0) {
-					amount = amount / 1000000000000.0;
-					after = "T" + after;
-				} else if(amount >= 1000000000.0) {
-					amount = amount / 1000000000.0;
-					after = "G" + after;
-				} else if(amount >= 1000000.0) {
-					amount = amount / 1000000.0;
-					after = "M" + after;
-				} else if(amount >= 1000.0) {
-					amount = amount / 1000.0;
-					after = "k" + after;
+			BigDecimal bigDecimal = BigDecimal.valueOf(amount);
+			boolean stripTrailingZeros = false;
+			int fractionalNumber = config.getInt("fractionalNumbers");
+			// Add metric suffix if necessary
+			if(config.getDouble("metricSuffixesAbove") != -1) {
+				String suffix = null;
+				double divider = 1;
+				for(Double number : suffixes.keySet()) {
+					if(amount >= number && number > divider) {
+						divider = number;
+						suffix = suffixes.get(number);
+					}
 				}
-				BigDecimal bigDecimal = new BigDecimal(amount);
-				if(bigDecimal.toString().contains(".")) {
-					int frontLength = bigDecimal.toString().substring(0, bigDecimal.toString().indexOf('.')).length();
-					bigDecimal = bigDecimal.setScale(config.getInt("fractionalNumbers") + (3 - frontLength), RoundingMode.HALF_UP);
+				if(suffix != null) {
+					bigDecimal = BigDecimal.valueOf(amount / divider);
+					after = suffix + after;
+					fractionalNumber = config.getInt("fractionalNumbersShort");
+					stripTrailingZeros = true;
 				}
-				result = bigDecimal.toString();
-			} else {
-				BigDecimal bigDecimal = new BigDecimal(amount);
-				bigDecimal = bigDecimal.setScale(config.getInt("fractionalNumbers"), RoundingMode.HALF_UP);
-				amount = bigDecimal.doubleValue();
-				result = bigDecimal.toString();
-				if(config.getBoolean("hideEmptyFractionalPart") && (amount % 1.0) == 0.0 && result.contains(".")) {
+			}
+
+			// Round if necessary
+			if(fractionalNumber >= 0) {
+				bigDecimal = bigDecimal.setScale(fractionalNumber, RoundingMode.HALF_UP);
+			}
+			result = bigDecimal.toString();
+			if(config.getBoolean("hideEmptyFractionalPart")) {
+				// Strip zero fractional: 12.00 -> 12
+				if(bigDecimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0 && result.contains(".")) {
 					result = result.substring(0, result.indexOf('.'));
+				}
+				// Strip zeros from suffixed numbers: 1.20M -> 1.2M
+				if(stripTrailingZeros && result.contains(".")) {
+					result = result.replaceAll("0+$", "");
 				}
 			}
 		}

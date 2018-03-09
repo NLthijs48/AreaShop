@@ -27,7 +27,6 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -490,11 +489,6 @@ public class SignsFeature extends RegionFeature {
 		}
 
 		Do.forAll(chunkSigns, RegionSign::update);
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onChunkUnload(ChunkUnloadEvent event) {
-		List<RegionSign> chunkSigns = signsByChunk.get(chunkToString(event.getChunk()));
 	}
 
 	/**

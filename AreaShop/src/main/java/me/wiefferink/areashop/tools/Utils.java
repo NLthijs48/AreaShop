@@ -564,7 +564,10 @@ public class Utils {
 			}
 		}
 		result = result.replace(".", config.getString("decimalMark"));
-		return before + result + after;
+		Message resultMessage = Message.fromString(result);
+		resultMessage.prepend(before);
+		resultMessage.append(after);
+		return resultMessage.getSingle();
 	}
 
 

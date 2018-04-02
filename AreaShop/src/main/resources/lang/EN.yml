@@ -156,8 +156,8 @@ sell-noPermission: "You don't have permission to sell a region."
 sell-noPermissionOther: "You don't have permission to sell another region."
 
 reload-reloading: "Reloaded all configuration and region files."
-reload-updateStart: "[gray]Updating %0% regions at %1% per second."
-reload-updateComplete: "[gray]Updating regions complete."
+reload-updateStart: ""
+reload-updateComplete: ""
 reload-noPermission: "You don't have permission to reload the config files."
 reload-updateCommandChanged: "'/as updaterents' and '/as updatebuys' have been removed, '/as reload' will also update the regions now so use that command instead."
 

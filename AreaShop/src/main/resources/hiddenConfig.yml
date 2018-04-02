@@ -25,7 +25,7 @@ expireWarning:
   regionsPerTick: 5
 # Timings for updating signs and region flags ('/as reload' or after '/as groupadd' or '/as groupdel').
 update:
-  regionsPerTick: 5
+  regionsPerTick: 10
 # Time between checking if any regions need to be unrented because the player was not online for the specified time period.
 inactive:
   delay: '17 minutes'

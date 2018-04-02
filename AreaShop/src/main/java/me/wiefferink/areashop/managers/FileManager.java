@@ -1030,7 +1030,7 @@ public class FileManager extends Manager {
 				}
 			}
 			List<String> noWorldNames = new ArrayList<>();
-			for(GeneralRegion region : noRegion) {
+			for(GeneralRegion region : toDisplay) {
 				noWorldNames.add(region.getName());
 			}
 			AreaShop.warn("World " + missingWorld + " is not loaded, the following AreaShop regions are not functional now: " + Utils.createCommaSeparatedList(noWorldNames));

@@ -8,6 +8,24 @@
   <name>AreaShop Parent</name>
   <url>https://github.com/NLthijs48/AreaShop</url>
 
+  <licenses>
+    <license>
+      <name>GNU General Public License v3.0</name>
+      <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <url>https://github.com/NLthijs48/AreaShop/issues</url>
+    <system>GitHub Issues</system>
+  </issueManagement>
+
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>http://jenkins.wiefferink.me/job/AreaShop</url>
+  </ciManagement>
+
   <repositories>
     <repository>
       <id>spigot-repo</id>

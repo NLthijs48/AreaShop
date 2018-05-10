@@ -241,3 +241,7 @@ buy:
   # Automatically sell the region after the specified number of minutes between the last login time of the buyer and the current time
   # Use times like '1 day' etc, or 'disabled' for never.
   inactiveTimeUntilSell: 'disabled'
+  # Selling is disabled for the region owner (players with areashop.sellown without areashop.sell)
+  sellDisabled: false
+  # Reselling is disabled for the region owner (players with areashop.resell without areashop.resellall)
+  resellDisabled: false

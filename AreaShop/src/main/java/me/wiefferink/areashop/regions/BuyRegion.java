@@ -452,7 +452,7 @@ public class BuyRegion extends GeneralRegion {
 	 */
 	@SuppressWarnings("deprecation")
 	public boolean sell(boolean giveMoneyBack, CommandSender executor) {
-		boolean own = executor != null && executor instanceof Player && this.isBuyer((Player)executor);
+		boolean own = executor instanceof Player && this.isBuyer((Player)executor);
 		if(executor != null) {
 			if(!executor.hasPermission("areashop.sell") && !own) {
 				message(executor, "sell-noPermissionOther");
@@ -460,6 +460,13 @@ public class BuyRegion extends GeneralRegion {
 			}
 			if(!executor.hasPermission("areashop.sell") && !executor.hasPermission("areashop.sellown") && own) {
 				message(executor, "sell-noPermission");
+				return false;
+			}
+			if(!executor.hasPermission("areashop.sell")
+					&& executor.hasPermission("areashop.sellown")
+					&& own
+					&& getBooleanSetting("buy.sellDisabled")) {
+				message(executor, "sell-disabled");
 				return false;
 			}
 		}

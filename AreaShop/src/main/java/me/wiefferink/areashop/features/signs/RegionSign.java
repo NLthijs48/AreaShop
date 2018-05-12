@@ -113,7 +113,9 @@ public class RegionSign {
 	public boolean update() {
 		// Ignore updates of signs in chunks that are not loaded
 		Location signLocation = getLocation();
-		if(!signLocation.getWorld().isChunkLoaded(signLocation.getBlockX() >> 4, signLocation.getBlockZ() >> 4)) {
+		if(signLocation == null
+				|| signLocation.getWorld() == null
+				|| !signLocation.getWorld().isChunkLoaded(signLocation.getBlockX() >> 4, signLocation.getBlockZ() >> 4)) {
 			return false;
 		}
 

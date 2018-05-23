@@ -14,7 +14,7 @@
 [►Frequently Asked Questions](https://github.com/NLthijs48/AreaShop/wiki/Frequently-Asked-Questions)&nbsp;&nbsp;
 [►Common errors](https://github.com/NLthijs48/AreaShop/wiki/Common-errors)<br/>
 **Support:**
-[►Request a feature, report a bug or ask support](https://github.com/NLthijs48/AreaShop/issues/new)&nbsp;&nbsp;
+[►Request a feature, report a bug or ask support](https://github.com/NLthijs48/AreaShop/issues/new/choose)&nbsp;&nbsp;
 [►Open issues](https://github.com/NLthijs48/AreaShop/issues)<br/>
 **Development:**
 [►Changelog](https://github.com/NLthijs48/AreaShop/wiki/Changelog)&nbsp;&nbsp;

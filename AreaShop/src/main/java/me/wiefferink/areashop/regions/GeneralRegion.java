@@ -33,14 +33,7 @@ import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion>, ReplacementProvider {
 	static final AreaShop plugin = AreaShop.getInstance();
@@ -1354,7 +1347,10 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public int hasRegionsInLimitGroup(OfflinePlayer player, String limitGroup, List<? extends GeneralRegion> regions, GeneralRegion exclude) {
 		int result = 0;
 		for(GeneralRegion region : regions) {
-			if(region.isOwner(player) && region.matchesLimitGroup(limitGroup) && (exclude == null || !exclude.getName().equals(region.getName()))) {
+			if(region.getBooleanSetting("default.countForLimits")
+					&& region.isOwner(player)
+					&& region.matchesLimitGroup(limitGroup)
+					&& (exclude == null || !exclude.getName().equals(region.getName()))) {
 				result++;
 			}
 		}

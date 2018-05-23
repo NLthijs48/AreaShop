@@ -108,13 +108,12 @@ public class AddCommand extends CommandAreaShop {
 			regions.put(args[2], region);
 		}
 		final boolean isRent = "rent".equals(args[1].toLowerCase());
-		final Map<String, ProtectedRegion> finalRegions = regions;
 		final Player finalPlayer = player;
-		final World finalWorld = world;
 		AreaShop.debug("Starting add task with " + regions.size() + " regions");
 
 		TreeSet<GeneralRegion> regionsSuccess = new TreeSet<>();
 		TreeSet<GeneralRegion> regionsAlready = new TreeSet<>();
+		TreeSet<GeneralRegion> regionsAlreadyOtherWorld = new TreeSet<>();
 		TreeSet<String> namesBlacklisted = new TreeSet<>();
 		TreeSet<String> namesNoPermission = new TreeSet<>();
 		Do.forAll(
@@ -132,9 +131,11 @@ public class AddCommand extends CommandAreaShop {
 				} else {
 					type = "buy";
 				}
-				FileManager.AddResult result = plugin.getFileManager().checkRegionAdd(sender, region, isRent ? GeneralRegion.RegionType.RENT : GeneralRegion.RegionType.BUY);
+				FileManager.AddResult result = plugin.getFileManager().checkRegionAdd(sender, region, world, isRent ? GeneralRegion.RegionType.RENT : GeneralRegion.RegionType.BUY);
 				if(result == FileManager.AddResult.ALREADYADDED) {
 					regionsAlready.add(plugin.getFileManager().getRegion(regionName));
+				} else if(result == FileManager.AddResult.ALREADYADDEDOTHERWORLD) {
+					regionsAlreadyOtherWorld.add(plugin.getFileManager().getRegion(regionName));
 				} else if(result == FileManager.AddResult.BLACKLISTED) {
 					namesBlacklisted.add(regionName);
 				} else if(result == FileManager.AddResult.NOPERMISSION) {
@@ -148,7 +149,7 @@ public class AddCommand extends CommandAreaShop {
 					existing.addAll(plugin.getWorldGuardHandler().getOwners(region).asUniqueIdList());
 					existing.addAll(plugin.getWorldGuardHandler().getMembers(region).asUniqueIdList());
 					if(isRent) {
-						RentRegion rent = new RentRegion(regionName, finalWorld);
+						RentRegion rent = new RentRegion(regionName, world);
 						// Set landlord
 						if(landlord) {
 							rent.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
@@ -191,7 +192,7 @@ public class AddCommand extends CommandAreaShop {
 
 						regionsSuccess.add(rent);
 					} else {
-						BuyRegion buy = new BuyRegion(regionName, finalWorld);
+						BuyRegion buy = new BuyRegion(regionName, world);
 						// Set landlord
 						if(landlord) {
 							buy.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
@@ -242,6 +243,9 @@ public class AddCommand extends CommandAreaShop {
 				}
 				if(!regionsAlready.isEmpty()) {
 					plugin.message(sender, "add-failed", Utils.combinedMessage(regionsAlready, "region"));
+				}
+				if(!regionsAlreadyOtherWorld.isEmpty()) {
+					plugin.message(sender, "add-failedOtherWorld", Utils.combinedMessage(regionsAlreadyOtherWorld, "region"));
 				}
 				if(!namesBlacklisted.isEmpty()) {
 					plugin.message(sender, "add-blacklisted", Utils.createCommaSeparatedList(namesBlacklisted));

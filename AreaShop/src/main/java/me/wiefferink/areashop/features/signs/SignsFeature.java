@@ -223,11 +223,13 @@ public class SignsFeature extends RegionFeature {
 				return;
 			}
 
-			FileManager.AddResult addResult = plugin.getFileManager().checkRegionAdd(player, regionManager.getRegion(secondLine), GeneralRegion.RegionType.RENT);
+			FileManager.AddResult addResult = plugin.getFileManager().checkRegionAdd(player, regionManager.getRegion(secondLine), event.getPlayer().getWorld(), GeneralRegion.RegionType.RENT);
 			if(addResult == FileManager.AddResult.BLACKLISTED) {
 				plugin.message(player, "setup-blacklisted", secondLine);
 			} else if(addResult == FileManager.AddResult.ALREADYADDED) {
 				plugin.message(player, "setup-alreadyRentSign");
+			} else if(addResult == FileManager.AddResult.ALREADYADDEDOTHERWORLD) {
+				plugin.message(player, "setup-alreadyOtherWorld");
 			} else if(addResult == FileManager.AddResult.NOPERMISSION) {
 				plugin.message(player, "setup-noPermission", secondLine);
 			} else if(thirdLine != null && thirdLine.length() != 0 && !Utils.checkTimeFormat(thirdLine)) {
@@ -331,11 +333,13 @@ public class SignsFeature extends RegionFeature {
 				plugin.message(player, "cmd-noRegion", secondLine);
 				return;
 			}
-			FileManager.AddResult addResult = plugin.getFileManager().checkRegionAdd(player, region, GeneralRegion.RegionType.BUY);
+			FileManager.AddResult addResult = plugin.getFileManager().checkRegionAdd(player, region, event.getPlayer().getWorld(), GeneralRegion.RegionType.BUY);
 			if(addResult == FileManager.AddResult.BLACKLISTED) {
 				plugin.message(player, "setup-blacklisted", secondLine);
 			} else if(addResult == FileManager.AddResult.ALREADYADDED) {
 				plugin.message(player, "setup-alreadyRentSign");
+			} else if(addResult == FileManager.AddResult.ALREADYADDEDOTHERWORLD) {
+				plugin.message(player, "setup-alreadyOtherWorld");
 			} else if(addResult == FileManager.AddResult.NOPERMISSION) {
 				plugin.message(player, "setup-noPermission", secondLine);
 			} else {

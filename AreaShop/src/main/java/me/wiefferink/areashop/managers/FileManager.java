@@ -67,6 +67,7 @@ public class FileManager extends Manager {
 		BLACKLISTED("blacklisted"),
 		NOPERMISSION("nopermission"),
 		ALREADYADDED("alreadyadded"),
+		ALREADYADDEDOTHERWORLD("alreadyaddedotherworld"),
 		SUCCESS("success");
 
 		private final String value;
@@ -357,10 +358,11 @@ public class FileManager extends Manager {
 	 * Check if a player can add a certain region as rent or buy region.
 	 * @param sender The player/console that wants to add a region
 	 * @param region The WorldGuard region to add
+	 * @param world The world the ProtectedRegion is located in
 	 * @param type   The type the region should have in AreaShop
 	 * @return The result if a player would want to add this region
 	 */
-	public AddResult checkRegionAdd(CommandSender sender, ProtectedRegion region, RegionType type) {
+	public AddResult checkRegionAdd(CommandSender sender, ProtectedRegion region, World world, RegionType type) {
 		Player player = null;
 		if(sender instanceof Player) {
 			player = (Player)sender;
@@ -383,7 +385,11 @@ public class FileManager extends Manager {
 		}
 		GeneralRegion asRegion = plugin.getFileManager().getRegion(region.getId());
 		if(asRegion != null) {
-			return AddResult.ALREADYADDED;
+			if(asRegion.getWorld().equals(world)) {
+				return AddResult.ALREADYADDED;
+			} else {
+				return AddResult.ALREADYADDEDOTHERWORLD;
+			}
 		} else if(plugin.getFileManager().isBlacklisted(region.getId())) {
 			return AddResult.BLACKLISTED;
 		} else {

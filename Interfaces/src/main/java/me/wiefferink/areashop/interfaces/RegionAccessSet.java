@@ -10,9 +10,9 @@ import java.util.Set;
 import java.util.UUID;
 
 public class RegionAccessSet {
-	private Set<String> playerNames;
-	private Set<UUID> playerUniqueIds;
-	private Set<String> groupNames;
+	private final Set<String> playerNames;
+	private final Set<UUID> playerUniqueIds;
+	private final Set<String> groupNames;
 
 	/**
 	 * Constructor, creates an empty set.

@@ -45,7 +45,7 @@ import java.util.UUID;
 public abstract class GeneralRegion implements GeneralRegionInterface, Comparable<GeneralRegion>, ReplacementProvider {
 	static final AreaShop plugin = AreaShop.getInstance();
 
-	YamlConfiguration config;
+	final YamlConfiguration config;
 	private boolean saveRequired = false;
 	private boolean deleted = false;
 	private long volume = -1;
@@ -1258,11 +1258,11 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Class to store the result of a limits check.
 	 */
 	public class LimitResult {
-		private boolean actionAllowed;
-		private LimitType limitingFactor;
-		private int maximum;
-		private int current;
-		private String limitingGroup;
+		private final boolean actionAllowed;
+		private final LimitType limitingFactor;
+		private final int maximum;
+		private final int current;
+		private final String limitingGroup;
 
 		/**
 		 * Constructor.

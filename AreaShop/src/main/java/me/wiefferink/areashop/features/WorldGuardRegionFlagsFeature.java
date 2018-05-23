@@ -181,8 +181,9 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 			}
 		}
 		// Indicate that the regions needs to be saved
-		// TODO do we still need this? maybe only for old WorldGuard?
-		plugin.getFileManager().saveIsRequiredForRegionWorld(region.getWorldName());
+		if(worldGuard.getDescription().getVersion().startsWith("5.")) {
+			plugin.getFileManager().saveIsRequiredForRegionWorld(region.getWorldName());
+		}
 		return result;
 	}
 

@@ -30,8 +30,8 @@ import java.util.UUID;
 
 public class ImportJob {
 
-	private AreaShop plugin;
-	private CommandSender sender;
+	private final AreaShop plugin;
+	private final CommandSender sender;
 
 	/**
 	 * Create and execute the import.
@@ -362,7 +362,6 @@ public class ImportJob {
 
 		// Set rented until
 		if(from.isLong("info.last-withdrawal")
-				&& region != null
 				&& region instanceof RentRegion) {
 			RentRegion rentRegion = (RentRegion)region;
 			long lastWithdrawal = from.getLong("info.last-withdrawal");
@@ -404,7 +403,7 @@ public class ImportJob {
 
 	}
 
-	private static List<Pair<Integer, String>> timeUnitLookup = new ArrayList<Pair<Integer, String>>() {
+	private static final List<Pair<Integer, String>> timeUnitLookup = new ArrayList<Pair<Integer, String>>() {
 		{
 			add(new Pair<>(60 * 24 * 30 * 12, "year"));
 			add(new Pair<>(60 * 24 * 30, "month"));

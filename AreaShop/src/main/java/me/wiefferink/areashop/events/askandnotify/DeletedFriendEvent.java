@@ -10,8 +10,8 @@ import org.bukkit.command.CommandSender;
  */
 public class DeletedFriendEvent extends CancellableRegionEvent<GeneralRegion> {
 
-	private OfflinePlayer friend;
-	private CommandSender by;
+	private final OfflinePlayer friend;
+	private final CommandSender by;
 
 	/**
 	 * Constructor.

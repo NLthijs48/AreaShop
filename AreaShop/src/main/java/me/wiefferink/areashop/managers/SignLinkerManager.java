@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class SignLinkerManager extends Manager implements Listener {
-	private Map<UUID, SignLinker> signLinkers;
+	private final Map<UUID, SignLinker> signLinkers;
 	private boolean eventsRegistered;
 
 	public SignLinkerManager() {
@@ -152,8 +152,8 @@ public class SignLinkerManager extends Manager implements Listener {
 		private boolean hasSign = false;
 		private boolean hasRegion = false;
 
-		public Player linker;
-		public String profile;
+		public final Player linker;
+		public final String profile;
 
 		public GeneralRegion region = null;
 

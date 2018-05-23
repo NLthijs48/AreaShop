@@ -155,7 +155,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		int fixes = 0;
 		Integer build = null;
 		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
-		if(plugin == null || !(plugin instanceof WorldGuardPlugin) || !plugin.isEnabled()) {
+		if(!(plugin instanceof WorldGuardPlugin) || !plugin.isEnabled()) {
 			error("WorldGuard plugin is not present or has not loaded correctly");
 			error = true;
 		} else {
@@ -232,7 +232,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Check if WorldEdit is present
 		String weVersion = null;
 		plugin = getServer().getPluginManager().getPlugin("WorldEdit");
-		if(plugin == null || !(plugin instanceof WorldEditPlugin) || !plugin.isEnabled()) {
+		if(!(plugin instanceof WorldEditPlugin) || !plugin.isEnabled()) {
 			error("WorldEdit plugin is not present or has not loaded correctly");
 			error = true;
 		} else {

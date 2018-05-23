@@ -3,7 +3,7 @@ package me.wiefferink.areashop.interfaces;
 import java.io.File;
 
 public abstract class WorldEditInterface {
-	protected AreaShopInterface pluginInterface;
+	protected final AreaShopInterface pluginInterface;
 
 	public WorldEditInterface(AreaShopInterface pluginInterface) {
 		this.pluginInterface = pluginInterface;

@@ -17,9 +17,9 @@ import java.util.Map;
  */
 public abstract class CommandAreaShop {
 
-	AreaShop plugin = AreaShop.getInstance();
+	final AreaShop plugin = AreaShop.getInstance();
 
-	private Map<String, Pair<String, Long>> lastUsed;
+	private final Map<String, Pair<String, Long>> lastUsed;
 
 	public CommandAreaShop() {
 		lastUsed = new HashMap<>();

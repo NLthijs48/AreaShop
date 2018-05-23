@@ -9,7 +9,7 @@ import org.bukkit.OfflinePlayer;
  */
 public class BuyingRegionEvent extends CancellableRegionEvent<BuyRegion> {
 
-	private OfflinePlayer player;
+	private final OfflinePlayer player;
 
 	/**
 	 * Constructor.

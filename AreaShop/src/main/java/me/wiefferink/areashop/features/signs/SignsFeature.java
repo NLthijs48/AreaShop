@@ -37,8 +37,8 @@ import java.util.Set;
 
 public class SignsFeature extends RegionFeature {
 
-	private static Map<String, RegionSign> allSigns = Collections.synchronizedMap(new HashMap<>());
-	private static Map<String, List<RegionSign>> signsByChunk = Collections.synchronizedMap(new HashMap<>());
+	private static final Map<String, RegionSign> allSigns = Collections.synchronizedMap(new HashMap<>());
+	private static final Map<String, List<RegionSign>> signsByChunk = Collections.synchronizedMap(new HashMap<>());
 
 	private Map<String, RegionSign> signs;
 

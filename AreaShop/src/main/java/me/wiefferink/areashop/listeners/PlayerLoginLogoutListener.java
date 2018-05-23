@@ -22,7 +22,7 @@ import java.util.List;
  * Notify region expiry and track activity time.
  */
 public final class PlayerLoginLogoutListener implements Listener {
-	private AreaShop plugin;
+	private final AreaShop plugin;
 
 	/**
 	 * Constructor.

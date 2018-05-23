@@ -56,7 +56,7 @@ public class FileManager extends Manager {
 	private YamlConfiguration defaultConfig = null;
 	private YamlConfiguration defaultConfigFallback = null;
 	private boolean saveGroupsRequired = false;
-	private Set<String> worldRegionsRequireSaving;
+	private final Set<String> worldRegionsRequireSaving;
 
 	private HashMap<String, Integer> versions = null;
 	private String versionPath = null;
@@ -184,7 +184,7 @@ public class FileManager extends Manager {
 	 */
 	public RentRegion getRent(String name) {
 		GeneralRegion region = regions.get(name.toLowerCase());
-		if(region != null && region instanceof RentRegion) {
+		if(region instanceof RentRegion) {
 			return (RentRegion)region;
 		}
 		return null;
@@ -197,7 +197,7 @@ public class FileManager extends Manager {
 	 */
 	public BuyRegion getBuy(String name) {
 		GeneralRegion region = regions.get(name.toLowerCase());
-		if(region != null && region instanceof BuyRegion) {
+		if(region instanceof BuyRegion) {
 			return (BuyRegion)region;
 		}
 		return null;

@@ -10,8 +10,8 @@ import java.util.UUID;
  */
 public class SoldRegionEvent extends NotifyRegionEvent<BuyRegion> {
 
-	private UUID oldBuyer;
-	private double refundedMoney;
+	private final UUID oldBuyer;
+	private final double refundedMoney;
 
 	/**
 	 * Constructor.

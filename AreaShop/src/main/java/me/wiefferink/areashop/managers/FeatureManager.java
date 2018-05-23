@@ -28,8 +28,8 @@ public class FeatureManager extends Manager {
 			TeleportFeature.class
 	));
 	// One instance of each feature, registered for event handling
-	private Set<RegionFeature> globalFeatures;
-	private Map<Class<? extends RegionFeature>, Constructor<? extends RegionFeature>> regionFeatureConstructors;
+	private final Set<RegionFeature> globalFeatures;
+	private final Map<Class<? extends RegionFeature>, Constructor<? extends RegionFeature>> regionFeatureConstructors;
 
 	/**
 	 * Constructor.

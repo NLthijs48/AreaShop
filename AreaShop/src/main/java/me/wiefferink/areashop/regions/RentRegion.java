@@ -638,7 +638,7 @@ public class RentRegion extends GeneralRegion {
 	 */
 	@SuppressWarnings("deprecation")
 	public boolean unRent(boolean giveMoneyBack, CommandSender executor) {
-		boolean own = executor != null && executor instanceof Player && this.isRenter((Player)executor);
+		boolean own = executor instanceof Player && this.isRenter((Player) executor);
 		if(executor != null) {
 			if(!executor.hasPermission("areashop.unrent") && !own) {
 				message(executor, "unrent-noPermissionOther");

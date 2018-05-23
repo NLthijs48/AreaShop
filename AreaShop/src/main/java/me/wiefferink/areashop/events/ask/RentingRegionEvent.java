@@ -9,8 +9,8 @@ import org.bukkit.OfflinePlayer;
  */
 public class RentingRegionEvent extends CancellableRegionEvent<RentRegion> {
 
-	private OfflinePlayer player;
-	private boolean extending;
+	private final OfflinePlayer player;
+	private final boolean extending;
 
 	/**
 	 * Constructor.

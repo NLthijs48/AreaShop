@@ -23,8 +23,8 @@ import java.util.List;
  */
 public class RegionSign {
 
-	private SignsFeature signsFeature;
-	private String key;
+	private final SignsFeature signsFeature;
+	private final String key;
 
 	public RegionSign(SignsFeature signsFeature, String key) {
 		this.signsFeature = signsFeature;

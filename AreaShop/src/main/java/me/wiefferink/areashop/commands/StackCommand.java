@@ -141,7 +141,7 @@ public class StackCommand extends CommandAreaShop {
 		plugin.message(player, "stack-addStart", amount, regionsPerTick * 20);
 		new BukkitRunnable() {
 			private int current = -1;
-			private RegionManager manager = AreaShop.getInstance().getWorldGuard().getRegionManager(selection.getWorld());
+			private final RegionManager manager = AreaShop.getInstance().getWorldGuard().getRegionManager(selection.getWorld());
 			private int counter = 1;
 			private int tooLow = 0;
 			private int tooHigh = 0;

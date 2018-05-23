@@ -1,7 +1,6 @@
 # Maven stuff
 /target
 
-*.pydevproject
 .project
 .metadata
 bin/
@@ -15,17 +14,8 @@ local.properties
 .settings/
 .loadpath
 
-# External tool builders
-.externalToolBuilders/
-
 # Locally stored "Eclipse launch configurations"
 *.launch
-
-# CDT-specific
-.cproject
-
-# PDT-specific
-.buildpath
 
 # IntelliJ IDEA
 *.iml

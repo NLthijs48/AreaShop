@@ -4,7 +4,7 @@ import me.wiefferink.areashop.AreaShop;
 
 public abstract class Manager {
 
-	AreaShop plugin = AreaShop.getInstance();
+	final AreaShop plugin = AreaShop.getInstance();
 
 	/**
 	 * Called at shutdown of the plugin.

@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public abstract class WorldGuardInterface {
-	protected AreaShopInterface pluginInterface;
+	protected final AreaShopInterface pluginInterface;
 
 	public WorldGuardInterface(AreaShopInterface pluginInterface) {
 		this.pluginInterface = pluginInterface;

@@ -18,15 +18,15 @@ import java.util.logging.Logger;
 
 public class GithubUpdateCheck {
 
-	public static String API_HOST = "https://api.github.com/repos";
-	public static String API_LATEST_RELEASE = "releases/latest";
-	public static String USER_AGENT = "GithubUpdateCheck by NLThijs48";
-	public static boolean DEBUG = false;
+	public static final String API_HOST = "https://api.github.com/repos";
+	public static final String API_LATEST_RELEASE = "releases/latest";
+	public static final String USER_AGENT = "GithubUpdateCheck by NLThijs48";
+	public static final boolean DEBUG = false;
 
-	private String author;
-	private String repository;
-	private Plugin plugin;
-	private Logger logger;
+	private final String author;
+	private final String repository;
+	private final Plugin plugin;
+	private final Logger logger;
 	private URL url;
 	private VersionComparator versionComparator;
 
@@ -35,7 +35,7 @@ public class GithubUpdateCheck {
 	private boolean error;
 	private boolean hasUpdate;
 	private String latestVersion;
-	private String currentVersion;
+	private final String currentVersion;
 
 	/**
 	 * Create a new GithubUpdateCheck with the required information.
@@ -223,19 +223,6 @@ public class GithubUpdateCheck {
 
 	public interface UpdateCallback {
 		void run(GithubUpdateCheck result);
-	}
-
-	public class UpdateCheckResult {
-		public boolean error;
-		public boolean hasUpdate;
-
-		/**
-		 * Constructor, create empty result.
-		 */
-		public UpdateCheckResult() {
-			error = false;
-			hasUpdate = false;
-		}
 	}
 
 	/**

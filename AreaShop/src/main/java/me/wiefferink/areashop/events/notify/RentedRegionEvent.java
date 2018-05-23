@@ -8,7 +8,7 @@ import me.wiefferink.areashop.regions.RentRegion;
  */
 public class RentedRegionEvent extends NotifyRegionEvent<RentRegion> {
 
-	private boolean extended;
+	private final boolean extended;
 
 	/**
 	 * Constructor.

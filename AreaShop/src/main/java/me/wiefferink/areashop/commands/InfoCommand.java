@@ -361,10 +361,12 @@ public class InfoCommand extends CommandAreaShop {
 								plugin.messageNoPrefix(sender, "info-regionBought", buy);
 							}
 							// Money back
-							if(SellCommand.canUse(sender, buy)) {
-								plugin.messageNoPrefix(sender, "info-regionMoneyBackBuyClick", buy);
-							} else {
-								plugin.messageNoPrefix(sender, "info-regionMoneyBackBuy", buy);
+							if(!buy.getBooleanSetting("buy.sellDisabled")) {
+								if (SellCommand.canUse(sender, buy)) {
+									plugin.messageNoPrefix(sender, "info-regionMoneyBackBuyClick", buy);
+								} else {
+									plugin.messageNoPrefix(sender, "info-regionMoneyBackBuy", buy);
+								}
 							}
 							// Friends
 							if(!buy.getFriendsFeature().getFriendNames().isEmpty()) {

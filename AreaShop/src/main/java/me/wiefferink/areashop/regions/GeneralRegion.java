@@ -1354,7 +1354,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public int hasRegionsInLimitGroup(OfflinePlayer player, String limitGroup, List<? extends GeneralRegion> regions, GeneralRegion exclude) {
 		int result = 0;
 		for(GeneralRegion region : regions) {
-			if(region.getBooleanSetting("default.countForLimits")
+			if(region.getBooleanSetting("general.countForLimits")
 					&& region.isOwner(player)
 					&& region.matchesLimitGroup(limitGroup)
 					&& (exclude == null || !exclude.getName().equals(region.getName()))) {

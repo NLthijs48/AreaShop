@@ -955,7 +955,7 @@ public class FileManager extends Manager {
 		List<GeneralRegion> noRegion = new ArrayList<>();
 		List<GeneralRegion> incorrectDuration = new ArrayList<>();
 		for(File regionFile : regionFiles) {
-			if(regionFile.exists() && regionFile.isFile()) {
+			if(regionFile.exists() && regionFile.isFile() && !regionFile.isHidden()) {
 
 				// Load the region file from disk in UTF8 mode
 				YamlConfiguration config;

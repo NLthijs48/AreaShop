@@ -112,7 +112,7 @@ public class ImportJob {
 		// Import regions from each world
 		for(File worldFolder : worldFolders) {
 			// Skip files
-			if(!worldFolder.isDirectory()) {
+			if(!worldFolder.isDirectory() || worldFolder.isHidden()) {
 				continue;
 			}
 

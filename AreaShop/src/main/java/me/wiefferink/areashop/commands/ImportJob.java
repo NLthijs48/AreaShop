@@ -248,7 +248,7 @@ public class ImportJob {
 				}
 
 				// Import settings
-				importRegionSettings(regionSection, region.getConfig(), region);
+				importRegionSettings(regionSection, region.getConfig(), region, !buyable && !rentable);
 				region.getConfig().set("general.importedFrom", "RegionForSale");
 
 				// Get existing owners and members
@@ -312,8 +312,9 @@ public class ImportJob {
 	 * @param from RegionForSale config section that specifies region settings
 	 * @param to AreaShop config section that specifies region settings
 	 * @param region GeneralRegion to copy settings to, or null if doing generic settings
+	 * @param permanent Region cannot be rented or bought, disables some features
 	 */
-	private void importRegionSettings(ConfigurationSection from, ConfigurationSection to, GeneralRegion region) {
+	private void importRegionSettings(ConfigurationSection from, ConfigurationSection to, GeneralRegion region, boolean permanent) {
 		// Maximum rental time, TODO check if this is actually the same
 		if(from.isLong("permissions.max-rent-time")) {
 			to.set("rent.maxRentTime", minutesToString(from.getLong("permissions.max-rent-time")));
@@ -358,6 +359,13 @@ public class ImportJob {
 					message("import-moneyBackFailed", buyPrice, sellPrice);
 				}
 			}
+		}
+
+		// Apply permanent region settings
+		if(permanent) {
+			to.set("buy.resellDisabled", true);
+			to.set("buy.sellDisabled", true);
+			to.set("general.countForLimits", false);
 		}
 
 		// Set rented until

@@ -80,7 +80,7 @@ public class ImportJob {
 			messageNoPrefix("import-loadConfigFailed", regionForSaleConfigFile.getAbsolutePath());
 			regionForSaleConfig = new YamlConfiguration();
 		} else {
-			importRegionSettings(regionForSaleConfig, regionForSaleGroup.getSettings(), null);
+			importRegionSettings(regionForSaleConfig, regionForSaleGroup.getSettings(), null, false);
 			regionForSaleGroup.setSetting("priority", 0);
 		}
 
@@ -150,7 +150,7 @@ public class ImportJob {
 			} else {
 				// RegionGroup with all world settings
 				RegionGroup worldGroup = new RegionGroup(plugin, "RegionForSale-" + worldFolder.getName());
-				importRegionSettings(worldConfig, worldGroup.getSettings(), null);
+				importRegionSettings(worldConfig, worldGroup.getSettings(), null, false);
 				worldGroup.setSetting("priority", 1);
 				worldGroup.addWorld(worldFolder.getName());
 				plugin.getFileManager().addGroup(regionForSaleGroup);
@@ -186,7 +186,7 @@ public class ImportJob {
 
 					// Import parent region settings into a RegionGroup
 					RegionGroup parentRegionGroup = new RegionGroup(plugin, "RegionForSale-" + worldFolder.getName() + "-" + parentRegionName);
-					importRegionSettings(parentRegionSection, parentRegionGroup.getSettings(), null);
+					importRegionSettings(parentRegionSection, parentRegionGroup.getSettings(), null, false);
 					parentRegionGroup.setSetting("priority", 2 + parentRegionSection.getLong("info.priority", 0));
 					parentRegionGroup.saveRequired();
 

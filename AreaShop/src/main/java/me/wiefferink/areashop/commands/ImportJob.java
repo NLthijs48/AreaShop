@@ -3,7 +3,6 @@ package me.wiefferink.areashop.commands;
 import com.google.common.base.Charsets;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import javafx.util.Pair;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.features.signs.RegionSign;
 import me.wiefferink.areashop.features.signs.SignsFeature;
@@ -411,12 +410,22 @@ public class ImportJob {
 
 	}
 
-	private static final List<Pair<Integer, String>> timeUnitLookup = new ArrayList<Pair<Integer, String>>() {
+	private static class TimeUnit {
+		public long minutes;
+		public String identifier;
+
+		TimeUnit(long minutes, String identifier) {
+			this.minutes = minutes;
+			this.identifier = identifier;
+		}
+	}
+
+	private static final List<TimeUnit> timeUnitLookup = new ArrayList<TimeUnit>() {
 		{
-			add(new Pair<>(60 * 24 * 30 * 12, "year"));
-			add(new Pair<>(60 * 24 * 30, "month"));
-			add(new Pair<>(60 * 24, "day"));
-			add(new Pair<>(60, "hour"));
+			add(new TimeUnit(60 * 24 * 30 * 12, "year"));
+			add(new TimeUnit(60 * 24 * 30, "month"));
+			add(new TimeUnit(60 * 24, "day"));
+			add(new TimeUnit(60, "hour"));
 		}
 	};
 
@@ -429,10 +438,10 @@ public class ImportJob {
 		// If the specified number of minutes can map nicely to a higher unit, use that one
 		String resultUnit = "minute";
 		long resultValue = minutes;
-		for(Pair<Integer, String> unit : timeUnitLookup) {
-			long result = minutes / unit.getKey();
-			if(resultValue * unit.getKey() == minutes) {
-				resultUnit = unit.getValue();
+		for(TimeUnit unit : timeUnitLookup) {
+			long result = minutes / unit.minutes;
+			if(resultValue * unit.minutes == minutes) {
+				resultUnit = unit.identifier;
 				resultValue = result;
 				break;
 			}

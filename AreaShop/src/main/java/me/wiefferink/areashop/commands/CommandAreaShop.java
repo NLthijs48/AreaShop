@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import javafx.util.Pair;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.interactivemessenger.processing.Message;
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +18,7 @@ public abstract class CommandAreaShop {
 
 	final AreaShop plugin = AreaShop.getInstance();
 
-	private final Map<String, Pair<String, Long>> lastUsed;
+	private final Map<String, CommandTime> lastUsed;
 
 	public CommandAreaShop() {
 		lastUsed = new HashMap<>();
@@ -80,14 +79,24 @@ public abstract class CommandAreaShop {
 	public boolean confirm(CommandSender sender, String[] args, Message message) {
 		String command = "/" + getCommandStart() + " " + StringUtils.join(args, " ", 1, args.length);
 		long now = System.currentTimeMillis();
-		Pair<String, Long> last = lastUsed.get(sender.getName());
-		if(last != null && last.getKey().equalsIgnoreCase(command) && last.getValue() > (now - 1000 * 60)) {
+		CommandTime last = lastUsed.get(sender.getName());
+		if(last != null && last.command.equalsIgnoreCase(command) && last.time > (now - 1000 * 60)) {
 			return true;
 		}
 
 		message.prefix().append(Message.fromKey("confirm-yes").replacements(command)).send(sender);
-		lastUsed.put(sender.getName(), new Pair<>(command, now));
+		lastUsed.put(sender.getName(), new CommandTime(command, now));
 		return false;
+	}
+
+	private class CommandTime {
+		public String command;
+		public long time;
+
+		CommandTime(String command, long time) {
+			this.command = command;
+			this.time = time;
+		}
 	}
 
 }

@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ German language file, plugin version 2.5.0, 393/424 messages are translated (93%)
+# ║ German language file, plugin version 2.5.0, 391/428 messages are translated (91%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -99,7 +99,7 @@
 "rent-lowMoneyExtend": "Du hast nicht genug Geld um die Miete zu verlängern. (Du hast %0% und benötigst %price%)."
 "rent-lowMoneyRent": "Du hast nicht genug Geld um die Region %lang:region% zu mieten. (Du hast %0% und benötigst %price%)."
 "rent-someoneElse": "Die Region %lang:region% ist bereits vermietet."
-"rent-notRentable": "Region ist nicht vorhanden (Nicht registiert in Areashop oder nicht gekauft)."
+"rent-notRentable": "Region '%0%' ist nicht vorhanden (Nicht registiert in Areashop oder nur zu verkaufen)."
 "rent-maxExtends": "Du kannst diese Miete nicht weiter verlängern. (Zulässig sind %maxextends% Verlängerungen). Nachdem die Miete abgelaufen ist, kannst du die Region %lang:region% erneut mieten."
 "rent-maxRentTime": "Du kannst die Region%lang:region% nicht noch mehr im Voraus mieten. Die maximale Zeit beträgt %maxrenttime% und du hast diese Region für %timeleft% gemietet."
 "rent-restrictedToWorld": "Du musst dich in der Welt '%world%' befinden, um die Region %lang:region% mieten zu können (Du befindest Dich in der Welt '%0%')."
@@ -136,8 +136,6 @@
 "sell-noPermission": "Du bist nicht berechtigt, diese Region zu verkaufen."
 "sell-noPermissionOther": "Du bist nicht berechtigt, eine Region zu verkaufen."
 "reload-reloading": "Alle Konfigurationsdateien und Region-Dateien wurden neu geladen."
-"reload-updateStart": "[gray]Aktualisiere %0% Regionen mit %1% Regionen pro Sekunde."
-"reload-updateComplete": "[gray]Regionen erfolgreich aktualisiert."
 "reload-noPermission": "Du hast keine Berechtigungen um die Konfigurationsdateien neu zu laden."
 "reload-updateCommandChanged": "'/as updaterents' und '/as updatebuys' wurden entfernt, bitte benutze '/as reload' um die Regionen neu zu laden."
 "info-help":
@@ -515,4 +513,4 @@
 "greeting-rented": "%region% ist vermietet an %player% bis %until%."
 "greeting-forsale": "%region% kann gekauft werden für %price%."
 "greeting-bought": "%region% ist Eigentum von %player%."
-"greeting-resale": "%region% kann für %resellprice% von 1%pplayer% gekauft werden."
+"greeting-resale": "%region% kann für %resellprice% von 1%player% gekauft werden."

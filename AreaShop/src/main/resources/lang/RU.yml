@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ Russian language file, plugin version 2.5.0, 397/424 messages are translated (94%)
+# ║ Russian language file, plugin version 2.5.0, 395/428 messages are translated (92%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -137,8 +137,6 @@
 "sell-noPermission": "У Вас нет прав для продажи региона."
 "sell-noPermissionOther": "У Вас нет прав для продажи другого региона."
 "reload-reloading": "Перезагружены все конфигурации и файлы регионов."
-"reload-updateStart": "[gray]Обновление %0% регионов за %1% секунд."
-"reload-updateComplete": "[gray]Обновление регионов завершено."
 "reload-noPermission": "Недостаточно полномочий для того, чтобы перезагрузить конфиги плагина."
 "reload-updateCommandChanged": "'/as updaterents' и '/as updatebuys' были удалены, '/as reload' теперь будет также обновлять регионы, используйте взамен эту команду."
 "info-help":

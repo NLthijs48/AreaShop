@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ Swedish language file, plugin version 2.5.0, 378/424 messages are translated (89%)
+# ║ Swedish language file, plugin version 2.5.0, 376/428 messages are translated (88%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -131,8 +131,6 @@
 "sell-sold": "%lang:region% för %lang:player% har sålts."
 "sell-noPermission": "Du har inte rättigheterna att sälja den här regionen."
 "sell-noPermissionOther": "Du har inte rättigheterna att sälja en annan region."
-"reload-updateStart": "[gray]Uppdaterar %0% regioner med %1% per sekund."
-"reload-updateComplete": "[gray]Uppdatering av regioner är klar."
 "reload-noPermission": "Du har inte rättigheterna för att ladda om konfigureringsfiler."
 "reload-updateCommandChanged": "'/as updaterents' och '/as updatebuys' har tagits bort, '/as reload' uppdaterar även regioner nu så använd det kommandot istället."
 "info-noPermission": "Du har inte rättigheterna för att få information om regionerna."

@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ French language file, plugin version 2.5.0, 397/424 messages are translated (94%)
+# ║ French language file, plugin version 2.5.0, 395/428 messages are translated (92%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -137,8 +137,6 @@
 "sell-noPermission": "Vous n'avez pas la permission de vendre une région."
 "sell-noPermissionOther": "Vous n'avez pas la permission de vendre une autre région."
 "reload-reloading": "Fichiers de configurations et des régions rechargés."
-"reload-updateStart": "[gray]Met à jour %0% régions, %1% par seconde."
-"reload-updateComplete": "[gray]Mise à jour des régions terminée."
 "reload-noPermission": "Vous n'avez pas la permission de recharger les fichiers."
 "reload-updateCommandChanged": "'/as updaterents' et '/as updatebuys' ont été supprimées, '/as reload' est la commande à utiliser pour mettre à jour les régions."
 "info-help":

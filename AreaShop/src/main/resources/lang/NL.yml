@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ Dutch language file, plugin version 2.5.0, 424/424 messages are translated (100%)
+# ║ Dutch language file, plugin version 2.5.0, 428/428 messages are translated (100%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -38,6 +38,7 @@
 - "    hover: %lang:action|Gebieden van %landlord%|%"
 - "    command: /areashop info player %landlord%"
 "total-maximum": "Je kunt niet meer dan %0% gebied(en) kopen en huren in totaal (je hebt er al %1% in groep '%2%')."
+"confirm-yes": " [gray]Klik om te %lang:command|bevestigen|%0%|%[gray], of herhaal het commando."
 "general-notReady": "AreaShop is nog niet volledig geladen, even geduld."
 "general-noWorld": "Je kunt deze actie niet uitvoeren, de wereld van %lang:region% is niet beschikbaar (wereld '%0%')."
 "general-noRegion": "Je kunt deze actie niet uitvoeren, het WorldGuard gebied is niet beschikbaar (gebied %lang:region%)."
@@ -137,9 +138,8 @@
 "sell-sold": "%lang:region% is verkocht voor %lang:player%."
 "sell-noPermission": "Je hebt geen toestemming om een gebied te verkopen."
 "sell-noPermissionOther": "Je hebt geen toestemming om een gebied van iemand anders te verkopen."
+"sell-disabled": "Verkopen is uitgeschakeld voor dit gebied."
 "reload-reloading": "Alle configuratie en gebied bestanden zijn herladen."
-"reload-updateStart": "[gray]%0% gebieden aan het updaten met %1% per seconde."
-"reload-updateComplete": "[gray]Updaten van gebieden compleet."
 "reload-noPermission": "Je hebt geen toestemming om configuratiebestanden te herladen."
 "reload-updateCommandChanged": "'/as updaterents' en '/as updatebuys' zijn verwijderd, '/as reload' updated nu ook de gebieden, gebruik dus dat commando."
 "info-help":
@@ -294,6 +294,7 @@
 "setduration-successRemoved": "Tijdsduur van %lang:region% is verwijderd, hij zal nu de tijdsduur van een group of default.yml gebruiken, nieuwe tijdsduur: %duration%."
 "setup-noRegion": "Je hebt geen gebied aangegeven op de tweede regel."
 "setup-alreadyRentSign": "Het aangegeven gebied is al toegevoegd als huur gebied aan AreaShop, voeg een bord toe met [as] op de eerste regel of met '/as addsign'."
+"setup-alreadyOtherWorld": "Het aangegeven gebied is al toegevoegd aan AreaShop in een andere wereld, gebieden in verschillende werelden moeten verschillende namen hebben."
 "setup-alreadyBuySign": "Het aangegeven gebied is al toegevoegd als koop gebied aan AreaShop, voeg een bord toe met [as] op de eerste regel of met '/as addsign'."
 "setup-noDuration": "Je hebt geen tijdsduur voor het huren aangegeven, zet dit op de derde regel."
 "setup-wrongDuration": "De aangegeven tijdsduur is niet in het correcte formaat, voorbeeld: 1 dag."
@@ -372,6 +373,7 @@
 "add-noPermission": "Je hebt geen toestemming om een gebied toe te voegen aan AreaShop."
 "add-success": "Toegevoegd als %0%: [gray]%1%."
 "add-failed": "Al geregistreerd: [gray]%0%."
+"add-failedOtherWorld": "Al geregistreerd in een andere wereld: [gray] %0%."
 "add-blacklisted": "Op de blacklist: [gray]%0%."
 "add-specifyWorld": "Geef de wereld van het gebied aan als je het commando vanuit de console gebruikt."
 "add-incorrectWorld": "Wereld '%0%' niet gevonden, probeer opnieuw (hoofdlettergevoelig)."
@@ -433,6 +435,7 @@
 "resell-success": "%lang:region% is succesvol in doorverkoop mode gezet voor %resellprice%."
 "resell-noPermission": "Je hebt geen toestemming om je gebied in doorverkoop mode te zetten."
 "resell-noPermissionOther": "Je hebt geen toestemming om gebieden in doorverkoop mode te zetten."
+"resell-disabled": "Doorverkopen is uitgeschakeld voor dit gebied."
 "stopresell-help": "/as stopresell [gebied], het gebied waarin je staat zal worden gebruikt als je deze niet aangeeft."
 "stopresell-notRegistered": "Het aangegeven gebied is niet geregistreerd: %0%."
 "stopresell-notResell": "Je kunt niet stoppen met doorverkopen van %lang:region% want hij staat niet in doorverkoop mode."
@@ -493,8 +496,9 @@
 "message-notOnline": "%0% is niet online."
 "import-help": "/as import RegionForSale"
 "import-wrongSource": "Geef aan vanaf waar je data wilt importeren, opties: RegionForSale."
-"import-noPluginFolder": "Kon de folder %0%niet vinden, weet je zeker dat je de data van de juiste bron importeert?"
+"import-noPluginFolder": "Kon de folder %0% niet vinden, weet je zeker dat je de data van de juiste bron importeert?"
 "import-noWorldsFolder": "Er is geen 'plugins/RegionForSale/worlds' map, daarom kon niets geïmporteerd worden."
+"import-confirm": "Weet je het zeker dat je alle gebieden van RegionForSale wilt importeren?"
 "import-start": "Het importeren van de data van RegionForSale begint:"
 "import-doWorld": "[darkgreen][bold]► Wereld %0%:"
 "import-noBukkitWorld": "[red]Kon de wereld niet in Bukkit vinden."

@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ Chinese language file, plugin version 2.5.0, 395/424 messages are translated (93%)
+# ║ Chinese language file, plugin version 2.5.0, 393/428 messages are translated (92%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -137,8 +137,6 @@
 "sell-noPermission": "你没有出售地区商店的权限."
 "sell-noPermissionOther": "你没有权限出售该区域。"
 "reload-reloading": "重新加载所有文件，并检查租金和更新区域."
-"reload-updateStart": "[gray]更新了 %0% 区域 ,以每秒 %1% 的速度."
-"reload-updateComplete": "[gray]刷新区域完成."
 "reload-noPermission": "你没有权限重新加载配置文件."
 "reload-updateCommandChanged": "'/as updaterents' 和 '/as updatebuys' 已被移除, '/as reload' 也会更新现在的区域，所以使用该命令."
 "info-help":

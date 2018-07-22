@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ Spanish language file, plugin version 2.5.0, 423/424 messages are translated (100%)
+# ║ Spanish language file, plugin version 2.5.0, 424/428 messages are translated (99%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -38,6 +38,7 @@
 - "    hover: %lang:action|Regions de %landlord%|%"
 - "    command: /areashop info player %landlord%"
 "total-maximum": "Tu no puedes alquilar o comprar mas de %0% región(es) en total (Actualmente tu tienes %1% en grupo de '%2%')."
+"confirm-yes": " [gray]Haz click en %lang:command|Confirm||%[gray], o reenvía el comando."
 "general-notReady": "AreaShop aún no se ha cargado por completo, por favor espera."
 "general-noWorld": "Tu no puedes hacer esto, el mundo de  %lang:region% no esta disponible actualmente (mundo '%world%')."
 "general-noRegion": "Tu no puedes hacer esto, la región del WorldGuard esta actualmente deshabilitado (region %lang:region%)."
@@ -88,6 +89,7 @@
 "help-linksigns": "%lang:helpCommand|/as linksigns|% Utilice el modo del cartel de enlace a granel."
 "help-stack": "%lang:helpCommand|/as stack|% Crea múltiples regiones."
 "help-setlandlord": "%lang:helpCommand|/as setlandlord|% Establecer el dueño de una región."
+"help-import": "%lang:helpCommand|/as import|% Importar región desde  RegionForSale."
 "rent-help": "/as rent [region], La región en la que estas sera utilizada si no se especifica."
 "rent-noPermission": "No tienes permisos para alquilar una región."
 "rent-maximum": "No puedes alquilar mas de %0% región(es) (Ya tienes %1% en el grupo '%2%')."
@@ -137,8 +139,6 @@
 "sell-noPermission": "No tienes permisos para vender una región."
 "sell-noPermissionOther": "No tienes permisos para vender otra región."
 "reload-reloading": "Se ha recargado los archivos de configuración y regiones."
-"reload-updateStart": "[gray]Actualizando %0% regiones a %1% por segundo."
-"reload-updateComplete": "[gray]Actualización de regiones completado."
 "reload-noPermission": "No tienes permisos para recargar los archivos de config."
 "reload-updateCommandChanged": "'/as updaterents' y '/as updatebuys' fueron eliminadas, '/as reload' también actualizará las regiones ahora para usar ese comando en su lugar."
 "info-help":
@@ -494,6 +494,7 @@
 "import-wrongSource": "Especifica de donde quieres importar los datos, opciones: 'RegionForSale'"
 "import-noPluginFolder": "No se pudo encontrar la carpeta %0%, ¿Seguro que lo está importando del lugar correcto?"
 "import-noWorldsFolder": "No hay una carpeta 'plugins/RegionForSale/worlds', por lo tanto no se ha importado nada."
+"import-confirm": "Estás seguro/a de que quieres importar todas las regiones desde RegionForSale?"
 "import-start": "Empezando importanción de datos de RegionForSale:"
 "import-doWorld": "[darkgreen][bold]► Mundo %0%:"
 "import-noBukkitWorld": "[red]no se pudo encontrar el mundo en Bukkit"

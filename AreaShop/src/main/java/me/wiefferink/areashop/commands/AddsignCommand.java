@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import me.wiefferink.areashop.features.signs.RegionSign;
 import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
@@ -67,7 +66,7 @@ public class AddsignCommand extends CommandAreaShop {
 			}
 		} else {
 			// Get region by sign position
-			List<GeneralRegion> regions = Utils.getRegionsInSelection(new CuboidSelection(block.getWorld(), block.getLocation(), block.getLocation()));
+			List<GeneralRegion> regions = Utils.getImportantRegions(block.getLocation());
 			if(regions.isEmpty()) {
 				plugin.message(sender, "addsign-noRegions");
 				return;

@@ -1,14 +1,15 @@
 package me.wiefferink.areashop.handlers;
 
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
@@ -16,18 +17,17 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.internal.LocalWorldAdapter;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.io.Closer;
-import com.sk89q.worldedit.world.registry.WorldData;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionType;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import me.wiefferink.areashop.interfaces.WorldEditSelection;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.entity.Player;
 
 import java.io.BufferedInputStream;
@@ -37,30 +37,32 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class WorldEditHandler6 extends WorldEditInterface {
+public class WorldEditHandler7 extends WorldEditInterface {
 
-	public WorldEditHandler6(AreaShopInterface pluginInterface) {
+	public WorldEditHandler7(AreaShopInterface pluginInterface) {
 		super(pluginInterface);
 	}
 
 	@Override
 	public WorldEditSelection getPlayerSelection(Player player) {
-		Selection selection = pluginInterface.getWorldEdit().getSelection(player);
-		if (selection == null) {
+		CuboidRegionSelector s;
+		try {
+			Region region = pluginInterface.getWorldEdit().getSession(player).getSelection(BukkitAdapter.adapt(player.getWorld()));
+			return new WorldEditSelection(
+					player.getWorld(),
+					BukkitAdapter.adapt(player.getWorld(), region.getMinimumPoint()),
+					BukkitAdapter.adapt(player.getWorld(), region.getMaximumPoint())
+			);
+		} catch (IncompleteRegionException e) {
 			return null;
 		}
-		return new WorldEditSelection(
-				player.getWorld(),
-				selection.getMinimumPoint(),
-				selection.getMaximumPoint()
-		);
 	}
 
 	@Override
 	public boolean restoreRegionBlocks(File file, GeneralRegionInterface regionInterface) {
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getName() != null) {
-			world = LocalWorldAdapter.adapt(new BukkitWorld(regionInterface.getWorld()));
+			world = BukkitAdapter.adapt(regionInterface.getWorld());
 		}
 		if(world == null) {
 			pluginInterface.getLogger().info("Did not restore region " + regionInterface.getName() + ", world not found: " + regionInterface.getWorldName());
@@ -76,11 +78,16 @@ public class WorldEditHandler6 extends WorldEditInterface {
 		try(Closer closer = Closer.create()) {
 			FileInputStream fis = closer.register(new FileInputStream(file));
 			BufferedInputStream bis = closer.register(new BufferedInputStream(fis));
-			ClipboardReader reader = ClipboardFormat.SCHEMATIC.getReader(bis);
+			ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
+			if (clipboardFormat == null) {
+				pluginInterface.getLogger().warning("WorldEdit could not detect format type of the schematic file:" + file.getAbsolutePath() + ", try updating WorldEdit");
+				return false;
+			}
+			ClipboardReader reader = clipboardFormat.getReader(bis);
 
-			WorldData worldData = world.getWorldData();
+			//WorldData worldData = world.getWorldData();
 			LocalSession session = new LocalSession(pluginInterface.getWorldEdit().getLocalConfiguration());
-			Clipboard clipboard = reader.read(worldData);
+			Clipboard clipboard = reader.read();
 			if(clipboard.getDimensions().getY() != regionInterface.getHeight()
 					|| clipboard.getDimensions().getX() != regionInterface.getWidth()
 					|| clipboard.getDimensions().getZ() != regionInterface.getDepth()) {
@@ -88,12 +95,12 @@ public class WorldEditHandler6 extends WorldEditInterface {
 				pluginInterface.debugI("schematic|region, x:" + clipboard.getDimensions().getX() + "|" + regionInterface.getWidth() + ", y:" + clipboard.getDimensions().getY() + "|" + regionInterface.getHeight() + ", z:" + clipboard.getDimensions().getZ() + "|" + regionInterface.getDepth());
 			}
 			clipboard.setOrigin(clipboard.getMinimumPoint());
-			ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard, worldData);
+			ClipboardHolder clipboardHolder = new ClipboardHolder(clipboard);
 			session.setBlockChangeLimit(pluginInterface.getConfig().getInt("maximumBlocks"));
 			session.setClipboard(clipboardHolder);
 
 			// Build operation
-			BlockTransformExtent extent = new BlockTransformExtent(clipboardHolder.getClipboard(), clipboardHolder.getTransform(), editSession.getWorld().getWorldData().getBlockRegistry());
+			BlockTransformExtent extent = new BlockTransformExtent(clipboardHolder.getClipboard(), clipboardHolder.getTransform());
 			ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), editSession, origin);
 			copy.setTransform(clipboardHolder.getTransform());
 			// Mask to region (for polygon and other weird shaped regions)
@@ -117,7 +124,8 @@ public class WorldEditHandler6 extends WorldEditInterface {
 			return false;
 		} catch(IOException e) {
 			pluginInterface.getLogger().warning("An error occured while restoring schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
-			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
+			// TODO enable
+			//pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;
 		}
 		editSession.flushQueue();
@@ -128,7 +136,7 @@ public class WorldEditHandler6 extends WorldEditInterface {
 	public boolean saveRegionBlocks(File file, GeneralRegionInterface regionInterface) {
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getWorld() != null) {
-			world = LocalWorldAdapter.adapt(new BukkitWorld(regionInterface.getWorld()));
+			world = BukkitAdapter.adapt(regionInterface.getWorld());
 		}
 		if(world == null) {
 			pluginInterface.getLogger().warning("Did not save region " + regionInterface.getName() + ", world not found: " + regionInterface.getWorldName());
@@ -150,11 +158,17 @@ public class WorldEditHandler6 extends WorldEditInterface {
 		try(Closer closer = Closer.create()) {
 			FileOutputStream fos = closer.register(new FileOutputStream(file));
 			BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
-			ClipboardWriter writer = closer.register(ClipboardFormat.SCHEMATIC.getWriter(bos));
-			writer.write(clipboard, world.getWorldData());
+			ClipboardFormat clipboardFormat = ClipboardFormats.findByAlias("schematic");
+			if (clipboardFormat == null) {
+				pluginInterface.getLogger().warning("WorldEdit could not load default schematic format, try updating WorldEdit");
+				return false;
+			}
+			ClipboardWriter writer = closer.register(clipboardFormat.getWriter(bos));
+			writer.write(clipboard);
 		} catch(IOException e) {
 			pluginInterface.getLogger().warning("An error occured while saving schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
-			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
+			// TODO enable
+			//pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;
 		}
 		return true;

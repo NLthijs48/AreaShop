@@ -60,6 +60,13 @@
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-worldguard-7</artifactId>
+            <version>WorldGuard-7</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.wiefferink</groupId>
             <artifactId>areashop-interface</artifactId>
             <version>AreaShopInterface</version>
             <type>jar</type>
@@ -79,20 +86,27 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-worldedit-7</artifactId>
+            <version>WorldEdit-7</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
-            <version>6.0.0-SNAPSHOT</version>
-            <scope>provided</scope>
-            <type>jar</type>
+            <scope>system</scope>
+            <version>any</version>
+            <systemPath>${project.basedir}/../dependencies/worldedit-bukkit-7.0.0-#3808.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
-            <version>6.0.0-SNAPSHOT</version>
-            <scope>provided</scope>
-            <type>jar</type>
+            <scope>system</scope>
+            <version>any</version>
+            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-#1728.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.milkbowl.vault</groupId>

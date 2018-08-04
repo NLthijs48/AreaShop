@@ -103,10 +103,10 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 					result = false;
 				}
 			} else if(flagName.equalsIgnoreCase("parent")) {
-				if(region.getWorld() == null || worldGuard.getRegionManager(region.getWorld()) == null) {
+				if(region.getWorld() == null || plugin.getRegionManager(region.getWorld()) == null) {
 					continue;
 				}
-				ProtectedRegion parentRegion = worldGuard.getRegionManager(region.getWorld()).getRegion(value);
+				ProtectedRegion parentRegion = plugin.getRegionManager(region.getWorld()).getRegion(value);
 				if(parentRegion != null) {
 					if(!parentRegion.equals(worldguardRegion.getParent())) {
 						try {

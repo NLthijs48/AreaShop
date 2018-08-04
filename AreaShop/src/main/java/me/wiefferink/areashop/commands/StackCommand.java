@@ -2,16 +2,17 @@ package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.interfaces.WorldEditSelection;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.interactivemessenger.processing.Message;
+import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -78,7 +79,7 @@ public class StackCommand extends CommandAreaShop {
 			return;
 		}
 		// Get WorldEdit selection
-		final Selection selection = plugin.getWorldEdit().getSelection(player);
+		final WorldEditSelection selection = plugin.getWorldEditHandler().getPlayerSelection(player);
 		if(selection == null) {
 			plugin.message(player, "stack-noSelection");
 			return;
@@ -139,9 +140,14 @@ public class StackCommand extends CommandAreaShop {
 		}
 		plugin.message(player, "stack-accepted", amount, type, gap, nameTemplate, groupsMessage);
 		plugin.message(player, "stack-addStart", amount, regionsPerTick * 20);
+
+		Location minimumLocation = selection.getMinimumLocation();
+		Vector minimumVector = new Vector(minimumLocation.getX(), minimumLocation.getY(), minimumLocation.getZ());
+		Location maximumLocation = selection.getMaximumLocation();
+		Vector maximumVector = new Vector(maximumLocation.getX(), maximumLocation.getY(), maximumLocation.getZ());
 		new BukkitRunnable() {
 			private int current = -1;
-			private final RegionManager manager = AreaShop.getInstance().getWorldGuard().getRegionManager(selection.getWorld());
+			private final RegionManager manager = AreaShop.getInstance().getRegionManager(selection.getWorld());
 			private int counter = 1;
 			private int tooLow = 0;
 			private int tooHigh = 0;
@@ -177,8 +183,8 @@ public class StackCommand extends CommandAreaShop {
 							}
 						}
 						// Add the region to WorldGuard (at startposition shifted by the number of this region times the blocks it should shift)
-						BlockVector minimum = new BlockVector(selection.getNativeMinimumPoint().add(finalShift.multiply(current)));
-						BlockVector maximum = new BlockVector(selection.getNativeMaximumPoint().add(finalShift.multiply(current)));
+						BlockVector minimum = new BlockVector(minimumVector.add(finalShift.multiply(current)));
+						BlockVector maximum = new BlockVector(maximumVector.add(finalShift.multiply(current)));
 						// Check for out of bounds
 						if(minimum.getBlockY() < 0) {
 							tooLow++;

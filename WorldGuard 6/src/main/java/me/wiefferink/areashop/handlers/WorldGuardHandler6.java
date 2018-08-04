@@ -8,11 +8,13 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.RegionAccessSet;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +24,11 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 
 	public WorldGuardHandler6(AreaShopInterface pluginInterface) {
 		super(pluginInterface);
+	}
+
+	@Override
+	public RegionManager getRegionManager(World world) {
+		return WorldGuardPlugin.inst().getRegionManager(world);
 	}
 
 	@Override

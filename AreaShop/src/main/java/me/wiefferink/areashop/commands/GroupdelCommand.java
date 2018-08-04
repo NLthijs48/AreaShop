@@ -1,6 +1,6 @@
 package me.wiefferink.areashop.commands;
 
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import me.wiefferink.areashop.interfaces.WorldEditSelection;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RegionGroup;
 import me.wiefferink.areashop.tools.Utils;
@@ -48,7 +48,7 @@ public class GroupdelCommand extends CommandAreaShop {
 				return;
 			}
 			Player player = (Player)sender;
-			Selection selection = plugin.getWorldEdit().getSelection(player);
+			WorldEditSelection selection = plugin.getWorldEditHandler().getPlayerSelection(player);
 			if(selection == null) {
 				plugin.message(player, "cmd-noSelection");
 				return;

@@ -1,11 +1,10 @@
 package me.wiefferink.areashop.tools;
 
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
-import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.interfaces.WorldEditSelection;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
@@ -319,7 +318,7 @@ public class Utils {
 	 * @param selection The selection to check
 	 * @return A list with all the AreaShop regions intersecting with the selection
 	 */
-	public static List<GeneralRegion> getRegionsInSelection(Selection selection) {
+	public static List<GeneralRegion> getRegionsInSelection(WorldEditSelection selection) {
 		ArrayList<GeneralRegion> result = new ArrayList<>();
 		for(ProtectedRegion region : getWorldEditRegionsInSelection(selection)) {
 			GeneralRegion asRegion = AreaShop.getInstance().getFileManager().getRegion(region.getId());
@@ -336,8 +335,7 @@ public class Utils {
 	 * @return A list with all the AreaShop regions that contain the location
 	 */
 	public static List<GeneralRegion> getRegions(Location location) {
-		Selection selection = new CuboidSelection(location.getWorld(), location, location);
-		return getRegionsInSelection(selection);
+		return getRegionsInSelection(new WorldEditSelection(location.getWorld(), location, location));
 	}
 
 	/**
@@ -345,13 +343,13 @@ public class Utils {
 	 * @param selection The selection to check
 	 * @return A list with all the WorldGuard regions intersecting with the selection
 	 */
-	public static List<ProtectedRegion> getWorldEditRegionsInSelection(Selection selection) {
+	public static List<ProtectedRegion> getWorldEditRegionsInSelection(WorldEditSelection selection) {
 		// Get all regions inside or intersecting with the WorldEdit selection of the player
 		World world = selection.getWorld();
-		RegionManager regionManager = AreaShop.getInstance().getWorldGuard().getRegionManager(world);
+		RegionManager regionManager = AreaShop.getInstance().getRegionManager(world);
 		ArrayList<ProtectedRegion> result = new ArrayList<>();
-		Location selectionMin = selection.getMinimumPoint();
-		Location selectionMax = selection.getMaximumPoint();
+		Location selectionMin = selection.getMinimumLocation();
+		Location selectionMax = selection.getMaximumLocation();
 		for(ProtectedRegion region : regionManager.getRegions().values()) {
 			BlockVector regionMin = region.getMinimumPoint();
 			BlockVector regionMax = region.getMaximumPoint();

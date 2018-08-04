@@ -2,7 +2,6 @@ package me.wiefferink.areashop.regions;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
@@ -29,7 +28,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -243,7 +241,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return 0 if the names are the same, below zero if this region is earlier in the alphabet, otherwise above zero
 	 */
 	@Override
-	public int compareTo(@Nonnull GeneralRegion o) {
+	public int compareTo(GeneralRegion o) {
 		return getName().compareTo(o.getName());
 	}
 
@@ -509,11 +507,11 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public ProtectedRegion getRegion() {
 		if(getWorld() == null
 				|| plugin.getWorldGuard() == null
-				|| plugin.getWorldGuard().getRegionManager(getWorld()) == null
-				|| plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName()) == null) {
+				|| plugin.getRegionManager(getWorld()) == null
+				|| plugin.getRegionManager(getWorld()).getRegion(getName()) == null) {
 			return null;
 		}
-		return plugin.getWorldGuard().getRegionManager(getWorld()).getRegion(getName());
+		return plugin.getRegionManager(getWorld()).getRegion(getName());
 	}
 
 	/**
@@ -790,8 +788,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	public void resetRegionFlags() {
 		ProtectedRegion region = getRegion();
 		if(region != null) {
-			region.setFlag(DefaultFlag.GREET_MESSAGE, null);
-			region.setFlag(DefaultFlag.FAREWELL_MESSAGE, null);
+			region.setFlag(plugin.getWorldGuardHandler().fuzzyMatchFlag("greeting"), null);
+			region.setFlag(plugin.getWorldGuardHandler().fuzzyMatchFlag("farewell"), null);
 		}
 	}
 

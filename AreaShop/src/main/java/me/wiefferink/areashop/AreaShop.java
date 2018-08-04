@@ -2,6 +2,7 @@ package me.wiefferink.areashop;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
@@ -22,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,7 +34,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -202,7 +203,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					wgVersion = "5";
 				} else if(major == 6 && minor == 1 && fixes < 3) {
 					wgVersion = "6";
-				} else {
+				} else if(major == 6) {
 					if(build != null && build == 1672) {
 						error = true;
 						error("Build 1672 of WorldGuard is broken, update to a later build or a stable version!");
@@ -211,9 +212,11 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					} else {
 						wgVersion = "6_1_3";
 					}
+				} else {
+					wgVersion = "7";
 				}
 			} catch(Exception e) { // If version detection fails, at least try to load the latest version
-				wgVersion = "6_1_3";
+				wgVersion = "7";
 			}
 			// Load chosen implementation
 			try {
@@ -240,8 +243,10 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			// Get correct WorldEditInterface (handles things that changed version to version)
 			if(worldEdit.getDescription().getVersion().startsWith("5.")) {
 				weVersion = "5";
-			} else {
+			} else if(worldEdit.getDescription().getVersion().startsWith("6.")) {
 				weVersion = "6";
+			} else {
+				weVersion = "7";
 			}
 			try {
 				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldEditHandler" + weVersion);
@@ -452,6 +457,15 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	}
 
 	/**
+	 * Get the RegionManager.
+	 * @param world World to get the RegionManager for
+	 * @return RegionManager for the given world, if there is one, otherwise null
+	 */
+	public RegionManager getRegionManager(World world) {
+		return this.worldGuardInterface.getRegionManager(world);
+	}
+
+	/**
 	 * Function to get the WorldEdit plugin.
 	 * @return WorldEditPlugin
 	 */
@@ -518,7 +532,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Get the Vault permissions provider.
 	 * @return Vault permissions provider
 	 */
-	public @Nullable net.milkbowl.vault.permission.Permission getPermissionProvider() {
+	public net.milkbowl.vault.permission.Permission getPermissionProvider() {
 		RegisteredServiceProvider<net.milkbowl.vault.permission.Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
 		if (permissionProvider == null || permissionProvider.getProvider() == null) {
 			return null;

@@ -125,7 +125,7 @@ public class ImportJob {
 			}
 
 			// Get the WorldGuard RegionManager
-			RegionManager regionManager = plugin.getWorldGuard().getRegionManager(world);
+			RegionManager regionManager = plugin.getRegionManager(world);
 			if(regionManager == null) {
 				messageNoPrefix("import-noRegionManger");
 				continue;

@@ -667,7 +667,7 @@ public class FileManager extends Manager {
 		for(String world : worldRegionsRequireSaving) {
 			World bukkitWorld = Bukkit.getWorld(world);
 			if(bukkitWorld != null) {
-				RegionManager manager = plugin.getWorldGuard().getRegionManager(bukkitWorld);
+				RegionManager manager = plugin.getRegionManager(bukkitWorld);
 				if(manager != null) {
 					try {
 						if(plugin.getWorldGuard().getDescription().getVersion().startsWith("5.")) {

@@ -1,8 +1,8 @@
 package me.wiefferink.areashop.commands;
 
-import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.interfaces.WorldEditSelection;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
@@ -66,7 +66,7 @@ public class AddCommand extends CommandAreaShop {
 				plugin.message(sender, "cmd-weOnlyByPlayer");
 				return;
 			}
-			Selection selection = plugin.getWorldEdit().getSelection(player);
+			WorldEditSelection selection = plugin.getWorldEditHandler().getPlayerSelection(player);
 			if(selection == null) {
 				plugin.message(player, "cmd-noSelection");
 				return;
@@ -100,7 +100,7 @@ public class AddCommand extends CommandAreaShop {
 					}
 				}
 			}
-			ProtectedRegion region = plugin.getWorldGuard().getRegionManager(world).getRegion(args[2]);
+			ProtectedRegion region = plugin.getRegionManager(world).getRegion(args[2]);
 			if(region == null) {
 				plugin.message(sender, "cmd-noRegion", args[2]);
 				return;
@@ -272,7 +272,7 @@ public class AddCommand extends CommandAreaShop {
 			if(sender instanceof Player) {
 				Player player = (Player)sender;
 				if(sender.hasPermission("areashop.createrent") || sender.hasPermission("areashop.createbuy")) {
-					for(ProtectedRegion region : plugin.getWorldGuard().getRegionManager(player.getWorld()).getRegions().values()) {
+					for(ProtectedRegion region : plugin.getRegionManager(player.getWorld()).getRegions().values()) {
 						result.add(region.getId());
 					}
 				}

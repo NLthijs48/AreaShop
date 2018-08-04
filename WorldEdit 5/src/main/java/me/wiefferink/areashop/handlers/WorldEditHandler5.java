@@ -5,13 +5,16 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
+import me.wiefferink.areashop.interfaces.WorldEditSelection;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +23,19 @@ public class WorldEditHandler5 extends WorldEditInterface {
 
 	public WorldEditHandler5(AreaShopInterface pluginInterface) {
 		super(pluginInterface);
+	}
+
+	@Override
+	public WorldEditSelection getPlayerSelection(Player player) {
+		Selection selection = pluginInterface.getWorldEdit().getSelection(player);
+		if (selection == null) {
+			return null;
+		}
+		return new WorldEditSelection(
+				player.getWorld(),
+				selection.getMinimumPoint(),
+				selection.getMaximumPoint()
+		);
 	}
 
 	@Override

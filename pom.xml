@@ -61,9 +61,11 @@
     <module>WorldGuard 5</module>
     <module>WorldGuard 6</module>
     <module>WorldGuard 6_1_3</module>
+    <module>WorldGuard 7</module>
     <module>Interfaces</module>
     <module>WorldEdit 5</module>
     <module>WorldEdit 6</module>
+    <module>WorldEdit 7</module>
     <module>AreaShop</module>
   </modules>
 

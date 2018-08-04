@@ -4,8 +4,10 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.Set;
 import java.util.UUID;
@@ -16,6 +18,13 @@ public abstract class WorldGuardInterface {
 	public WorldGuardInterface(AreaShopInterface pluginInterface) {
 		this.pluginInterface = pluginInterface;
 	}
+
+	/**
+	 * Get the RegionManager for a certain bukkit World.
+	 * @param world World to get the RegionManager for
+	 * @return RegionManager if there is one for the given World
+	 */
+	public abstract RegionManager getRegionManager(World world);
 
 	/**
 	 * Get a set of ProtectedRegion's that are present on a certain location.

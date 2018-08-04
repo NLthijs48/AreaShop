@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.features.signs;
 
-import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
@@ -177,7 +176,7 @@ public class SignsFeature extends RegionFeature {
 			String fourthLine = event.getLine(3);
 
 			// Get the regionManager for accessing regions
-			RegionManager regionManager = plugin.getWorldGuard().getRegionManager(event.getPlayer().getWorld());
+			RegionManager regionManager = plugin.getRegionManager(event.getPlayer().getWorld());
 
 			// If the secondLine does not contain a name try to find the region by location
 			if(secondLine == null || secondLine.length() == 0) {
@@ -289,7 +288,7 @@ public class SignsFeature extends RegionFeature {
 			String thirdLine = event.getLine(2);
 
 			// Get the regionManager for accessing regions
-			RegionManager regionManager = plugin.getWorldGuard().getRegionManager(event.getPlayer().getWorld());
+			RegionManager regionManager = plugin.getRegionManager(event.getPlayer().getWorld());
 
 			// If the secondLine does not contain a name try to find the region by location
 			if(secondLine == null || secondLine.length() == 0) {
@@ -403,7 +402,7 @@ public class SignsFeature extends RegionFeature {
 				}
 			} else {
 				// Get region by sign position
-				List<GeneralRegion> regions = Utils.getRegionsInSelection(new CuboidSelection(event.getBlock().getWorld(), event.getBlock().getLocation(), event.getBlock().getLocation()));
+				List<GeneralRegion> regions = Utils.getImportantRegions(event.getBlock().getLocation());
 				if(regions.isEmpty()) {
 					plugin.message(player, "addsign-noRegions");
 					return;

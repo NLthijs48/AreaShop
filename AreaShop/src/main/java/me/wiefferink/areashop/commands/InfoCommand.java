@@ -10,8 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,7 +42,7 @@ public class InfoCommand extends CommandAreaShop {
 	 * @param pageInput   The page number, if any
 	 * @param baseCommand The command to execute for next/previous page (/areashop will be added)
 	 */
-	private void showSortedPagedList(@Nonnull CommandSender sender, @Nonnull List<? extends GeneralRegion> regions, @Nullable RegionGroup filterGroup, @Nonnull String keyHeader, @Nullable String pageInput, @Nonnull String baseCommand) {
+	private void showSortedPagedList(CommandSender sender, List<? extends GeneralRegion> regions, RegionGroup filterGroup, String keyHeader, String pageInput, String baseCommand) {
 		int maximumItems = 20;
 		int itemsPerPage = maximumItems - 2;
 		int page = 1;

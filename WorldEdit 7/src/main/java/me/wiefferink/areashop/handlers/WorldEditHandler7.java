@@ -8,6 +8,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
@@ -28,6 +29,7 @@ import me.wiefferink.areashop.interfaces.AreaShopInterface;
 import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import me.wiefferink.areashop.interfaces.WorldEditSelection;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.entity.Player;
 
 import java.io.BufferedInputStream;
@@ -124,8 +126,7 @@ public class WorldEditHandler7 extends WorldEditInterface {
 			return false;
 		} catch(IOException e) {
 			pluginInterface.getLogger().warning("An error occured while restoring schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
-			// TODO enable
-			//pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
+			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;
 		}
 		editSession.flushQueue();
@@ -158,17 +159,11 @@ public class WorldEditHandler7 extends WorldEditInterface {
 		try(Closer closer = Closer.create()) {
 			FileOutputStream fos = closer.register(new FileOutputStream(file));
 			BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
-			ClipboardFormat clipboardFormat = ClipboardFormats.findByAlias("schematic");
-			if (clipboardFormat == null) {
-				pluginInterface.getLogger().warning("WorldEdit could not load default schematic format, try updating WorldEdit");
-				return false;
-			}
-			ClipboardWriter writer = closer.register(clipboardFormat.getWriter(bos));
+			ClipboardWriter writer = closer.register(BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(bos));
 			writer.write(clipboard);
 		} catch(IOException e) {
 			pluginInterface.getLogger().warning("An error occured while saving schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
-			// TODO enable
-			//pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
+			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;
 		}
 		return true;

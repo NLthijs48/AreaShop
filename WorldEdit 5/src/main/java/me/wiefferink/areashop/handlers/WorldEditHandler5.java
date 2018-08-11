@@ -40,6 +40,11 @@ public class WorldEditHandler5 extends WorldEditInterface {
 
 	@Override
 	public boolean restoreRegionBlocks(File file, GeneralRegionInterface regionInterface) {
+		file = new File(file.getAbsolutePath() + ".schematic");
+		if(!file.exists() || !file.isFile()) {
+			pluginInterface.getLogger().info("Did not restore region " + regionInterface.getName() + ", schematic file does not exist: " + file.getAbsolutePath());
+			return false;
+		}
 		boolean result = true;
 		EditSession editSession = pluginInterface.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(new BukkitWorld(regionInterface.getWorld()), pluginInterface.getConfig().getInt("maximumBlocks"));
 		// Get the origin and size of the region
@@ -57,7 +62,7 @@ public class WorldEditHandler5 extends WorldEditInterface {
 			}
 			clipBoard.place(editSession, origin, false);
 		} catch(MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
+			pluginInterface.getLogger().warning("exceeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			result = false;
 		} catch(DataException | IOException e) {
 			otherException = e;
@@ -73,6 +78,7 @@ public class WorldEditHandler5 extends WorldEditInterface {
 
 	@Override
 	public boolean saveRegionBlocks(File file, GeneralRegionInterface regionInterface) {
+		file = new File(file.getAbsolutePath() + ".schematic");
 		boolean result = true;
 		ProtectedRegion region = regionInterface.getRegion();
 		// Get the origin and size of the region

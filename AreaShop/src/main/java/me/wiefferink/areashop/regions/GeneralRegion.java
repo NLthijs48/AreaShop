@@ -740,7 +740,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return false;
 		}
 		// The path to save the schematic
-		File saveFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
+		File saveFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName);
 		// Create parent directories
 		File parent = saveFile.getParentFile();
 		if(parent != null && !parent.exists()) {
@@ -767,11 +767,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			return false;
 		}
 		// The path to save the schematic
-		File restoreFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName + AreaShop.schematicExtension);
-		if(!restoreFile.exists() || !restoreFile.isFile()) {
-			AreaShop.info("Did not restore region " + getName() + ", schematic file does not exist: " + restoreFile.getAbsolutePath());
-			return false;
-		}
+		File restoreFile = new File(plugin.getFileManager().getSchematicFolder() + File.separator + fileName);
 		boolean result = plugin.getWorldEditHandler().restoreRegionBlocks(restoreFile, this);
 		if(result) {
 			AreaShop.debug("Restored schematic for region " + getName());

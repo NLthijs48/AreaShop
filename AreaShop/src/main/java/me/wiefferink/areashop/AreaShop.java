@@ -67,7 +67,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	// Folders and file names
 	public static final String languageFolder = "lang";
 	public static final String schematicFolder = "schem";
-	public static final String schematicExtension = ".schematic";
 	public static final String regionsFolder = "regions";
 	public static final String groupsFile = "groups.yml";
 	public static final String defaultFile = "default.yml";

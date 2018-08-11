@@ -58,6 +58,11 @@ public class WorldEditHandler6 extends WorldEditInterface {
 
 	@Override
 	public boolean restoreRegionBlocks(File file, GeneralRegionInterface regionInterface) {
+		file = new File(file.getAbsolutePath() + ".schematic");
+		if(!file.exists() || !file.isFile()) {
+			pluginInterface.getLogger().info("Did not restore region " + regionInterface.getName() + ", schematic file does not exist: " + file.getAbsolutePath());
+			return false;
+		}
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getName() != null) {
 			world = LocalWorldAdapter.adapt(new BukkitWorld(regionInterface.getWorld()));
@@ -113,7 +118,7 @@ public class WorldEditHandler6 extends WorldEditInterface {
 			}
 			Operations.completeLegacy(copy);
 		} catch(MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
+			pluginInterface.getLogger().warning("exceeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;
 		} catch(IOException e) {
 			pluginInterface.getLogger().warning("An error occured while restoring schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
@@ -126,6 +131,7 @@ public class WorldEditHandler6 extends WorldEditInterface {
 
 	@Override
 	public boolean saveRegionBlocks(File file, GeneralRegionInterface regionInterface) {
+		file = new File(file.getAbsolutePath() + ".schematic");
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getWorld() != null) {
 			world = LocalWorldAdapter.adapt(new BukkitWorld(regionInterface.getWorld()));
@@ -143,7 +149,7 @@ public class WorldEditHandler6 extends WorldEditInterface {
 		try {
 			Operations.completeLegacy(copy);
 		} catch(MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while saving schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
+			pluginInterface.getLogger().warning("exceeded the block limit while saving schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;
 		}
 

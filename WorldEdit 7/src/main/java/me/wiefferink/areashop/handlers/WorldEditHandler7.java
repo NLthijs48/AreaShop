@@ -61,7 +61,20 @@ public class WorldEditHandler7 extends WorldEditInterface {
 	}
 
 	@Override
-	public boolean restoreRegionBlocks(File file, GeneralRegionInterface regionInterface) {
+	public boolean restoreRegionBlocks(File rawFile, GeneralRegionInterface regionInterface) {
+		File file = null;
+		for (BuiltInClipboardFormat format : BuiltInClipboardFormat.values()) {
+			for (String extension : format.getFileExtensions()) {
+				if (new File(rawFile.getAbsolutePath() + "." + extension).exists()) {
+					file = new File(rawFile.getAbsolutePath() + "." + extension);
+				}
+			}
+		}
+		if(file == null) {
+			pluginInterface.getLogger().info("Did not restore region " + regionInterface.getName() + ", schematic file does not exist: " + rawFile.getAbsolutePath());
+			return false;
+		}
+
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getName() != null) {
 			world = BukkitAdapter.adapt(regionInterface.getWorld());
@@ -122,7 +135,7 @@ public class WorldEditHandler7 extends WorldEditInterface {
 			}
 			Operations.completeLegacy(copy);
 		} catch(MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
+			pluginInterface.getLogger().warning("exceeded the block limit while restoring schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;
 		} catch(IOException e) {
 			pluginInterface.getLogger().warning("An error occured while restoring schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
@@ -135,6 +148,7 @@ public class WorldEditHandler7 extends WorldEditInterface {
 
 	@Override
 	public boolean saveRegionBlocks(File file, GeneralRegionInterface regionInterface) {
+		file = new File(file.getAbsolutePath() + "." + BuiltInClipboardFormat.SPONGE_SCHEMATIC.getPrimaryFileExtension());
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getWorld() != null) {
 			world = BukkitAdapter.adapt(regionInterface.getWorld());
@@ -152,7 +166,7 @@ public class WorldEditHandler7 extends WorldEditInterface {
 		try {
 			Operations.completeLegacy(copy);
 		} catch(MaxChangedBlocksException e) {
-			pluginInterface.getLogger().warning("Exeeded the block limit while saving schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
+			pluginInterface.getLogger().warning("Exceeded the block limit while saving schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;
 		}
 

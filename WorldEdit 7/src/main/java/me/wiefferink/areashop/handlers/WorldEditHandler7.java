@@ -117,6 +117,7 @@ public class WorldEditHandler7 extends WorldEditInterface {
 			// Build operation
 			BlockTransformExtent extent = new BlockTransformExtent(clipboardHolder.getClipboard(), clipboardHolder.getTransform());
 			ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), editSession, origin);
+			copy.setCopyingEntities(false);
 			copy.setTransform(clipboardHolder.getTransform());
 			// Mask to region (for polygon and other weird shaped regions)
 			// TODO make this more efficient (especially for polygon regions)

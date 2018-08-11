@@ -35,7 +35,7 @@ public class WorldGuardHandler6 extends WorldGuardInterface {
 	public Set<ProtectedRegion> getApplicableRegionsSet(Location location) {
 		Set<ProtectedRegion> result = new HashSet<>();
 		Vector vector = new Vector(location.getX(), location.getY(), location.getZ());
-		for(ProtectedRegion region : pluginInterface.getWorldGuard().getRegionManager(location.getWorld()).getRegions().values()) {
+		for(ProtectedRegion region : getRegionManager(location.getWorld()).getRegions().values()) {
 			if(region.contains(vector)) {
 				result.add(region);
 			}

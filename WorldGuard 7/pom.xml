@@ -31,7 +31,7 @@
             <artifactId>worldedit</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/worldedit-bukkit-7.0.0-#3808.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/worldedit-bukkit-7.0.0-#3817.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>
@@ -52,7 +52,7 @@
             <artifactId>worldguard</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-#1728.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-#1735.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

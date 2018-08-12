@@ -581,7 +581,7 @@ public class Utils {
 		}
 
 		// Check if the suffix is one of these values
-		String suffix = time.substring(time.indexOf(' ') + 1, time.length());
+		String suffix = time.substring(time.indexOf(' ') + 1);
 		if(!identifiers.contains(suffix)) {
 			return false;
 		}
@@ -599,7 +599,7 @@ public class Utils {
 	public static long durationStringToLong(String duration) {
 		if(duration == null) {
 			return 0;
-		} else if(duration.equalsIgnoreCase("disabled") || duration.equalsIgnoreCase("unlimited")) {
+		} else if(duration.equalsIgnoreCase("disabled") || duration.equalsIgnoreCase("unlimited") || duration.length() == 0) {
 			return -1;
 		} else if(duration.indexOf(' ') == -1) {
 			return 0;
@@ -607,7 +607,7 @@ public class Utils {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(0);
 
-		String durationString = duration.substring(duration.indexOf(' ') + 1, duration.length());
+		String durationString = duration.substring(duration.indexOf(' ') + 1);
 		int durationInt = 0;
 		try {
 			durationInt = Integer.parseInt(duration.substring(0, duration.indexOf(' ')));

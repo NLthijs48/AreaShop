@@ -736,7 +736,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 	/**
 	 * Print an error to the console.
-	 * @param message The messagfe to print
+	 * @param message The message to print
 	 */
 	public static void error(Object... message) {
 		AreaShop.getInstance().getLogger().severe(StringUtils.join(message, " "));

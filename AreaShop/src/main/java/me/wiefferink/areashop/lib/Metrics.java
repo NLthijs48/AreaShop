@@ -49,6 +49,7 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -519,7 +520,7 @@ public class Metrics {
 
 		try {
 			gzos = new GZIPOutputStream(baos);
-			gzos.write(input.getBytes("UTF-8"));
+			gzos.write(input.getBytes(StandardCharsets.UTF_8));
 		} catch(IOException e) {
 			e.printStackTrace();
 		} finally {

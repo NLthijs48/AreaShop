@@ -154,11 +154,11 @@ public class TeleportFeature extends RegionFeature {
 		int maxTries = plugin.getConfig().getInt("maximumTries");
 
 		// Tracking of which sides to continue the search
-		boolean done = isSafe(safeLocation) && ((blocksInRegion && insideRegion) || (!insideRegion));
+		boolean done = isSafe(safeLocation) && (blocksInRegion || !insideRegion);
 		boolean northDone = false, eastDone = false, southDone = false, westDone = false, topDone = false, bottomDone = false;
 		boolean continueThisDirection;
 
-		while(((blocksInRegion && insideRegion) || (!insideRegion)) && !done) {
+		while((blocksInRegion || !insideRegion) && !done) {
 			blocksInRegion = false;
 
 			// North side

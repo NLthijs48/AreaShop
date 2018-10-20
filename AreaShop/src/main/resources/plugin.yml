@@ -203,7 +203,7 @@ permissions:
     default: op
   areashop.limits.default:
     description: Assign limits as set in the 'default' group in the 'limitGroups' section of the config
-    default: not op
+    default: true
   areashop.limitbypass:
     description: Bypass the limits for renting/buying regions (how many you can have at the same time)
     default: op

@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ German language file, plugin version 2.5.0, 391/428 messages are translated (91%)
+# ║ German language file, plugin version 2.5.0, 396/428 messages are translated (93%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -38,6 +38,7 @@
 - "    hover: %lang:action|Regionen von %landlord%|%"
 - "    command: /areashop info player %landlord%"
 "total-maximum": "Du kannst nicht mehr als %0% Region(en) mieten/kaufen (Du hast bereits %1% in Gruppe '%2%')."
+"confirm-yes": " [gray]Klicken um %lang:command|den Command zu bestätigen|1%0%|%[gray] oder zu wiederholen."
 "general-notReady": "AreaShop ist noch nicht vollständig geladen, bitte warten."
 "general-noWorld": "Du kannst das nicht machen, die Welt von %lang:region% ist derzeit nicht verfügbar (Welt '%world%')."
 "general-noRegion": "Du kannst das nicht machen, die WorldGuard Region ist derzeit nicht verfügbar (region %lang:region%)."
@@ -111,6 +112,7 @@
 "buy-noPermission": "Du bist nicht berechtigt, eine Region zu kaufen."
 "buy-noPermissionResell": "Du hast keine Berechtigung eine Region im Weiterverkaufs-Modus zu kaufen."
 "buy-noPermissionNoResell": "Du hast keine Berechtigung um eine Region zu kaufen, die nicht im Weiterverkaufs-Modus ist."
+"buy-notBuyable": "Region '1%0%' ist nicht zum Kauf verfügbar (nicht registriert in AreaShop oder es ist eine mietbare Region)"
 "buy-maximum": "Du kannst nicht mehr als %0% Region(en) erwerben (Du hast bereits %1% in Gruppe '%2%')."
 "buy-payError": "Die Bezahlung hat nicht funktioniert. Bitte versuche es später noch einmal."
 "buy-succes": "Du hast %lang:region% erfolgreich gekauft."
@@ -135,6 +137,7 @@
 "sell-sold": "Die Region %lang:region% von %lang:player% wurde verkauft."
 "sell-noPermission": "Du bist nicht berechtigt, diese Region zu verkaufen."
 "sell-noPermissionOther": "Du bist nicht berechtigt, eine Region zu verkaufen."
+"sell-disabled": "Das verkaufen dieser Region wurde deaktiviert."
 "reload-reloading": "Alle Konfigurationsdateien und Region-Dateien wurden neu geladen."
 "reload-noPermission": "Du hast keine Berechtigungen um die Konfigurationsdateien neu zu laden."
 "reload-updateCommandChanged": "'/as updaterents' und '/as updatebuys' wurden entfernt, bitte benutze '/as reload' um die Regionen neu zu laden."
@@ -282,6 +285,7 @@
 "setduration-successRemoved": "Die Mietdauer der Region %lang:region% wurde entfernt, es wird nun die Dauer von einer Gruppe oder der default.yml Datei benutzt. Neue Mietdauer: %duration%."
 "setup-noRegion": "Du hast in der zweiten Zeile keine Region angegeben."
 "setup-alreadyRentSign": "Die angegebene Region ist bereits in AreaShop als eine Miet-Region eingefügt, du kannst Schilder zu der Region mit  [as] in der ersten Zeile hinzufügen, oder '/as addsign' verwenden."
+"setup-alreadyOtherWorld": "Die Region, die angegeben wurde, wurde bereits in einer anderen Welt hinzugefügt, Regionen aus verschiedenen Welten benötigen dennoch andere Namen."
 "setup-alreadyBuySign": "Die angegebene Region ist bereits in AreaShop als eine Kauf-Region eingefügt, du kannst Schilder zu der Region mit  [as] in der ersten Zeile hinzufügen, oder '/as addsign' verwenden."
 "setup-noDuration": "Du hast nicht angegeben, wie lange eine Region mietbar ist. Bitte trage dies in die dritte Zeile ein."
 "setup-wrongDuration": "Die angegebene Zeit liegt nicht in einem korrekten Format vor. Beispiel: 1 Tag."
@@ -418,6 +422,7 @@
 "resell-success": "Weiterverkauf für %lang:region% erfolgreich aktiviert. Preis: %resellprice%."
 "resell-noPermission": "Du hast keine Berechtigung, deine Region weiterzuverkaufen."
 "resell-noPermissionOther": "Du hast keine Berechtigung, den Weiterverkauf von Regionen zu aktivieren."
+"resell-disabled": "Der Weiterverkauf wurde für diese Region deaktiviert."
 "stopresell-help": "/as stopresell [Region], wählt automatisch die Region, in der du dich befindest, wenn nicht angegeben."
 "stopresell-notRegistered": "Die angegebene Region ist nicht registriert: %0%."
 "stopresell-notResell": "Du kannst den Weiterverkauf von %lang:region% nicht stoppen, weil sie bisher nicht weiterverkauft werden soll."

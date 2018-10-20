@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ French language file, plugin version 2.5.0, 395/428 messages are translated (92%)
+# ║ French language file, plugin version 2.5.0, 399/428 messages are translated (93%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -38,6 +38,7 @@
 - "    hover: %lang:action|Région de %landlord%|%"
 - "    command: /areashop info player %landlord%"
 "total-maximum": "Vous ne pouvez pas louer ou acheter plus de %0% région(s) au total (vous possédez déjà %1% dans le groupe '%2%')."
+"confirm-yes": " [gray]Clique ici %lang:command|Confirm%0% |%[gray], ou refait la commande."
 "general-notReady": "AreaShop n'est pas totalement chargé, merci d'attendre."
 "general-noWorld": "Vous ne pouvez pas faire ceci, le monde de %lang:region% n'est en ce moment pas disponible (monde '%world%')."
 "general-noRegion": "Vous ne pouvez pas faire ceci, la région WorldGuard n'est pour le moment pas disponible (région %lang:region%)."
@@ -88,6 +89,7 @@
 "help-linksigns": "%lang:helpCommand|/as linksigns|% Utilisez le mode de liaison de panneau."
 "help-stack": "%lang:helpCommand|/as stack|% Créez plusieurs régions et ajoutez les."
 "help-setlandlord": "%lang:helpCommand|/as setlandlord|% Définir le bailleur d'une région"
+"help-import": "%lang:helpCommand|/as import|% Importe les régions des régions à vendre."
 "rent-help": "/as rent [region], Si non spécifiée, cible la région dans laquelle vous vous trouvez."
 "rent-noPermission": "Vous n'avez pas la permission de louer une région."
 "rent-maximum": "Vous ne pouvez pas louer plus de %0% région(s) au total (vous possédez déjà %1% dans le groupe '%2%')."
@@ -136,6 +138,7 @@
 "sell-sold": " %lang:player% a vendu la région %lang:region%"
 "sell-noPermission": "Vous n'avez pas la permission de vendre une région."
 "sell-noPermissionOther": "Vous n'avez pas la permission de vendre une autre région."
+"sell-disabled": "La vente a été désactivé dans cette région."
 "reload-reloading": "Fichiers de configurations et des régions rechargés."
 "reload-noPermission": "Vous n'avez pas la permission de recharger les fichiers."
 "reload-updateCommandChanged": "'/as updaterents' et '/as updatebuys' ont été supprimées, '/as reload' est la commande à utiliser pour mettre à jour les régions."
@@ -168,6 +171,10 @@
 "info-entrySold": "[darkgreen][bold]►[reset] %lang:region%: [gray]Vendu à %lang:player%."
 "info-entryReselling": "[darkgreen][bold]►[reset] %lang:region%: [gray]Vendu à %lang:player% (revente)."
 "info-pageStatus": "[gold]Page %0%/%1%"
+"info-pagePrevious":
+- "[gold][bold]◄Précédent[/bold] "
+- "hover: %lang:action|Montrer la page précédente |%"
+- "command: /areashop %0%"
 "info-pageNoPrevious":
 - "    [darkgray][bold]◄Précédent[/bold]    "
 - "    hover: C'est déjà la premier page"

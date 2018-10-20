@@ -21,7 +21,7 @@ public class DelCommand extends CommandAreaShop {
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.destroyrent") || target.hasPermission("areashop.destroybuy")) {
+		if(target.hasPermission("areashop.destroyrent") || target.hasPermission("areashop.destroybuy") || target.hasPermission("areashop.destroyrent.landlord") || target.hasPermission("areashop.destroybuy.landlord")) {
 			return "help-del";
 		}
 		return null;

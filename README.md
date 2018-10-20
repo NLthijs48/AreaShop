@@ -83,6 +83,6 @@ Help translating the plugin into different languages and to keep the translation
 
 ![Transifex-translation-progress](https://transifex.com/projects/p/areashop/resource/enyml/chart/image_png)
 
-[![Discord-support-chat](https://user-images.githubusercontent.com/6951068/47256366-5235e900-d47f-11e8-9109-a8b6d1cae6ca.png)](https://discord.gg/84kGMCQ)
+[![Discord-support-chat](https://user-images.githubusercontent.com/6951068/47256403-31ba5e80-d480-11e8-8ca7-d788a7e7ee29.png)](https://discord.gg/84kGMCQ)
 
 [![Donate through PayPal to support development](https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VEECV88NG3L5C)

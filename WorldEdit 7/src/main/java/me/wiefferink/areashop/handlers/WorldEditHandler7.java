@@ -8,7 +8,6 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
@@ -63,10 +62,12 @@ public class WorldEditHandler7 extends WorldEditInterface {
 	@Override
 	public boolean restoreRegionBlocks(File rawFile, GeneralRegionInterface regionInterface) {
 		File file = null;
-		for (ClipboardFormat format : ClipboardFormats.getAll()) {
-			for (String extension : format.getFileExtensions()) {
+		ClipboardFormat format = null;
+		for (ClipboardFormat formatOption : ClipboardFormats.getAll()) {
+			for (String extension : formatOption.getFileExtensions()) {
 				if (new File(rawFile.getAbsolutePath() + "." + extension).exists()) {
 					file = new File(rawFile.getAbsolutePath() + "." + extension);
+					format = formatOption;
 				}
 			}
 		}
@@ -74,6 +75,7 @@ public class WorldEditHandler7 extends WorldEditInterface {
 			pluginInterface.getLogger().info("Did not restore region " + regionInterface.getName() + ", schematic file does not exist: " + rawFile.getAbsolutePath());
 			return false;
 		}
+		pluginInterface.debugI("Trying to restore region", regionInterface.getName(), " from file", file.getAbsolutePath(), "with format", format.getName());
 
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getName() != null) {
@@ -153,7 +155,20 @@ public class WorldEditHandler7 extends WorldEditInterface {
 
 	@Override
 	public boolean saveRegionBlocks(File file, GeneralRegionInterface regionInterface) {
-		file = new File(file.getAbsolutePath() + "." + BuiltInClipboardFormat.SPONGE_SCHEMATIC.getPrimaryFileExtension());
+		ClipboardFormat format = ClipboardFormats.findByAlias("sponge");
+		if(format == null) {
+			// Sponge format does not exist, try to select another one
+			for(ClipboardFormat otherFormat : ClipboardFormats.getAll()) {
+				format = otherFormat;
+			}
+			if(format == null) {
+				pluginInterface.getLogger().warning("Cannot find a format to save a schematic in, no available formats!");
+				return false;
+			}
+		}
+
+		file = new File(file.getAbsolutePath() + "." + format.getPrimaryFileExtension());
+		pluginInterface.debugI("Trying to save region", regionInterface.getName(), " to file", file.getAbsolutePath(), "with format", format.getName());
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getWorld() != null) {
 			world = BukkitAdapter.adapt(regionInterface.getWorld());
@@ -163,6 +178,7 @@ public class WorldEditHandler7 extends WorldEditInterface {
 			return false;
 		}
 		EditSession editSession = pluginInterface.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(world, pluginInterface.getConfig().getInt("maximumBlocks"));
+
 		// Create a clipboard
 		CuboidRegion selection = new CuboidRegion(world, regionInterface.getRegion().getMinimumPoint(), regionInterface.getRegion().getMaximumPoint());
 		BlockArrayClipboard clipboard = new BlockArrayClipboard(selection);
@@ -178,7 +194,7 @@ public class WorldEditHandler7 extends WorldEditInterface {
 		try(Closer closer = Closer.create()) {
 			FileOutputStream fos = closer.register(new FileOutputStream(file));
 			BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
-			ClipboardWriter writer = closer.register(BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(bos));
+			ClipboardWriter writer = closer.register(format.getWriter(bos));
 			writer.write(clipboard);
 		} catch(IOException e) {
 			pluginInterface.getLogger().warning("An error occured while saving schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");

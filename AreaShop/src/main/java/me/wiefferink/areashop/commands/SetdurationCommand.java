@@ -90,14 +90,14 @@ public class SetdurationCommand extends CommandAreaShop {
 	@Override
 	public List<String> getTabCompleteList(int toComplete, String[] start, CommandSender sender) {
 		List<String> result = new ArrayList<>();
-		if(toComplete == 2) {
-			result = plugin.getFileManager().getRentNames();
-		} else if(toComplete == 4) {
+		if(toComplete == 3) {
 			result.addAll(plugin.getConfig().getStringList("minutes"));
 			result.addAll(plugin.getConfig().getStringList("hours"));
 			result.addAll(plugin.getConfig().getStringList("days"));
 			result.addAll(plugin.getConfig().getStringList("months"));
 			result.addAll(plugin.getConfig().getStringList("years"));
+		} else if(toComplete == 4) {
+			result = plugin.getFileManager().getRentNames();
 		}
 		return result;
 	}

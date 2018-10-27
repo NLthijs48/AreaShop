@@ -3,6 +3,7 @@ package me.wiefferink.areashop.commands;
 import me.wiefferink.areashop.features.signs.RegionSign;
 import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
+import me.wiefferink.areashop.tools.Materials;
 import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -51,7 +52,7 @@ public class AddsignCommand extends CommandAreaShop {
 				block = next;
 			}
 		}
-		if(block == null || !(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST)) {
+		if(block == null || !Materials.isSign(block.getType())) {
 			plugin.message(sender, "addsign-noSign");
 			return;
 		}

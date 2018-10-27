@@ -3,6 +3,7 @@ package me.wiefferink.areashop.features.signs;
 import com.google.common.base.Objects;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.GeneralRegion;
+import me.wiefferink.areashop.tools.Materials;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.interactivemessenger.processing.Message;
 import org.bukkit.Bukkit;
@@ -99,11 +100,13 @@ public class RegionSign {
 	 * @return Material of the sign, normally {@link Material#WALL_SIGN} or {@link Material#SIGN_POST}, but could be something else or null.
 	 */
 	public Material getMaterial() {
-		try {
-			return Material.valueOf(getRegion().getConfig().getString("general.signs." + key + ".signType"));
-		} catch(NullPointerException | IllegalArgumentException e) {
-			return null;
+		String name = getRegion().getConfig().getString("general.signs." + key + ".signType");
+		if ("WALL_SIGN".equals(name)) {
+			return Materials.wallSign;
+		} else if ("SIGN_POST".equals(name) || "SIGN".equals(name)) {
+			return Materials.floorSign;
 		}
+		return null;
 	}
 
 	/**
@@ -145,16 +148,16 @@ public class RegionSign {
 			return true;
 		}
 
-		Sign signState = null;
 		// Place the sign back (with proper rotation and type) after it has been hidden or (indirectly) destroyed
-		if(block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
+		Sign signState = null;
+		if(!Materials.isSign(block.getType())) {
 			Material signType = getMaterial();
-			if(signType != Material.WALL_SIGN && signType != Material.SIGN_POST) {
+			if(!Materials.isSign(signType)) {
 				AreaShop.debug("Setting sign", key, "of region", getRegion().getName(), "failed, could not set sign block back");
 				return false;
 			}
 			block.setType(signType);
-			signState = (Sign)block.getState();
+			signState = (Sign) block.getState();
 			org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 			BlockFace signFace = getFacing();
 			if(signFace != null) {
@@ -163,13 +166,17 @@ public class RegionSign {
 			}
 		}
 		if(signState == null) {
-			signState = (Sign)block.getState();
+			signState = (Sign) block.getState();
 		}
 
 		// Save current rotation and type
 		org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 		if(!regionConfig.isString("general.signs." + key + ".signType")) {
-			getRegion().setSetting("general.signs." + key + ".signType", signState.getType().toString());
+			String signType = signState.getType().name();
+			if (signType.equals("SIGN")) {
+				signType = "SIGN_POST"; // Save with a backwards-compatible name
+			}
+			getRegion().setSetting("general.signs." + key + ".signType", signType);
 		}
 		if(!regionConfig.isString("general.signs." + key + ".facing")) {
 			getRegion().setSetting("general.signs." + key + ".facing", signData.getFacing().toString());

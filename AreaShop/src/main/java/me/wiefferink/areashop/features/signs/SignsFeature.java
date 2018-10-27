@@ -9,6 +9,7 @@ import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
+import me.wiefferink.areashop.tools.Materials;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.bukkitdo.Do;
 import org.bukkit.Chunk;
@@ -88,7 +89,7 @@ public class SignsFeature extends RegionFeature {
 		}
 		Block block = event.getBlock();
 		// Check if it is a sign
-		if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
+		if(Materials.isSign(block.getType())) {
 			// Check if the rent sign is really the same as a saved rent
 			RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
 			if(regionSign == null) {
@@ -107,7 +108,8 @@ public class SignsFeature extends RegionFeature {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onIndirectSignBreak(BlockPhysicsEvent event) {
-		if(event.getBlock().getType() == Material.SIGN_POST || event.getBlock().getType() == Material.WALL_SIGN) {
+		// 1.13+ does not support this anymore, only way would be checking surrounding blocks, which is still not 100% sufficient
+		if(Materials.isSign(event.getBlock().getType())) {
 			// Check if the rent sign is really the same as a saved rent
 			if(SignsFeature.getSignByLocation(event.getBlock().getLocation()) != null) {
 				// Cancel the sign breaking, will create a floating sign but at least it is not disconnected/gone
@@ -116,15 +118,12 @@ public class SignsFeature extends RegionFeature {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onSignClick(PlayerInteractEvent event) {
-		if(event.isCancelled()) {
-			return;
-		}
 		Block block = event.getClickedBlock();
 		// Check for clicking a sign and rightclicking
 		if((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK)
-				&& (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN)) {
+				&& Materials.isSign(block.getType())) {
 			// Check if the rent sign is really the same as a saved rent
 			RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
 			if(regionSign == null) {

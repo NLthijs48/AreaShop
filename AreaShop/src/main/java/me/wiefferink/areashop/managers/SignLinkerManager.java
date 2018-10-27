@@ -3,6 +3,7 @@ package me.wiefferink.areashop.managers;
 import me.wiefferink.areashop.features.signs.RegionSign;
 import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
+import me.wiefferink.areashop.tools.Materials;
 import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -120,7 +121,7 @@ public class SignLinkerManager extends Manager implements Listener {
 						block = next;
 					}
 				}
-				if(block == null || !(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST)) {
+				if(block == null || !Materials.isSign(block.getType())) {
 					plugin.message(player, "linksigns-noSign");
 					return;
 				}

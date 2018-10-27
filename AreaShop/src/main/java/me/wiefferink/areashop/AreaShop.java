@@ -164,7 +164,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			try {
 				rawVersion = worldGuard.getDescription().getVersion();
 				if(rawVersion.contains("-SNAPSHOT;")) {
-					String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;") + 10, rawVersion.length());
+					String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;") + 10);
 					if(buildNumber.contains("-")) {
 						buildNumber = buildNumber.substring(0, buildNumber.indexOf("-"));
 						try {

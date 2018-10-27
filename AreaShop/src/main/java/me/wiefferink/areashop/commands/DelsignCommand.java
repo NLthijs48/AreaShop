@@ -2,6 +2,7 @@ package me.wiefferink.areashop.commands;
 
 import me.wiefferink.areashop.features.signs.RegionSign;
 import me.wiefferink.areashop.features.signs.SignsFeature;
+import me.wiefferink.areashop.tools.Materials;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -47,7 +48,7 @@ public class DelsignCommand extends CommandAreaShop {
 				block = next;
 			}
 		}
-		if(block == null || !(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST)) {
+		if(block == null || !Materials.isSign(block.getType())) {
 			plugin.message(sender, "delsign-noSign");
 			return;
 		}

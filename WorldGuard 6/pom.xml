@@ -16,9 +16,6 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>${bukkit.version}</version>
-            <type>jar</type>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>
@@ -29,9 +26,9 @@
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
-            <version>6.0.0-SNAPSHOT</version>
-            <scope>provided</scope>
-            <type>jar</type>
+            <scope>system</scope>
+            <version>any</version>
+            <systemPath>${project.basedir}/../dependencies/worldguard-6.0.0-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

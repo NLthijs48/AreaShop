@@ -28,14 +28,6 @@
 
   <repositories>
     <repository>
-      <id>spigot-repo</id>
-      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-    </repository>
-    <repository>
-      <id>sk89q-repo-wg</id>
-      <url>http://maven.sk89q.com/artifactory/repo/</url>
-    </repository>
-    <repository>
       <id>vault-repo</id>
       <url>http://nexus.hc.to/content/repositories/pub_releases</url>
     </repository>
@@ -54,7 +46,6 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <build.number>#CUSTOM</build.number>
-    <bukkit.version>1.8-R0.1-SNAPSHOT</bukkit.version>
   </properties>
 
   <modules>
@@ -68,6 +59,29 @@
     <module>WorldEdit 7</module>
     <module>AreaShop</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.bukkit</groupId>
+        <artifactId>bukkit</artifactId>
+        <scope>system</scope>
+        <version>any</version>
+        <systemPath>${project.basedir}/../dependencies/bukkit-1.8-R0.1-SNAPSHOT.jar</systemPath>
+        <type>jar</type>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.bukkit</groupId>
+        <artifactId>craftbukkit</artifactId>
+        <scope>system</scope>
+        <version>any</version>
+        <systemPath>${project.basedir}/../dependencies/craftbukkit-1.8-R0.1-SNAPSHOT.jar</systemPath>
+        <type>jar</type>
+        <optional>true</optional>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <plugins>

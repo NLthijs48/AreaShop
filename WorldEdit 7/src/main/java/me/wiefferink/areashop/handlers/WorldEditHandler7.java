@@ -19,7 +19,6 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.io.Closer;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -46,7 +45,6 @@ public class WorldEditHandler7 extends WorldEditInterface {
 
 	@Override
 	public WorldEditSelection getPlayerSelection(Player player) {
-		CuboidRegionSelector s;
 		try {
 			Region region = pluginInterface.getWorldEdit().getSession(player).getSelection(BukkitAdapter.adapt(player.getWorld()));
 			return new WorldEditSelection(

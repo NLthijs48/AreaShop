@@ -15,10 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.13-R0.1-SNAPSHOT</version>
-            <type>jar</type>
-            <optional>true</optional>
+            <artifactId>craftbukkit</artifactId>
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>

@@ -120,8 +120,9 @@
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.4</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <version>any</version>
+            <systemPath>${project.basedir}/../dependencies/VaultAPI-1.4.jar</systemPath>
         </dependency>
 
         <!-- bStats -->

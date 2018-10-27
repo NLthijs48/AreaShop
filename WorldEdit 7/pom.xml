@@ -16,13 +16,11 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>me.wiefferink</groupId>
-            <artifactId>areashop-interface</artifactId>
-            <version>AreaShopInterface</version>
+            <version>1.13-R0.1-SNAPSHOT</version>
             <type>jar</type>
+            <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
@@ -36,6 +34,13 @@
             <scope>system</scope>
             <version>any</version>
             <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-beta01.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-interface</artifactId>
+            <version>AreaShopInterface</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 </project>

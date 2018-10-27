@@ -13,10 +13,15 @@
     </parent>
 
     <dependencies>
-        <!-- Bukkit, AreaShop aims to support 1.7.9+, but this is the lowest Bukkit version available from the Spigot repo, Bukkit repository is gone -->
+        <!-- Bukkit, AreaShop aims to support 1.7.9+ -->
         <dependency>
             <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
+            <artifactId>craftbukkit</artifactId>
+            <scope>system</scope>
+            <version>any</version>
+            <systemPath>${project.basedir}/../dependencies/craftbukkit-1.7.9-R0.2-SNAPSHOT.jar</systemPath>
+            <type>jar</type>
+            <optional>true</optional>
         </dependency>
 
         <!-- InteractiveMessenger library -->
@@ -33,6 +38,16 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
+        <!-- Interfaces that specific WorldGuard and WorldEdit versions are built against -->
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-interface</artifactId>
+            <version>AreaShopInterface</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- WorldGuard implementations -->
         <dependency>
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-worldguard-5</artifactId>
@@ -61,13 +76,8 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>me.wiefferink</groupId>
-            <artifactId>areashop-interface</artifactId>
-            <version>AreaShopInterface</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
+
+        <!-- WorldEdit implementations -->
         <dependency>
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-worldedit-5</artifactId>
@@ -90,6 +100,7 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- WorldEdit/WorldGuard -->
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
@@ -104,12 +115,16 @@
             <version>any</version>
             <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-beta01.jar</systemPath>
         </dependency>
+
+        <!-- Vault -->
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
             <version>1.4</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- bStats -->
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>

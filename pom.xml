@@ -60,29 +60,6 @@
     <module>AreaShop</module>
   </modules>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.bukkit</groupId>
-        <artifactId>bukkit</artifactId>
-        <scope>system</scope>
-        <version>any</version>
-        <systemPath>${project.basedir}/../dependencies/bukkit-1.8-R0.1-SNAPSHOT.jar</systemPath>
-        <type>jar</type>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>org.bukkit</groupId>
-        <artifactId>craftbukkit</artifactId>
-        <scope>system</scope>
-        <version>any</version>
-        <systemPath>${project.basedir}/../dependencies/craftbukkit-1.8-R0.1-SNAPSHOT.jar</systemPath>
-        <type>jar</type>
-        <optional>true</optional>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <build>
     <plugins>
       <plugin>

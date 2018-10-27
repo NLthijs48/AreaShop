@@ -16,13 +16,21 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>me.wiefferink</groupId>
-            <artifactId>areashop-interface</artifactId>
-            <version>AreaShopInterface</version>
+            <scope>system</scope>
+            <version>any</version>
+            <systemPath>${project.basedir}/../dependencies/bukkit-1.7.9-R0.2.jar</systemPath>
             <type>jar</type>
+            <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-legacy</artifactId>
+            <scope>system</scope>
+            <version>any</version>
+            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-6.1.3-SNAPSHOT.jar</systemPath>
+        </dependency>
+
         <dependency>
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-worldguard-6</artifactId>
@@ -30,12 +38,12 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
-            <groupId>com.sk89q.worldguard</groupId>
-            <artifactId>worldguard-legacy</artifactId>
-            <scope>system</scope>
-            <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-6.1.3-SNAPSHOT.jar</systemPath>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-interface</artifactId>
+            <version>AreaShopInterface</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 </project>

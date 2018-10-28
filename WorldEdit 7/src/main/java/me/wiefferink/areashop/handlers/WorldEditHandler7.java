@@ -36,6 +36,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class WorldEditHandler7 extends WorldEditInterface {
 
@@ -147,7 +150,23 @@ public class WorldEditHandler7 extends WorldEditInterface {
 			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;
 		}
-		editSession.flushQueue();
+
+		// flushQueue is for worldedit-bukkit-7.0.0-beta-01, later versions have renamed it to flushSession
+		boolean done = false;
+		for (String methodName : Arrays.asList("flushSession", "flushQueue")) {
+			try {
+				Method method = editSession.getClass().getMethod(methodName);
+				method.invoke(editSession);
+				done = true;
+			} catch (SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+				// Try the next methodName
+			}
+		}
+
+		if(!done) {
+			pluginInterface.getLogger().warning("Could not restore schematic of " + regionInterface.getName() + ", flushSession() failed");
+		}
+
 		return true;
 	}
 

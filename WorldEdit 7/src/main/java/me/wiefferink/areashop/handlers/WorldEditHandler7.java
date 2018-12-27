@@ -96,12 +96,7 @@ public class WorldEditHandler7 extends WorldEditInterface {
 		try(Closer closer = Closer.create()) {
 			FileInputStream fis = closer.register(new FileInputStream(file));
 			BufferedInputStream bis = closer.register(new BufferedInputStream(fis));
-			ClipboardFormat clipboardFormat = ClipboardFormats.findByFile(file);
-			if (clipboardFormat == null) {
-				pluginInterface.getLogger().warning("WorldEdit could not detect format type of the schematic file:" + file.getAbsolutePath() + ", try updating WorldEdit");
-				return false;
-			}
-			ClipboardReader reader = clipboardFormat.getReader(bis);
+			ClipboardReader reader = format.getReader(bis);
 
 			//WorldData worldData = world.getWorldData();
 			LocalSession session = new LocalSession(pluginInterface.getWorldEdit().getLocalConfiguration());

@@ -42,7 +42,7 @@
         <dependency>
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-interface</artifactId>
-            <version>AreaShopInterface</version>
+            <version>latest</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -51,51 +51,35 @@
         <dependency>
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-worldguard-5</artifactId>
-            <version>WorldGuard-5</version>
+            <version>latest</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-worldguard-6</artifactId>
-            <version>WorldGuard-6</version>
+            <version>latest</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-worldguard-6_1_3</artifactId>
-            <version>WorldGuard-6_1_3</version>
+            <version>latest</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>
-            <artifactId>areashop-worldguard-7</artifactId>
-            <version>WorldGuard-7</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- WorldEdit implementations -->
-        <dependency>
-            <groupId>me.wiefferink</groupId>
-            <artifactId>areashop-worldedit-5</artifactId>
-            <version>WorldEdit-5</version>
+            <artifactId>areashop-worldguard-7_beta_1</artifactId>
+            <version>latest</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>
-            <artifactId>areashop-worldedit-6</artifactId>
-            <version>WorldEdit-6</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.wiefferink</groupId>
-            <artifactId>areashop-worldedit-7</artifactId>
-            <version>WorldEdit-7</version>
+            <artifactId>areashop-worldguard-7_beta_2</artifactId>
+            <version>latest</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -106,14 +90,44 @@
             <artifactId>worldedit</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/worldedit-bukkit-7.0.0-beta-01.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/worldedit-bukkit-7.0.0-beta-04.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-beta01.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-beta-02.jar</systemPath>
+        </dependency>
+
+        <!-- WorldEdit implementations -->
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-worldedit-5</artifactId>
+            <version>latest</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-worldedit-6</artifactId>
+            <version>latest</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-worldedit-7_beta_1</artifactId>
+            <version>latest</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-worldedit-7_beta_4</artifactId>
+            <version>latest</version>
+            <type>jar</type>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Vault -->

@@ -528,12 +528,14 @@ public class TeleportFeature extends RegionFeature {
 		// Calculate a default location
 		if(startLocation == null) {
 			// Set to block in the middle, y configured in the config
-			com.sk89q.worldedit.Vector middle = com.sk89q.worldedit.Vector.getMidpoint(worldguardRegion.getMaximumPoint(), worldguardRegion.getMinimumPoint());
+			Vector regionMin = AreaShop.getInstance().getWorldGuardHandler().getMinimumPoint(worldguardRegion);
+			Vector regionMax = AreaShop.getInstance().getWorldGuardHandler().getMaximumPoint(worldguardRegion);
+			Vector middle = regionMin.clone().midpoint(regionMax);
 			String configSetting = getRegion().getStringSetting("general.teleportLocationY");
 			if("bottom".equalsIgnoreCase(configSetting)) {
-				middle = middle.setY(worldguardRegion.getMinimumPoint().getBlockY());
+				middle = middle.setY(regionMin.getBlockY());
 			} else if("top".equalsIgnoreCase(configSetting)) {
-				middle = middle.setY(worldguardRegion.getMaximumPoint().getBlockY());
+				middle = middle.setY(regionMax.getBlockY());
 			} else if("middle".equalsIgnoreCase(configSetting)) {
 				middle = middle.setY(middle.getBlockY());
 			} else {

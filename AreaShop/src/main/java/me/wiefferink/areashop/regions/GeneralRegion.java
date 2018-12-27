@@ -1,7 +1,5 @@
 package me.wiefferink.areashop.regions;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
@@ -27,6 +25,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
@@ -515,6 +514,22 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	}
 
 	/**
+	 * Get the minimum corner of the region.
+	 * @return Vector
+	 */
+	public Vector getMinimumPoint() {
+		return plugin.getWorldGuardHandler().getMinimumPoint(getRegion());
+	}
+
+	/**
+	 * Get the maximum corner of the region.
+	 * @return Vector
+	 */
+	public Vector getMaximumPoint() {
+		return plugin.getWorldGuardHandler().getMaximumPoint(getRegion());
+	}
+
+	/**
 	 * Get the width of the region (x-axis).
 	 * @return The width of the region (x-axis)
 	 */
@@ -522,7 +537,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(getRegion() == null) {
 			return 0;
 		}
-		return getRegion().getMaximumPoint().getBlockX() - getRegion().getMinimumPoint().getBlockX() + 1;
+		return getMaximumPoint().getBlockX() - getMinimumPoint().getBlockX() + 1;
 	}
 
 	/**
@@ -533,7 +548,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(getRegion() == null) {
 			return 0;
 		}
-		return getRegion().getMaximumPoint().getBlockZ() - getRegion().getMinimumPoint().getBlockZ() + 1;
+		return getMaximumPoint().getBlockZ() - getMinimumPoint().getBlockZ() + 1;
 	}
 
 	/**
@@ -544,7 +559,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		if(getRegion() == null) {
 			return 0;
 		}
-		return getRegion().getMaximumPoint().getBlockY() - getRegion().getMinimumPoint().getBlockY() + 1;
+		return getMaximumPoint().getBlockY() - getMinimumPoint().getBlockY() + 1;
 	}
 
 	/**
@@ -1495,8 +1510,8 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		// Use own calculation for polygon regions, as WorldGuard does not implement it and returns 0
 		ProtectedRegion region = getRegion();
 		if(region instanceof ProtectedPolygonalRegion) {
-			BlockVector min = region.getMinimumPoint();
-			BlockVector max = region.getMaximumPoint();
+			Vector min = getMinimumPoint();
+			Vector max = getMaximumPoint();
 
 			// Exact, but slow algorithm
 			if(getWidth() * getDepth() < 100) {
@@ -1512,7 +1527,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			}
 			// Estimate, but quick algorithm
 			else {
-				List<BlockVector2D> points = region.getPoints();
+				List<Vector> points = plugin.getWorldGuardHandler().getRegionPoints(region);
 				int numPoints = points.size();
 				if(numPoints < 3) {
 					return 0;

@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.tools;
 
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
@@ -21,6 +20,7 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -351,8 +351,8 @@ public class Utils {
 		Location selectionMin = selection.getMinimumLocation();
 		Location selectionMax = selection.getMaximumLocation();
 		for(ProtectedRegion region : regionManager.getRegions().values()) {
-			BlockVector regionMin = region.getMinimumPoint();
-			BlockVector regionMax = region.getMaximumPoint();
+			Vector regionMin = AreaShop.getInstance().getWorldGuardHandler().getMinimumPoint(region);
+			Vector regionMax = AreaShop.getInstance().getWorldGuardHandler().getMaximumPoint(region);
 			if(
 					(      // x part, resolves to true if the selection and region overlap anywhere on the x-axis
 							(regionMin.getBlockX() <= selectionMax.getBlockX() && regionMin.getBlockX() >= selectionMin.getBlockX())

@@ -1,7 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import me.wiefferink.areashop.AreaShop;
@@ -17,6 +15,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +103,7 @@ public class StackCommand extends CommandAreaShop {
 			plugin.message(player, "stack-unclearDirection", facing.toString().toLowerCase().replace('_', '-'));
 			return;
 		}
-		Vector shift = new BlockVector(0, 0, 0);
+		Vector shift = new Vector(0, 0, 0);
 		if(facing == BlockFace.SOUTH) {
 			shift = shift.setZ(-selection.getLength() - gap);
 		} else if(facing == BlockFace.WEST) {
@@ -183,8 +182,8 @@ public class StackCommand extends CommandAreaShop {
 							}
 						}
 						// Add the region to WorldGuard (at startposition shifted by the number of this region times the blocks it should shift)
-						BlockVector minimum = new BlockVector(minimumVector.add(finalShift.multiply(current)));
-						BlockVector maximum = new BlockVector(maximumVector.add(finalShift.multiply(current)));
+						Vector minimum = minimumVector.clone().add(finalShift.clone().multiply(current));
+						Vector maximum = maximumVector.clone().add(finalShift.clone().multiply(current));
 						// Check for out of bounds
 						if(minimum.getBlockY() < 0) {
 							tooLow++;
@@ -193,7 +192,7 @@ public class StackCommand extends CommandAreaShop {
 							tooHigh++;
 							continue;
 						}
-						ProtectedCuboidRegion region = new ProtectedCuboidRegion(regionName, minimum, maximum);
+						ProtectedCuboidRegion region = plugin.getWorldGuardHandler().createCuboidRegion(regionName, minimum,maximum);
 						manager.addRegion(region);
 						// Add the region to AreaShop
 						if(rentRegions) {

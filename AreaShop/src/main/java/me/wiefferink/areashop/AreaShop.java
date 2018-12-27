@@ -147,14 +147,57 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		managers = new HashSet<>();
 		boolean error = false;
 
+		// Check if WorldEdit is present
+		String weVersion = null;
+		String rawWeVersion = null;
+		String weBeta = null;
+		Plugin plugin = getServer().getPluginManager().getPlugin("WorldEdit");
+		if(!(plugin instanceof WorldEditPlugin) || !plugin.isEnabled()) {
+			error("WorldEdit plugin is not present or has not loaded correctly");
+			error = true;
+		} else {
+			worldEdit = (WorldEditPlugin)plugin;
+			rawWeVersion = worldEdit.getDescription().getVersion();
+
+			// Find beta version
+			Pattern pattern = Pattern.compile("beta-?\\d+");
+			Matcher matcher = pattern.matcher(rawWeVersion);
+			if (matcher.find()) {
+				weBeta = matcher.group();
+			}
+
+			// Get correct WorldEditInterface (handles things that changed version to version)
+			if(worldEdit.getDescription().getVersion().startsWith("5.")) {
+				weVersion = "5";
+			} else if(worldEdit.getDescription().getVersion().startsWith("6.")) {
+				weVersion = "6";
+			} else if ("beta-01".equalsIgnoreCase(weBeta)) {
+				weVersion = "7_beta_1";
+			} else {
+				// beta-02 and beta-03 also have the new vector system already
+				weVersion = "7_beta_4";
+			}
+			try {
+				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldEditHandler" + weVersion);
+				// Check if we have a NMSHandler class at that location.
+				if(WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
+					worldEditInterface = (WorldEditInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
+				}
+			} catch(final Exception e) {
+				error("Could not load the handler for WorldEdit (tried to load " + weVersion + "), report this problem to the author: " + ExceptionUtils.getStackTrace(e));
+				error = true;
+				weVersion = null;
+			}
+		}
+
 		// Check if WorldGuard is present
 		String wgVersion = null;
-		String rawVersion = null;
+		String rawWgVersion = null;
 		int major = 0;
 		int minor = 0;
 		int fixes = 0;
 		Integer build = null;
-		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
+		plugin = getServer().getPluginManager().getPlugin("WorldGuard");
 		if(!(plugin instanceof WorldGuardPlugin) || !plugin.isEnabled()) {
 			error("WorldGuard plugin is not present or has not loaded correctly");
 			error = true;
@@ -162,20 +205,20 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			worldGuard = (WorldGuardPlugin)plugin;
 			// Get correct WorldGuardInterface (handles things that changed version to version)
 			try {
-				rawVersion = worldGuard.getDescription().getVersion();
-				if(rawVersion.contains("-SNAPSHOT;")) {
-					String buildNumber = rawVersion.substring(rawVersion.indexOf("-SNAPSHOT;") + 10);
+				rawWgVersion = worldGuard.getDescription().getVersion();
+				if(rawWgVersion.contains("-SNAPSHOT;")) {
+					String buildNumber = rawWgVersion.substring(rawWgVersion.indexOf("-SNAPSHOT;") + 10);
 					if(buildNumber.contains("-")) {
 						buildNumber = buildNumber.substring(0, buildNumber.indexOf("-"));
 						try {
 							build = Integer.parseInt(buildNumber);
 						} catch(NumberFormatException e) {
-							warn("Could not correctly parse the build of WorldGuard, raw version: " + rawVersion + ", buildNumber: " + buildNumber);
+							warn("Could not correctly parse the build of WorldGuard, raw version: " + rawWgVersion + ", buildNumber: " + buildNumber);
 						}
 					}
 				}
 				// Clear stuff from the version string that is not a number
-				String[] versionParts = rawVersion.split("\\.");
+				String[] versionParts = rawWgVersion.split("\\.");
 				for(int i = 0; i < versionParts.length; i++) {
 					Pattern pattern = Pattern.compile("^\\d+");
 					Matcher matcher = pattern.matcher(versionParts[i]);
@@ -195,10 +238,11 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 						fixes = Integer.parseInt(versionParts[2]);
 					}
 				} catch(NumberFormatException e) {
-					warn("Something went wrong while parsing WorldGuard version number: " + rawVersion);
+					warn("Something went wrong while parsing WorldGuard version number: " + rawWgVersion);
 				}
+
 				// Determine correct implementation to use
-				if(worldGuard.getDescription().getVersion().startsWith("5.")) {
+				if(rawWgVersion.startsWith("5.")) {
 					wgVersion = "5";
 				} else if(major == 6 && minor == 1 && fixes < 3) {
 					wgVersion = "6";
@@ -211,11 +255,16 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					} else {
 						wgVersion = "6_1_3";
 					}
+				} else if ("beta-01".equalsIgnoreCase(weBeta)) {
+					// When using WorldEdit beta-01, we need to use the WorldGuard variant with the old vector system
+					wgVersion = "7_beta_1";
 				} else {
-					wgVersion = "7";
+					// Even though the WorldGuard file is called beta-02, the reported version is still beta-01!
+					wgVersion = "7_beta_2";
 				}
 			} catch(Exception e) { // If version detection fails, at least try to load the latest version
-				wgVersion = "7";
+				warn("Parsing the WorldGuard version failed, assuming version 7_beta_2:", rawWgVersion);
+				wgVersion = "7_beta_2";
 			}
 			// Load chosen implementation
 			try {
@@ -228,35 +277,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				error("Could not load the handler for WorldGuard (tried to load " + wgVersion + "), report this problem to the author:" + ExceptionUtils.getStackTrace(e));
 				error = true;
 				wgVersion = null;
-			}
-		}
-
-		// Check if WorldEdit is present
-		String weVersion = null;
-		plugin = getServer().getPluginManager().getPlugin("WorldEdit");
-		if(!(plugin instanceof WorldEditPlugin) || !plugin.isEnabled()) {
-			error("WorldEdit plugin is not present or has not loaded correctly");
-			error = true;
-		} else {
-			worldEdit = (WorldEditPlugin)plugin;
-			// Get correct WorldEditInterface (handles things that changed version to version)
-			if(worldEdit.getDescription().getVersion().startsWith("5.")) {
-				weVersion = "5";
-			} else if(worldEdit.getDescription().getVersion().startsWith("6.")) {
-				weVersion = "6";
-			} else {
-				weVersion = "7";
-			}
-			try {
-				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldEditHandler" + weVersion);
-				// Check if we have a NMSHandler class at that location.
-				if(WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
-					worldEditInterface = (WorldEditInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
-				}
-			} catch(final Exception e) {
-				error("Could not load the handler for WorldEdit (tried to load " + weVersion + "), report this problem to the author: " + ExceptionUtils.getStackTrace(e));
-				error = true;
-				weVersion = null;
 			}
 		}
 
@@ -273,10 +293,10 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Print loaded version of WG and WE in debug
 		if(wgVersion != null) {
-			AreaShop.debug("Loaded WorldGuardHandler" + wgVersion + " (raw version: " + rawVersion + ", major:" + major + ", minor:" + minor + ", fixes:" + fixes + ", build:" + build + ")");
+			AreaShop.debug("Loaded WorldGuardHandler", wgVersion, "(raw version:" + rawWgVersion + ", major:" + major + ", minor:" + minor + ", fixes:" + fixes + ", build:" + build + ")");
 		}
 		if(weVersion != null) {
-			AreaShop.debug("Loaded WorldEditHandler" + weVersion);
+			AreaShop.debug("Loaded WorldEditHandler", weVersion, "(raw version:" + rawWeVersion + ", beta:" + weBeta + ")");
 		}
 
 		setupLanguageManager();

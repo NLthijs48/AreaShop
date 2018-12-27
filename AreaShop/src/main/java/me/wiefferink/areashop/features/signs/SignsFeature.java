@@ -112,8 +112,8 @@ public class SignsFeature extends RegionFeature {
 		if(Materials.isSign(event.getBlock().getType())) {
 			// Check if the rent sign is really the same as a saved rent
 			if(SignsFeature.getSignByLocation(event.getBlock().getLocation()) != null) {
-				// Cancel the sign breaking, will create a floating sign but at least it is not disconnected/gone
-				event.setCancelled(true);
+				// Remove the sign so that it does not fall on the floor as an item (next region update will place it back)
+				event.getBlock().setType(Material.AIR);
 			}
 		}
 	}

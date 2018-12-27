@@ -145,23 +145,7 @@ public class WorldEditHandler7_beta_1 extends WorldEditInterface {
 			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;
 		}
-
-		// flushQueue is for worldedit-bukkit-7.0.0-beta-01, later versions have renamed it to flushSession
-		boolean done = false;
-		for (String methodName : Arrays.asList("flushSession", "flushQueue")) {
-			try {
-				Method method = editSession.getClass().getMethod(methodName);
-				method.invoke(editSession);
-				done = true;
-			} catch (SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
-				// Try the next methodName
-			}
-		}
-
-		if(!done) {
-			pluginInterface.getLogger().warning("Could not restore schematic of " + regionInterface.getName() + ", flushSession() failed");
-		}
-
+		editSession.flushQueue();
 		return true;
 	}
 

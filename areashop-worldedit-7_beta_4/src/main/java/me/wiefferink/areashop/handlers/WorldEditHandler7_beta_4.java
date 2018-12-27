@@ -87,7 +87,6 @@ public class WorldEditHandler7_beta_4 extends WorldEditInterface {
 			return false;
 		}
 		EditSession editSession = pluginInterface.getWorldEdit().getWorldEdit().getEditSessionFactory().getEditSession(world, pluginInterface.getConfig().getInt("maximumBlocks"));
-		editSession.enableQueue();
 		ProtectedRegion region = regionInterface.getRegion();
 		// Get the origin and size of the region
 		BlockVector3 origin = BlockVector3.at(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
@@ -145,23 +144,7 @@ public class WorldEditHandler7_beta_4 extends WorldEditInterface {
 			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;
 		}
-
-		// flushQueue is for worldedit-bukkit-7.0.0-beta-01, later versions have renamed it to flushSession
-		boolean done = false;
-		for (String methodName : Arrays.asList("flushSession", "flushQueue")) {
-			try {
-				Method method = editSession.getClass().getMethod(methodName);
-				method.invoke(editSession);
-				done = true;
-			} catch (SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
-				// Try the next methodName
-			}
-		}
-
-		if(!done) {
-			pluginInterface.getLogger().warning("Could not restore schematic of " + regionInterface.getName() + ", flushSession() failed");
-		}
-
+		editSession.flushSession();
 		return true;
 	}
 

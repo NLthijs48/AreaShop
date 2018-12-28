@@ -130,7 +130,7 @@ public class AddCommand extends CommandAreaShop {
 				ProtectedRegion region = regionEntry.getValue();
 				// Determine if the player is an owner or member of the region
 				boolean isMember = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
-				boolean isOwner = finalPlayer != null && plugin.getWorldGuardHandler().containsMember(region, finalPlayer.getUniqueId());
+				boolean isOwner = finalPlayer != null && plugin.getWorldGuardHandler().containsOwner(region, finalPlayer.getUniqueId());
 				String type;
 				if(isRent) {
 					type = "rent";
@@ -154,6 +154,16 @@ public class AddCommand extends CommandAreaShop {
 					List<UUID> existing = new ArrayList<>();
 					existing.addAll(plugin.getWorldGuardHandler().getOwners(region).asUniqueIdList());
 					existing.addAll(plugin.getWorldGuardHandler().getMembers(region).asUniqueIdList());
+
+					AreaShop.debug("regionAddLandlordStatus:", regionName,
+							"landlord:", landlord,
+							"existing:", existing,
+							"isMember:", isMember,
+							"isOwner:", isOwner,
+							"createPermission:", sender.hasPermission("areashop.create" + type),
+							"ownerPermission:", sender.hasPermission("areashop.create" + type + ".owner"),
+							"memberPermission:", sender.hasPermission("areashop.create" + type + ".member"));
+
 					if(isRent) {
 						RentRegion rent = new RentRegion(regionName, world);
 						// Set landlord

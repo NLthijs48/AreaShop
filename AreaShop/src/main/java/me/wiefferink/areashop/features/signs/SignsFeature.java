@@ -27,6 +27,7 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.material.Sign;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,14 +109,29 @@ public class SignsFeature extends RegionFeature {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onIndirectSignBreak(BlockPhysicsEvent event) {
-		// 1.13+ does not support this anymore, only way would be checking surrounding blocks, which is still not 100% sufficient
-		if(Materials.isSign(event.getBlock().getType())) {
-			// Check if the rent sign is really the same as a saved rent
-			if(SignsFeature.getSignByLocation(event.getBlock().getLocation()) != null) {
-				// Remove the sign so that it does not fall on the floor as an item (next region update will place it back)
-				event.getBlock().setType(Material.AIR);
-			}
+		// Check if the block is a sign
+		if(!Materials.isSign(event.getBlock().getType())) {
+			return;
 		}
+
+		// Check if still attached to a block
+		Block b = event.getBlock();
+		Sign s = (Sign) b.getState().getData();
+		Block attachedBlock = b.getRelative(s.getAttachedFace());
+		if (attachedBlock.getType() != Material.AIR) {
+			return;
+		}
+
+		// Check if the rent sign is really the same as a saved rent
+		RegionSign regionSign = SignsFeature.getSignByLocation(event.getBlock().getLocation());
+		if(regionSign == null) {
+			return;
+		}
+
+		// Remove the sign so that it does not fall on the floor as an item (next region update will place it back)
+		AreaShop.debug("onIndirectSignBreak: Removed block of sign for", regionSign.getRegion().getName(), "at", regionSign.getStringLocation());
+		event.getBlock().setType(Material.AIR);
+		event.setCancelled(true);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

@@ -152,11 +152,11 @@ public class RegionSign {
 		Sign signState = null;
 		if(!Materials.isSign(block.getType())) {
 			Material signType = getMaterial();
-			if(!Materials.isSign(signType)) {
+			block.setType(signType);
+			if(!Materials.isSign(block.getType())) {
 				AreaShop.debug("Setting sign", key, "of region", getRegion().getName(), "failed, could not set sign block back");
 				return false;
 			}
-			block.setType(signType);
 			signState = (Sign) block.getState();
 			org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 			BlockFace signFace = getFacing();

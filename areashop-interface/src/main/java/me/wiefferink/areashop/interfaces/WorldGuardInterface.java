@@ -81,7 +81,7 @@ public abstract class WorldGuardInterface {
 	 */
 	public abstract RegionAccessSet getOwners(ProtectedRegion region);
 
-	// New flag system was introcuded in version 6.1.3, requiring different flag parsing
+	// New flag system was introduced in version 6.1.3, requiring different flag parsing
 	/**
 	 * Get a flag from the name of a flag.
 	 * @param flagName The name of the flag to get
@@ -108,6 +108,7 @@ public abstract class WorldGuardInterface {
 	 */
 	public abstract RegionGroup parseFlagGroupInput(RegionGroupFlag flag, String input) throws InvalidFlagFormat;
 
+	// WorldEdit Vector -> BlockVector3 refactor in WorldEdit 7 beta-2
 	/**
 	 * Get the minimum point of a region.
 	 * @param region The region to get it for

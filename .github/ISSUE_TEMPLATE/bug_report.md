@@ -1,6 +1,9 @@
 ---
 name: Bug report
 about: Report a problem in the plugin
+title: ''
+labels: 'Type: Bug'
+assignees: ''
 
 ---
 

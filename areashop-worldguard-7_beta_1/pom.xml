@@ -36,20 +36,6 @@
             <version>any</version>
             <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-beta-01.jar</systemPath>
         </dependency>
-        <dependency>
-            <groupId>me.wiefferink</groupId>
-            <artifactId>areashop-worldguard-6</artifactId>
-            <version>latest</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.wiefferink</groupId>
-            <artifactId>areashop-worldguard-6_1_3</artifactId>
-            <version>latest</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>me.wiefferink</groupId>

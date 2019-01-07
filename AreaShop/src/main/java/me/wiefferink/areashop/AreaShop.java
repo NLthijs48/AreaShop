@@ -34,6 +34,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -147,7 +148,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		managers = new HashSet<>();
 		boolean error = false;
 
-		// Check if WorldEdit is present
+		// Find WorldEdit integration version to load
 		String weVersion = null;
 		String rawWeVersion = null;
 		String weBeta = null;
@@ -177,20 +178,11 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				// beta-02 and beta-03 also have the new vector system already
 				weVersion = "7_beta_4";
 			}
-			try {
-				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldEditHandler" + weVersion);
-				// Check if we have a NMSHandler class at that location.
-				if(WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
-					worldEditInterface = (WorldEditInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
-				}
-			} catch(final Exception e) {
-				error("Could not load the handler for WorldEdit (tried to load " + weVersion + "), report this problem to the author: " + ExceptionUtils.getStackTrace(e));
-				error = true;
-				weVersion = null;
-			}
+
+			weVersion = "WorldEditHandler" + weVersion;
 		}
 
-		// Check if WorldGuard is present
+		// Find WorldGuard integration version to load
 		String wgVersion = null;
 		String rawWgVersion = null;
 		int major = 0;
@@ -266,18 +258,63 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				warn("Parsing the WorldGuard version failed, assuming version 7_beta_2:", rawWgVersion);
 				wgVersion = "7_beta_2";
 			}
-			// Load chosen implementation
-			try {
-				final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.WorldGuardHandler" + wgVersion);
-				// Check if we have a NMSHandler class at that location.
-				if(WorldGuardInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldGuardInterface
-					worldGuardInterface = (WorldGuardInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
+
+			wgVersion = "WorldGuardHandler" + wgVersion;
+		}
+
+		// Check if FastAsyncWorldEdit is installed
+		boolean fawe;
+		try {
+			Class.forName("com.boydti.fawe.Fawe" );
+			fawe = true;
+		} catch (ClassNotFoundException ignore) {
+			fawe = false;
+		}
+
+		if (fawe) {
+			boolean useNewIntegration = true;
+			List<String> standardIntegrationVersions = Arrays.asList("1.7", "1.8", "1.9", "1.10", "1.11", "1.12");
+			for(String standardIntegrationVersion : standardIntegrationVersions) {
+				String version = Bukkit.getBukkitVersion();
+				// Detects '1.8', '1.8.3', '1.8-pre1' style versions
+				if(version.equals(standardIntegrationVersion)
+						|| version.startsWith(standardIntegrationVersion + ".")
+						|| version.startsWith(standardIntegrationVersion + "-")) {
+					useNewIntegration = false;
+					break;
 				}
-			} catch(final Exception e) {
-				error("Could not load the handler for WorldGuard (tried to load " + wgVersion + "), report this problem to the author:" + ExceptionUtils.getStackTrace(e));
-				error = true;
-				wgVersion = null;
 			}
+
+			if (useNewIntegration) {
+				weVersion = "FastAsyncWorldEditHandler";
+				wgVersion = "FastAsyncWorldEditWorldGuardHandler";
+			}
+		}
+
+		// Load WorldEdit
+		try {
+			final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + weVersion);
+			// Check if we have a NMSHandler class at that location.
+			if(WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
+				worldEditInterface = (WorldEditInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
+			}
+		} catch(final Exception e) {
+			error("Could not load the handler for WorldEdit (tried to load " + weVersion + "), report this problem to the author: " + ExceptionUtils.getStackTrace(e));
+			error = true;
+			weVersion = null;
+		}
+
+		// Load WorldGuard
+		try {
+			final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + wgVersion);
+			// Check if we have a NMSHandler class at that location.
+			if(WorldGuardInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldGuardInterface
+				worldGuardInterface = (WorldGuardInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
+			}
+		} catch(final Exception e) {
+			error("Could not load the handler for WorldGuard (tried to load " + wgVersion + "), report this problem to the author:" + ExceptionUtils.getStackTrace(e));
+			error = true;
+			wgVersion = null;
 		}
 
 		// Check if Vault is present

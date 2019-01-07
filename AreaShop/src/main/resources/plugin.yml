@@ -3,7 +3,7 @@ main: me.wiefferink.areashop.AreaShop
 version: "${project.version}${build.number}"
 description: "Selling and renting WorldGuard regions to your players, highly configurable."
 depend: [Vault, WorldGuard, WorldEdit]
-softdepend: [Multiverse-Core]
+softdepend: [Multiverse-Core, FastAsyncWorldEdit]
 author: NLThijs48
 website: https://github.com/NLthijs48/AreaShop
 commands:

@@ -59,6 +59,7 @@
     <module>areashop-worldedit-6</module>
     <module>areashop-worldedit-7_beta_1</module>
     <module>areashop-worldedit-7_beta_4</module>
+    <module>areashop-fastasyncworldedit</module>
     <module>AreaShop</module>
   </modules>
 

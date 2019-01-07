@@ -38,6 +38,22 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
+        <!-- WorldEdit/WorldGuard -->
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit</artifactId>
+            <scope>system</scope>
+            <version>any</version>
+            <systemPath>${project.basedir}/../dependencies/worldedit-bukkit-7.0.0-beta-04.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldguard</artifactId>
+            <scope>system</scope>
+            <version>any</version>
+            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-beta-02.jar</systemPath>
+        </dependency>
+
         <!-- Interfaces that specific WorldGuard and WorldEdit versions are built against -->
         <dependency>
             <groupId>me.wiefferink</groupId>
@@ -84,22 +100,6 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- WorldEdit/WorldGuard -->
-        <dependency>
-            <groupId>com.sk89q</groupId>
-            <artifactId>worldedit</artifactId>
-            <scope>system</scope>
-            <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/worldedit-bukkit-7.0.0-beta-04.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.sk89q</groupId>
-            <artifactId>worldguard</artifactId>
-            <scope>system</scope>
-            <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-beta-02.jar</systemPath>
-        </dependency>
-
         <!-- WorldEdit implementations -->
         <dependency>
             <groupId>me.wiefferink</groupId>
@@ -125,6 +125,11 @@
         <dependency>
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-worldedit-7_beta_4</artifactId>
+            <version>latest</version>
+        </dependency>
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-fastasyncworldedit</artifactId>
             <version>latest</version>
             <type>jar</type>
             <scope>compile</scope>

@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ French language file, plugin version 2.5.0, 399/428 messages are translated (93%)
+# ║ French language file, plugin version 2.5.0, 428/428 messages are translated (100%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -178,6 +178,10 @@
 "info-pageNoPrevious":
 - "    [darkgray][bold]◄Précédent[/bold]    "
 - "    hover: C'est déjà la premier page"
+"info-pageNext":
+- "[gold][bold]Suivant►[/bold]"
+- "hover: %lang:action|Page suivante|%"
+- "commande: /areashop "
 "info-pageNoNext":
 - "    [darkgray][bold]Suivaznt►[/bold]"
 - "    hover: C'est déjà la dernière page"
@@ -290,6 +294,7 @@
 "setduration-successRemoved": "La durée de location de %lang:region% a été supprimé, maintenant celle-ci utilisera le durée de location du group ou du fichier default.yml, nouvelle durée de location : %duration%."
 "setup-noRegion": "Vous n'avez pas spécifié de région à la seconde ligne."
 "setup-alreadyRentSign": "La région que vous avez spécifiée a déjà été ajoutée à AreaShop en tant qu'une région louable, ajoutez un panneau avec [as] sur le première ligne ou tapez '/as addsign'."
+"setup-alreadyOtherWorld": "La région que vous avez spécifiée est déjà ajoutée à AreaShop dans un autre monde. Les régions de différents mondes ont toujours besoin de noms différents."
 "setup-alreadyBuySign": "La région que vous avez spécifiée a déjà été ajoutée à AreaShop en tant qu'une région achetable, ajoutez un panneau avec [as] sur le première ligne ou tapez '/as addsign'."
 "setup-noDuration": "A la troisième ligne, vous n'avez pas spécifié la durée de location de la région."
 "setup-wrongDuration": "Le temps spécifié n'est pas au bon format. Exemple : 1 day."
@@ -368,6 +373,7 @@
 "add-noPermission": "Vous n'avez pas la permission d'ajouter une région à AreaShop."
 "add-success": "Ajoutée comme %0% :  [gray]%1%."
 "add-failed": "Déjà enregistré: [gray]%0%."
+"add-failedOtherWorld": "Déjà inscrit d'un autre monde: [gray]%0%."
 "add-blacklisted": "Dans la liste noir: [gray]%0%."
 "add-specifyWorld": "Spécifiez le monde de la région lors de l'utilisation de la console."
 "add-incorrectWorld": "Le monde '%0%' est introuvable, essayez de nouveau (attention à la casse)."
@@ -379,6 +385,7 @@
 "addsign-help": "/as addsign [region] [profile]"
 "addsign-noSign": "Vous ne regardez pas de panneau."
 "addsign-noRegions": "Aucune région trouvée autour du panneau."
+"addSign-notRegistered": "La région spécifiée n'est pas enregistrée dans AreaShop: %0% (elle doit d'abord être ajoutée à AreaShop avant qu'un signe puisse être ajouté)."
 "addsign-couldNotDetect": "Plusieurs régions ont été trouvées à proximité du panneau. Spécifiez la région en argument supplémentaire (2 des régions trouvées: %lang:tRegion|%0%|% et %lang:tRegion|%1%|%)."
 "addsign-couldNotDetectSign": "Plusieurs régions ont été trouvées à proximité du panneau. Spécifiez la région à la deuxième ligne (2 des régions trouvées: %lang:tRegion|%0%|% et %lang:tRegion|%1%|%)."
 "addsign-wrongProfile": "Le profil spécifié n'existe pas, utilisez l'un de la liste suivante (Vérifiez la config): [gray]%0%."
@@ -428,6 +435,7 @@
 "resell-success": "%lang:region% a été mise en revente avec succès pour un prix de %resellprice%."
 "resell-noPermission": "Vous n'avez pas la permission de mettre votre région en revente."
 "resell-noPermissionOther": "Vous n'avez pas la permission de mettre des régions en revente."
+"resell-disabled": "La revente a été désactivée pour cette région."
 "stopresell-help": "/as stropresell [région], la région où vous vous trouvez sera utilisée si vous ne spécifiez pas de région."
 "stopresell-notRegistered": "La région spécifiée n'est pas enregistrée : %0%."
 "stopresell-notResell": "Vous ne pouvez pas stopper la revente %lang:region% car elle n'est pas en mode revente."
@@ -486,6 +494,30 @@
 "message-help": "/as message <joueur> <message...>"
 "message-noPermission": "Vous n'avez pas la permission d'envoyer des messages AreaShop."
 "message-notOnline": "%0% n'est pas connecté."
+"import-help": "/as import RegionAVendre"
+"import-wrongSource": "Spécifiez d'où vous voulez importer les données, les options: RegionAVendre"
+"import-noPluginFolder": "Impossible de trouver le dossier %0%, êtes-vous sûr que vous importez de la bonne source?"
+"import-noWorldsFolder": "Il n'y a pas de dossier 'plugins/RegionForSale/worlds' donc rien ne peut être importé."
+"import-confirm": "Êtes-vous sûr de vouloir importer toutes les régions de RegionAVendre?"
+"import-start": "Début de l'importation des données RegionAVendre :"
+"import-doWorld": "[darkgreen][bold]► Monde %0% :"
+"import-noBukkitWorld": "[red]Impossible de trouver le monde dans Bukkit."
+"import-noRegionManager": "[red]Impossible d’obtenir RegionManager de WorldGuard, les régions sont-elles activées dans ce monde?"
+"import-noRegions": "[red]Pas de fichier regions.yml trouvé."
+"import-loadRegionsFailed": "[red]Impossible de charger regions.yml de : %0%"
+"import-invalidRegionSection": "[red]Mauvaise section dans regions.yml : %0%."
+"import-noWorldGuardRegion": "[red]La région de WorldGuard n'a pas été trouvée :%0%."
+"import-noWorldGuardRegionParent": "[red]La région de WorldGuard pour la région parent n'a pas été trouvé : %0%"
+"import-buyAndRent": "[gold] %0% peuvent être achetés et loués, seulement en ajoutant comme achat dans AreaShop (ne peuvent pas être les deux)."
+"import-noBuyAndNoRent": "[red]%0%  ne peut pas être acheté ni être loué sans importer."
+"import-imported": "[green]%lang:tRegion|%0% importé."
+"import-loadWorldConfigFailed": "[red} Chargement de world-specific config.yml échoué : %0%."
+"import-improperParentRegion": "[red]Region parent %0% n'a pas de réglages lisible."
+"import-alreadyAdded": "[red]Region '%0%' a déjà été ajoutée."
+"import-alreadyAddedOtherWorld": "[red]Region '%0%' a déjà été ajoutée dans le monde %1%,  les régions de différents mondes ne peuvent pas avoir le même nom dans AreaShop."
+"import-invalidSignLocation": "[red]Echec d'importation de la pancarte de la région '%0%', location invalide '%1%'."
+"import-signAlreadyAdded": "[red] Ignoré l'ajout de la pancarte à la location '%1%' de la région '%0%', il est déjà ajouté à la région '%2%'."
+"import-moneyBackFailed": "[red] Échec de l'analyse du prix d'achat '%0%' et du prix de vente '%1%' pour définir le pourcentage de remboursement."
 "confirm-rent":
 - "%lang:prefix%Êtes-vous sur de vouloir louer %lang:tRegion|%0%|%?[break]"
 - "[darkgreen][bold]►[reset] %lang:button|Cliquez ici pour louer %0%|%"

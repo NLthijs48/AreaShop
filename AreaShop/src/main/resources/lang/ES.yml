@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ Spanish language file, plugin version 2.5.0, 424/428 messages are translated (99%)
+# ║ Spanish language file, plugin version 2.5.0, 426/428 messages are translated (100%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -138,6 +138,7 @@
 "sell-sold": "La región %lang:region%, de %lang:player%, ha sido vendida."
 "sell-noPermission": "No tienes permiso para vender regiones."
 "sell-noPermissionOther": "No tienes permiso para vender regiones ajenas."
+"sell-disabled": "La venta fue desactivada para esta región."
 "reload-reloading": "Todos los archivos han sido recargados, comprobando alquileres y actualizando regiones..."
 "reload-noPermission": "No tienes permiso para recargar los archivos de configuración."
 "reload-updateCommandChanged": "Los comandos '/as updaterents' y '/as updatebuys' han sido borrados, '/as reload' actualizará las regiones. Puedes usar este comando en vez de los 2 primeros."
@@ -432,6 +433,7 @@
 "resell-success": "%lang:region% está en modo reventa por %resellprice%."
 "resell-noPermission": "No tienes permiso para cambiar tu región a modo reventa."
 "resell-noPermissionOther": "No tienes permiso para cambiar las regiones a modo reventa."
+"resell-disabled": "La reventa fue deshabilitada para esta región."
 "stopresell-help": "/as stopresell [región], la región en la que estás se usará si no se especifican nombres."
 "stopresell-notRegistered": "La región especificada no es válida: %0%."
 "stopresell-notResell": "No puedes parar la reventa de %lang:region% porque no está en modo reventa."

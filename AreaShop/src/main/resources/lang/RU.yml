@@ -1,6 +1,6 @@
 # ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ║ Language file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop
-# ║ Russian language file, plugin version 2.5.0, 395/428 messages are translated (92%)
+# ║ Russian language file, plugin version 2.5.0, 403/428 messages are translated (94%)
 # ║
 # ║ This file will be overwritten at each startup/reload of the plugin, if you want to change anything then do the following:
 # ║   1: Make a copy of this file
@@ -136,6 +136,7 @@
 "sell-sold": "%lang:region% был продан %lang:player%."
 "sell-noPermission": "У Вас нет прав для продажи региона."
 "sell-noPermissionOther": "У Вас нет прав для продажи другого региона."
+"sell-disabled": "Продажа была отключена для этого региона"
 "reload-reloading": "Перезагружены все конфигурации и файлы регионов."
 "reload-noPermission": "Недостаточно полномочий для того, чтобы перезагрузить конфиги плагина."
 "reload-updateCommandChanged": "'/as updaterents' и '/as updatebuys' были удалены, '/as reload' теперь будет также обновлять регионы, используйте взамен эту команду."
@@ -283,6 +284,7 @@
 "setduration-successRemoved": "Длительность аренды в %lang:region% было удалено, использование новой длительности аренды из группы или файла default.yml, новая длительность: %duration%."
 "setup-noRegion": "Вы не указали регион на второй строке."
 "setup-alreadyRentSign": "Регион уже добавлен в AreaShop в виде аренды региона, добавьте табличку с [as] на первой строке, или '/as addsign'."
+"setup-alreadyOtherWorld": "Регион который ты выбрал уже добавлен в AreaShop в другом мире, регионы из разных миров должы иметь разные названия"
 "setup-alreadyBuySign": "Регион уже добавлен в AreaShop в виде покупного региона, добавьте табличку с [as] на первой строке, или '/as addsign'."
 "setup-noDuration": "Вы не указали, на сколько времени этот регион можно арендовать, сделайте это на третьей строчке."
 "setup-wrongDuration": "Время указано не в правильном формате, например: 1 day."
@@ -361,6 +363,7 @@
 "add-noPermission": "У вас нет разрешения добавлять регионы в AreaShop."
 "add-success": "Добавлен в %0%: [gray]%1%."
 "add-failed": "Уже зарегистрирован: [gray]%0%."
+"add-failedOtherWorld": "Уже зарегистрирован в другом мире: [gray]"
 "add-blacklisted": "Включен в черный список : [gray]%0%."
 "add-specifyWorld": "Укажите мир региона при использовании из консоли."
 "add-incorrectWorld": "Мир '%0%'  не найден, попробуйте еще раз (с учетом регистра)."
@@ -372,6 +375,7 @@
 "addsign-help": "/as addsign [регион] [профиль]."
 "addsign-noSign": "Вы не смотрите на табличку."
 "addsign-noRegions": "Не найдено регионов вокруг таблички."
+"addSign-notRegistered": "Данный регион не зарегистрирован в AreaShop%0% (сначало нужно добавить регион в AreaShop прежде чем создавать табичку)"
 "addsign-couldNotDetect": "Найдено несколько регионов вокруг таблички, укажите регион в качестве дополнительного аргумента (2 из регионов, которые были найдены: %lang:tRegion|%0%|% и %lang:tRegion|%1%|%)."
 "addsign-couldNotDetectSign": "Найдено несколько регионов вокруг таблички, укажите регион на второй строке (2 из регионов, которые были найдены: %lang:tRegion|%0%|% и %lang:tRegion|%1%|%)."
 "addsign-wrongProfile": "Указанный профиль не существует, используйте одно из следующих действий (проверьте конфиг.): [gray]%0%."
@@ -421,6 +425,7 @@
 "resell-success": "%lang:region%  был успешно выставлен в режим перепродажи за %resellprice%."
 "resell-noPermission": "У Вас нет прав что бы установить ваш регион в режим перепродажи."
 "resell-noPermissionOther": "У Вас нет прав что бы установить регион в режим перепродажи."
+"resell-disabled": "Перепродажа была отключенна для этого региона"
 "stopresell-help": "/as stopresell [имярегиона], если не указано имя, будет выбран регион в котором вы находитесь."
 "stopresell-notRegistered": "Указанный регион не зарегистрирован: %0%."
 "stopresell-notResell": "Вы не можете остановить перепродажу %lang:region% потому что регион не в режиме перепродажи."
@@ -479,6 +484,9 @@
 "message-help": "/as message <игрок> <сообщение...>"
 "message-noPermission": "У вас нет разрешения на отправку AreaShop сообщений."
 "message-notOnline": "%0% не в сети."
+"import-help": "/as import RegionForSale"
+"import-confirm": "Вы действительно хотите импортировать все регионы из RegionForSale?"
+"import-noWorldGuardRegion": "[red]WorldGuard регион не найден:"
 "confirm-rent":
 - "%lang:prefix%Вы уверены, что вы хотите арендовать %lang:tRegion|%0%|%?[break]"
 - "[darkgreen][bold]►[reset] %lang:button|Нажмите, чтобы арендовать %0%|%"

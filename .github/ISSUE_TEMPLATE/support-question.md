@@ -2,7 +2,7 @@
 name: Support question
 about: Ask help with the setup or usage of the plugin
 title: ''
-labels: 'Type: Support'
+labels: 'NEW, Type: Support'
 assignees: ''
 
 ---

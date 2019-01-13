@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea
 title: ''
-labels: 'Type: Feature'
+labels: 'NEW, Type: Feature'
 assignees: ''
 
 ---

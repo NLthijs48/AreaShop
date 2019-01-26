@@ -90,8 +90,8 @@ public abstract class CommandAreaShop {
 	}
 
 	private class CommandTime {
-		public String command;
-		public long time;
+		public final String command;
+		public final long time;
 
 		CommandTime(String command, long time) {
 			this.command = command;

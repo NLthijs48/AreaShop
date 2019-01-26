@@ -142,6 +142,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	/**
 	 * Called on start or reload of the server.
 	 */
+	@Override
 	public void onEnable() {
 		AreaShop.instance = this;
 		Do.init(this);
@@ -201,10 +202,10 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				if(rawWgVersion.contains("-SNAPSHOT;")) {
 					String buildNumber = rawWgVersion.substring(rawWgVersion.indexOf("-SNAPSHOT;") + 10);
 					if(buildNumber.contains("-")) {
-						buildNumber = buildNumber.substring(0, buildNumber.indexOf("-"));
-						try {
+						buildNumber = buildNumber.substring(0, buildNumber.indexOf('-'));
+						if (Utils.isNumeric(buildNumber)) {
 							build = Integer.parseInt(buildNumber);
-						} catch(NumberFormatException e) {
+						} else {
 							warn("Could not correctly parse the build of WorldGuard, raw version: " + rawWgVersion + ", buildNumber: " + buildNumber);
 						}
 					}
@@ -326,7 +327,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Load all data from files and check versions
 		fileManager = new FileManager();
 		managers.add(fileManager);
-		error = error | !fileManager.loadFiles(false);
+		boolean loadFilesResult = fileManager.loadFiles(false);
+		error = error || !loadFilesResult;
 
 		// Print loaded version of WG and WE in debug
 		if(wgVersion != null) {
@@ -373,7 +375,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 						"AreaShop"
 				).withVersionComparator((latestVersion, currentVersion) ->
 						!cleanVersion(latestVersion).equals(cleanVersion(currentVersion))
-				).checkUpdate((result) -> {
+				).checkUpdate(result -> {
 					AreaShop.debug("Update check result:", result);
 					if(!result.hasUpdate()) {
 						return;
@@ -422,6 +424,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	/**
 	 * Called on shutdown or reload of the server.
 	 */
+	@Override
 	public void onDisable() {
 
 		Bukkit.getServer().getScheduler().cancelTasks(this);
@@ -500,6 +503,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Function to get the WorldGuard plugin.
 	 * @return WorldGuardPlugin
 	 */
+	@Override
 	public WorldGuardPlugin getWorldGuard() {
 		return worldGuard;
 	}
@@ -525,6 +529,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Function to get the WorldEdit plugin.
 	 * @return WorldEditPlugin
 	 */
+	@Override
 	public WorldEditPlugin getWorldEdit() {
 		return worldEdit;
 	}
@@ -771,6 +776,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * Non-static debug to use as implementation of the interface.
 	 * @param message Object parts of the message that should be logged, toString() will be used
 	 */
+	@Override
 	public void debugI(Object... message) {
 		AreaShop.debug(StringUtils.join(message, " "));
 	}

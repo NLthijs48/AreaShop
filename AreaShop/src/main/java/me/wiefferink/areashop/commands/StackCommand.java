@@ -157,33 +157,16 @@ public class StackCommand extends CommandAreaShop {
 					current++;
 					if(current < amount) {
 						// Create the region name
-						String counterName = counter + "";
-						int minimumLength = plugin.getConfig().getInt("stackRegionNumberLength");
-						while(counterName.length() < minimumLength) {
-							counterName = "0" + counterName;
-						}
-						String regionName;
-						if(nameTemplate.contains("#")) {
-							regionName = nameTemplate.replace("#", counterName);
-						} else {
-							regionName = nameTemplate + counterName;
-						}
+						String regionName = countToName(nameTemplate, counter);
 						while(manager.getRegion(regionName) != null || AreaShop.getInstance().getFileManager().getRegion(regionName) != null) {
 							counter++;
-							counterName = counter + "";
-							minimumLength = plugin.getConfig().getInt("stackRegionNumberLength");
-							while(counterName.length() < minimumLength) {
-								counterName = "0" + counterName;
-							}
-							if(nameTemplate.contains("#")) {
-								regionName = nameTemplate.replace("#", counterName);
-							} else {
-								regionName = nameTemplate + counterName;
-							}
+							regionName = countToName(nameTemplate, counter);
 						}
+
 						// Add the region to WorldGuard (at startposition shifted by the number of this region times the blocks it should shift)
 						Vector minimum = minimumVector.clone().add(finalShift.clone().multiply(current));
 						Vector maximum = maximumVector.clone().add(finalShift.clone().multiply(current));
+
 						// Check for out of bounds
 						if(minimum.getBlockY() < 0) {
 							tooLow++;
@@ -194,6 +177,7 @@ public class StackCommand extends CommandAreaShop {
 						}
 						ProtectedCuboidRegion region = plugin.getWorldGuardHandler().createCuboidRegion(regionName, minimum,maximum);
 						manager.addRegion(region);
+
 						// Add the region to AreaShop
 						if(rentRegions) {
 							RentRegion rent = new RentRegion(regionName, selection.getWorld());
@@ -234,6 +218,26 @@ public class StackCommand extends CommandAreaShop {
 				}
 			}
 		}.runTaskTimer(plugin, 1, 1);
+	}
+
+	/**
+	 * Build a name from a count, with the right length.
+	 * @param template Template to put the name in (# to put the count there, otherwise count is appended)
+	 * @param count Number to use
+	 * @return name with prepended 0's
+	 */
+	private String countToName(String template, int count) {
+		StringBuilder counterName =  new StringBuilder().append(count);
+		int minimumLength = plugin.getConfig().getInt("stackRegionNumberLength");
+		while(counterName.length() < minimumLength) {
+			counterName.insert(0, "0");
+		}
+
+		if(template.contains("#")) {
+			return template.replace("#", counterName);
+		} else {
+			return template + counterName;
+		}
 	}
 
 	@Override

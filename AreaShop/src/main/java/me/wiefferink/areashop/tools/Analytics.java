@@ -10,6 +10,10 @@ import java.util.HashMap;
 
 public class Analytics {
 
+	private Analytics() {
+
+	}
+
 	/**
 	 * Start analytics tracking.
 	 */

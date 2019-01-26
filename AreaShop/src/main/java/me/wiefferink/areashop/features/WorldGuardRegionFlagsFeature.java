@@ -42,7 +42,7 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 		// Region flags for all states
 		ConfigurationSection allFlags = flagProfileSection.getConfigurationSection("ALL");
 		if(allFlags != null) {
-			result = result && updateRegionFlags(region, allFlags);
+			result = updateRegionFlags(region, allFlags);
 		}
 
 		// Region flags for the current state
@@ -52,9 +52,8 @@ public class WorldGuardRegionFlagsFeature extends RegionFeature {
 		if(stateFlags == null && region.getState() == GeneralRegion.RegionState.RESELL) {
 			stateFlags = flagProfileSection.getConfigurationSection("resale");
 		}
-
 		if(stateFlags != null) {
-			result = result && updateRegionFlags(region, stateFlags);
+			result &= updateRegionFlags(region, stateFlags);
 		}
 
 		return result;

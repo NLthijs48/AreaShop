@@ -4,9 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 public class WorldEditSelection {
-	private World world;
-	private Location minimum;
-	private Location maximum;
+	private final World world;
+	private final Location minimum;
+	private final Location maximum;
 
 	/**
 	 * Craete a WorldEditSelection.

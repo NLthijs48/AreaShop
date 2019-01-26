@@ -311,6 +311,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Get the name of the region.
 	 * @return The region name
 	 */
+	@Override
 	public String getName() {
 		return config.getString("general.name");
 	}
@@ -365,6 +366,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Get the World of the region.
 	 * @return The World where the region is located
 	 */
+	@Override
 	public World getWorld() {
 		return Bukkit.getWorld(getWorldName());
 	}
@@ -373,6 +375,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Get the name of the world where the region is located.
 	 * @return The name of the world of the region
 	 */
+	@Override
 	public String getWorldName() {
 		return getStringSetting("general.world");
 	}
@@ -503,6 +506,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Get the WorldGuard region associated with this AreaShop region.
 	 * @return The ProtectedRegion of WorldGuard or null if the region does not exist anymore
 	 */
+	@Override
 	public ProtectedRegion getRegion() {
 		if(getWorld() == null
 				|| plugin.getWorldGuard() == null
@@ -533,6 +537,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Get the width of the region (x-axis).
 	 * @return The width of the region (x-axis)
 	 */
+	@Override
 	public int getWidth() {
 		if(getRegion() == null) {
 			return 0;
@@ -544,6 +549,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Get the depth of the region (z-axis).
 	 * @return The depth of the region (z-axis)
 	 */
+	@Override
 	public int getDepth() {
 		if(getRegion() == null) {
 			return 0;
@@ -555,6 +561,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * Get the height of the region (y-axis).
 	 * @return The height of the region (y-axis)
 	 */
+	@Override
 	public int getHeight() {
 		if(getRegion() == null) {
 			return 0;
@@ -1414,12 +1421,12 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		String save = profileSection.getString(type.getValue() + ".save");
 		String restore = profileSection.getString(type.getValue() + ".restore");
 		// Save the region if needed
-		if(save != null && save.length() != 0) {
+		if(save != null && !save.isEmpty()) {
 			save = Message.fromString(save).replacements(this).getSingle();
 			saveRegionBlocks(save);
 		}
 		// Restore the region if needed
-		if(restore != null && restore.length() != 0) {
+		if(restore != null && !restore.isEmpty()) {
 			restore = Message.fromString(restore).replacements(this).getSingle();
 			restoreRegionBlocks(restore);
 		}
@@ -1438,7 +1445,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 		}
 
 		for(String command : commands) {
-			if(command == null || command.length() == 0) {
+			if(command == null || command.isEmpty()) {
 				continue;
 			}
 			// It is not ideal we have to disable language replacements here, but otherwise giving language variables
@@ -1542,7 +1549,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 					x2 = points.get(i + 1).getBlockX();
 					z2 = points.get(i + 1).getBlockZ();
 
-					area = area + ((z1 + z2) * (x1 - x2));
+					area += ((z1 + z2) * (x1 - x2));
 				}
 
 				x1 = points.get(numPoints - 1).getBlockX();
@@ -1550,7 +1557,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				x2 = points.get(0).getBlockX();
 				z2 = points.get(0).getBlockZ();
 
-				area = area + ((z1 + z2) * (x1 - x2));
+				area += ((z1 + z2) * (x1 - x2));
 				area = Math.ceil(Math.abs(area) / 2);
 				return (long)(area * getHeight());
 			}

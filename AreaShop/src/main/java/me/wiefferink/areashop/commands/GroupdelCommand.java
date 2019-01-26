@@ -54,7 +54,7 @@ public class GroupdelCommand extends CommandAreaShop {
 				return;
 			}
 			List<GeneralRegion> regions = Utils.getRegionsInSelection(selection);
-			if(regions.size() == 0) {
+			if(regions.isEmpty()) {
 				plugin.message(player, "cmd-noRegionsFound");
 				return;
 			}
@@ -67,10 +67,10 @@ public class GroupdelCommand extends CommandAreaShop {
 					regionsFailed.add(region);
 				}
 			}
-			if(regionsSuccess.size() != 0) {
+			if(!regionsSuccess.isEmpty()) {
 				plugin.message(player, "groupdel-weSuccess", group.getName(), Utils.combinedMessage(regionsSuccess, "region"));
 			}
-			if(regionsFailed.size() != 0) {
+			if(!regionsFailed.isEmpty()) {
 				plugin.message(player, "groupdel-weFailed", group.getName(), Utils.combinedMessage(regionsFailed, "region"));
 			}
 			// Update all regions, this does it in a task, updating them without lag

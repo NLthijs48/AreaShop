@@ -2,29 +2,29 @@ package me.wiefferink.areashop.tools;
 
 public class Value<T> {
 
-	private T value;
+	private T content;
 
 	/**
-	 * Create a container with a default value.
-	 * @param value The value to set
+	 * Create a container with a default content.
+	 * @param content The content to set
 	 */
-	public Value(T value) {
-		this.value = value;
+	public Value(T content) {
+		this.content = content;
 	}
 
 	/**
-	 * Get the stored value.
-	 * @return The stored value
+	 * Get the stored content.
+	 * @return The stored content
 	 */
 	public T get() {
-		return value;
+		return content;
 	}
 
 	/**
-	 * Set the value.
-	 * @param value The new value
+	 * Set the content.
+	 * @param value The new content
 	 */
 	public void set(T value) {
-		this.value = value;
+		this.content = value;
 	}
 }

@@ -59,12 +59,13 @@ public class TeleportCommand extends CommandAreaShop {
 			plugin.message(player, "teleport-noRentOrBuy", args[1]);
 			return;
 		}
-		if(args.length >= 3 && (args[2].equalsIgnoreCase("sign") || args[2].equalsIgnoreCase("yes") || args[2].equalsIgnoreCase("true"))) {
-			region.getTeleportFeature().teleportPlayer(player, true);
-		} else {
-			region.getTeleportFeature().teleportPlayer(player, false);
-		}
 
+		boolean toSign = args.length >= 3 && (
+				args[2].equalsIgnoreCase("sign")
+						|| args[2].equalsIgnoreCase("yes")
+						|| args[2].equalsIgnoreCase("true")
+		);
+		region.getTeleportFeature().teleportPlayer(player, toSign);
 	}
 
 	@Override

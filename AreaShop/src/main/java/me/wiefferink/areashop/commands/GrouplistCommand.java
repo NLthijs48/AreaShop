@@ -28,7 +28,7 @@ public class GrouplistCommand extends CommandAreaShop {
 			return;
 		}
 		List<String> groups = plugin.getFileManager().getGroupNames();
-		if(groups.size() == 0) {
+		if(groups.isEmpty()) {
 			plugin.message(sender, "grouplist-noGroups");
 		} else {
 			plugin.message(sender, "grouplist-success", Utils.createCommaSeparatedList(groups));

@@ -265,7 +265,7 @@ public class Utils {
 	public static String millisToHumanFormat(long milliseconds) {
 		long timeLeft = milliseconds + 500;
 		// To seconds
-		timeLeft = timeLeft / 1000;
+		timeLeft /= 1000;
 		if(timeLeft <= 0) {
 			return Message.fromKey("timeleft-ended").getPlain();
 		} else if(timeLeft == 1) {
@@ -274,27 +274,27 @@ public class Utils {
 			return Message.fromKey("timeleft-seconds").replacements(timeLeft).getPlain();
 		}
 		// To minutes
-		timeLeft = timeLeft / 60;
+		timeLeft /= 60;
 		if(timeLeft <= 120) {
 			return Message.fromKey("timeleft-minutes").replacements(timeLeft).getPlain();
 		}
 		// To hours
-		timeLeft = timeLeft / 60;
+		timeLeft /= 60;
 		if(timeLeft <= 48) {
 			return Message.fromKey("timeleft-hours").replacements(timeLeft).getPlain();
 		}
 		// To days
-		timeLeft = timeLeft / 24;
+		timeLeft /= 24;
 		if(timeLeft <= 60) {
 			return Message.fromKey("timeleft-days").replacements(timeLeft).getPlain();
 		}
 		// To months
-		timeLeft = timeLeft / 30;
+		timeLeft /= 30;
 		if(timeLeft <= 24) {
 			return Message.fromKey("timeleft-months").replacements(timeLeft).getPlain();
 		}
 		// To years
-		timeLeft = timeLeft / 12;
+		timeLeft /= 12;
 		return Message.fromKey("timeleft-years").replacements(timeLeft).getPlain();
 	}
 
@@ -599,7 +599,7 @@ public class Utils {
 	public static long durationStringToLong(String duration) {
 		if(duration == null) {
 			return 0;
-		} else if(duration.equalsIgnoreCase("disabled") || duration.equalsIgnoreCase("unlimited") || duration.length() == 0) {
+		} else if(duration.equalsIgnoreCase("disabled") || duration.equalsIgnoreCase("unlimited") || duration.isEmpty()) {
 			return -1;
 		} else if(duration.indexOf(' ') == -1) {
 			return 0;
@@ -647,7 +647,7 @@ public class Utils {
 		if(config.isLong(path) || config.isInt(path)) {
 			long setting = config.getLong(path);
 			if(setting != -1) {
-				setting = setting * 1000;
+				setting *= 1000;
 			}
 			return setting;
 		} else {
@@ -665,7 +665,7 @@ public class Utils {
 		if(config.isLong(path) || config.isInt(path)) {
 			long setting = config.getLong(path);
 			if(setting != -1) {
-				setting = setting * 60 * 1000;
+				setting *= 60 * 1000;
 			}
 			return setting;
 		} else {
@@ -683,7 +683,7 @@ public class Utils {
 		try {
 			number = Long.parseLong(input);
 			if(number != -1) {
-				number = number * 60 * 1000;
+				number *= 60 * 1000;
 			}
 			return number;
 		} catch(NumberFormatException e) {
@@ -701,7 +701,7 @@ public class Utils {
 		try {
 			number = Long.parseLong(input);
 			if(number != -1) {
-				number = number * 1000;
+				number *= 1000;
 			}
 			return number;
 		} catch(NumberFormatException e) {

@@ -148,8 +148,8 @@ public class RegionGroup {
 	 */
 	public Set<GeneralRegion> getMemberRegions() {
 		Set<GeneralRegion> result = new HashSet<>();
-		for(String name : getMembers()) {
-			result.add(plugin.getFileManager().getRegion(name));
+		for(String playerName : getMembers()) {
+			result.add(plugin.getFileManager().getRegion(playerName));
 		}
 		return result;
 	}

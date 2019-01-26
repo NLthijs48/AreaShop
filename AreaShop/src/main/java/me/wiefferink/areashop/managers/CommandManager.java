@@ -95,7 +95,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 	 * Get the list with AreaShop commands.
 	 * @return The list with AreaShop commands
 	 */
-	public ArrayList<CommandAreaShop> getCommands() {
+	public List<CommandAreaShop> getCommands() {
 		return commands;
 	}
 
@@ -114,7 +114,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 		plugin.message(target, "help-alias");
 		for(CommandAreaShop command : commands) {
 			String help = command.getHelp(target);
-			if(help != null && help.length() != 0) {
+			if(help != null && !help.isEmpty()) {
 				messages.add(help);
 			}
 		}
@@ -130,11 +130,13 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 			plugin.message(sender, "general-notReady");
 			return true;
 		}
+
 		// Redirect `/as info player <player>` to `/as me <player>`
 		if(args.length == 3 && "info".equals(args[0]) && "player".equals(args[1])) {
 			args[0] = "me";
 			args[1] = args[2];
 		}
+
 		// Execute command
 		boolean executed = false;
 		for(int i = 0; i < commands.size() && !executed; i++) {
@@ -143,16 +145,21 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 				executed = true;
 			}
 		}
-		if(!executed && args.length == 0) {
-			this.showHelp(sender);
-		} else if(!executed && args.length > 0) {
-			// Indicate that the '/as updaterents' and '/as updatebuys' commands are removed
-			if("updaterents".equalsIgnoreCase(args[0]) || "updatebuys".equalsIgnoreCase(args[0])) {
-				plugin.message(sender, "reload-updateCommandChanged");
+
+		// Show help
+		if (!executed) {
+			if (args.length == 0) {
+				this.showHelp(sender);
 			} else {
-				plugin.message(sender, "cmd-notValid");
+				// Indicate that the '/as updaterents' and '/as updatebuys' commands are removed
+				if("updaterents".equalsIgnoreCase(args[0]) || "updatebuys".equalsIgnoreCase(args[0])) {
+					plugin.message(sender, "reload-updateCommandChanged");
+				} else {
+					plugin.message(sender, "cmd-notValid");
+				}
 			}
 		}
+
 		return true;
 	}
 
@@ -181,7 +188,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 			}
 		}
 		// Filter and sort the results
-		if(result.size() > 0) {
+		if(!result.isEmpty()) {
 			SortedSet<String> set = new TreeSet<>();
 			for(String suggestion : result) {
 				if(suggestion.toLowerCase().startsWith(toCompletePrefix)) {

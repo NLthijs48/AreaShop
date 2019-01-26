@@ -27,11 +27,11 @@ public class ImportCommand extends CommandAreaShop {
 		return null;
 	}
 
-	// TODO
-	// - Landlord?
-	// - Friends
-	// - Region flags?
-	// - Settings from the 'permissions' section in RegionForSale/config.yml?
+	// TODO:
+	//  - Landlord?
+	//  - Friends
+	//  - Region flags?
+	//  - Settings from the 'permissions' section in RegionForSale/config.yml?
 
 	@Override
 	public void execute(CommandSender sender, String[] args) {
@@ -54,7 +54,7 @@ public class ImportCommand extends CommandAreaShop {
 			return;
 		}
 
-		ImportJob importJob = new ImportJob(sender);
+		new ImportJob(sender);
 	}
 
 	@Override

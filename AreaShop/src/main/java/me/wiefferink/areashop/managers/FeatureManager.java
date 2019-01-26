@@ -40,13 +40,11 @@ public class FeatureManager extends Manager {
 		for(Class<? extends RegionFeature> clazz : featureClasses) {
 			try {
 				Constructor<? extends RegionFeature> constructor = clazz.getConstructor();
-				try {
-					RegionFeature feature = constructor.newInstance();
-					feature.listen();
-					globalFeatures.add(feature);
-				} catch(InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
-					AreaShop.error("Failed to instantiate global feature:", clazz, e);
-				}
+				RegionFeature feature = constructor.newInstance();
+				feature.listen();
+				globalFeatures.add(feature);
+			} catch(InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+				AreaShop.error("Failed to instantiate global feature:", clazz, e);
 			} catch(NoSuchMethodException e) {
 				// Feature does not have a global part
 			}

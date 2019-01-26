@@ -330,7 +330,7 @@ public class ImportJob {
 		String buyPrice = from.getString("economic-settings.cost-per-unit.buy");
 		String sellPrice = from.getString("economic-settings.cost-per-unit.selling-price");
 		// TODO: There is no easy way to import this, setup eventCommandsProfile?
-		String taxes = from.getString("economic-settings.cost-per-unit.taxes");
+		// String taxes = from.getString("economic-settings.cost-per-unit.taxes");
 
 		// Determine unit and add that to the price
 		String unitSuffix = "";
@@ -411,8 +411,8 @@ public class ImportJob {
 	}
 
 	private static class TimeUnit {
-		public long minutes;
-		public String identifier;
+		public final long minutes;
+		public final String identifier;
 
 		TimeUnit(long minutes, String identifier) {
 			this.minutes = minutes;

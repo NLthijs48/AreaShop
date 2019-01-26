@@ -9,6 +9,10 @@ import java.util.List;
 
 public class Materials {
 
+	private Materials() {
+
+	}
+
 	private static boolean legacyMaterials = false;
 
 	static {

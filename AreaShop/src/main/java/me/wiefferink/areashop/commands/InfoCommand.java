@@ -113,9 +113,9 @@ public class InfoCommand extends CommandAreaShop {
 			}
 			// Page status
 			if(totalPages > 1) {
-				String pageString = "" + page;
+				StringBuilder pageString = new StringBuilder("" + page);
 				for(int i = pageString.length(); i < (totalPages + "").length(); i++) {
-					pageString = "0" + pageString;
+					pageString.insert(0, "0");
 				}
 				footer.append(Message.fromKey("info-pageStatus").replacements(page, totalPages));
 				if(page < totalPages) {

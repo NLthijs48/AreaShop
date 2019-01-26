@@ -49,8 +49,8 @@ public class GithubUpdateCheck {
 		this.author = author;
 		this.repository = repository;
 		this.currentVersion = plugin.getDescription().getVersion();
-		this.versionComparator = (latestVersion, currentVersion) ->
-				!latestVersion.equalsIgnoreCase(currentVersion);
+		this.versionComparator = (latest, current) ->
+				!latest.equalsIgnoreCase(current);
 
 		this.checking = false;
 		this.error = false;

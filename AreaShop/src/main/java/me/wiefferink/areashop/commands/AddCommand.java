@@ -57,7 +57,7 @@ public class AddCommand extends CommandAreaShop {
 			return;
 		}
 
-		if(args.length < 2 || args[1] == null || (!"rent".equals(args[1].toLowerCase()) && !"buy".equals(args[1].toLowerCase()))) {
+		if(args.length < 2 || args[1] == null || (!"rent".equalsIgnoreCase(args[1]) && !"buy".equalsIgnoreCase(args[1]))) {
 			plugin.message(sender, "add-help");
 			return;
 		}
@@ -79,7 +79,7 @@ public class AddCommand extends CommandAreaShop {
 			}
 			world = selection.getWorld();
 			regions = Utils.getWorldEditRegionsInSelection(selection).stream().collect(Collectors.toMap(ProtectedRegion::getId, region -> region));
-			if(regions.size() == 0) {
+			if(regions.isEmpty()) {
 				plugin.message(player, "cmd-noWERegionsFound");
 				return;
 			}
@@ -113,7 +113,7 @@ public class AddCommand extends CommandAreaShop {
 			}
 			regions.put(args[2], region);
 		}
-		final boolean isRent = "rent".equals(args[1].toLowerCase());
+		final boolean isRent = "rent".equalsIgnoreCase(args[1]);
 		final Player finalPlayer = player;
 		AreaShop.debug("Starting add task with " + regions.size() + " regions");
 

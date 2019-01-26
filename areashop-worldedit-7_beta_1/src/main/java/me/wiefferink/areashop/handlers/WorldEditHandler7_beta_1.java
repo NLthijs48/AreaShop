@@ -36,9 +36,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class WorldEditHandler7_beta_1 extends WorldEditInterface {
 
@@ -66,8 +63,9 @@ public class WorldEditHandler7_beta_1 extends WorldEditInterface {
 		ClipboardFormat format = null;
 		for (ClipboardFormat formatOption : ClipboardFormats.getAll()) {
 			for (String extension : formatOption.getFileExtensions()) {
-				if (new File(rawFile.getAbsolutePath() + "." + extension).exists()) {
-					file = new File(rawFile.getAbsolutePath() + "." + extension);
+				File fileOption = new File(rawFile.getAbsolutePath() + "." + extension);
+				if (fileOption.exists()) {
+					file = fileOption;
 					format = formatOption;
 				}
 			}

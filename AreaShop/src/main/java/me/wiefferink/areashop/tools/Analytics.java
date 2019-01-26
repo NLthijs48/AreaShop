@@ -14,14 +14,6 @@ public class Analytics {
 	 * Start analytics tracking.
 	 */
 	public static void start() {
-		// Legacy MCstats statistics (remove at some point)
-		try {
-			new me.wiefferink.areashop.lib.Metrics(AreaShop.getInstance()).start();
-			AreaShop.debug("Started mcstats.org statistics service");
-		} catch(Exception e) {
-			AreaShop.debug("Could not start mcstats.org statistics service");
-		}
-
 		// bStats statistics
 		try {
 			Metrics metrics = new Metrics(AreaShop.getInstance());

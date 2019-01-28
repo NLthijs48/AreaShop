@@ -3,6 +3,7 @@ package me.wiefferink.areashop.features.signs;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.events.ask.AddingRegionEvent;
 import me.wiefferink.areashop.events.notify.UpdateRegionEvent;
 import me.wiefferink.areashop.features.RegionFeature;
 import me.wiefferink.areashop.managers.FileManager;
@@ -280,16 +281,16 @@ public class SignsFeature extends RegionFeature {
 				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
 				rent.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
 
-				// Run commands
-				rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
+				AddingRegionEvent addingRegionEvent = plugin.getFileManager().addRegion(rent);
+				if (addingRegionEvent.isCancelled()) {
+					plugin.message(player, "general-cancelled", addingRegionEvent.getReason());
+					return;
+				}
 
-				plugin.getFileManager().addRent(rent);
 				rent.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
 				plugin.message(player, "setup-rentSuccess", rent);
 				// Update the region after the event has written its lines
 				Do.sync(rent::update);
-				// Run commands
-				rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 			}
 		} else if(event.getLine(0).contains(plugin.getConfig().getString("signTags.buy"))) {
 			// Check for permission
@@ -384,17 +385,17 @@ public class SignsFeature extends RegionFeature {
 				}
 				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
 				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
-				// Run commands
-				buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
 
-				plugin.getFileManager().addBuy(buy);
+				AddingRegionEvent addingRegionEvent = plugin.getFileManager().addRegion(buy);
+				if (addingRegionEvent.isCancelled()) {
+					plugin.message(player, "general-cancelled", addingRegionEvent.getReason());
+					return;
+				}
+
 				buy.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
 				plugin.message(player, "setup-buySuccess", buy);
 				// Update the region after the event has written its lines
 				Do.sync(buy::update);
-
-				// Run commands
-				buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 			}
 		} else if(event.getLine(0).contains(plugin.getConfig().getString("signTags.add"))) {
 			// Check for permission

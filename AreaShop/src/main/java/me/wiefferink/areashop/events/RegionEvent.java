@@ -16,6 +16,11 @@ public class RegionEvent<T> extends Event {
 		return handlers;
 	}
 
+	// Required by Bukkit/Spigot
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
 	/**
 	 * Get the region of this event.
 	 * @return The region the event is about

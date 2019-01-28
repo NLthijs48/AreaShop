@@ -6,6 +6,27 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
+/*
+Possible future feature classes:
+- RestrictedToRegion feature
+	- rent/buy restricted to the region itself
+- RestrictedToWorld feature
+	- rent/buy restricted to the world of the region
+- CountLimitsFeature:
+	- Check region limits
+- TimeLimitsFeatures:
+	- maxExtends
+	- maxRentTime
+- SchematicFeature
+	- save/load schematics
+- CommandsFeature
+	- execute commands after extend/rent/etc
+- LandlordFeature
+	- manage landlords
+- ExpirationWarningsFeature
+	- sending rental expiration warnings
+ */
+
 public abstract class RegionFeature implements Listener {
 	public static final AreaShop plugin = AreaShop.getInstance();
 

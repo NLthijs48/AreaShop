@@ -5,6 +5,8 @@ import com.google.common.io.Files;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.events.ask.AddingRegionEvent;
+import me.wiefferink.areashop.events.ask.DeletingRegionEvent;
 import me.wiefferink.areashop.events.notify.AddedRegionEvent;
 import me.wiefferink.areashop.events.notify.DeletedRegionEvent;
 import me.wiefferink.areashop.regions.BuyRegion;
@@ -288,26 +290,39 @@ public class FileManager extends Manager {
 	}
 
 	/**
-	 * Add a rent to the list without saving it to disk (useful for loading at startup).
-	 * @param rent The rental region to add
+	 * Add a region to the list and mark it as to-be-saved.
+	 * @param region Then region to add
+	 * @return true when successful, otherwise false (denied by an event listener)
 	 */
-	public void addRentNoSave(RentRegion rent) {
-		if(rent == null) {
-			AreaShop.debug("Tried adding a null rent!");
-			return;
+	public AddingRegionEvent addRegion(GeneralRegion region) {
+		AddingRegionEvent event = addRegionNoSave(region);
+		if (event.isCancelled()) {
+			return event;
 		}
-		regions.put(rent.getName().toLowerCase(), rent);
-		Bukkit.getPluginManager().callEvent(new AddedRegionEvent(rent));
+		region.saveRequired();
+		markGroupsAutoDirty();
+		return event;
 	}
 
 	/**
-	 * Add a rent to the list and mark it as to-be-saved.
-	 * @param rent Then rental region to add
+	 * Add a region to the list without saving it to disk (useful for loading at startup).
+	 * @param region The region to add
+	 * @return true when successful, otherwise false (denied by an event listener)
 	 */
-	public void addRent(RentRegion rent) {
-		addRentNoSave(rent);
-		rent.saveRequired();
-		markGroupsAutoDirty();
+	public AddingRegionEvent addRegionNoSave(GeneralRegion region) {
+		AddingRegionEvent event = new AddingRegionEvent(region);
+		if(region == null) {
+			AreaShop.debug("Tried adding a null region!");
+			event.cancel("null region");
+			return event;
+		}
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			return event;
+		}
+		regions.put(region.getName().toLowerCase(), region);
+		Bukkit.getPluginManager().callEvent(new AddedRegionEvent(region));
+		return event;
 	}
 
 	/**
@@ -317,29 +332,6 @@ public class FileManager extends Manager {
 		for(RegionGroup group : getGroups()) {
 			group.autoDirty();
 		}
-	}
-
-	/**
-	 * Add a buy to the list without saving it to disk (useful for loading at startup).
-	 * @param buy The buy region to add
-	 */
-	public void addBuyNoSave(BuyRegion buy) {
-		if(buy == null) {
-			AreaShop.debug("Tried adding a null buy!");
-			return;
-		}
-		regions.put(buy.getName().toLowerCase(), buy);
-		Bukkit.getPluginManager().callEvent(new AddedRegionEvent(buy));
-	}
-
-	/**
-	 * Add a buy to the list and mark it as to-be-saved.
-	 * @param buy The buy region to add
-	 */
-	public void addBuy(BuyRegion buy) {
-		addBuyNoSave(buy);
-		buy.saveRequired();
-		markGroupsAutoDirty();
 	}
 
 	/**
@@ -397,113 +389,68 @@ public class FileManager extends Manager {
 		}
 	}
 
-	/**
-	 * Remove a rent from the list.
-	 * @param rent          The region to remove
-	 * @param giveMoneyBack use true to give money back to the player if someone is currently renting this region, otherwise false
-	 * @return true if the rent has been removed, false otherwise
-	 */
-	public boolean removeRent(RentRegion rent, boolean giveMoneyBack) {
-		boolean result = false;
-		if(rent != null) {
-			rent.setDeleted();
-			if(rent.isRented()) {
-				rent.unRent(giveMoneyBack, null);
-			}
-			// Handle schematics and run commands
-			rent.handleSchematicEvent(RegionEvent.DELETED);
-			rent.runEventCommands(RegionEvent.DELETED, true);
-
-			// Delete the signs and the variable
-			if(rent.getWorld() != null) {
-				for(Location sign : rent.getSignsFeature().getSignLocations()) {
-					sign.getBlock().setType(Material.AIR);
-					AreaShop.debug("Removed sign at: " + sign.toString());
-				}
-			}
-			RegionGroup[] regionGroups = getGroups().toArray(new RegionGroup[0]);
-			for(RegionGroup group : regionGroups) {
-				group.removeMember(rent);
-			}
-			rent.resetRegionFlags();
-			regions.remove(rent.getLowerCaseName());
-			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + rent.getLowerCaseName() + ".yml");
-			boolean deleted;
-			if(file.exists()) {
-				try {
-					deleted = file.delete();
-				} catch(Exception e) {
-					deleted = false;
-				}
-				if(!deleted) {
-					AreaShop.warn("File could not be deleted: " + file.toString());
-				}
-			}
-			result = true;
-
-			// Broadcast event
-			Bukkit.getPluginManager().callEvent(new DeletedRegionEvent(rent));
-
-			// Run commands
-			rent.runEventCommands(RegionEvent.DELETED, false);
-		}
-		return result;
-	}
 
 	/**
-	 * Remove a buy from the list.
-	 * @param buy           The BuyRegion to remove
-	 * @param giveMoneyBack true if money should be given back to the player, otherwise false
-	 * @return true if the buy has been removed, false otherwise
+	 * Remove a region from the list.
+	 * @param region The region to remove
+	 * @param giveMoneyBack use true to give money back to the player if someone is currently holding this region, otherwise false
+	 * @return true if the region has been removed, false otherwise
 	 */
-	public boolean removeBuy(BuyRegion buy, boolean giveMoneyBack) {
-		boolean result = false;
-		if(buy != null) {
-			buy.setDeleted();
-			if(buy.isSold()) {
-				buy.sell(giveMoneyBack, null);
-			}
-			// Handle schematics and run commands
-			buy.handleSchematicEvent(RegionEvent.DELETED);
-			buy.runEventCommands(RegionEvent.DELETED, true);
-
-			// Delete the sign and the variable
-			if(buy.getWorld() != null) {
-				for(Location sign : buy.getSignsFeature().getSignLocations()) {
-					sign.getBlock().setType(Material.AIR);
-				}
-			}
-			regions.remove(buy.getLowerCaseName());
-			buy.resetRegionFlags();
-
-			// Removing from groups
-			for(RegionGroup group : getGroups()) {
-				group.removeMember(buy);
-			}
-
-			// Deleting the file
-			File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + buy.getLowerCaseName() + ".yml");
-			boolean deleted;
-			if(file.exists()) {
-				try {
-					deleted = file.delete();
-				} catch(Exception e) {
-					deleted = false;
-				}
-				if(!deleted) {
-					AreaShop.warn("File could not be deleted: " + file.toString());
-				}
-			}
-
-			result = true;
-
-			// Broadcast event
-			Bukkit.getPluginManager().callEvent(new DeletedRegionEvent(buy));
-
-			// Run commands
-			buy.runEventCommands(RegionEvent.DELETED, false);
+	public DeletingRegionEvent deleteRegion(GeneralRegion region, boolean giveMoneyBack) {
+		DeletingRegionEvent event = new DeletingRegionEvent(region);
+		if(region == null) {
+			event.cancel("null region");
+			return event;
 		}
-		return result;
+
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			return event;
+		}
+
+		region.setDeleted();
+		if(region instanceof RentRegion && ((RentRegion)region).isRented()) {
+			((RentRegion)region).unRent(giveMoneyBack, null);
+		} else if (region instanceof BuyRegion && ((BuyRegion)region).isSold()) {
+			((BuyRegion)region).sell(giveMoneyBack, null);
+		}
+
+		// Handle schematics
+		region.handleSchematicEvent(RegionEvent.DELETED);
+
+		// Delete the signs
+		if(region.getWorld() != null) {
+			for(Location sign : region.getSignsFeature().getSignLocations()) {
+				sign.getBlock().setType(Material.AIR);
+			}
+		}
+
+		// Remove from RegionGroups
+		RegionGroup[] regionGroups = getGroups().toArray(new RegionGroup[0]);
+		for(RegionGroup group : regionGroups) {
+			group.removeMember(region);
+		}
+
+		region.resetRegionFlags();
+		regions.remove(region.getLowerCaseName());
+
+		// Remove file
+		File file = new File(plugin.getDataFolder() + File.separator + AreaShop.regionsFolder + File.separator + region.getLowerCaseName() + ".yml");
+		if(file.exists()) {
+			boolean deleted;
+			try {
+				deleted = file.delete();
+			} catch(Exception e) {
+				deleted = false;
+			}
+			if(!deleted) {
+				AreaShop.warn("File could not be deleted: " + file.toString());
+			}
+		}
+
+		// Broadcast event
+		Bukkit.getPluginManager().callEvent(new DeletedRegionEvent(region));
+		return event;
 	}
 
 	/**
@@ -989,11 +936,7 @@ public class FileManager extends Manager {
 					incorrectDuration.add(region);
 				} else {
 					added = true;
-					if(region instanceof RentRegion) {
-						addRentNoSave((RentRegion)region);
-					} else if(region instanceof BuyRegion) {
-						addBuyNoSave((BuyRegion)region);
-					}
+					addRegionNoSave(region);
 				}
 				if(!added) {
 					region.destroy();

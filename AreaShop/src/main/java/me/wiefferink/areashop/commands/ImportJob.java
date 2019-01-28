@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.events.ask.AddingRegionEvent;
 import me.wiefferink.areashop.features.signs.RegionSign;
 import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.regions.BuyRegion;
@@ -240,10 +241,13 @@ public class ImportJob {
 				GeneralRegion region;
 				if(rentable || (owner != null && !isBought)) {
 					region = new RentRegion(regionKey, world);
-					plugin.getFileManager().addRent((RentRegion)region);
 				} else {
 					region = new BuyRegion(regionKey, world);
-					plugin.getFileManager().addBuy((BuyRegion)region);
+				}
+				AddingRegionEvent event = plugin.getFileManager().addRegion(region);
+				if (event.isCancelled()) {
+					messageNoPrefix("general-cancelled", event.getReason());
+					continue;
 				}
 
 				// Import settings

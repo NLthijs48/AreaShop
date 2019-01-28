@@ -3,6 +3,7 @@ package me.wiefferink.areashop.commands;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.events.ask.AddingRegionEvent;
 import me.wiefferink.areashop.interfaces.WorldEditSelection;
 import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
@@ -179,27 +180,24 @@ public class StackCommand extends CommandAreaShop {
 						manager.addRegion(region);
 
 						// Add the region to AreaShop
+						GeneralRegion newRegion;
 						if(rentRegions) {
-							RentRegion rent = new RentRegion(regionName, selection.getWorld());
-							if(finalGroup != null) {
-								finalGroup.addMember(rent);
-							}
-							rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
-							plugin.getFileManager().addRent(rent);
-							rent.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
-							rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
-							rent.update();
+							newRegion = new RentRegion(regionName, selection.getWorld());
+
 						} else {
-							BuyRegion buy = new BuyRegion(regionName, selection.getWorld());
-							if(finalGroup != null) {
-								finalGroup.addMember(buy);
-							}
-							buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
-							plugin.getFileManager().addBuy(buy);
-							buy.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
-							buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
-							buy.update();
+							newRegion = new BuyRegion(regionName, selection.getWorld());
 						}
+
+						if(finalGroup != null) {
+							finalGroup.addMember(newRegion);
+						}
+						AddingRegionEvent event = plugin.getFileManager().addRegion(newRegion);
+						if (event.isCancelled()) {
+							plugin.message(player, "general-cancelled", event.getReason());
+							continue;
+						}
+						newRegion.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
+						newRegion.update();
 					}
 				}
 				if(current >= amount) {

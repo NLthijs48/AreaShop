@@ -2,6 +2,11 @@ package me.wiefferink.areashop.commands;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
+import me.wiefferink.areashop.events.ask.AddingRegionEvent;
+import me.wiefferink.areashop.events.ask.BuyingRegionEvent;
+import me.wiefferink.areashop.events.ask.RentingRegionEvent;
+import me.wiefferink.areashop.events.notify.BoughtRegionEvent;
+import me.wiefferink.areashop.events.notify.RentedRegionEvent;
 import me.wiefferink.areashop.interfaces.WorldEditSelection;
 import me.wiefferink.areashop.managers.FileManager;
 import me.wiefferink.areashop.regions.BuyRegion;
@@ -10,6 +15,7 @@ import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.bukkitdo.Do;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -120,8 +126,11 @@ public class AddCommand extends CommandAreaShop {
 		TreeSet<GeneralRegion> regionsSuccess = new TreeSet<>();
 		TreeSet<GeneralRegion> regionsAlready = new TreeSet<>();
 		TreeSet<GeneralRegion> regionsAlreadyOtherWorld = new TreeSet<>();
+		TreeSet<GeneralRegion> regionsRentCancelled = new TreeSet<>(); // Denied by an event listener
+		TreeSet<GeneralRegion> regionsBuyCancelled = new TreeSet<>(); // Denied by an event listener
 		TreeSet<String> namesBlacklisted = new TreeSet<>();
 		TreeSet<String> namesNoPermission = new TreeSet<>();
+		TreeSet<String> namesAddCancelled = new TreeSet<>(); // Denied by an event listener
 		Do.forAll(
 			plugin.getConfig().getInt("adding.regionsPerTick"),
 			regions.entrySet(),
@@ -170,40 +179,40 @@ public class AddCommand extends CommandAreaShop {
 						if(landlord) {
 							rent.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
 						}
-						// Run commands
-						rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
-						plugin.getFileManager().addRent(rent);
+
+						AddingRegionEvent event = plugin.getFileManager().addRegion(rent);
+						if (event.isCancelled()) {
+							namesAddCancelled.add(rent.getName());
+							return;
+						}
 						rent.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
-
 						rent.update();
-
-						// Run commands
-						rent.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 
 						// Add existing owners/members if any
 						if(!landlord && !existing.isEmpty()) {
-							// TODO also execute rent events to notify other plugins?
+							UUID rentBy = existing.remove(0);
+							OfflinePlayer rentByPlayer = Bukkit.getOfflinePlayer(rentBy);
 
-							// Run commands
-							rent.runEventCommands(GeneralRegion.RegionEvent.RENTED, true);
+							RentingRegionEvent rentingRegionEvent = new RentingRegionEvent(rent, rentByPlayer, false);
+							Bukkit.getPluginManager().callEvent(rentingRegionEvent);
+							if(rentingRegionEvent.isCancelled()) {
+								regionsRentCancelled.add(rent);
+							} else {
+								// Add values to the rent and send it to FileManager
+								rent.setRentedUntil(Calendar.getInstance().getTimeInMillis() + rent.getDuration());
+								rent.setRenter(rentBy);
+								rent.updateLastActiveTime();
 
-							// Add values to the rent and send it to FileManager
-							rent.setRentedUntil(Calendar.getInstance().getTimeInMillis() + rent.getDuration());
-							rent.setRenter(existing.remove(0));
-							rent.updateLastActiveTime();
+								// Fire schematic event and updated times extended
+								rent.handleSchematicEvent(GeneralRegion.RegionEvent.RENTED);
 
-							// Add others as friends
-							for(UUID friend : existing) {
-								rent.getFriendsFeature().addFriend(friend, null);
+								// Add others as friends
+								for(UUID friend : existing) {
+									rent.getFriendsFeature().addFriend(friend, null);
+								}
+
+								rent.notifyAndUpdate(new RentedRegionEvent(rent, false));
 							}
-
-							// Fire schematic event and updated times extended
-							rent.handleSchematicEvent(GeneralRegion.RegionEvent.RENTED);
-
-							// Notify about updates
-							rent.update();
-
-							rent.runEventCommands(GeneralRegion.RegionEvent.RENTED, false);
 						}
 
 						regionsSuccess.add(rent);
@@ -213,40 +222,40 @@ public class AddCommand extends CommandAreaShop {
 						if(landlord) {
 							buy.setLandlord(finalPlayer.getUniqueId(), finalPlayer.getName());
 						}
-						// Run commands
-						buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, true);
 
-						plugin.getFileManager().addBuy(buy);
+						AddingRegionEvent event = plugin.getFileManager().addRegion(buy);
+						if (event.isCancelled()) {
+							namesAddCancelled.add(buy.getName());
+							return;
+						}
+
 						buy.handleSchematicEvent(GeneralRegion.RegionEvent.CREATED);
-
 						buy.update();
-
-						// Run commands
-						buy.runEventCommands(GeneralRegion.RegionEvent.CREATED, false);
 
 						// Add existing owners/members if any
 						if(!landlord && !existing.isEmpty()) {
-							// TODO also execute buy events to notify for other plugins?
+							UUID buyBy = existing.remove(0);
+							OfflinePlayer buyByPlayer = Bukkit.getOfflinePlayer(buyBy);
 
-							// Run commands
-							buy.runEventCommands(GeneralRegion.RegionEvent.BOUGHT, true);
+							BuyingRegionEvent buyingRegionEvent = new BuyingRegionEvent(buy, buyByPlayer);
+							Bukkit.getPluginManager().callEvent(buyingRegionEvent);
+							if(buyingRegionEvent.isCancelled()) {
+								regionsBuyCancelled.add(buy);
+							} else {
+								// Set the owner
+								buy.setBuyer(buyBy);
+								buy.updateLastActiveTime();
 
-							// Set the owner
-							buy.setBuyer(existing.remove(0));
-							buy.updateLastActiveTime();
-							// Add others as friends
-							for(UUID friend : existing) {
-								buy.getFriendsFeature().addFriend(friend, null);
+								// Update everything
+								buy.handleSchematicEvent(GeneralRegion.RegionEvent.BOUGHT);
+
+								// Add others as friends
+								for (UUID friend : existing) {
+									buy.getFriendsFeature().addFriend(friend, null);
+								}
+
+								buy.notifyAndUpdate(new BoughtRegionEvent(buy));
 							}
-
-							// Notify about updates
-							buy.update();
-
-							// Update everything
-							buy.handleSchematicEvent(GeneralRegion.RegionEvent.BOUGHT);
-
-							// Run commands
-							buy.runEventCommands(GeneralRegion.RegionEvent.BOUGHT, false);
 						}
 
 						regionsSuccess.add(buy);
@@ -263,12 +272,21 @@ public class AddCommand extends CommandAreaShop {
 				if(!regionsAlreadyOtherWorld.isEmpty()) {
 					plugin.message(sender, "add-failedOtherWorld", Utils.combinedMessage(regionsAlreadyOtherWorld, "region"));
 				}
+				if(!regionsRentCancelled.isEmpty()) {
+					plugin.message(sender, "add-rentCancelled", Utils.combinedMessage(regionsRentCancelled, "region"));
+				}
+				if(!regionsBuyCancelled.isEmpty()) {
+					plugin.message(sender, "add-buyCancelled", Utils.combinedMessage(regionsBuyCancelled, "region"));
+				}
 				if(!namesBlacklisted.isEmpty()) {
 					plugin.message(sender, "add-blacklisted", Utils.createCommaSeparatedList(namesBlacklisted));
 				}
 				if(!namesNoPermission.isEmpty()) {
 					plugin.message(sender, "add-noPermissionRegions", Utils.createCommaSeparatedList(namesNoPermission));
 					plugin.message(sender, "add-noPermissionOwnerMember");
+				}
+				if(!namesAddCancelled.isEmpty()) {
+					plugin.message(sender, "add-rentCancelled", Utils.createCommaSeparatedList(namesAddCancelled));
 				}
 			}
 		);

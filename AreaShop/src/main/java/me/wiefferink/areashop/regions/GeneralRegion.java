@@ -183,15 +183,16 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	/**
 	 * Get a feature of this region.
 	 * @param clazz The class of the feature to get
-	 * @return The feature (either just instanciated or cached)
+	 * @param <T> The feature to get
+	 * @return The feature (either just instantiated or cached)
 	 */
-	public RegionFeature getFeature(Class<? extends RegionFeature> clazz) {
+	public <T extends RegionFeature> T getFeature(Class<T> clazz) {
 		RegionFeature result = features.get(clazz);
 		if(result == null) {
 			result = plugin.getFeatureManager().getRegionFeature(this, clazz);
 			features.put(clazz, result);
 		}
-		return result;
+		return clazz.cast(result);
 	}
 
 	/**
@@ -199,7 +200,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return The FriendsFeature of this region
 	 */
 	public FriendsFeature getFriendsFeature() {
-		return (FriendsFeature)getFeature(FriendsFeature.class);
+		return getFeature(FriendsFeature.class);
 	}
 
 	/**
@@ -207,7 +208,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return The SignsFeature of this region
 	 */
 	public SignsFeature getSignsFeature() {
-		return (SignsFeature)getFeature(SignsFeature.class);
+		return getFeature(SignsFeature.class);
 	}
 
 	/**
@@ -215,7 +216,7 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 	 * @return The TeleportFeature
 	 */
 	public TeleportFeature getTeleportFeature() {
-		return (TeleportFeature)getFeature(TeleportFeature.class);
+		return getFeature(TeleportFeature.class);
 	}
 
 	// ABSTRACT
@@ -1477,23 +1478,6 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 				AreaShop.debug("Command run, executor=" + sender.getName() + ", command=" + command);
 			}
 		}
-	}
-
-	/**
-	 * Run command for a certain event.
-	 * @param event  The event
-	 * @param before The 'before' or 'after' commands
-	 */
-	public void runEventCommands(RegionEvent event, boolean before) {
-		ConfigurationSection eventCommandProfileSection = getConfigurationSectionSetting("general.eventCommandProfile", "eventCommandProfiles");
-		if(eventCommandProfileSection == null) {
-			return;
-		}
-		List<String> commands = eventCommandProfileSection.getStringList(event.getValue() + "." + (before ? "before" : "after"));
-		if(commands == null || commands.isEmpty()) {
-			return;
-		}
-		runCommands(Bukkit.getConsoleSender(), commands);
 	}
 
 	/**

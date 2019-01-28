@@ -259,189 +259,186 @@ public class BuyRegion extends GeneralRegion {
 	@SuppressWarnings("deprecation")
 	public boolean buy(OfflinePlayer offlinePlayer) {
 		// Check if the player has permission
-		if(plugin.hasPermission(offlinePlayer, "areashop.buy")) {
-			if(plugin.getEconomy() == null) {
-				message(offlinePlayer, "general-noEconomy");
+		if(!plugin.hasPermission(offlinePlayer, "areashop.buy")) {
+			message(offlinePlayer, "buy-noPermission");
+			return false;
+		}
+
+		if(plugin.getEconomy() == null) {
+			message(offlinePlayer, "general-noEconomy");
+			return false;
+		}
+
+		if(isInResellingMode()) {
+			if(!plugin.hasPermission(offlinePlayer, "areashop.buyresell")) {
+				message(offlinePlayer, "buy-noPermissionResell");
 				return false;
-			}
-			if(isInResellingMode()) {
-				if(!plugin.hasPermission(offlinePlayer, "areashop.buyresell")) {
-					message(offlinePlayer, "buy-noPermissionResell");
-					return false;
-				}
-			} else {
-				if(!plugin.hasPermission(offlinePlayer, "areashop.buynormal")) {
-					message(offlinePlayer, "buy-noPermissionNoResell");
-					return false;
-				}
-			}
-			if(getWorld() == null) {
-				message(offlinePlayer, "general-noWorld");
-				return false;
-			}
-			if(getRegion() == null) {
-				message(offlinePlayer, "general-noRegion");
-				return false;
-			}
-			if(!isSold() || (isInResellingMode() && !isBuyer(offlinePlayer))) {
-				boolean isResell = isInResellingMode();
-
-				// Only relevant if the player is online
-				Player player = offlinePlayer.getPlayer();
-				if(player != null) {
-					// Check if the players needs to be in the region for buying
-					if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName())
-							|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
-						message(offlinePlayer, "buy-restrictedToRegion");
-						return false;
-					}
-					// Check if the players needs to be in the world for buying
-					if(restrictedToWorld() && !player.getWorld().getName().equals(getWorldName())) {
-						message(offlinePlayer, "buy-restrictedToWorld", player.getWorld().getName());
-						return false;
-					}
-				}
-
-				// Check region limits
-				LimitResult limitResult = this.limitsAllow(RegionType.BUY, offlinePlayer);
-				AreaShop.debug("LimitResult: " + limitResult.toString());
-				if(!limitResult.actionAllowed()) {
-					if(limitResult.getLimitingFactor() == LimitType.TOTAL) {
-						message(offlinePlayer, "total-maximum", limitResult.getMaximum(), limitResult.getCurrent(), limitResult.getLimitingGroup());
-						return false;
-					}
-					if(limitResult.getLimitingFactor() == LimitType.BUYS) {
-						message(offlinePlayer, "buy-maximum", limitResult.getMaximum(), limitResult.getCurrent(), limitResult.getLimitingGroup());
-						return false;
-					}
-					// Should not be reached, but is safe like this
-					return false;
-				}
-
-				// Check if the player has enough money
-				if((!isResell && plugin.getEconomy().has(offlinePlayer, getWorldName(), getPrice())) || (isResell && plugin.getEconomy().has(offlinePlayer, getWorldName(), getResellPrice()))) {
-					UUID oldOwner = getBuyer();
-					if(isResell && oldOwner != null) {
-						// Broadcast and check event
-						ResellingRegionEvent event = new ResellingRegionEvent(this, offlinePlayer);
-						Bukkit.getPluginManager().callEvent(event);
-						if(event.isCancelled()) {
-							message(offlinePlayer, "general-cancelled", event.getReason());
-							return false;
-						}
-
-						getFriendsFeature().clearFriends();
-						double resellPrice = getResellPrice();
-						// Transfer the money to the previous owner
-						EconomyResponse r = plugin.getEconomy().withdrawPlayer(offlinePlayer, getWorldName(), getResellPrice());
-						if(!r.transactionSuccess()) {
-							message(offlinePlayer, "buy-payError");
-							AreaShop.debug("Something went wrong with getting money from " + offlinePlayer.getName() + " while buying " + getName() + ": " + r.errorMessage);
-							return false;
-						}
-						r = null;
-						OfflinePlayer oldOwnerPlayer = Bukkit.getOfflinePlayer(oldOwner);
-						String oldOwnerName = getPlayerName();
-						if(oldOwnerPlayer != null && oldOwnerPlayer.getName() != null) {
-							r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
-							oldOwnerName = oldOwnerPlayer.getName();
-						} else if(oldOwnerName != null) {
-							r = plugin.getEconomy().depositPlayer(oldOwnerName, getWorldName(), getResellPrice());
-						}
-						if(r == null || !r.transactionSuccess()) {
-							AreaShop.warn("Something went wrong with paying '" + oldOwnerName + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + offlinePlayer.getName());
-						}
-						// Resell is done, disable that now
-						disableReselling();
-						// Run commands
-						this.runEventCommands(RegionEvent.RESELL, true);
-						// Set the owner
-						setBuyer(offlinePlayer.getUniqueId());
-						updateLastActiveTime();
-
-						// Update everything
-						handleSchematicEvent(RegionEvent.RESELL);
-
-						// Notify about updates
-						this.notifyAndUpdate(new ResoldRegionEvent(this, oldOwner));
-
-						// Send message to the player
-						message(offlinePlayer, "buy-successResale", oldOwnerName);
-						Player seller = Bukkit.getPlayer(oldOwner);
-						if(seller != null) {
-							message(seller, "buy-successSeller", resellPrice);
-						}
-						// Run commands
-						this.runEventCommands(RegionEvent.RESELL, false);
-					} else {
-						// Broadcast and check event
-						BuyingRegionEvent event = new BuyingRegionEvent(this, offlinePlayer);
-						Bukkit.getPluginManager().callEvent(event);
-						if(event.isCancelled()) {
-							message(offlinePlayer, "general-cancelled", event.getReason());
-							return false;
-						}
-
-						// Substract the money from the players balance
-						EconomyResponse r = plugin.getEconomy().withdrawPlayer(offlinePlayer, getWorldName(), getPrice());
-						if(!r.transactionSuccess()) {
-							message(offlinePlayer, "buy-payError");
-							return false;
-						}
-						// Optionally give money to the landlord
-						OfflinePlayer landlordPlayer = null;
-						if(getLandlord() != null) {
-							landlordPlayer = Bukkit.getOfflinePlayer(getLandlord());
-						}
-						String landlordName = getLandlordName();
-						if(landlordName != null) {
-							if(landlordPlayer != null && landlordPlayer.getName() != null) {
-								r = plugin.getEconomy().depositPlayer(landlordPlayer, getWorldName(), getPrice());
-							} else {
-								r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), getPrice());
-							}
-							if(r != null && !r.transactionSuccess()) {
-								AreaShop.warn("Something went wrong with paying '" + landlordName + "' " + getFormattedPrice() + " for his sell of region " + getName() + " to " + offlinePlayer.getName());
-							}
-						}
-
-						// Run commands
-						this.runEventCommands(RegionEvent.BOUGHT, true);
-						// Set the owner
-						setBuyer(offlinePlayer.getUniqueId());
-						updateLastActiveTime();
-
-						// Notify about updates
-						this.notifyAndUpdate(new BoughtRegionEvent(this));
-
-						// Update everything
-						handleSchematicEvent(RegionEvent.BOUGHT);
-
-						// Send message to the player
-						message(offlinePlayer, "buy-succes");
-						// Run commands
-						this.runEventCommands(RegionEvent.BOUGHT, false);
-					}
-					return true;
-				} else {
-					// Player has not enough money
-					if(isResell) {
-						message(offlinePlayer, "buy-lowMoneyResell", Utils.formatCurrency(plugin.getEconomy().getBalance(offlinePlayer, getWorldName())));
-					} else {
-						message(offlinePlayer, "buy-lowMoney", Utils.formatCurrency(plugin.getEconomy().getBalance(offlinePlayer, getWorldName())));
-					}
-				}
-			} else {
-				if(isBuyer(offlinePlayer)) {
-					message(offlinePlayer, "buy-yours");
-				} else {
-					message(offlinePlayer, "buy-someoneElse");
-				}
 			}
 		} else {
-			message(offlinePlayer, "buy-noPermission");
+			if(!plugin.hasPermission(offlinePlayer, "areashop.buynormal")) {
+				message(offlinePlayer, "buy-noPermissionNoResell");
+				return false;
+			}
 		}
-		return false;
+
+		if(getWorld() == null) {
+			message(offlinePlayer, "general-noWorld");
+			return false;
+		}
+
+		if(getRegion() == null) {
+			message(offlinePlayer, "general-noRegion");
+			return false;
+		}
+
+		if (isSold() && !(isInResellingMode() && !isBuyer(offlinePlayer))) {
+			if(isBuyer(offlinePlayer)) {
+				message(offlinePlayer, "buy-yours");
+			} else {
+				message(offlinePlayer, "buy-someoneElse");
+			}
+		}
+
+		boolean isResell = isInResellingMode();
+
+		// Only relevant if the player is online
+		Player player = offlinePlayer.getPlayer();
+		if(player != null) {
+			// Check if the players needs to be in the region for buying
+			if(restrictedToRegion() && (!player.getWorld().getName().equals(getWorldName())
+					|| !getRegion().contains(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
+				message(offlinePlayer, "buy-restrictedToRegion");
+				return false;
+			}
+			// Check if the players needs to be in the world for buying
+			if(restrictedToWorld() && !player.getWorld().getName().equals(getWorldName())) {
+				message(offlinePlayer, "buy-restrictedToWorld", player.getWorld().getName());
+				return false;
+			}
+		}
+
+		// Check region limits
+		LimitResult limitResult = this.limitsAllow(RegionType.BUY, offlinePlayer);
+		AreaShop.debug("LimitResult: " + limitResult.toString());
+		if(!limitResult.actionAllowed()) {
+			if(limitResult.getLimitingFactor() == LimitType.TOTAL) {
+				message(offlinePlayer, "total-maximum", limitResult.getMaximum(), limitResult.getCurrent(), limitResult.getLimitingGroup());
+				return false;
+			}
+			if(limitResult.getLimitingFactor() == LimitType.BUYS) {
+				message(offlinePlayer, "buy-maximum", limitResult.getMaximum(), limitResult.getCurrent(), limitResult.getLimitingGroup());
+				return false;
+			}
+			// Should not be reached, but is safe like this
+			return false;
+		}
+
+		// Check if the player has enough money
+		if (isResell && !plugin.getEconomy().has(offlinePlayer, getWorldName(), getResellPrice())) {
+			message(offlinePlayer, "buy-lowMoneyResell", Utils.formatCurrency(plugin.getEconomy().getBalance(offlinePlayer, getWorldName())));
+			return false;
+		}
+		if (!isResell && !plugin.getEconomy().has(offlinePlayer, getWorldName(), getPrice())) {
+			message(offlinePlayer, "buy-lowMoney", Utils.formatCurrency(plugin.getEconomy().getBalance(offlinePlayer, getWorldName())));
+			return false;
+		}
+
+		UUID oldOwner = getBuyer();
+		if(isResell && oldOwner != null) {
+			// Broadcast and check event
+			ResellingRegionEvent event = new ResellingRegionEvent(this, offlinePlayer);
+			Bukkit.getPluginManager().callEvent(event);
+			if(event.isCancelled()) {
+				message(offlinePlayer, "general-cancelled", event.getReason());
+				return false;
+			}
+
+			getFriendsFeature().clearFriends();
+			double resellPrice = getResellPrice();
+			// Transfer the money to the previous owner
+			EconomyResponse r = plugin.getEconomy().withdrawPlayer(offlinePlayer, getWorldName(), getResellPrice());
+			if(!r.transactionSuccess()) {
+				message(offlinePlayer, "buy-payError");
+				AreaShop.debug("Something went wrong with getting money from " + offlinePlayer.getName() + " while buying " + getName() + ": " + r.errorMessage);
+				return false;
+			}
+			r = null;
+			OfflinePlayer oldOwnerPlayer = Bukkit.getOfflinePlayer(oldOwner);
+			String oldOwnerName = getPlayerName();
+			if(oldOwnerPlayer != null && oldOwnerPlayer.getName() != null) {
+				r = plugin.getEconomy().depositPlayer(oldOwnerPlayer, getWorldName(), getResellPrice());
+				oldOwnerName = oldOwnerPlayer.getName();
+			} else if(oldOwnerName != null) {
+				r = plugin.getEconomy().depositPlayer(oldOwnerName, getWorldName(), getResellPrice());
+			}
+			if(r == null || !r.transactionSuccess()) {
+				AreaShop.warn("Something went wrong with paying '" + oldOwnerName + "' " + getFormattedPrice() + " for his resell of region " + getName() + " to " + offlinePlayer.getName());
+			}
+			// Resell is done, disable that now
+			disableReselling();
+
+			// Set the owner
+			setBuyer(offlinePlayer.getUniqueId());
+			updateLastActiveTime();
+
+			// Update everything
+			handleSchematicEvent(RegionEvent.RESELL);
+
+			// Notify about updates
+			this.notifyAndUpdate(new ResoldRegionEvent(this, oldOwner));
+
+			// Send message to the player
+			message(offlinePlayer, "buy-successResale", oldOwnerName);
+			Player seller = Bukkit.getPlayer(oldOwner);
+			if(seller != null) {
+				message(seller, "buy-successSeller", resellPrice);
+			}
+		} else {
+			// Broadcast and check event
+			BuyingRegionEvent event = new BuyingRegionEvent(this, offlinePlayer);
+			Bukkit.getPluginManager().callEvent(event);
+			if(event.isCancelled()) {
+				message(offlinePlayer, "general-cancelled", event.getReason());
+				return false;
+			}
+
+			// Substract the money from the players balance
+			EconomyResponse r = plugin.getEconomy().withdrawPlayer(offlinePlayer, getWorldName(), getPrice());
+			if(!r.transactionSuccess()) {
+				message(offlinePlayer, "buy-payError");
+				return false;
+			}
+			// Optionally give money to the landlord
+			OfflinePlayer landlordPlayer = null;
+			if(getLandlord() != null) {
+				landlordPlayer = Bukkit.getOfflinePlayer(getLandlord());
+			}
+			String landlordName = getLandlordName();
+			if(landlordName != null) {
+				if(landlordPlayer != null && landlordPlayer.getName() != null) {
+					r = plugin.getEconomy().depositPlayer(landlordPlayer, getWorldName(), getPrice());
+				} else {
+					r = plugin.getEconomy().depositPlayer(landlordName, getWorldName(), getPrice());
+				}
+				if(r != null && !r.transactionSuccess()) {
+					AreaShop.warn("Something went wrong with paying '" + landlordName + "' " + getFormattedPrice() + " for his sell of region " + getName() + " to " + offlinePlayer.getName());
+				}
+			}
+
+			// Set the owner
+			setBuyer(offlinePlayer.getUniqueId());
+			updateLastActiveTime();
+
+			// Send message to the player
+			message(offlinePlayer, "buy-succes");
+
+			// Update everything
+			handleSchematicEvent(RegionEvent.BOUGHT);
+
+			// Notify about updates
+			this.notifyAndUpdate(new BoughtRegionEvent(this));
+		}
+		return true;
 	}
 
 	/**
@@ -482,9 +479,6 @@ public class BuyRegion extends GeneralRegion {
 			message(executor, "general-cancelled", event.getReason());
 			return false;
 		}
-
-		// Run commands
-		this.runEventCommands(RegionEvent.SOLD, true);
 
 		disableReselling();
 		// Give part of the buying price back
@@ -528,8 +522,6 @@ public class BuyRegion extends GeneralRegion {
 			}
 		}
 
-		message(executor, "sell-sold");
-
 		// Handle schematic save/restore (while %uuid% is still available)
 		handleSchematicEvent(RegionEvent.SOLD);
 
@@ -539,11 +531,10 @@ public class BuyRegion extends GeneralRegion {
 		setBuyer(null);
 		removeLastActiveTime();
 
+		message(executor, "sell-sold");
+
 		// Notify about updates
 		this.notifyAndUpdate(new SoldRegionEvent(this, oldBuyer, Math.max(moneyBack, 0)));
-
-		// Run commands
-		this.runEventCommands(RegionEvent.SOLD, false);
 		return true;
 	}
 

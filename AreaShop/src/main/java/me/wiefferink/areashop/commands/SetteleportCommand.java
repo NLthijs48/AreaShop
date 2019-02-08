@@ -20,7 +20,7 @@ public class SetteleportCommand extends CommandAreaShop {
 
 	@Override
 	public String getHelp(CommandSender target) {
-		if(target.hasPermission("areashop.teleportall") || target.hasPermission("areashop.teleport")) {
+		if(target.hasPermission("areashop.setteleportall") || target.hasPermission("areashop.setteleport")) {
 			return "help-setteleport";
 		}
 		return null;

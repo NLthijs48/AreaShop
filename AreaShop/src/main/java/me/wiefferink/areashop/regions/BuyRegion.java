@@ -297,6 +297,7 @@ public class BuyRegion extends GeneralRegion {
 			} else {
 				message(offlinePlayer, "buy-someoneElse");
 			}
+			return false;
 		}
 
 		boolean isResell = isInResellingMode();

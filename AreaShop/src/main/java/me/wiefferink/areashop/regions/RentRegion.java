@@ -436,6 +436,7 @@ public class RentRegion extends GeneralRegion {
 		// Check if the player has permission
 		if(!plugin.hasPermission(offlinePlayer, "areashop.rent")) {
 			message(offlinePlayer, "rent-noPermission");
+			return false;
 		}
 
 		// Check location restrictions

@@ -11,6 +11,7 @@ import me.wiefferink.areashop.regions.BuyRegion;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.areashop.tools.Materials;
+import me.wiefferink.areashop.tools.SignUtils;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.bukkitdo.Do;
 import org.bukkit.Chunk;
@@ -28,6 +29,7 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.material.MaterialData;
 import org.bukkit.material.Sign;
 
 import java.util.ArrayList;
@@ -117,8 +119,8 @@ public class SignsFeature extends RegionFeature {
 
 		// Check if still attached to a block
 		Block b = event.getBlock();
-		Sign s = (Sign) b.getState().getData();
-		Block attachedBlock = b.getRelative(s.getAttachedFace());
+		MaterialData materialData = b.getState().getData();
+		Block attachedBlock = b.getRelative(SignUtils.getAttachedFace(materialData));
 		if (attachedBlock.getType() != Material.AIR) {
 			return;
 		}
@@ -278,8 +280,8 @@ public class SignsFeature extends RegionFeature {
 				if(durationSet) {
 					rent.setDuration(thirdLine);
 				}
-				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
-				rent.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				MaterialData materialData = event.getBlock().getState().getData();
+				rent.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), SignUtils.getFacing(materialData), null);
 
 				AddingRegionEvent addingRegionEvent = plugin.getFileManager().addRegion(rent);
 				if (addingRegionEvent.isCancelled()) {
@@ -383,8 +385,8 @@ public class SignsFeature extends RegionFeature {
 				if(priceSet) {
 					buy.setPrice(price);
 				}
-				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
-				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				MaterialData materialData = event.getBlock().getState().getData();
+				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), SignUtils.getFacing(materialData), null);
 
 				AddingRegionEvent addingRegionEvent = plugin.getFileManager().addRegion(buy);
 				if (addingRegionEvent.isCancelled()) {
@@ -428,12 +430,12 @@ public class SignsFeature extends RegionFeature {
 				}
 				region = regions.get(0);
 			}
-			org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
+			MaterialData materialData = event.getBlock().getState().getData();
 			if(thirdLine == null || thirdLine.isEmpty()) {
-				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), SignUtils.getFacing(materialData), null);
 				plugin.message(player, "addsign-success", region);
 			} else {
-				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
+				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), SignUtils.getFacing(materialData), thirdLine);
 				plugin.message(player, "addsign-successProfile", thirdLine, region);
 			}
 

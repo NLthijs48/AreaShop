@@ -4,11 +4,13 @@ import me.wiefferink.areashop.features.signs.RegionSign;
 import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Materials;
+import me.wiefferink.areashop.tools.SignUtils;
 import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.material.MaterialData;
 import org.bukkit.material.Sign;
 import org.bukkit.util.BlockIterator;
 
@@ -77,7 +79,7 @@ public class AddsignCommand extends CommandAreaShop {
 			}
 			region = regions.get(0);
 		}
-		Sign sign = (Sign)block.getState().getData();
+		MaterialData materialData = block.getState().getData();
 		String profile = null;
 		if(args.length > 2) {
 			profile = args[2];
@@ -93,7 +95,7 @@ public class AddsignCommand extends CommandAreaShop {
 			return;
 		}
 
-		region.getSignsFeature().addSign(block.getLocation(), block.getType(), sign.getFacing(), profile);
+		region.getSignsFeature().addSign(block.getLocation(), block.getType(), SignUtils.getFacing(materialData), profile);
 		if(profile == null) {
 			plugin.message(sender, "addsign-success", region);
 		} else {

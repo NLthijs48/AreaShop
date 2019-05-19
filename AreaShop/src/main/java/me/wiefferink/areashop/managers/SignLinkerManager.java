@@ -4,6 +4,7 @@ import me.wiefferink.areashop.features.signs.RegionSign;
 import me.wiefferink.areashop.features.signs.SignsFeature;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Materials;
+import me.wiefferink.areashop.tools.SignUtils;
 import me.wiefferink.areashop.tools.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.material.MaterialData;
 import org.bukkit.material.Sign;
 import org.bukkit.util.BlockIterator;
 
@@ -131,8 +133,8 @@ public class SignLinkerManager extends Manager implements Listener {
 					plugin.message(player, "linksigns-alreadyRegistered", regionSign.getRegion());
 					return;
 				}
-				Sign sign = (Sign)block.getState().getData();
-				linker.setSign(block.getLocation(), block.getType(), sign.getFacing());
+				MaterialData materialData = block.getState().getData();
+				linker.setSign(block.getLocation(), block.getType(), SignUtils.getFacing(materialData));
 			}
 		}
 	}

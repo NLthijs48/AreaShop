@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Materials;
+import me.wiefferink.areashop.tools.SignUtils;
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.interactivemessenger.processing.Message;
 import org.bukkit.Bukkit;
@@ -15,6 +16,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -158,11 +160,11 @@ public class RegionSign {
 				return false;
 			}
 			signState = (Sign) block.getState();
-			org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
+			MaterialData materialData = signState.getData();
 			BlockFace signFace = getFacing();
 			if(signFace != null) {
-				signData.setFacingDirection(signFace);
-				signState.setData(signData);
+				SignUtils.setFacingDirection(materialData,signFace);
+				signState.setData(materialData);
 			}
 		}
 		if(signState == null) {
@@ -170,7 +172,7 @@ public class RegionSign {
 		}
 
 		// Save current rotation and type
-		org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
+		MaterialData materialData = signState.getData();
 		if(!regionConfig.isString("general.signs." + key + ".signType")) {
 			String signType = signState.getType().name();
 			if (signType.equals("SIGN")) {
@@ -179,7 +181,7 @@ public class RegionSign {
 			getRegion().setSetting("general.signs." + key + ".signType", signType);
 		}
 		if(!regionConfig.isString("general.signs." + key + ".facing")) {
-			getRegion().setSetting("general.signs." + key + ".facing", signData.getFacing().toString());
+			getRegion().setSetting("general.signs." + key + ".facing", SignUtils.getFacing(materialData).toString());
 		}
 
 		// Apply replacements and color and then set it on the sign

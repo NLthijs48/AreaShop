@@ -111,27 +111,43 @@ public class SignsFeature extends RegionFeature {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onIndirectSignBreak(BlockPhysicsEvent event) {
 		// Check if the block is a sign
-		if(!Materials.isSign(event.getBlock().getType())) {
+		final Block b = event.getBlock();
+		if(!Materials.isSign(b.getType())) {
 			return;
 		}
 
 		// Check if still attached to a block
-		Block b = event.getBlock();
-		Sign s = (Sign) b.getState().getData();
-		Block attachedBlock = b.getRelative(s.getAttachedFace());
-		if (attachedBlock.getType() != Material.AIR) {
-			return;
+		final org.bukkit.material.MaterialData d = b.getState().getData();
+		if(d instanceof Sign) {
+			Sign s = (Sign) d;
+			Block attachedBlock = b.getRelative(s.getAttachedFace());
+			if (attachedBlock.getType() != Material.AIR) {
+				return;
+			}
+		} else {
+			BlockFace facing = null;
+			// 1.14 method
+			org.bukkit.block.data.BlockData bs = event.getBlock().getState().getBlockData();
+			if(bs instanceof org.bukkit.block.data.type.WallSign) {
+				facing = ((org.bukkit.block.data.type.WallSign) bs).getFacing().getOppositeFace();
+			} else if(bs instanceof org.bukkit.block.data.type.Sign) {
+				facing = BlockFace.DOWN;
+			}
+			Block attachedBlock = b.getRelative(facing);
+			if (attachedBlock.getType() != Material.AIR) {
+				return;
+			}
 		}
 
 		// Check if the rent sign is really the same as a saved rent
-		RegionSign regionSign = SignsFeature.getSignByLocation(event.getBlock().getLocation());
+		RegionSign regionSign = SignsFeature.getSignByLocation(b.getLocation());
 		if(regionSign == null) {
 			return;
 		}
 
 		// Remove the sign so that it does not fall on the floor as an item (next region update will place it back)
 		AreaShop.debug("onIndirectSignBreak: Removed block of sign for", regionSign.getRegion().getName(), "at", regionSign.getStringLocation());
-		event.getBlock().setType(Material.AIR);
+		b.setType(Material.AIR);
 		event.setCancelled(true);
 	}
 
@@ -278,8 +294,19 @@ public class SignsFeature extends RegionFeature {
 				if(durationSet) {
 					rent.setDuration(thirdLine);
 				}
-				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
-				rent.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				BlockFace facing = null;
+				if(event.getBlock().getState().getData() instanceof org.bukkit.material.Sign) {
+					facing = ((org.bukkit.material.Sign) event.getBlock().getState().getData()).getFacing();
+				} else {
+					// 1.14 method
+					org.bukkit.block.data.BlockData bs = event.getBlock().getState().getBlockData();
+					if(bs instanceof org.bukkit.block.data.type.WallSign) {
+						facing = ((org.bukkit.block.data.type.WallSign) bs).getFacing();
+					} else if(bs instanceof org.bukkit.block.data.type.Sign) {
+						facing = ((org.bukkit.block.data.type.Sign) bs).getRotation();
+					}
+				}
+				rent.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), facing, null);
 
 				AddingRegionEvent addingRegionEvent = plugin.getFileManager().addRegion(rent);
 				if (addingRegionEvent.isCancelled()) {
@@ -383,8 +410,19 @@ public class SignsFeature extends RegionFeature {
 				if(priceSet) {
 					buy.setPrice(price);
 				}
-				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
-				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				BlockFace facing = null;
+				if(event.getBlock().getState().getData() instanceof org.bukkit.material.Sign) {
+					facing = ((org.bukkit.material.Sign) event.getBlock().getState().getData()).getFacing();
+				} else {
+					// 1.14 method
+					org.bukkit.block.data.BlockData bs = event.getBlock().getState().getBlockData();
+					if(bs instanceof org.bukkit.block.data.type.WallSign) {
+						facing = ((org.bukkit.block.data.type.WallSign) bs).getFacing();
+					} else if(bs instanceof org.bukkit.block.data.type.Sign) {
+						facing = ((org.bukkit.block.data.type.Sign) bs).getRotation();
+					}
+				}
+				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), facing, null);
 
 				AddingRegionEvent addingRegionEvent = plugin.getFileManager().addRegion(buy);
 				if (addingRegionEvent.isCancelled()) {
@@ -428,12 +466,24 @@ public class SignsFeature extends RegionFeature {
 				}
 				region = regions.get(0);
 			}
-			org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
+
+			BlockFace facing = null;
+			if(event.getBlock().getState().getData() instanceof org.bukkit.material.Sign) {
+				facing = ((org.bukkit.material.Sign) event.getBlock().getState().getData()).getFacing();
+			} else {
+				// 1.14 method
+				org.bukkit.block.data.BlockData bs = event.getBlock().getState().getBlockData();
+				if(bs instanceof org.bukkit.block.data.type.WallSign) {
+					facing = ((org.bukkit.block.data.type.WallSign) bs).getFacing();
+				} else if(bs instanceof org.bukkit.block.data.type.Sign) {
+					facing = ((org.bukkit.block.data.type.Sign) bs).getRotation();
+				}
+			}
 			if(thirdLine == null || thirdLine.isEmpty()) {
-				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), facing, null);
 				plugin.message(player, "addsign-success", region);
 			} else {
-				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
+				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), facing, thirdLine);
 				plugin.message(player, "addsign-successProfile", thirdLine, region);
 			}
 

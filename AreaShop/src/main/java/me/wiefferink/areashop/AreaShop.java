@@ -19,8 +19,6 @@ import me.wiefferink.bukkitdo.Do;
 import me.wiefferink.interactivemessenger.processing.Message;
 import me.wiefferink.interactivemessenger.source.LanguageManager;
 import net.milkbowl.vault.economy.Economy;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -38,6 +36,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -300,7 +300,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				worldEditInterface = (WorldEditInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
 			}
 		} catch(final Exception e) {
-			error("Could not load the handler for WorldEdit (tried to load " + weVersion + "), report this problem to the author: " + ExceptionUtils.getStackTrace(e));
+			error(e, "Could not load the handler for WorldEdit (tried to load " + weVersion + "), report this problem to the author: ");
 			error = true;
 			weVersion = null;
 		}
@@ -313,7 +313,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				worldGuardInterface = (WorldGuardInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
 			}
 		} catch(final Exception e) {
-			error("Could not load the handler for WorldGuard (tried to load " + wgVersion + "), report this problem to the author:" + ExceptionUtils.getStackTrace(e));
+			error(e, "Could not load the handler for WorldGuard (tried to load " + wgVersion + "), report this problem to the author:");
 			error = true;
 			wgVersion = null;
 		}
@@ -768,7 +768,11 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public static void debug(Object... message) {
 		if(AreaShop.getInstance().debug) {
-			info("Debug: " + StringUtils.join(message, " "));
+			StringJoiner list = new StringJoiner(" ");
+			for(Object o : message) {
+				list.add(o.toString());
+			}
+			info("Debug: " + list.toString());
 		}
 	}
 
@@ -778,7 +782,11 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	@Override
 	public void debugI(Object... message) {
-		AreaShop.debug(StringUtils.join(message, " "));
+		StringJoiner list = new StringJoiner(" ");
+		for(Object o : message) {
+			list.add(o.toString());
+		}
+		AreaShop.debug(list.toString());
 	}
 
 	/**
@@ -786,7 +794,11 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * @param message The message to print
 	 */
 	public static void info(Object... message) {
-		AreaShop.getInstance().getLogger().info(StringUtils.join(message, " "));
+		StringJoiner list = new StringJoiner(" ");
+		for(Object o : message) {
+			list.add(o.toString());
+		}
+		AreaShop.getInstance().getLogger().info(list.toString());
 	}
 
 	/**
@@ -794,7 +806,24 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * @param message The message to print
 	 */
 	public static void warn(Object... message) {
-		AreaShop.getInstance().getLogger().warning(StringUtils.join(message, " "));
+		StringJoiner list = new StringJoiner(" ");
+		for(Object o : message) {
+			list.add(o.toString());
+		}
+		AreaShop.getInstance().getLogger().warning(list.toString());
+	}
+
+	/**
+	 * Print a warning to the console.
+	 * @param t Stacktrace
+	 * @param message The message to print
+	 */
+	public static void warn(Throwable t, Object... message) {
+		StringJoiner list = new StringJoiner(" ");
+		for(Object o : message) {
+			list.add(o.toString());
+		}
+		AreaShop.getInstance().getLogger().log(Level.WARNING, list.toString(), t);
 	}
 
 	/**
@@ -802,7 +831,24 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 * @param message The message to print
 	 */
 	public static void error(Object... message) {
-		AreaShop.getInstance().getLogger().severe(StringUtils.join(message, " "));
+		StringJoiner list = new StringJoiner(" ");
+		for(Object o : message) {
+			list.add(o.toString());
+		}
+		AreaShop.getInstance().getLogger().severe(list.toString());
+	}
+
+	/**
+	 * Print an error to the console.
+	 * @param t Stacktrace
+	 * @param message The message to print
+	 */
+	public static void error(Throwable t, Object... message) {
+		StringJoiner list = new StringJoiner(" ");
+		for(Object o : message) {
+			list.add(o.toString());
+		}
+		AreaShop.getInstance().getLogger().log(Level.SEVERE, list.toString(), t);
 	}
 
 	/**
@@ -811,7 +857,11 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public static void debugTask(Object... message) {
 		if(AreaShop.getInstance().getConfig().getBoolean("debugTask")) {
-			AreaShop.debug(StringUtils.join(message, " "));
+			StringJoiner list = new StringJoiner(" ");
+			for(Object o : message) {
+				list.add(o.toString());
+			}
+			AreaShop.debug(list.toString());
 		}
 	}
 

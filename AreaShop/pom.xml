@@ -19,7 +19,7 @@
             <artifactId>craftbukkit</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/craftbukkit-1.7.9-R0.2-SNAPSHOT.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/spigot-api-1.13.1-R0.1-SNAPSHOT.jar</systemPath>
             <type>jar</type>
             <optional>true</optional>
         </dependency>
@@ -150,6 +150,14 @@
             <artifactId>bstats-bukkit</artifactId>
             <version>1.1</version>
         </dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
     </dependencies>
 
     <profiles>

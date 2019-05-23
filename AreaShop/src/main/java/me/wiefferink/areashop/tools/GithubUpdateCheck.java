@@ -1,11 +1,11 @@
 package me.wiefferink.areashop.tools;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
+//import com.google.gson.Gson;
+//import com.google.gson.GsonBuilder;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +13,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Arrays;
+import java.util.StringJoiner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GithubUpdateCheck {
@@ -110,7 +111,7 @@ public class GithubUpdateCheck {
 						try(BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
 							String response = reader.readLine();
 							debug("Response:", response);
-
+							//gson.fromJson(response, );
 							JSONObject latestRelease = (JSONObject)JSONValue.parse(response);
 
 							if(latestRelease.isEmpty()) {
@@ -126,12 +127,12 @@ public class GithubUpdateCheck {
 
 							// Current version
 							debug("Plugin version:", currentVersion);
-
 							// Compare version
 							hasUpdate = versionComparator.isNewer(latestVersion, currentVersion);
+
 						}
 					} catch(IOException e) {
-						logger.severe("Failed to get latest release:" + ExceptionUtils.getStackTrace(e));
+						logger.log(Level.SEVERE, "Failed to get latest release:", e);
 						error = true;
 					} catch(ClassCastException e) {
 						logger.info("Unexpected structure of the result, failed to parse it");
@@ -231,21 +232,25 @@ public class GithubUpdateCheck {
 	 */
 	private void debug(Object... message) {
 		if(DEBUG) {
-			logger.info("[" + this.getClass().getSimpleName() + "] [DEBUG] " + StringUtils.join(message, " "));
+			StringJoiner list = new StringJoiner(" ");
+			for(Object o : message) {
+				list.add(o.toString());
+			}
+			logger.info("[" + this.getClass().getSimpleName() + "] [DEBUG] " + list.toString());
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "GithubUpdateCheck(" + StringUtils.join(Arrays.asList(
-				"author=" + author,
-				"repository=" + repository,
-				"plugin=" + plugin.getName(),
-				"checking=" + checking,
-				"hasUpdate=" + hasUpdate,
-				"error=" + error,
-				"currentVersion=" + currentVersion,
-				"latestVersion=" + latestVersion
-		), ", ") + ")";
+		return "GithubUpdateCheck("
+				+ "author=" + author
+				+ "repository=" + repository
+				+ "plugin=" + plugin.getName()
+				+ "checking=" + checking
+				+ "hasUpdate=" + hasUpdate
+				+ "error=" + error
+				+ "currentVersion=" + currentVersion
+				+ "latestVersion=" + latestVersion
+				+ ")";
 	}
 }

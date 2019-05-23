@@ -15,7 +15,6 @@ import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.bukkitdo.Do;
 import me.wiefferink.interactivemessenger.processing.Message;
 import me.wiefferink.interactivemessenger.processing.ReplacementProvider;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -1454,22 +1453,18 @@ public abstract class GeneralRegion implements GeneralRegionInterface, Comparabl
 			command = Message.fromString(command).replacements(this).noLanguageReplacements().getSingle();
 
 			boolean result;
-			String error = null;
-			String stacktrace = null;
+			CommandException e = null;
 			try {
 				result = plugin.getServer().dispatchCommand(sender, command);
-			} catch(CommandException e) {
+			} catch(CommandException ex) {
 				result = false;
-				error = e.getMessage();
-				stacktrace = ExceptionUtils.getStackTrace(e);
+				e = ex;
 			}
 			boolean printed = false;
 			if(!result) {
 				printed = true;
-				if(error != null) {
-					AreaShop.warn("Command execution failed, command=" + command + ", error=" + error + ", stacktrace:");
-					AreaShop.warn(stacktrace);
-					AreaShop.warn("--- End of stacktrace ---");
+				if(e != null) {
+					AreaShop.warn(e, "Command execution failed, command=" + command);
 				} else {
 					AreaShop.warn("Command execution failed, command=" + command);
 				}

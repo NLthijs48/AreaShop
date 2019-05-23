@@ -1,7 +1,5 @@
 package me.wiefferink.areashop.managers;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
@@ -36,6 +34,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -770,8 +769,8 @@ public class FileManager extends Manager {
 		}
 		// Load default.yml from the plugin folder, and as backup the default one
 		try(
-				InputStreamReader custom = new InputStreamReader(new FileInputStream(defaultFile), Charsets.UTF_8);
-				InputStreamReader normal = new InputStreamReader(plugin.getResource(AreaShop.defaultFile), Charsets.UTF_8)
+				InputStreamReader custom = new InputStreamReader(new FileInputStream(defaultFile), Charset.forName("UTF-8"));
+				InputStreamReader normal = new InputStreamReader(plugin.getResource(AreaShop.defaultFile), Charset.forName("UTF-8"))
 		) {
 			defaultConfig = YamlConfiguration.loadConfiguration(custom);
 			if(defaultConfig.getKeys(false).isEmpty()) {
@@ -810,9 +809,9 @@ public class FileManager extends Manager {
 		}
 		// Load config.yml from the plugin folder
 		try(
-				InputStreamReader custom = new InputStreamReader(new FileInputStream(configFile), Charsets.UTF_8);
-				InputStreamReader normal = new InputStreamReader(plugin.getResource(AreaShop.configFile), Charsets.UTF_8);
-				InputStreamReader hidden = new InputStreamReader(plugin.getResource(AreaShop.configFileHidden), Charsets.UTF_8)
+				InputStreamReader custom = new InputStreamReader(new FileInputStream(configFile), Charset.forName("UTF-8"));
+				InputStreamReader normal = new InputStreamReader(plugin.getResource(AreaShop.configFile), Charset.forName("UTF-8"));
+				InputStreamReader hidden = new InputStreamReader(plugin.getResource(AreaShop.configFileHidden), Charset.forName("UTF-8"))
 		) {
 			config = YamlConfiguration.loadConfiguration(custom);
 			if(config.getKeys(false).isEmpty()) {
@@ -848,7 +847,7 @@ public class FileManager extends Manager {
 		File groupFile = new File(groupsPath);
 		if(groupFile.exists() && groupFile.isFile()) {
 			try(
-					InputStreamReader reader = new InputStreamReader(new FileInputStream(groupFile), Charsets.UTF_8)
+					InputStreamReader reader = new InputStreamReader(new FileInputStream(groupFile), Charset.forName("UTF-8"))
 			) {
 				groupsConfig = YamlConfiguration.loadConfiguration(reader);
 			} catch(IOException e) {
@@ -901,7 +900,7 @@ public class FileManager extends Manager {
 				// Load the region file from disk in UTF8 mode
 				YamlConfiguration regionConfig;
 				try(
-						InputStreamReader reader = new InputStreamReader(new FileInputStream(regionFile), Charsets.UTF_8)
+						InputStreamReader reader = new InputStreamReader(new FileInputStream(regionFile), Charset.forName("UTF-8"))
 				) {
 					regionConfig = YamlConfiguration.loadConfiguration(reader);
 					if(regionConfig.getKeys(false).isEmpty()) {
@@ -1046,7 +1045,7 @@ public class FileManager extends Manager {
 				} else {
 					// Move old file
 					try {
-						Files.move(new File(rentPath), new File(oldFolderPath + "rents"));
+						(new File(rentPath)).renameTo(new File(oldFolderPath + "rents"));
 					} catch(Exception e) {
 						AreaShop.warn("  Could not create a backup of '" + rentPath + "', check the file permissions (conversion to next version continues)");
 					}
@@ -1165,7 +1164,7 @@ public class FileManager extends Manager {
 				} else {
 					// Backup current file
 					try {
-						Files.move(new File(buyPath), new File(oldFolderPath + "buys"));
+						(new File(buyPath)).renameTo(new File(oldFolderPath + "buys"));
 					} catch(Exception e) {
 						AreaShop.warn("  Could not create a backup of '" + buyPath + "', check the file permissions (conversion to next version continues)");
 					}
@@ -1254,18 +1253,18 @@ public class FileManager extends Manager {
 
 			// Separate try-catch blocks to try them all individually (don't stop after 1 has failed)
 			try {
-				Files.move(new File(rentPath + ".old"), new File(oldFolderPath + "rents.old"));
+				(new File(rentPath + ".old")).renameTo(new File(oldFolderPath + "rents.old"));
 			} catch(Exception e) {
 				// Ignore
 			}
 			try {
-				Files.move(new File(buyPath + ".old"), new File(oldFolderPath + "buys.old"));
+				(new File(buyPath + ".old")).renameTo(new File(oldFolderPath + "buys.old"));
 			} catch(Exception e) {
 				// Ignore
 			}
 			if(buyFileFound || rentFileFound) {
 				try {
-					Files.move(new File(plugin.getDataFolder() + File.separator + "config.yml"), new File(oldFolderPath + "config.yml"));
+					(new File(plugin.getDataFolder() + File.separator + "config.yml")).renameTo(new File(oldFolderPath + "config.yml"));
 				} catch(Exception e) {
 					// Ignore
 				}

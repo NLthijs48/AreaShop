@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.features.signs;
 
-import com.google.common.base.Objects;
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.tools.Materials;
@@ -11,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Sign that is connected to a region to display information and interact with the region.
@@ -101,12 +102,12 @@ public class RegionSign {
 	 */
 	public Material getMaterial() {
 		String name = getRegion().getConfig().getString("general.signs." + key + ".signType");
-		if ("WALL_SIGN".equals(name)) {
+		if (name.contains("WALL_SIGN")) {
 			return Materials.wallSign;
-		} else if ("SIGN_POST".equals(name) || "SIGN".equals(name)) {
+		} else if (name.contains("SIGN")) {
 			return Materials.floorSign;
 		}
-		return null;
+		return Material.AIR;
 	}
 
 	/**
@@ -139,7 +140,7 @@ public class RegionSign {
 		// Get the lines
 		String[] signLines = new String[4];
 		boolean signEmpty = true;
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < 4; ++i) {
 			signLines[i] = stateConfig.getString("line" + (i + 1));
 			signEmpty &= (signLines[i] == null || signLines[i].isEmpty());
 		}
@@ -152,38 +153,59 @@ public class RegionSign {
 		Sign signState = null;
 		if(!Materials.isSign(block.getType())) {
 			Material signType = getMaterial();
-			block.setType(signType);
-			if(!Materials.isSign(block.getType())) {
-				AreaShop.debug("Setting sign", key, "of region", getRegion().getName(), "failed, could not set sign block back");
+			block.setType(signType == null ? Material.AIR : signType, false);
+			BlockState state = block.getState();
+			if(!(state instanceof Sign)) {
+				AreaShop.error("Setting sign", key, "of region", getRegion().getName(), "failed, could not set sign block back");
 				return false;
 			}
-			signState = (Sign) block.getState();
-			org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
+			signState = (Sign) state;
 			BlockFace signFace = getFacing();
-			if(signFace != null) {
-				signData.setFacingDirection(signFace);
-				signState.setData(signData);
+			if(signState.getData() instanceof org.bukkit.material.Sign) {
+				org.bukkit.material.Sign signData = (org.bukkit.material.Sign) signState.getData();
+				if(signFace != null) {
+					signData.setFacingDirection(signFace);
+					signState.setData(signData);
+				}
+			} else {
+				// 1.14 method
+				block.setType(signType);
+				final org.bukkit.block.data.BlockData bs = block.getState().getBlockData();
+				if(bs instanceof org.bukkit.block.data.type.WallSign) {
+					((org.bukkit.block.data.type.WallSign) bs).setFacing(signFace);
+				} else if(bs instanceof org.bukkit.block.data.type.Sign) {
+					((org.bukkit.block.data.type.Sign) bs).setRotation(signFace);
+				}
+				block.setBlockData(bs);
+				signState = (Sign) block.getState();
 			}
 		}
 		if(signState == null) {
 			signState = (Sign) block.getState();
 		}
 
-		// Save current rotation and type
-		org.bukkit.material.Sign signData = (org.bukkit.material.Sign)signState.getData();
 		if(!regionConfig.isString("general.signs." + key + ".signType")) {
-			String signType = signState.getType().name();
-			if (signType.equals("SIGN")) {
-				signType = "SIGN_POST"; // Save with a backwards-compatible name
-			}
-			getRegion().setSetting("general.signs." + key + ".signType", signType);
+			getRegion().setSetting("general.signs." + key + ".signType", block.getType().name());
 		}
 		if(!regionConfig.isString("general.signs." + key + ".facing")) {
-			getRegion().setSetting("general.signs." + key + ".facing", signData.getFacing().toString());
+			// Save current rotation and type
+			BlockFace facing = null;
+			if(signState.getData() instanceof org.bukkit.material.Sign) {
+				facing = ((org.bukkit.material.Sign) block.getState().getData()).getFacing();
+			} else {
+				// 1.14 method
+				org.bukkit.block.data.BlockData bs = signState.getBlockData();
+				if(bs instanceof org.bukkit.block.data.type.WallSign) {
+					facing = ((org.bukkit.block.data.type.WallSign) bs).getFacing();
+				} else if(bs instanceof org.bukkit.block.data.type.Sign) {
+					facing = ((org.bukkit.block.data.type.Sign) bs).getRotation();
+				}
+			}
+			getRegion().setSetting("general.signs." + key + ".facing", facing == null ? "null" : facing.toString());
 		}
 
 		// Apply replacements and color and then set it on the sign
-		for(int i = 0; i < signLines.length; i++) {
+		for(int i = 0; i < signLines.length; ++i) {
 			if(signLines[i] == null) {
 				signState.setLine(i, "");
 				continue;
@@ -207,7 +229,7 @@ public class RegionSign {
 		}
 		ConfigurationSection stateConfig = signConfig.getConfigurationSection(getRegion().getState().getValue().toLowerCase());
 		// Check the lines for the timeleft tag
-		for(int i = 1; i <= 4; i++) {
+		for(int i = 1; i <= 4; ++i) {
 			String line = stateConfig.getString("line" + i);
 			if(line != null && !line.isEmpty() && line.contains(Message.VARIABLE_START + AreaShop.tagTimeLeft + Message.VARIABLE_END)) {
 				return true;
@@ -254,6 +276,9 @@ public class RegionSign {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(key, getRegion().getName());
+		int hash = 7;
+		hash = 41 * hash + Objects.hashCode(getRegion().getName());
+		hash = 41 * hash + Objects.hashCode(this.key);
+		return hash;
 	}
 }

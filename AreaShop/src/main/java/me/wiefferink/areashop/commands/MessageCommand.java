@@ -2,13 +2,13 @@ package me.wiefferink.areashop.commands;
 
 import me.wiefferink.areashop.tools.Utils;
 import me.wiefferink.interactivemessenger.processing.Message;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class MessageCommand extends CommandAreaShop {
 
@@ -43,7 +43,11 @@ public class MessageCommand extends CommandAreaShop {
 
 		String[] messageArgs = new String[args.length - 2];
 		System.arraycopy(args, 2, messageArgs, 0, args.length - 2);
-		String message = StringUtils.join(messageArgs, " ");
+		StringJoiner list = new StringJoiner(" ");
+		for(String s : messageArgs) {
+			list.add(s);
+		}
+		String message = list.toString();
 
 		Message.fromString(message).send(player);
 	}

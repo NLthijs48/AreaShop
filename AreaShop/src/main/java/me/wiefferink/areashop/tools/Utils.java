@@ -9,7 +9,6 @@ import me.wiefferink.areashop.regions.GeneralRegion;
 import me.wiefferink.areashop.regions.RentRegion;
 import me.wiefferink.interactivemessenger.Log;
 import me.wiefferink.interactivemessenger.processing.Message;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -765,7 +764,7 @@ public class Utils {
 		try {
 			result = scriptEngine.eval(input);
 		} catch(ScriptException e) {
-			AreaShop.warn("Price of region", region.getName(), "is set with an invalid expression: '" + input + "', exception:", ExceptionUtils.getStackTrace(e));
+			AreaShop.warn(e, "Price of region", region.getName(), "is set with an invalid expression: '" + input + "', exception:");
 			return 99999999999.0; // High fallback for safety
 		}
 

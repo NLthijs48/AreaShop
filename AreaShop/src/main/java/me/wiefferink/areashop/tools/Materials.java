@@ -54,9 +54,12 @@ public class Materials {
 		} else {
 			result = Material.getMaterial(name);
 		}
+		if (result == null) {
+			result = Material.getMaterial("OAK_" + name);
+		}
 
 		if (result == null) {
-			AreaShop.debug("Materials.get() null result:", name, legacyName);
+			AreaShop.error("Materials.get() null result:", name, legacyName);
 		}
 
 		return result;

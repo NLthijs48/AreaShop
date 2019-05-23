@@ -2,7 +2,6 @@ package me.wiefferink.areashop.commands;
 
 import me.wiefferink.areashop.AreaShop;
 import me.wiefferink.interactivemessenger.processing.Message;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * Abstract class for generalising command classes.
@@ -31,7 +31,11 @@ public abstract class CommandAreaShop {
 	 * @return true if it can execute the command, false otherwise
 	 */
 	public boolean canExecute(Command command, String[] args) {
-		String commandString = command.getName() + " " + StringUtils.join(args, " ");
+		StringJoiner list = new StringJoiner(" ");
+		for(String o : args) {
+			list.add(o);
+		}
+		String commandString = command.getName() + " " + list.toString();
 		if(commandString.length() > getCommandStart().length()) {
 			return commandString.toLowerCase().startsWith(getCommandStart().toLowerCase() + " ");
 		}
@@ -77,7 +81,11 @@ public abstract class CommandAreaShop {
 	 * @return true if confirmed, false if confirmation is required
 	 */
 	public boolean confirm(CommandSender sender, String[] args, Message message) {
-		String command = "/" + getCommandStart() + " " + StringUtils.join(args, " ", 1, args.length);
+		StringJoiner list = new StringJoiner(" ");
+		for(int i = 1; i < args.length; ++i) {
+			list.add(args[i]);
+		}
+		String command = "/" + getCommandStart() + " " + list.toString();
 		long now = System.currentTimeMillis();
 		CommandTime last = lastUsed.get(sender.getName());
 		if(last != null && last.command.equalsIgnoreCase(command) && last.time > (now - 1000 * 60)) {

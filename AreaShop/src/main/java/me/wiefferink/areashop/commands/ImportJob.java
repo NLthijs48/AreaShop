@@ -1,6 +1,5 @@
 package me.wiefferink.areashop.commands;
 
-import com.google.common.base.Charsets;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.wiefferink.areashop.AreaShop;
@@ -24,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -302,7 +302,7 @@ public class ImportJob {
 	 */
 	private YamlConfiguration loadConfiguration(File from) {
 		try(
-				InputStreamReader reader = new InputStreamReader(new FileInputStream(from), Charsets.UTF_8)
+				InputStreamReader reader = new InputStreamReader(new FileInputStream(from), Charset.forName("UTF-8"))
 		) {
 			return YamlConfiguration.loadConfiguration(reader);
 		} catch(IOException e) {

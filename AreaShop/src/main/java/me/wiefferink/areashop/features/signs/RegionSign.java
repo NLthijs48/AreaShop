@@ -96,7 +96,7 @@ public class RegionSign {
 	}
 
 	/**
-	 * Get the material of the sign
+	 * Get the material of the sign.
 	 * @return Material of the sign, normally {@link Material#WALL_SIGN} or {@link Material#SIGN_POST}, but could be something else or null.
 	 */
 	public Material getMaterial() {

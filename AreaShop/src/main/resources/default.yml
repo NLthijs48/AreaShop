@@ -10,7 +10,7 @@ general:
   # The y location within the region to start searching for safe teleport locations (x and z are in the middle of the region).
   # Possible values: 'bottom', 'middle', 'top' or a number indicating an exact y coordinate.
   teleportLocationY: bottom
-  # If true the teleportation algorithm only allows telportation to inside the region, otherwise it will expand
+  # If true the teleportation algorithm only allows teleportation to inside the region, otherwise it will expand
   # a cube from the starting point to check for safe spots (then it could end outside of the region).
   teleportIntoRegion: true
   # Same as above, but then for when you teleport to the sign of a region instead of the region itself.

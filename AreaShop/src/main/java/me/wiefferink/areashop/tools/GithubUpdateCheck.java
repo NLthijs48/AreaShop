@@ -1,7 +1,5 @@
 package me.wiefferink.areashop.tools;
 
-//import com.google.gson.Gson;
-//import com.google.gson.GsonBuilder;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.bukkit.plugin.Plugin;
@@ -111,7 +109,6 @@ public class GithubUpdateCheck {
 						try(BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
 							String response = reader.readLine();
 							debug("Response:", response);
-							//gson.fromJson(response, );
 							JSONObject latestRelease = (JSONObject)JSONValue.parse(response);
 
 							if(latestRelease.isEmpty()) {

@@ -694,6 +694,9 @@ public class RentRegion extends GeneralRegion {
 		// Handle schematic save/restore (while %uuid% is still available)
 		handleSchematicEvent(RegionEvent.UNRENTED);
 
+		// Send message: before actual removal of the renter so that it is still available for variables
+		message(executor, "unrent-unrented");
+
 		// Remove friends, the owner and renteduntil values
 		getFriendsFeature().clearFriends();
 		UUID oldRenter = getRenter();
@@ -701,9 +704,6 @@ public class RentRegion extends GeneralRegion {
 		setRentedUntil(null);
 		setTimesExtended(-1);
 		removeLastActiveTime();
-
-		// Send messages
-		message(executor, "unrent-unrented");
 
 		// Notify about updates
 		this.notifyAndUpdate(new UnrentedRegionEvent(this, oldRenter, Math.max(0, moneyBack)));

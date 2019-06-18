@@ -18,7 +18,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.material.Sign;
 import org.bukkit.util.BlockIterator;
 
 import java.util.HashMap;
@@ -113,12 +112,14 @@ public class SignLinkerManager extends Manager implements Listener {
 				// No regions found within the maximum range
 				plugin.message(player, "linksigns-noRegions");
 			} else if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-				Block block = null;
-				BlockIterator blockIterator = new BlockIterator(player, 100);
-				while(blockIterator.hasNext() && block == null) {
-					Block next = blockIterator.next();
-					if(next.getType() != Material.AIR) {
-						block = next;
+				Block block = event.getClickedBlock();
+				if(block == null) {
+					BlockIterator blockIterator = new BlockIterator(player, 100);
+					while(blockIterator.hasNext() && block == null) {
+						Block next = blockIterator.next();
+						if(next.getType() != Material.AIR) {
+							block = next;
+						}
 					}
 				}
 				if(block == null || !Materials.isSign(block.getType())) {
@@ -131,8 +132,19 @@ public class SignLinkerManager extends Manager implements Listener {
 					plugin.message(player, "linksigns-alreadyRegistered", regionSign.getRegion());
 					return;
 				}
-				Sign sign = (Sign)block.getState().getData();
-				linker.setSign(block.getLocation(), block.getType(), sign.getFacing());
+				BlockFace facing = null;
+				if(block.getState().getData() instanceof org.bukkit.material.Sign) {
+					facing = ((org.bukkit.material.Sign) block.getState().getData()).getFacing();
+				} else {
+					// 1.14 method
+					org.bukkit.block.data.BlockData bs = block.getState().getBlockData();
+					if(bs instanceof org.bukkit.block.data.type.WallSign) {
+						facing = ((org.bukkit.block.data.type.WallSign) bs).getFacing();
+					} else if(bs instanceof org.bukkit.block.data.type.Sign) {
+						facing = ((org.bukkit.block.data.type.Sign) bs).getRotation();
+					}
+				}
+				linker.setSign(block.getLocation(), block.getType(), facing);
 			}
 		}
 	}

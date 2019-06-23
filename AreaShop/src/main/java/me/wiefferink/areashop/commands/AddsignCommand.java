@@ -9,12 +9,12 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.material.Sign;
 import org.bukkit.util.BlockIterator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.bukkit.block.BlockFace;
 
 public class AddsignCommand extends CommandAreaShop {
 
@@ -77,7 +77,6 @@ public class AddsignCommand extends CommandAreaShop {
 			}
 			region = regions.get(0);
 		}
-		Sign sign = (Sign)block.getState().getData();
 		String profile = null;
 		if(args.length > 2) {
 			profile = args[2];
@@ -93,7 +92,19 @@ public class AddsignCommand extends CommandAreaShop {
 			return;
 		}
 
-		region.getSignsFeature().addSign(block.getLocation(), block.getType(), sign.getFacing(), profile);
+		BlockFace facing = null;
+		if(block.getState().getData() instanceof org.bukkit.material.Sign) {
+			facing = ((org.bukkit.material.Sign) block.getState().getData()).getFacing();
+		} else {
+			// 1.14 method
+			org.bukkit.block.data.BlockData bs = block.getState().getBlockData();
+			if(bs instanceof org.bukkit.block.data.type.WallSign) {
+				facing = ((org.bukkit.block.data.type.WallSign) bs).getFacing();
+			} else if(bs instanceof org.bukkit.block.data.type.Sign) {
+				facing = ((org.bukkit.block.data.type.Sign) bs).getRotation();
+			}
+		}
+		region.getSignsFeature().addSign(block.getLocation(), block.getType(), facing, profile);
 		if(profile == null) {
 			plugin.message(sender, "addsign-success", region);
 		} else {

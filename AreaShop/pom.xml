@@ -20,6 +20,7 @@
             <version>1.13-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <!-- InteractiveMessenger library -->

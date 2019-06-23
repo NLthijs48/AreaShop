@@ -18,7 +18,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.material.Sign;
 import org.bukkit.util.BlockIterator;
 
 import java.util.HashMap;
@@ -131,8 +130,7 @@ public class SignLinkerManager extends Manager implements Listener {
 					plugin.message(player, "linksigns-alreadyRegistered", regionSign.getRegion());
 					return;
 				}
-				Sign sign = (Sign)block.getState().getData();
-				linker.setSign(block.getLocation(), block.getType(), sign.getFacing());
+				linker.setSign(block.getLocation(), block.getType(), plugin.getBukkitHandler().getSignFacing(block));
 			}
 		}
 	}

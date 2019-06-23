@@ -9,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.material.Sign;
 import org.bukkit.util.BlockIterator;
 
 import java.util.ArrayList;
@@ -77,7 +76,6 @@ public class AddsignCommand extends CommandAreaShop {
 			}
 			region = regions.get(0);
 		}
-		Sign sign = (Sign)block.getState().getData();
 		String profile = null;
 		if(args.length > 2) {
 			profile = args[2];
@@ -93,7 +91,7 @@ public class AddsignCommand extends CommandAreaShop {
 			return;
 		}
 
-		region.getSignsFeature().addSign(block.getLocation(), block.getType(), sign.getFacing(), profile);
+		region.getSignsFeature().addSign(block.getLocation(), block.getType(), plugin.getBukkitHandler().getSignFacing(block), profile);
 		if(profile == null) {
 			plugin.message(sender, "addsign-success", region);
 		} else {

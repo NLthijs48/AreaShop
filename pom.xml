@@ -50,6 +50,8 @@
 
   <modules>
     <module>areashop-interface</module>
+    <module>areashop-bukkit-1_12</module>
+    <module>areashop-bukkit-1_13</module>
     <module>areashop-worldguard-5</module>
     <module>areashop-worldguard-6</module>
     <module>areashop-worldguard-6_1_3</module>

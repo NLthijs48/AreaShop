@@ -17,9 +17,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <scope>system</scope>
-            <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/craftbukkit-1.7.9-R0.2-SNAPSHOT.jar</systemPath>
+            <version>1.14.2-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <optional>true</optional>
         </dependency>
@@ -58,6 +56,22 @@
         <dependency>
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-interface</artifactId>
+            <version>latest</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Bukkit api implementations -->
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-bukkit-1_12</artifactId>
+            <version>latest</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-bukkit-1_13</artifactId>
             <version>latest</version>
             <type>jar</type>
             <scope>compile</scope>

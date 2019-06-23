@@ -1,5 +1,5 @@
 # Maven stuff
-/target
+target
 
 .project
 .metadata

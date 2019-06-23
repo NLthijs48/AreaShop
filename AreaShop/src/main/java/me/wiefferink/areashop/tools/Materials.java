@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class Materials {
@@ -12,6 +13,35 @@ public class Materials {
 	private Materials() {
 
 	}
+
+	private static final HashSet<String> WALL_SIGN_TYPES = new HashSet<>(Arrays.asList(
+		// 1.14+ types
+		"ACACIA_WALL_SIGN",
+		"BIRCH_WALL_SIGN",
+		"DARK_OAK_WALL_SIGN",
+		"JUNGLE_WALL_SIGN",
+		"OAK_WALL_SIGN",
+		"SPRUCE_WALL_SIGN",
+
+		// Legacy types
+		"LEGACY_WALL_SIGN",
+		"WALL_SIGN"
+	));
+	private static final HashSet<String> FLOOR_SIGN_TYPES = new HashSet<>(Arrays.asList(
+		// 1.14+ types
+		"ACACIA_SIGN",
+		"BIRCH_SIGN",
+		"DARK_OAK_SIGN",
+		"JUNGLE_SIGN",
+		"OAK_SIGN",
+		"SPRUCE_SIGN",
+
+		// Legacy types
+		"LEGACY_SIGN",
+		"LEGACY_SIGN_POST",
+		"SIGN",
+		"SIGN_POST"
+	));
 
 	private static boolean legacyMaterials = false;
 
@@ -29,34 +59,53 @@ public class Materials {
 		}
 	}
 
-	public static final Material wallSign = get("WALL_SIGN");
-	public static final Material floorSign = get("SIGN", "SIGN_POST");
-
 	/**
-	 * Get Material version independent.
-	 * @param name Name in 1.13 and later (uppercase, with underscores)
-	 * @return Material matching the name
+	 * Get material based on a sign material name.
+	 * @param name Name of the sign material
+	 * @return null if not a sign, otherwise the material matching the name (when the material is not available on the current minecraft version, it returns the base type)
 	 */
-	public static Material get(String name) {
-		return get(name, null);
-	}
+	public static Material signNameToMaterial(String name) {
+		// Expected null case
+		if (!isSign(name)) {
+			return null;
+		}
 
-	/**
-	 * Get Material version independent.
-	 * @param name Name in 1.13 and later (uppercase, with underscores)
-	 * @param legacyName Name in 1.12 and earlier (uppercase, with underscores)
-	 * @return Material matching the name
-	 */
-	public static Material get(String name, String legacyName) {
-		Material result;
-		if (legacyMaterials && legacyName != null) {
-			result = Material.getMaterial(legacyName);
+		Material result = null;
+		if (legacyMaterials) {
+			// 1.12 and lower just know SIGN_POST, WALL_SIGN and SIGN
+			if (FLOOR_SIGN_TYPES.contains(name)) {
+				result = Material.getMaterial("SIGN_POST");
+			} else if (WALL_SIGN_TYPES.contains(name)) {
+				result = Material.getMaterial("WALL_SIGN");
+				if (result == null) {
+					result = Material.getMaterial("SIGN");
+				}
+			}
 		} else {
+			// Try saved name (works for wood types on 1.14, regular types for below)
 			result = Material.getMaterial(name);
+			if (result == null) {
+				// Cases for 1.13, which don't know wood types, but need new materials
+				if (FLOOR_SIGN_TYPES.contains(name)) {
+					// SIGN -> OAK_SIGN for 1.14
+					result = Material.getMaterial("OAK_SIGN");
+					// Fallback for 1.13
+					if (result == null) {
+						result = Material.getMaterial("SIGN");
+					}
+				} else if (WALL_SIGN_TYPES.contains(name)) {
+					// WALL_SIGN -> OAK_WALL_SIGN for 1.14
+					result = Material.getMaterial("OAK_WALL_SIGN");
+					// Fallback for 1.13
+					if (result == null) {
+						result = Material.getMaterial("WALL_SIGN");
+					}
+				}
+			}
 		}
 
 		if (result == null) {
-			AreaShop.debug("Materials.get() null result:", name, legacyName);
+			AreaShop.debug("Materials.get() null result:", name, "legacyMaterials:", legacyMaterials);
 		}
 
 		return result;
@@ -68,7 +117,16 @@ public class Materials {
 	 * @return true if the given material is a sign
 	 */
 	public static boolean isSign(Material material) {
-		return material != null && material.name().contains("SIGN");
+		return isSign(material.name());
+	}
+
+	/**
+	 * Check if a Material is a sign (of either the wall or floor type).
+	 * @param name String to check
+	 * @return true if the given material is a sign
+	 */
+	public static boolean isSign(String name) {
+		return name != null && (FLOOR_SIGN_TYPES.contains(name) || WALL_SIGN_TYPES.contains(name));
 	}
 
 }

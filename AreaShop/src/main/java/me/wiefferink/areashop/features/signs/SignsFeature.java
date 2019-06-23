@@ -28,7 +28,6 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.material.Sign;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -116,20 +115,19 @@ public class SignsFeature extends RegionFeature {
 		}
 
 		// Check if still attached to a block
-		Block b = event.getBlock();
-		Sign s = (Sign) b.getState().getData();
-		Block attachedBlock = b.getRelative(s.getAttachedFace());
+		Block attachedBlock = plugin.getBukkitHandler().getSignAttachedTo(event.getBlock());
+		// TODO: signs cannot be placed on all blocks, improve this check to isSolid()?
 		if (attachedBlock.getType() != Material.AIR) {
 			return;
 		}
 
-		// Check if the rent sign is really the same as a saved rent
+		// Check if the sign is really the same as a saved rent
 		RegionSign regionSign = SignsFeature.getSignByLocation(event.getBlock().getLocation());
 		if(regionSign == null) {
 			return;
 		}
 
-		// Remove the sign so that it does not fall on the floor as an item (next region update will place it back)
+		// Remove the sign so that it does not fall on the floor as an item (next region update will place it back when possible)
 		AreaShop.debug("onIndirectSignBreak: Removed block of sign for", regionSign.getRegion().getName(), "at", regionSign.getStringLocation());
 		event.getBlock().setType(Material.AIR);
 		event.setCancelled(true);
@@ -138,34 +136,48 @@ public class SignsFeature extends RegionFeature {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onSignClick(PlayerInteractEvent event) {
 		Block block = event.getClickedBlock();
-		// Check for clicking a sign and rightclicking
-		if((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK)
-				&& Materials.isSign(block.getType())) {
-			// Check if the rent sign is really the same as a saved rent
-			RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
-			if(regionSign == null) {
-				return;
-			}
-			Player player = event.getPlayer();
-			if(plugin.getSignlinkerManager().isInSignLinkMode(player)) {
-				return;
-			}
-			// Get the clicktype
-			GeneralRegion.ClickType clickType = null;
-			if(player.isSneaking() && event.getAction() == Action.LEFT_CLICK_BLOCK) {
-				clickType = GeneralRegion.ClickType.SHIFTLEFTCLICK;
-			} else if(!player.isSneaking() && event.getAction() == Action.LEFT_CLICK_BLOCK) {
-				clickType = GeneralRegion.ClickType.LEFTCLICK;
-			} else if(player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-				clickType = GeneralRegion.ClickType.SHIFTRIGHTCLICK;
-			} else if(!player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-				clickType = GeneralRegion.ClickType.RIGHTCLICK;
-			}
-			// Run the commands
-			boolean ran = regionSign.runSignCommands(player, clickType);
-			// Only cancel event if at least one command has been executed
-			event.setCancelled(ran);
+		if (block == null) {
+			return;
 		}
+
+		// Only listen to left and right clicks on blocks
+		if (!(event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
+			return;
+		}
+
+		// Only care about clicking blocks
+		if(!Materials.isSign(block.getType())) {
+			return;
+		}
+
+		// Check if this sign belongs to a region
+		RegionSign regionSign = SignsFeature.getSignByLocation(block.getLocation());
+		if(regionSign == null) {
+			return;
+		}
+
+		// Ignore players that are in sign link mode (which will handle the event itself)
+		Player player = event.getPlayer();
+		if(plugin.getSignlinkerManager().isInSignLinkMode(player)) {
+			return;
+		}
+
+		// Get the clicktype
+		GeneralRegion.ClickType clickType = null;
+		if(player.isSneaking() && event.getAction() == Action.LEFT_CLICK_BLOCK) {
+			clickType = GeneralRegion.ClickType.SHIFTLEFTCLICK;
+		} else if(!player.isSneaking() && event.getAction() == Action.LEFT_CLICK_BLOCK) {
+			clickType = GeneralRegion.ClickType.LEFTCLICK;
+		} else if(player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			clickType = GeneralRegion.ClickType.SHIFTRIGHTCLICK;
+		} else if(!player.isSneaking() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			clickType = GeneralRegion.ClickType.RIGHTCLICK;
+		}
+
+		boolean ran = regionSign.runSignCommands(player, clickType);
+
+		// Only cancel event if at least one command has been executed
+		event.setCancelled(ran);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -278,8 +290,7 @@ public class SignsFeature extends RegionFeature {
 				if(durationSet) {
 					rent.setDuration(thirdLine);
 				}
-				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
-				rent.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				rent.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), plugin.getBukkitHandler().getSignFacing(event.getBlock()), null);
 
 				AddingRegionEvent addingRegionEvent = plugin.getFileManager().addRegion(rent);
 				if (addingRegionEvent.isCancelled()) {
@@ -383,8 +394,7 @@ public class SignsFeature extends RegionFeature {
 				if(priceSet) {
 					buy.setPrice(price);
 				}
-				org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
-				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				buy.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), plugin.getBukkitHandler().getSignFacing(event.getBlock()), null);
 
 				AddingRegionEvent addingRegionEvent = plugin.getFileManager().addRegion(buy);
 				if (addingRegionEvent.isCancelled()) {
@@ -428,12 +438,12 @@ public class SignsFeature extends RegionFeature {
 				}
 				region = regions.get(0);
 			}
-			org.bukkit.material.Sign sign = (org.bukkit.material.Sign)event.getBlock().getState().getData();
+
 			if(thirdLine == null || thirdLine.isEmpty()) {
-				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), null);
+				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), plugin.getBukkitHandler().getSignFacing(event.getBlock()), null);
 				plugin.message(player, "addsign-success", region);
 			} else {
-				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), sign.getFacing(), thirdLine);
+				region.getSignsFeature().addSign(event.getBlock().getLocation(), event.getBlock().getType(), plugin.getBukkitHandler().getSignFacing(event.getBlock()), thirdLine);
 				plugin.message(player, "addsign-successProfile", thirdLine, region);
 			}
 

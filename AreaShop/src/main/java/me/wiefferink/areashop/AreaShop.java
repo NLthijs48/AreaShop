@@ -4,6 +4,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import me.wiefferink.areashop.interfaces.AreaShopInterface;
+import me.wiefferink.areashop.interfaces.BukkitInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import me.wiefferink.areashop.interfaces.WorldGuardInterface;
 import me.wiefferink.areashop.listeners.PlayerLoginLogoutListener;
@@ -54,6 +55,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	private WorldGuardInterface worldGuardInterface = null;
 	private WorldEditPlugin worldEdit = null;
 	private WorldEditInterface worldEditInterface = null;
+	private BukkitInterface bukkitInterface = null;
 	private FileManager fileManager = null;
 	private LanguageManager languageManager = null;
 	private CommandManager commandManager = null;
@@ -294,12 +296,12 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Load WorldEdit
 		try {
-			final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + weVersion);
+			Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + weVersion);
 			// Check if we have a NMSHandler class at that location.
 			if(WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
 				worldEditInterface = (WorldEditInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
 			}
-		} catch(final Exception e) {
+		} catch(Exception e) {
 			error("Could not load the handler for WorldEdit (tried to load " + weVersion + "), report this problem to the author: " + ExceptionUtils.getStackTrace(e));
 			error = true;
 			weVersion = null;
@@ -307,15 +309,33 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Load WorldGuard
 		try {
-			final Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + wgVersion);
+			Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + wgVersion);
 			// Check if we have a NMSHandler class at that location.
 			if(WorldGuardInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldGuardInterface
 				worldGuardInterface = (WorldGuardInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this); // Set our handler
 			}
-		} catch(final Exception e) {
+		} catch(Exception e) {
 			error("Could not load the handler for WorldGuard (tried to load " + wgVersion + "), report this problem to the author:" + ExceptionUtils.getStackTrace(e));
 			error = true;
 			wgVersion = null;
+		}
+
+		// Load Bukkit implementation
+		String bukkitHandler;
+		try {
+			Class.forName("org.bukkit.block.data.type.WallSign");
+			bukkitHandler = "1_13";
+		} catch (ClassNotFoundException e) {
+			bukkitHandler = "1_12";
+		}
+
+		try {
+			Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers.BukkitHandler" + bukkitHandler);
+			bukkitInterface = (BukkitInterface)clazz.getConstructor(AreaShopInterface.class).newInstance(this);
+		} catch (Exception e) {
+			error("Could not load the Bukkit handler (used for sign updates), tried to load:", bukkitHandler + ", report this problem to the author:", ExceptionUtils.getStackTrace(e));
+			error = true;
+			bukkitHandler = null;
 		}
 
 		// Check if Vault is present
@@ -332,10 +352,13 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Print loaded version of WG and WE in debug
 		if(wgVersion != null) {
-			AreaShop.debug("Loaded WorldGuardHandler", wgVersion, "(raw version:" + rawWgVersion + ", major:" + major + ", minor:" + minor + ", fixes:" + fixes + ", build:" + build + ")");
+			AreaShop.debug("Loaded ", wgVersion, "(raw version:" + rawWgVersion + ", major:" + major + ", minor:" + minor + ", fixes:" + fixes + ", build:" + build + ", fawe:" + fawe + ")");
 		}
 		if(weVersion != null) {
-			AreaShop.debug("Loaded WorldEditHandler", weVersion, "(raw version:" + rawWeVersion + ", beta:" + weBeta + ")");
+			AreaShop.debug("Loaded ", weVersion, "(raw version:" + rawWeVersion + ", beta:" + weBeta + ")");
+		}
+		if(bukkitHandler != null) {
+			AreaShop.debug("Loaded BukkitHandler", bukkitHandler);
 		}
 
 		setupLanguageManager();
@@ -548,6 +571,14 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	 */
 	public LanguageManager getLanguageManager() {
 		return languageManager;
+	}
+
+	/**
+	 * Get the BukkitHandler, for sign interactions.
+	 * @return BukkitHandler
+	 */
+	public BukkitInterface getBukkitHandler() {
+		return this.bukkitInterface;
 	}
 
 	/**

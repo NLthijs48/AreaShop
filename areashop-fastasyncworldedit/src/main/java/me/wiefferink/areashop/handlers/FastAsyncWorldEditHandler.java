@@ -4,11 +4,11 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
@@ -16,6 +16,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -63,9 +64,9 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 		// TODO implement using the FastAsyncWorldEdit api to paste async
 		File file = null;
 		ClipboardFormat format = null;
-		for (ClipboardFormat formatOption : ClipboardFormat.values()) {
-			if (new File(rawFile.getAbsolutePath() + "." + formatOption.getExtension()).exists()) {
-				file = new File(rawFile.getAbsolutePath() + "." + formatOption.getExtension());
+		for (ClipboardFormat formatOption : ClipboardFormats.getAll()) {
+			if (new File(rawFile.getAbsolutePath() + "." + formatOption.getPrimaryFileExtension()).exists()) {
+				file = new File(rawFile.getAbsolutePath() + "." + formatOption.getPrimaryFileExtension());
 				format = formatOption;
 			}
 		}
@@ -73,7 +74,7 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 			pluginInterface.getLogger().info("Did not restore region " + regionInterface.getName() + ", schematic file does not exist: " + rawFile.getAbsolutePath());
 			return false;
 		}
-		pluginInterface.debugI("Trying to restore region", regionInterface.getName(), " from file", file.getAbsolutePath(), "with format", format.name());
+		pluginInterface.debugI("Trying to restore region", regionInterface.getName(), " from file", file.getAbsolutePath(), "with format", format.getName());
 
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getName() != null) {
@@ -87,7 +88,7 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 		editSession.enableQueue();
 		ProtectedRegion region = regionInterface.getRegion();
 		// Get the origin and size of the region
-		Vector origin = new Vector(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
+		BlockVector3 origin = BlockVector3.at(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
 
 		// Read the schematic and paste it into the world
 		try(Closer closer = Closer.create()) {
@@ -117,7 +118,7 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 			if(region.getType() != RegionType.CUBOID) {
 				copy.setSourceMask(new Mask() {
 					@Override
-					public boolean test(Vector vector) {
+					public boolean test(BlockVector3 vector) {
 						return region.contains(vector);
 					}
 
@@ -147,11 +148,11 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 	@Override
 	public boolean saveRegionBlocks(File file, GeneralRegionInterface regionInterface) {
 		// TODO implement using the FastAsyncWorldEdit api to save async
-		ClipboardFormat format = ClipboardFormat.STRUCTURE;
+		ClipboardFormat format = ClipboardFormats.findByFile(file);
 		// TODO allow selecting FAWE format in the config? (when enabled you cannot go back to vanilla WorldEdit easily)
 
-		file = new File(file.getAbsolutePath() + "." + format.getExtension());
-		pluginInterface.debugI("Trying to save region", regionInterface.getName(), " to file", file.getAbsolutePath(), "with format", format.name());
+		file = new File(file.getAbsolutePath() + "." + format.getPrimaryFileExtension());
+		pluginInterface.debugI("Trying to save region", regionInterface.getName(), " to file", file.getAbsolutePath(), "with format", format.getName());
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getWorld() != null) {
 			world = BukkitAdapter.adapt(regionInterface.getWorld());

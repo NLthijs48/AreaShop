@@ -26,7 +26,7 @@
             <artifactId>worldedit</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-bukkit-1.13.132.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-bukkit-1.13.178.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>

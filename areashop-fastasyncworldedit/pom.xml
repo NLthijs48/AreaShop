@@ -33,7 +33,7 @@
             <artifactId>worldguard</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-worldguard-legacy-beta-03-dist.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-worldguard-legacy-7.0.0-beta-03-dist.jar</systemPath>
         </dependency>
 
         <dependency>

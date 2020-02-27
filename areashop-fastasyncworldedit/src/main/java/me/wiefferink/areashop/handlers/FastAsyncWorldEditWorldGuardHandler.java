@@ -1,8 +1,8 @@
 package me.wiefferink.areashop.handlers;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -41,7 +41,7 @@ public class FastAsyncWorldEditWorldGuardHandler extends WorldGuardInterface {
 	@Override
 	public Set<ProtectedRegion> getApplicableRegionsSet(Location location) {
 		Set<ProtectedRegion> result = new HashSet<>();
-		com.sk89q.worldedit.Vector vector = new com.sk89q.worldedit.Vector(location.getX(), location.getY(), location.getZ());
+		com.sk89q.worldedit.math.BlockVector3 vector = com.sk89q.worldedit.math.BlockVector3.at(location.getX(), location.getY(), location.getZ());
 		for(ProtectedRegion region : getRegionManager(location.getWorld()).getRegions().values()) {
 			if(region.contains(vector)) {
 				result.add(region);
@@ -134,20 +134,20 @@ public class FastAsyncWorldEditWorldGuardHandler extends WorldGuardInterface {
 
 	@Override
 	public Vector getMinimumPoint(ProtectedRegion region) {
-		BlockVector min = region.getMinimumPoint();
+		BlockVector3 min = region.getMinimumPoint();
 		return new Vector(min.getX(), min.getY(), min.getZ());
 	}
 
 	@Override
 	public Vector getMaximumPoint(ProtectedRegion region) {
-		BlockVector min = region.getMaximumPoint();
+		BlockVector3 min = region.getMaximumPoint();
 		return new Vector(min.getX(), min.getY(), min.getZ());
 	}
 
 	@Override
 	public List<Vector> getRegionPoints(ProtectedRegion region) {
 		List<Vector> result = new ArrayList<>();
-		for (BlockVector2D point : region.getPoints()) {
+		for (BlockVector2 point : region.getPoints()) {
 			result.add(new Vector(point.getX(), 0,point.getZ()));
 		}
 		return result;
@@ -155,6 +155,6 @@ public class FastAsyncWorldEditWorldGuardHandler extends WorldGuardInterface {
 
 	@Override
 	public ProtectedCuboidRegion createCuboidRegion(String name, Vector corner1, Vector corner2) {
-		return new ProtectedCuboidRegion(name, new BlockVector(corner1.getBlockX(), corner1.getBlockY(), corner1.getBlockZ()), new BlockVector(corner2.getBlockX(), corner2.getBlockY(), corner2.getBlockZ()));
+		return new ProtectedCuboidRegion(name, BlockVector3.at(corner1.getBlockX(), corner1.getBlockY(), corner1.getBlockZ()), BlockVector3.at(corner2.getBlockX(), corner2.getBlockY(), corner2.getBlockZ()));
 	}
 }

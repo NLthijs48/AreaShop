@@ -26,14 +26,14 @@
             <artifactId>worldedit</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-bukkit-1.13.132.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-bukkit-1.13.178.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-worldguard-legacy-7.0.0-SNAPSHOT-dist.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-worldguard-legacy-7.0.0-beta-03-dist.jar</systemPath>
         </dependency>
 
         <dependency>

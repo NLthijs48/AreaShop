@@ -41,6 +41,7 @@ permissions:
       areashop.tabcomplete: true
       areashop.setteleportoutsideregion: true
       areashop.find: true
+      areashop.findminimum: true
       areashop.groupadd: true
       areashop.groupdel: true
       areashop.grouplist: true
@@ -187,6 +188,8 @@ permissions:
   areashop.find:
     description: Allows you to teleport to a free region (/as find)
     default: true
+  areashop.findminimum:
+  description: Allows you to teleport to a free region with the region's price being a given minimum (/as findminimum)
   areashop.groupadd:
     description: Allows you to add regions to groups
     default: op

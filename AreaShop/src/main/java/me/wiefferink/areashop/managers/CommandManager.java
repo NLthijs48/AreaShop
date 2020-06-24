@@ -9,6 +9,7 @@ import me.wiefferink.areashop.commands.DelCommand;
 import me.wiefferink.areashop.commands.DelfriendCommand;
 import me.wiefferink.areashop.commands.DelsignCommand;
 import me.wiefferink.areashop.commands.FindCommand;
+import me.wiefferink.areashop.commands.FindMinimumCommand;
 import me.wiefferink.areashop.commands.GroupaddCommand;
 import me.wiefferink.areashop.commands.GroupdelCommand;
 import me.wiefferink.areashop.commands.GroupinfoCommand;
@@ -64,6 +65,7 @@ public class CommandManager extends Manager implements CommandExecutor, TabCompl
 		commands.add(new AddfriendCommand());
 		commands.add(new DelfriendCommand());
 		commands.add(new FindCommand());
+		commands.add(new FindMinimumCommand());
 		commands.add(new ResellCommand());
 		commands.add(new StopresellCommand());
 		commands.add(new SetrestoreCommand());

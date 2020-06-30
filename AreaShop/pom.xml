@@ -15,9 +15,9 @@
     <dependencies>
         <!-- Bukkit, AreaShop aims to support 1.7.9+ -->
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.13-R0.1-SNAPSHOT</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.15.2-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <optional>true</optional>
             <scope>provided</scope>
@@ -43,14 +43,14 @@
             <artifactId>worldedit</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/worldedit-bukkit-7.0.0-beta-04.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/worldedit-bukkit-7.2.0-beta-01.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/worldguard-legacy-7.0.0-beta-02.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/worldguard-bukkit-7.0.4-beta1.jar</systemPath>
         </dependency>
 
         <!-- Interfaces that specific WorldGuard and WorldEdit versions are built against -->
@@ -141,6 +141,11 @@
             <groupId>me.wiefferink</groupId>
             <artifactId>areashop-worldedit-7_beta_4</artifactId>
             <version>latest</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>
@@ -288,7 +293,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

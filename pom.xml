@@ -39,6 +39,14 @@
 	  <id>CodeMC</id>
 	  <url>https://repo.codemc.org/repository/maven-public</url>
 	</repository>
+    <repository>
+        <id>sk89q-repo</id>
+        <url>https://maven.enginehub.org/repo/</url>
+    </repository>
+    <repository>
+        <id>spigot-repo</id>
+        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>	
   </repositories>
 
   <properties>
@@ -61,6 +69,7 @@
     <module>areashop-worldedit-6</module>
     <module>areashop-worldedit-7_beta_1</module>
     <module>areashop-worldedit-7_beta_4</module>
+    <module>areashop-worldedit-7_2_0_beta</module>
     <module>areashop-fastasyncworldedit</module>
     <module>AreaShop</module>
   </modules>

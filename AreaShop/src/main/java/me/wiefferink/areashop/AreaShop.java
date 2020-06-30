@@ -301,8 +301,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Load WorldEdit
 		try {
-			Bukkit.getLogger().log(Level.INFO, "Version Debug: " + weVersion); //WorldEditHandler7_beta_1
-			Bukkit.getLogger().log(Level.INFO, "Beta Debug: " + rawWgVersion); //WorldEditHandler7_beta_1
 			Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + weVersion);
 			// Check if we have a NMSHandler class at that location.
 			if(WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
@@ -316,8 +314,6 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Load WorldGuard
 		try {
-			Bukkit.getLogger().log(Level.INFO, "Version Debug: " + wgVersion); //WorldGuardHandler7_beta_1
-			Bukkit.getLogger().log(Level.INFO, "Raw Version Debug: " + rawWgVersion); //7.0.4-beta1
 			Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + wgVersion);
 			// Check if we have a NMSHandler class at that location.
 			if(WorldGuardInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldGuardInterface

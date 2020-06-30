@@ -112,6 +112,13 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-worldguard-7_0_4_beta1</artifactId>
+            <version>latest</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- WorldEdit implementations -->
         <dependency>

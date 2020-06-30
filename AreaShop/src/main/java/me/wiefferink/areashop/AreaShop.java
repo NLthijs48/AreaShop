@@ -253,12 +253,14 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					} else {
 						wgVersion = "6_1_3";
 					}
-				} else if ("beta-01".equalsIgnoreCase(weBeta)) {
+				} else if (worldGuard.getDescription().getVersion().startsWith("7.0.0") && "beta-01".equalsIgnoreCase(weBeta)) {
 					// When using WorldEdit beta-01, we need to use the WorldGuard variant with the old vector system
 					wgVersion = "7_beta_1";
-				} else {
+				} else if (worldGuard.getDescription().getVersion().startsWith("7.0.0") && "beta-02".equalsIgnoreCase(weBeta)) {
 					// Even though the WorldGuard file is called beta-02, the reported version is still beta-01!
 					wgVersion = "7_beta_2";
+				} else {
+					wgVersion = "7_0_4_beta1";
 				}
 			} catch(Exception e) { // If version detection fails, at least try to load the latest version
 				warn("Parsing the WorldGuard version failed, assuming version 7_beta_2:", rawWgVersion);
@@ -300,7 +302,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 		// Load WorldEdit
 		try {
 			Bukkit.getLogger().log(Level.INFO, "Version Debug: " + weVersion); //WorldEditHandler7_beta_1
-			Bukkit.getLogger().log(Level.INFO, "Beta Debug: " + weBeta); //WorldEditHandler7_beta_1
+			Bukkit.getLogger().log(Level.INFO, "Beta Debug: " + rawWgVersion); //WorldEditHandler7_beta_1
 			Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + weVersion);
 			// Check if we have a NMSHandler class at that location.
 			if(WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface
@@ -314,6 +316,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Load WorldGuard
 		try {
+			Bukkit.getLogger().log(Level.INFO, "Version Debug: " + wgVersion); //WorldGuardHandler7_beta_1
+			Bukkit.getLogger().log(Level.INFO, "Raw Version Debug: " + rawWgVersion); //7.0.4-beta1
 			Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + wgVersion);
 			// Check if we have a NMSHandler class at that location.
 			if(WorldGuardInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldGuardInterface

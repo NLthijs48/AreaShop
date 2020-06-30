@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -175,11 +176,13 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 				weVersion = "5";
 			} else if(worldEdit.getDescription().getVersion().startsWith("6.")) {
 				weVersion = "6";
-			} else if ("beta-01".equalsIgnoreCase(weBeta)) {
+			} else if (worldEdit.getDescription().getVersion().startsWith("7.0.0") && "beta-01".equalsIgnoreCase(weBeta)) {
 				weVersion = "7_beta_1";
-			} else {
+			} else if (worldEdit.getDescription().getVersion().startsWith("7.0.0") && "beta-04".equalsIgnoreCase(weBeta)) {
 				// beta-02 and beta-03 also have the new vector system already
 				weVersion = "7_beta_4";
+			} else if (worldEdit.getDescription().getVersion().startsWith("7.2.0")) {
+				weVersion = "7_2_0_beta";
 			}
 
 			weVersion = "WorldEditHandler" + weVersion;
@@ -296,6 +299,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 
 		// Load WorldEdit
 		try {
+			Bukkit.getLogger().log(Level.INFO, "Version Debug: " + weVersion); //WorldEditHandler7_beta_1
+			Bukkit.getLogger().log(Level.INFO, "Beta Debug: " + weBeta); //WorldEditHandler7_beta_1
 			Class<?> clazz = Class.forName("me.wiefferink.areashop.handlers." + weVersion);
 			// Check if we have a NMSHandler class at that location.
 			if(WorldEditInterface.class.isAssignableFrom(clazz)) { // Make sure it actually implements WorldEditInterface

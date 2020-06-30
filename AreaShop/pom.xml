@@ -15,11 +15,9 @@
     <dependencies>
         <!-- Bukkit, AreaShop aims to support 1.7.9+ -->
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
             <version>1.15.2-R0.1-SNAPSHOT</version>
-            <type>jar</type>
-            <optional>true</optional>
             <scope>provided</scope>
         </dependency>
 
@@ -143,9 +141,11 @@
             <version>latest</version>
         </dependency>
         <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>7.2.0-SNAPSHOT</version>
+            <groupId>me.wiefferink</groupId>
+            <artifactId>areashop-worldedit-7_2_0_beta</artifactId>
+            <version>latest</version>
+            <type>jar</type>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>me.wiefferink</groupId>

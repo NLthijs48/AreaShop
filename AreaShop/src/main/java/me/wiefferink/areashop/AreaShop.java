@@ -65,7 +65,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 	private boolean debug = false;
 	private List<String> chatprefix = null;
 	private boolean ready = false;
-//	private GithubUpdateCheck githubUpdateCheck = null;
+	// private GithubUpdateCheck githubUpdateCheck = null;
 
 	// Folders and file names
 	public static final String languageFolder = "lang";
@@ -391,37 +391,37 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			registerDynamicPermissions();
 
 			// Don't initialize the updatechecker if disabled in the config
-//			if(getConfig().getBoolean("checkForUpdates")) {
-//				githubUpdateCheck = new GithubUpdateCheck(
-//						AreaShop.getInstance(),
-//						"NLThijs48",
-//						"AreaShop"
-//				).withVersionComparator((latestVersion, currentVersion) ->
-//						!cleanVersion(latestVersion).equals(cleanVersion(currentVersion))
-//				).checkUpdate(result -> {
-//					AreaShop.debug("Update check result:", result);
-//					if(!result.hasUpdate()) {
-//						return;
-//					}
-//
-//					AreaShop.info("Update from AreaShop V" + cleanVersion(result.getCurrentVersion()) + " to AreaShop V" + cleanVersion(result.getLatestVersion()) + " available, get the latest version at https://www.spigotmc.org/resources/areashop.2991/");
-//					for(Player player : Utils.getOnlinePlayers()) {
-//						notifyUpdate(player);
-//					}
-//				});
-//			}
+			//			if(getConfig().getBoolean("checkForUpdates")) {
+			//				githubUpdateCheck = new GithubUpdateCheck(
+			//						AreaShop.getInstance(),
+			//						"NLThijs48",
+			//						"AreaShop"
+			//				).withVersionComparator((latestVersion, currentVersion) ->
+			//						!cleanVersion(latestVersion).equals(cleanVersion(currentVersion))
+			//				).checkUpdate(result -> {
+			//					AreaShop.debug("Update check result:", result);
+			//					if(!result.hasUpdate()) {
+			//						return;
+			//					}
+			//
+			//					AreaShop.info("Update from AreaShop V" + cleanVersion(result.getCurrentVersion()) + " to AreaShop V" + cleanVersion(result.getLatestVersion()) + " available, get the latest version at https://www.spigotmc.org/resources/areashop.2991/");
+			//					for(Player player : Utils.getOnlinePlayers()) {
+			//						notifyUpdate(player);
+			//					}
+			//				});
+			//			}
 		}
 	}
 
-//	/**
-//	 * Notify a player about an update if he wants notifications about it and an update is available.
-//	 * @param sender CommandSender to notify
-//	 */
-//	public void notifyUpdate(CommandSender sender) {
-//		if(githubUpdateCheck != null && githubUpdateCheck.hasUpdate() && sender.hasPermission("areashop.notifyupdate")) {
-//			AreaShop.getInstance().message(sender, "update-playerNotify", cleanVersion(githubUpdateCheck.getCurrentVersion()), cleanVersion(githubUpdateCheck.getLatestVersion()));
-//		}
-//	}
+	//	/**
+	//	 * Notify a player about an update if he wants notifications about it and an update is available.
+	//	 * @param sender CommandSender to notify
+	//	 */
+	//	public void notifyUpdate(CommandSender sender) {
+	//		if(githubUpdateCheck != null && githubUpdateCheck.hasUpdate() && sender.hasPermission("areashop.notifyupdate")) {
+	//			AreaShop.getInstance().message(sender, "update-playerNotify", cleanVersion(githubUpdateCheck.getCurrentVersion()), cleanVersion(githubUpdateCheck.getLatestVersion()));
+	//		}
+	//	}
 
 	/**
 	 * Cleanup a version number.

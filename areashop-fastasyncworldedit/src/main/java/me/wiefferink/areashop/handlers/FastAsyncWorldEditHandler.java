@@ -4,11 +4,11 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
@@ -16,6 +16,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -27,6 +28,7 @@ import me.wiefferink.areashop.interfaces.GeneralRegionInterface;
 import me.wiefferink.areashop.interfaces.WorldEditInterface;
 import me.wiefferink.areashop.interfaces.WorldEditSelection;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.io.BufferedInputStream;
@@ -63,9 +65,9 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 		// TODO implement using the FastAsyncWorldEdit api to paste async
 		File file = null;
 		ClipboardFormat format = null;
-		for (ClipboardFormat formatOption : ClipboardFormat.values()) {
-			if (new File(rawFile.getAbsolutePath() + "." + formatOption.getExtension()).exists()) {
-				file = new File(rawFile.getAbsolutePath() + "." + formatOption.getExtension());
+		for (ClipboardFormat formatOption : ClipboardFormats.getAll()) {
+			if (new File(rawFile.getAbsolutePath() + "." + formatOption.getPrimaryFileExtension()).exists()) {
+				file = new File(rawFile.getAbsolutePath() + "." + formatOption.getPrimaryFileExtension());
 				format = formatOption;
 			}
 		}
@@ -73,7 +75,7 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 			pluginInterface.getLogger().info("Did not restore region " + regionInterface.getName() + ", schematic file does not exist: " + rawFile.getAbsolutePath());
 			return false;
 		}
-		pluginInterface.debugI("Trying to restore region", regionInterface.getName(), " from file", file.getAbsolutePath(), "with format", format.name());
+		pluginInterface.debugI("Trying to restore region", regionInterface.getName(), " from file", file.getAbsolutePath(), "with format", format.getName());
 
 		com.sk89q.worldedit.world.World world = null;
 		if(regionInterface.getName() != null) {
@@ -87,7 +89,7 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 		editSession.enableQueue();
 		ProtectedRegion region = regionInterface.getRegion();
 		// Get the origin and size of the region
-		Vector origin = new Vector(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
+		BlockVector3 origin = BlockVector3.at(region.getMinimumPoint().getBlockX(), region.getMinimumPoint().getBlockY(), region.getMinimumPoint().getBlockZ());
 
 		// Read the schematic and paste it into the world
 		try(Closer closer = Closer.create()) {
@@ -117,7 +119,7 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 			if(region.getType() != RegionType.CUBOID) {
 				copy.setSourceMask(new Mask() {
 					@Override
-					public boolean test(Vector vector) {
+					public boolean test(BlockVector3 vector) {
 						return region.contains(vector);
 					}
 
@@ -147,16 +149,26 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 	@Override
 	public boolean saveRegionBlocks(File file, GeneralRegionInterface regionInterface) {
 		// TODO implement using the FastAsyncWorldEdit api to save async
-		ClipboardFormat format = ClipboardFormat.STRUCTURE;
+		ClipboardFormat format = ClipboardFormats.findByAlias("sponge");
+		if (format == null) {
+			// Sponge format does not exist, try to select another one
+			for (ClipboardFormat otherFormat : ClipboardFormats.getAll()) {
+				format = otherFormat;
+			}
+			if (format == null) {
+				pluginInterface.getLogger().warning("Cannot find a format to save a schematic in, no available formats!");
+				return false;
+			}
+		}
 		// TODO allow selecting FAWE format in the config? (when enabled you cannot go back to vanilla WorldEdit easily)
 
-		file = new File(file.getAbsolutePath() + "." + format.getExtension());
-		pluginInterface.debugI("Trying to save region", regionInterface.getName(), " to file", file.getAbsolutePath(), "with format", format.name());
+		file = new File(file.getAbsolutePath() + "." + format.getPrimaryFileExtension());
+		pluginInterface.debugI("Trying to save region", regionInterface.getName(), " to file", file.getAbsolutePath(), "with format", format.getName());
 		com.sk89q.worldedit.world.World world = null;
-		if(regionInterface.getWorld() != null) {
+		if (regionInterface.getWorld() != null) {
 			world = BukkitAdapter.adapt(regionInterface.getWorld());
 		}
-		if(world == null) {
+		if (world == null) {
 			pluginInterface.getLogger().warning("Did not save region " + regionInterface.getName() + ", world not found: " + regionInterface.getWorldName());
 			return false;
 		}
@@ -169,17 +181,17 @@ public class FastAsyncWorldEditHandler extends WorldEditInterface {
 		ForwardExtentCopy copy = new ForwardExtentCopy(editSession, new CuboidRegion(world, regionInterface.getRegion().getMinimumPoint(), regionInterface.getRegion().getMaximumPoint()), clipboard, regionInterface.getRegion().getMinimumPoint());
 		try {
 			Operations.completeLegacy(copy);
-		} catch(MaxChangedBlocksException e) {
+		} catch (MaxChangedBlocksException e) {
 			pluginInterface.getLogger().warning("Exceeded the block limit while saving schematic of " + regionInterface.getName() + ", limit in exception: " + e.getBlockLimit() + ", limit passed by AreaShop: " + pluginInterface.getConfig().getInt("maximumBlocks"));
 			return false;
 		}
 
-		try(Closer closer = Closer.create()) {
+		try (Closer closer = Closer.create()) {
 			FileOutputStream fos = closer.register(new FileOutputStream(file));
 			BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
 			ClipboardWriter writer = closer.register(format.getWriter(bos));
 			writer.write(clipboard);
-		} catch(IOException e) {
+		} catch (IOException e) {
 			pluginInterface.getLogger().warning("An error occured while saving schematic of " + regionInterface.getName() + ", enable debug to see the complete stacktrace");
 			pluginInterface.debugI(ExceptionUtils.getStackTrace(e));
 			return false;

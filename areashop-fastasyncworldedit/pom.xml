@@ -15,8 +15,8 @@
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.13-R0.1-SNAPSHOT</version>
+            <artifactId>bukkit</artifactId>
+            <version>1.15-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
             <optional>true</optional>
@@ -26,14 +26,14 @@
             <artifactId>worldedit</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-bukkit-1.13.132.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-1.16-288.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
             <scope>system</scope>
             <version>any</version>
-            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-worldguard-legacy-7.0.0-SNAPSHOT-dist.jar</systemPath>
+            <systemPath>${project.basedir}/../dependencies/FastAsyncWorldEdit-worldguard-bukkit-7.0.4-beta1.jar</systemPath>
         </dependency>
 
         <dependency>

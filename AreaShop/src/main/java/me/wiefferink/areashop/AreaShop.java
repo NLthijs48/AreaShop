@@ -161,27 +161,32 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 			error("WorldEdit plugin is not present or has not loaded correctly");
 			error = true;
 		} else {
-			worldEdit = (WorldEditPlugin)plugin;
-			rawWeVersion = worldEdit.getDescription().getVersion();
-
-			// Find beta version
-			Pattern pattern = Pattern.compile("beta-?\\d+");
-			Matcher matcher = pattern.matcher(rawWeVersion);
-			if (matcher.find()) {
-				weBeta = matcher.group();
-			}
-
-			// Get correct WorldEditInterface (handles things that changed version to version)
-			if(worldEdit.getDescription().getVersion().startsWith("5.")) {
-				weVersion = "5";
-			} else if(worldEdit.getDescription().getVersion().startsWith("6.")) {
-				weVersion = "6";
-			} else if (worldEdit.getDescription().getVersion().startsWith("7.0.0") && "beta-01".equalsIgnoreCase(weBeta)) {
-				weVersion = "7_beta_1";
-			} else if (worldEdit.getDescription().getVersion().startsWith("7.0.0") && "beta-04".equalsIgnoreCase(weBeta)) {
-				// beta-02 and beta-03 also have the new vector system already
-				weVersion = "7_beta_4";
-			} else if (worldEdit.getDescription().getVersion().startsWith("7.2.0")) {
+			try {
+				worldEdit = (WorldEditPlugin)plugin;
+				rawWeVersion = worldEdit.getDescription().getVersion();
+	
+				// Find beta version
+				Pattern pattern = Pattern.compile("beta-?\\d+");
+				Matcher matcher = pattern.matcher(rawWeVersion);
+				if (matcher.find()) {
+					weBeta = matcher.group();
+				}
+	
+				// Get correct WorldEditInterface (handles things that changed version to version)
+				if(worldEdit.getDescription().getVersion().startsWith("5.")) {
+					weVersion = "5";
+				} else if(worldEdit.getDescription().getVersion().startsWith("6.")) {
+					weVersion = "6";
+				} else if (worldEdit.getDescription().getVersion().startsWith("7.0.0") && "beta-01".equalsIgnoreCase(weBeta)) {
+					weVersion = "7_beta_1";
+				} else if (worldEdit.getDescription().getVersion().startsWith("7.0.0") && "beta-04".equalsIgnoreCase(weBeta)) {
+					// beta-02 and beta-03 also have the new vector system already
+					weVersion = "7_beta_4";
+				} else if (worldEdit.getDescription().getVersion().startsWith("7.2.0")) {
+					weVersion = "7_2_0_beta";
+				}
+			} catch (Exception e) { // If version detection fails, at least try to load the latest version
+				warn("Parsing the WorldEdit version failed, assuming version 7_2_0: ", rawWeVersion);
 				weVersion = "7_2_0_beta";
 			}
 
@@ -263,8 +268,8 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					wgVersion = "7_0_4_beta1";
 				}
 			} catch(Exception e) { // If version detection fails, at least try to load the latest version
-				warn("Parsing the WorldGuard version failed, assuming version 7_beta_2:", rawWgVersion);
-				wgVersion = "7_beta_2";
+				warn("Parsing the WorldGuard version failed, assuming version 7_0_4_beta1: ", rawWgVersion);
+				wgVersion = "7_0_4_beta1";
 			}
 
 			wgVersion = "WorldGuardHandler" + wgVersion;

@@ -184,6 +184,9 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					weVersion = "7_beta_4";
 				} else if (worldEdit.getDescription().getVersion().startsWith("7.2.0")) {
 					weVersion = "7_2_0_beta";
+				} else {
+					warn("Parsing the WorldEdit version failed, assuming version 7.2.0: ", rawWeVersion);
+					weVersion = "7_2_0_beta";
 				}
 			} catch (Exception e) { // If version detection fails, at least try to load the latest version
 				warn("Parsing the WorldEdit version failed, assuming version 7_2_0: ", rawWeVersion);
@@ -266,6 +269,7 @@ public final class AreaShop extends JavaPlugin implements AreaShopInterface {
 					wgVersion = "7_beta_2";
 				} else {
 					wgVersion = "7_0_4_beta1";
+					warn("Parsing the WorldGuard version failed, assuming version 7_0_4_beta1: ", rawWgVersion);
 				}
 			} catch(Exception e) { // If version detection fails, at least try to load the latest version
 				warn("Parsing the WorldGuard version failed, assuming version 7_0_4_beta1: ", rawWgVersion);
